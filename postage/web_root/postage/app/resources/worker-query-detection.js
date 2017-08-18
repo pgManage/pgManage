@@ -374,8 +374,15 @@ function positionFindRange(
                                 intQueryStart = arrExtraSearchWords[i].index;
                                 strFirstWord = arrExtraSearchWords[i].word;
                                 break;
+                            } else if (
+                                arrExtraSearchWords[i].word === 'UPDATE' &&
+	                                arrExtraSearchWords[0].word === 'SET'
+                            ) {
+                                bolDeduced = true;
+                                intQueryStart = arrExtraSearchWords[i].index;
+                                strFirstWord = arrExtraSearchWords[i].word;
+                                break;
                             }
-                            //console.log('\'' + arrExtraSearchWords[i].word + '\'');
                             i += 1;
                         }
 
@@ -629,7 +636,7 @@ function selectionFindRange(strScript, intCursorPos) {
         //'BEGIN', 'DECLARE', 'END'
     ];
     arrDangerousQueryStartKeywords = [
-        'EXECUTE', 'SELECT', 'INSERT', 'UPDATE', 'DELETE', 'TRUNCATE'
+        'EXECUTE', 'SELECT', 'INSERT', 'UPDATE', 'DELETE', 'TRUNCATE', 'SET'
     ];
     arrExtraSearchKeywords = [
         'TO', 'FROM', 'INSERT', 'UPDATE', 'DELETE', 'TRUNCATE'

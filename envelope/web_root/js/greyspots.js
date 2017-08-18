@@ -6094,7 +6094,7 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
     }
 
     function errorJSONToHTML(errorJSON) {
-        console.log(errorJSON);
+        //console.log(errorJSON);
         return '<pre style="word-break: break-all; white-space: pre-wrap;">' +
                     (errorJSON.error_title ?
                         'There was ' +
@@ -7077,7 +7077,7 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
         var strKey = (strSchema + strObject + strColumns + strWhere + strOrd + strLimit + strOffset)
           , intQueryIndex, i, len, currentEntry;
 
-        console.log(strKey, bolClearCache, cacheLedger[strKey]);
+        //console.log(strKey, bolClearCache, cacheLedger[strKey]);
 
         if (bolClearCache) {
             cacheLedger[strKey] = null;
@@ -7139,14 +7139,14 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
             cacheCallbacks[intQueryIndex].push({'callback': callback, 'ready': true});
 
         } else {
-            console.log(strKey);
-            console.log(cacheQueries.length);
+            //console.log(strKey);
+            //console.log(cacheQueries.length);
             cacheQueries.push(strKey);
             cacheCallbacks.push([{'callback': callback, 'ready': true}]);
             cacheResults.push([]);
-            console.log(cacheQueries.length);
+            //console.log(cacheQueries.length);
             intQueryIndex = (cacheQueries.length - 1);
-            console.log(intQueryIndex);
+            //console.log(intQueryIndex);
 
             GS.requestSelectFromSocket(socket, strSchema, strObject, strColumns
                                      , strWhere, strOrd, strLimit, strOffset
@@ -7191,7 +7191,7 @@ GS.encodeForTabDelimited = function (strValue, nullValue) {
 GS.decodeFromTabDelimited = function (strValue, nullValue) {
     'use strict';
     var i, len, strRet = '';
-
+    //console.log(strValue, nullValue);
     if (nullValue === undefined) {
         nullValue = '\\N';
     }
@@ -24644,147 +24644,6 @@ window.addEventListener('design-register-element', function () {
         window.open(location.protocol + '//' + location.host + getRealPath(element) + '' + lineElement.getAttribute('data-name'));
     }
     
-    function fileUpload(element, target) {
-        var templateElement = document.createElement('template');
-        var strHTML;
-        
-        strHTML = ml(function () {/*
-            <gs-page>
-                <gs-header><center><h3>Upload a File</h3></center></gs-header>
-                <gs-body padded>
-                    <form class="upload-form" action="/env/upload" method="POST" target="upload_response_gs_folder"
-                                enctype="multipart/form-data">
-                        <label>File:</label>
-                        <gs-text class="upload-file" name="file_content" type="file"></gs-text>
-                    */});
-        
-        if (element.hasAttribute('upload-choose-file-name')) {
-            strHTML += ml(function () {/*
-                        <br />
-                        <label>File Name:</label>
-                        <gs-text class="upload-name" disabled autocorrect="off" autocapitalize="off" autocomplete="off" spellcheck="false"></gs-text>
-            */});
-        } else {
-            strHTML += ml(function () {/*
-                        <gs-text class="upload-name" hidden></gs-text>
-            */});
-        }
-        
-        strHTML +=  ml(function () {/*
-                        <input class="upload-path" name="file_name" hidden />
-                    </form>
-                    <iframe class="upload-frame" name="upload_response_gs_folder" hidden></iframe>
-                </gs-body>
-                <gs-footer>
-                    <gs-grid>
-                        <gs-block><gs-button dialogclose>Cancel</gs-button></gs-block>
-                        <gs-block><gs-button class="upload-button">Upload File</gs-button></gs-block>
-                    </gs-grid>
-                </gs-footer>
-            </gs-page>
-        */});
-
-        templateElement.innerHTML = strHTML;
-
-        GS.openDialog(templateElement, function () {
-            var dialog = this,
-                formElement = xtag.query(dialog, '.upload-form')[0],
-                fileControl = xtag.query(dialog, '.upload-file')[0],
-                nameControl = xtag.query(dialog, '.upload-name')[0],
-                pathControl = xtag.query(dialog, '.upload-path')[0],
-                uploadButton = xtag.query(dialog, '.upload-button')[0],
-                responseFrame = xtag.query(dialog, '.upload-frame')[0],
-                strFileExtension;
-            
-            // upload existing file
-            uploadButton.addEventListener('click', function(event) {
-                var strFile = fileControl.value
-                  , strName = nameControl.value;
-                
-                //console.log(element.innerPath + nameControl.value);
-                pathControl.setAttribute('value', getPath(element) + nameControl.value + '.' + strFileExtension);
-                
-                if (strName === '' && strFile === '') { // no values (no file and no file name)
-                    GS.msgbox('Error', 'No values in form. Please fill in the form.', 'okonly');
-                    
-                } else if (strFile === '') { // one value missing (no file)
-                    GS.msgbox('Error', 'No file selected. Please select a file using the file input.', 'okonly');
-                    
-                } else if (strName === '') { // one value missing (no file name)
-                    GS.msgbox('Error', 'No value in file path textbox. Please fill in file name textbox.', 'okonly');
-                    
-                } else { // values are filled in submit the form
-                    responseFrame.loadListen = true;
-                    formElement.submit();
-                    GS.addLoader('file-upload', 'Uploading file...');
-                }
-            });
-            
-            fileControl.addEventListener('change', function(event) {
-                var strValue = this.value;
-                
-                strFileExtension = strValue.substring(strValue.lastIndexOf('.') + 1);
-                
-                nameControl.removeAttribute('disabled');
-                nameControl.value = strValue.substring(strValue.lastIndexOf('\\') + 1, strValue.lastIndexOf('.')) || 'filename';
-                nameControl.focus();
-            });
-            
-            nameControl.addEventListener('keydown', function(event) {
-                if (event.keyCode === 13) {
-                    GS.triggerEvent('click', uploadButton);
-                }
-            });
-            
-            // response frame binding
-            responseFrame.addEventListener('load', function (event) {
-                var strResponseText = responseFrame.contentWindow.document.body.textContent,
-                    jsnResponse, strResponse, bolError, strError;
-                
-                if (responseFrame.loadListen === true) {
-                    // get error text
-                    try {
-                        jsnResponse = JSON.parse(strResponseText);
-                        
-                    } catch (err) {
-                        strResponse = strResponseText;
-                    }
-                    
-                    if (strResponse.trim() === 'Upload Succeeded') {
-                        GS.closeDialog(dialog, 'cancel');
-                    } else {
-                        if (jsnResponse) {
-                            if (jsnResponse.stat === true) {
-                                bolError = false;
-                            } else {
-                                bolError = true;
-                                if (jsnResponse.dat && jsnResponse.dat.error) {
-                                    strError = jsnResponse.dat.error;
-                                } else {
-                                    strError = jsnResponse.dat;
-                                }
-                            }
-                        } else {
-                            bolError = true;
-                            strError = strResponse;
-                        }
-                        
-                        // if no error destroy new file popup
-                        if (!bolError) {
-                            GS.closeDialog(dialog, 'cancel');
-                            
-                        // if error open error popup
-                        } else {
-                            GS.msgbox('Error', strError, 'okonly');
-                        }
-                    }
-                    
-                    getData(element);
-                    GS.removeLoader('file-upload');
-                }
-            });
-        });
-    }
     
     // ################################################################################################
     // ############################################# XTAG #############################################
@@ -42022,7 +41881,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 'len': intTotalRecords
             });
 
-            console.log(strRecord);
+            //console.log(strRecord);
 
             // return record html
             return strRecord;
@@ -45044,7 +44903,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // gotta let the user know that an insert is in progress
             addLoader(element, 'data-insert', 'Inserting Data...');
-
+            console.log(strSchema,
+                strObject,
+                strReturn,
+                strPK,
+                strSeq,
+                strInsertData);
             // begin the websocket insert
             GS.requestInsertFromSocket(
                 getSocket(element),
@@ -45405,7 +45269,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 strHashString += (
                     strTemp === '\\N'
                         ? ''
-                        : strTemp
+                        : GS.encodeForTabDelimited(strTemp, '\\N')
                 );
                 i += 1;
             }
@@ -45641,7 +45505,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     strHashString += (
                         strTemp === '\\N'
                             ? ''
-                            : strTemp
+                            : GS.encodeForTabDelimited(strTemp, '\\N')
                     );
                     lock_i += 1;
                 }
@@ -46080,6 +45944,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         ? ""
                         : strTemp
                 );
+                console.log(strTemp, strRecordToHash);
 
                 col_i += 1;
             }

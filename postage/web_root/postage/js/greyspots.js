@@ -1,11 +1,11 @@
 //jslint white:true
 /**
-    
+
     ######## BEFORE UPDATING DATA-HANDLING CODE OR USING THE COALESCE OPERATOR: ######## ~michael
     don't use the pipe-pipe "||" coalesce operator when handling data because if a zero comes to the coalesce (and it is a number 0 and not a string "0") it will be evaluated as false and thus coalesce to the next operand. Whenever you use this operator: be careful of what will be evaluated.
-    
+
     To see this in action run this in your console:
-    
+
     console.log( true      || 'test' );  // logs:  true  (expected)
     console.log( false     || 'test' );  // logs: 'test' (expected)
 
@@ -16,9 +16,9 @@
     console.log(  1        || 'test' );  // logs:  1     (expected)
     console.log( '0'       || 'test' );  // logs: '0'    (expected)
     console.log(  0        || 'test' );  // logs: 'test' (OH NO!!)
-    
+
     here is another demonstration:
-    
+
     console.log( Boolean(true)      );
     console.log( Boolean(false)     );
     console.log( Boolean(null)      );
@@ -27,48 +27,48 @@
     console.log( Boolean( 1)        );
     console.log( Boolean('0')       );
     console.log( Boolean( 0)        ); // zero evaluates to false
-    
-    
+
+
     ######## BEFORE UPDATING FASTCLICK: ######## ~michael
     fastclick (around line 254) has some code added (by michael) to add a feature to fastclick, bring this code to any new version
-    
+
     it also has (around line 123) some code added to an if statement added by joseph:
         if (deviceIsAndroid || deviceIsIOS) {
     as opposed to:
         if (deviceIsAndroid) {
-    
-    
+
+
     ######## BEFORE UPDATING X-TAGS: ######## ~michael and nunzio
     nunzio: the below warning now seems to be outdated
     nunzio: you have to delete '"function"==typeof define&&define.amd?define(X):"undefined"!=typeof module&&module.exports?module.exports=X:' from xtags for electron
     make sure you include the polyfills and make sure that there isn't still a duplicated block of code in the source, if there is remove it, here is how to find out:
-    
+
     do a find in textedit for: "scope.upgradeDocumentTree = nop;" (excluding the quotes of course)
     AND var IMPORT_LINK_TYPE = scope.IMPORT_LINK_TYPE
-    
+
     remove the whole block of code surrounding the second match (it might be the first match but I think it is the second match)
-    
-    
+
+
     ######## ELEMENT REGISTRATION: ######## ~michael
     When registering a custom element:
         1) register it after the "DOMContentLoaded" event has fired. Doing this prevents an issue that we ran into where in some cases (I believe when greyspots.js is cached and you are on yosemite is one case) some elements would be cut off and would disappear.
         2) Use the "methods" for public functions only, private functions should be kept in the "DOMContentLoaded" function. By keeping the functions in there it makes it so that the code for that element is the only code that can run those functions and it prevents these functions for cluttering public namespaces.
         3) Use "'use strict';" from the beginning. If you don't start out with it you might introduce strict mode errors that you don't even know about. Then one day you might decide to put "'use strict';" in there and errors you didn't know about will appear. Some errors might appear when you first move it over and some errors might be disvovered by your users because you didn't test every little feature of the element.
-    
+
     An example:
-    
+
     document.addEventListener('DOMContentLoaded', function () {
         'use strict';
-        
+
         // ### private functions go here ###
         function foobar() {
             // do stuff to "element" here (gs-new-element is the only element that can run this function)
         }
-        
+
         xtag.register('gs-new-element', {
             lifecycle: {
                 'created': function () {
-                    
+
                 }
             },
             events: {},
@@ -78,17 +78,17 @@
             }
         });
     });
-    
+
     ######## PSEUDO ELEMENT WARNING: ######## ~michael
     In firefox I ran into an issue where the undo history of controls in a gs-form (with the attribute "save-while-typing") was being erased. Turns out the issue was caused by a CSS pseudo-element. I was using a pseudo-element for a little box attached to the form to tell the user if the form was waiting to save or saving. By changing the pseudo-element to a real element that I add and remove with Javascript the issue was fixed.
-    
+
     If you want to use a pseudo-element: make sure it doesn't affect the undo history of elements that are children of the element that the pseudo-element is attached to. This issue could have been fixed by now.
-    
-    
-    
+
+
+
     ######## TEMPLATE SHIM: ######## ~michael
     The template polyfill has been changed, DO NOT UPDATE. It is for old browsers, and old browsers don't change so there is should be no need for the polyfill to change.
-    
+
 *//**
  * @license
  * Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
@@ -125,51 +125,51 @@ if (typeof HTMLTemplateElement === 'undefined') {
         while (child = template.firstChild) {
             template.content.appendChild(child);
         }
-        
+
         if (!template.content.children) {
             Object.defineProperty(template.content, 'children', {
                 get: function() {
                     'use strict';
                     var arrChildren = [], i, len, childNodes = this.childNodes;
-                    
+
                     for (i = 0, len = childNodes.length; i < len; i += 1) {
                         if (childNodes[i].nodeType !== 3) {
                             arrChildren.push(childNodes[i]);
                         }
                     }
-                    
+
                     return arrChildren;
                 },
                 configurable: true
             });
         }
-        
+
         //HTMLTemplateElement.bootstrap(template.content);
-        
+
         //console.log(template.content);
-        
+
         // add innerHTML to template
         Object.defineProperty(template, 'innerHTML', {
             get: function() {
                 var o = '', fragment = this.content.cloneNode(true);//,
                     //templates = xtag.toArray(fragment.querySelectorAll(TEMPLATE_TAG)), i, l;
-                
+
                 //for (i = 0, l = templates.length; i < l; i += 1) {
                 //    templates[i].outerHTML = templates[i].outerHTML;
                 //    console.log(templates[i].outerHTML);
                 //}
-                
+
                 for (var e = fragment.firstChild; e; e = e.nextSibling) {
                     o += e.outerHTML || escapeData(e.data);
                 }
-                
+
                 //console.log(o);
-                
+
                 return o;
             },
             set: function(text) {
                 contentDoc.body.innerHTML = text;
-                
+
                 while (this.content.firstChild) {
                     this.content.removeChild(this.content.firstChild);
                 }
@@ -181,18 +181,18 @@ if (typeof HTMLTemplateElement === 'undefined') {
             configurable: true
             //writable: true
         });
-      
+
         // add outerHTML to template
         Object.defineProperty(template, 'outerHTML', {
             get: function () {
                 var openTagText, arrAttr, i, len, innerHTML = this.innerHTML;
-                
+
                 arrAttr = this.attributes;
-                
+
                 for (i = 0, len = arrAttr.length, openTagText = '<template'; i < len; i += 1) { // >
                     openTagText += ' ' + arrAttr[i].nodeName + '="' + encodeHTML(arrAttr[i].value) + '"';
                 }
-                
+
                 return openTagText + '>' + innerHTML + '</template>';
             },
             configurable: true
@@ -206,7 +206,7 @@ if (typeof HTMLTemplateElement === 'undefined') {
     */
     HTMLTemplateElement.bootstrap = function(doc) {
         var templates = doc.querySelectorAll(TEMPLATE_TAG), i, l, t;
-        
+
         for (i = 0, l = templates.length, t; (i < l) && (t = templates[i]); i += 1) {
             if (!GS.findParentTag(t, 'template') && GS.findParentTag(t, 'html')) {
                 HTMLTemplateElement.decorate(t);
@@ -507,21 +507,21 @@ for(var t=e.shadowRoot;t;)m(t),t=t.olderShadowRoot}}function p(e,n){if(g.dom){va
 		case 'video':
 			return true;
 		}
-        
+
         // CODE ADDED BY MICHAEL (added for case when we need to have click for html that we have no control over
         //                          (our example is the contents of an ACE editor need regular clicks but we cant add a "needsclick" to every element in an ACE editor)
         //                       )
         var currentElement = target.parentNode;
-        
+
         // loop through parents and if any of the parents has the "childrenneedsclick" class than return true
         while (currentElement && currentElement.parentNode && currentElement.parentNode.nodeName !== 'HTML') {
             if (currentElement.classList.contains('childrenneedsclick')) {//alert('test');
                 return true;
             }
-            
+
             currentElement = currentElement.parentNode;
         }
-        
+
 		return (/\bneedsclick\b/).test(target.className);
 	};
 
@@ -1096,7 +1096,7 @@ for(var t=e.shadowRoot;t;)m(t),t=t.olderShadowRoot}}function p(e,n){if(g.dom){va
 		module.exports = FastClick.attach;
 		module.exports.FastClick = FastClick;
 	}// else {
-	
+
 	window.FastClick = FastClick;
 	//}
 }());
@@ -1398,7 +1398,7 @@ for(var t=e.shadowRoot;t;)m(t),t=t.olderShadowRoot}}function p(e,n){if(g.dom){va
 //	 */
 //	FastClick.prototype.sendClick = function(targetElement, event) {
 //		var clickEvent, touch;
-//        
+//
 //		// On some Android devices activeElement needs to be blurred otherwise the synthetic click will have no effect (#24)
 //		if (document.activeElement && document.activeElement !== targetElement) {
 //			document.activeElement.blur();
@@ -1625,9 +1625,9 @@ for(var t=e.shadowRoot;t;)m(t),t=t.olderShadowRoot}}function p(e,n){if(g.dom){va
 //	 */
 //	FastClick.prototype.onTouchEnd = function(event) {
 //		var forElement, trackingClickStart, targetTagName, scrollParent, touch, targetElement = this.targetElement;
-//        
+//
 //        //console.trace('TRACE');
-//        
+//
 //		if (!this.trackingClick) {
 //			return true;
 //		}
@@ -1786,26 +1786,26 @@ for(var t=e.shadowRoot;t;)m(t),t=t.olderShadowRoot}}function p(e,n){if(g.dom){va
 //	 */
 //	FastClick.prototype.onClick = function(event) {
 //		var permitted;
-//        
+//
 //		// It's possible for another FastClick-like library delivered with third-party code to fire a click event before FastClick does (issue #44). In that case, set the click-tracking flag back to false and return early. This will cause onTouchEnd to return early.
 //		if (this.trackingClick) {
 //			this.targetElement = null;
 //			this.trackingClick = false;
 //			return true;
 //		}
-//        
+//
 //		// Very odd behaviour on iOS (issue #18): if a submit element is present inside a form and the user hits enter in the iOS simulator or clicks the Go button on the pop-up OS keyboard the a kind of 'fake' click event will be triggered with the submit-type input element as the target.
 //		if (event.target.type === 'submit' && event.detail === 0) {
 //			return true;
 //		}
-//        
+//
 //		permitted = this.onMouse(event);
-//        
+//
 //		// Only unset targetElement if the click is not permitted. This will ensure that the check for !targetElement in onMouse fails and the //browser's click doesn't go through.
 //		if (!permitted) {
 //			this.targetElement = null;
 //		}
-//        
+//
 //		// If clicks are permitted, return true for the action to go through.
 //		return permitted;
 //	};
@@ -2347,7 +2347,7 @@ e+"="+a+";if(arr"+e+"){var "+c+","+g+"=-1,l"+e+"=arr"+e+".length-1;while("+g+"<l
     //      the global namespace
     if (!window.doT) { // && window.module
         window.doT = f;
-        
+
         //window.doT.encodeHTMLSource = module.exports.encodeHTMLSource;
         //window.doT.compile = module.exports.compile;
         //window.doT.templateSettings = module.exports.templateSettings;
@@ -2392,13 +2392,13 @@ function decodeHTML(text) {
     var decode = {
         "&#38;": "&",
         "&amp;": "&",
-        
+
         "&#60;": "<",
         "&#62;": ">",
-        
+
         "&lt;":  "<", // The rose by another name
         "&gt;":  ">", // The rose by another name
-        
+
         "&#34;": '"',
         "&#39;": "'",
         "&#47;": "/"
@@ -2416,9 +2416,9 @@ function decodeHTML(text) {
 // */console.log});
 function ml(func) {
     'use strict';
-    
+
     func = func.toString();
-    
+
     return func.substring(func.indexOf('/*') + 2, func.indexOf('*/'));
 }
 //global window
@@ -2464,11 +2464,11 @@ Description:
     The reason for this is because even though the 'mousedown' event works on a phone it is substantially slower than if you had used 'touchstart',
     But if you used 'touchstart' it wouldn't work on the computer so we wrap both under the name evt.mousedown and only give mobile browsers
     'touchstart' and desktop browsers 'mousedown' so that you dont have to differentiate.
-    
+
 List of variables:
     evt.touchDevice  equals true|false depending on whether or not we are on a touch-enabled devide
     evt.deviceType   equals 'desktop'|'tablet'|'phone' depending on what type of device you are on
-    
+
     evt.mousedown    if we are on a touch device: 'touchstart'  else  'mousedown'
     evt.mouseover    if we are on a touch device: 'touchenter'  else  'mouseover'
     evt.mousemove    if we are on a touch device: 'touchmove'   else  'mousemove'
@@ -2501,13 +2501,13 @@ evt.click     = 'click';
 //Append to greyspots.js after the rsync of the web_root files
 window.addEventListener('load', function () {
     var styleElement, helperElement, helperFunction;
-    
+
     styleElement = document.createElement('style');
     styleElement.innerHTML = 'body, body gs-panel, body gs-panel gs-header, body gs-panel gs-body, ' +
                              'body gs-page, body gs-page gs-header, body gs-page gs-body {\n' +
                              '    background-color: #FFBBBB;\n' +
                              '}';
-    
+
     document.head.appendChild(styleElement);
 });
 */
@@ -2518,15 +2518,15 @@ window.addEventListener('load', function () {
 
 if (window.GS === undefined) {
     window.GS = {};
-    
+
     GS.version = function () {
         'use strict';
         return '1.1.1';
     };
-    
+
     window.addEventListener('design-register-element', function () {
         'use strict';
-        
+
         registerDesignSnippet('GS.version', 'GS.version', 'GS.version();');
     });
 }
@@ -2573,18 +2573,18 @@ if (evt.touchDevice) {
     (function () {
         var startTime, startTouchTop, endTime, endTouchTop, lastTouchTop, currentTouchTop,
             bolCurrentlyMonitoring = false, bolTouchScrollPrevented = false, currentScrollingElement, scrollingLooper;
-        
+
         window.ontouchstart = function(event){
             lastTouchTop = GS.mousePosition(event).top;
         };
-        
+
         //window.addEventListener('scroll', function (event) {
         //    console.log(event);
         //}, true);
-        
+
         window.ontouchmove = function (event) {
             var currentTouchTop = GS.mousePosition(event).top, currentElement = GS.scrollParent(event.target), bolFoundScrollable = Boolean(currentElement);
-            
+
             //console.log(currentElement,
             //            event.target,
             //            bolFoundScrollable,
@@ -2597,25 +2597,25 @@ if (evt.touchDevice) {
             //            currentTouchTop > lastTouchTop,
             //            currentElement.scrollTop + currentElement.clientHeight >= currentElement.scrollHeight,
             //            currentTouchTop < lastTouchTop);
-            
+
             if (bolFoundScrollable === false ||
                 (currentElement.scrollTop <= 0 && currentTouchTop > lastTouchTop) ||
                 (currentElement.scrollTop + currentElement.clientHeight >= currentElement.scrollHeight && currentTouchTop < lastTouchTop)) {
-                
+
                 //console.log('prevent default');
-                
+
                 bolTouchScrollPrevented = true;
                 event.preventDefault();
                 //event.stopPropagation();
-                
+
             } else if (bolFoundScrollable === true && bolTouchScrollPrevented === true) {
                 currentElement.scrollTop += (lastTouchTop - currentTouchTop);
             }
-            
+
             currentScrollingElement = currentElement;
             lastTouchTop = currentTouchTop;
         };
-        
+
         window.ontouchend = function () {
             bolTouchScrollPrevented = false;
         };
@@ -2634,7 +2634,7 @@ GS.database.engine = "postgres";
 // if db is SQL Server: utf16 else utf8
 (function () {
     "use strict";
-    
+
     // get a cookie from the browser
     function getCookie(c_name) {
         var c_value = document.cookie, c_end,
@@ -2661,11 +2661,11 @@ GS.database.engine = "postgres";
     } else { //ss
         GS.database.engine = 'mssqlserver'
     }
-    
+
     if (GS.database.engine === "postgres") {
         GS.database.type.text = "text";
         GS.database.type.timestamp = "timestamptz";
-        
+
     } else if (GS.database.engine === "mssqlserver") {
         GS.database.type.text = "nvarchar(MAX)";
         GS.database.type.timestamp = "datetime";
@@ -2683,23 +2683,23 @@ GS.database.engine = "postgres";
 window.addEventListener('click', function (event) {
     'use strict';
     var labelElement, targetElement;
-    
+
     //console.log(event.target, GS.findParentTag(event.target, 'LABEL'));
-    
+
     if (event.target.nodeName === 'LABEL') {
         labelElement = event.target;
     } else if (GS.findParentTag(event.target, 'LABEL')) {
         labelElement = GS.findParentTag(event.target, 'LABEL');
     }
-    
+
     //console.log(labelElement, labelElement.getAttribute('for'));
-    
+
     if (labelElement && labelElement.hasAttribute('for')) {
         targetElement = document.getElementById(labelElement.getAttribute('for'));
-        
+
         //console.log(targetElement);
         //console.log(targetElement.focus, !targetElement.hasAttribute('disabled'));
-        
+
         if (targetElement && targetElement.focus && !targetElement.hasAttribute('disabled')) {
             targetElement.focus();
         }
@@ -2714,7 +2714,7 @@ window.addEventListener('click', function (event) {
     function aboutDialog() {
         'use strict';
         var templateElement = document.createElement('template');
-        
+
         templateElement.innerHTML = ml(function () {/*
             <gs-page>
                 <gs-header><center><h3>About Envelope</h3></center></gs-header>
@@ -2787,9 +2787,9 @@ window.addEventListener('click', function (event) {
                         <gs-block>
                             <center><h4>3.1.2</h4></center>
                         </gs-block>
-                        
+
                     </gs-grid>
-                    
+
                     <div>
                         All other source code and documentation copyright Workflow Products, LLC. All Rights Reserved.
                         <br /><br />
@@ -2810,15 +2810,15 @@ window.addEventListener('click', function (event) {
                 </gs-footer>
             </gs-page>
         */}).replace(/\{\{DOT\}\}/gi, doT.version);
-        
+
         GS.openDialog(templateElement);
     }
-    
-    
+
+
     window.addEventListener('load', function () {
         'use strict';
         var bolOpen, intMaxHeight, curlElement, menuElement, strPostageUName, strHTML, toggleCurl;
-        
+
         if (window.bolCurl !== false) {
             bolOpen = false;
             intMaxHeight = 0;
@@ -2826,24 +2826,24 @@ window.addEventListener('click', function (event) {
             menuElement = document.createElement('div');
             strPostageUName = GS.getCookie('postage_uname');
             strHTML = '';
-            
+
             curlElement.setAttribute('id', 'gs-document-curl-container');
             curlElement.innerHTML = '<div id="gs-document-curl-part-1"></div>' +
                                     '<div id="gs-document-curl-part-2"></div>' +
                                     '<div id="gs-document-curl-part-3"></div>' +
                                     '<div id="gs-document-curl-part-4"></div>';
-            
+
             document.body.appendChild(curlElement);
-            
+
             if (evt.deviceType === 'phone') {
                 curlElement.setAttribute('style', 'font-size: 1.3em;');
             } else {
                 curlElement.setAttribute('style', 'font-size: 0.7em;');
             }
-            
+
             menuElement.setAttribute('id', 'gs-document-menu-container');
             menuElement.setAttribute('style', 'height: 0px;');
-            
+
             // this is for envelope
             if (location.pathname.indexOf('/env/') === 0) {
                 strHTML += '<center><b><a target="_self" href="/env/app/all/index.html">Back To Main Menu</a></b></center>';
@@ -2852,7 +2852,7 @@ window.addEventListener('click', function (event) {
                                 '<gs-button onclick="GS.userChangePassword()" inline>Change Password</gs-button>' +
                             '</center>';
                 intMaxHeight += 4.8;
-                
+
             // and this is for postage
             } else {
                 strHTML += '<center>' +
@@ -2861,49 +2861,49 @@ window.addEventListener('click', function (event) {
                             '</center>';
                 intMaxHeight += 3.4;
             }
-            
+
             strHTML += '<center><gs-button onclick="GS.showShimmed()" inline>Browser Support</gs-button></center>';
             intMaxHeight += 1.9;
-            
+
             strHTML += '<center><gs-button onclick="window.location.reload(true);" inline>Update Software</gs-button></center>';
             intMaxHeight += 1.9;
-            
+
             if (location.pathname.indexOf('/env/') === 0) {
                 strHTML += '<center><gs-button id="gs-button-about" inline>About</gs-button></center>';
                 intMaxHeight += 1.9;
             }
-            
+
             intMaxHeight += 1;
-            
+
             menuElement.innerHTML = '<div id="gs-document-menu-link-container" style="height: ' + intMaxHeight + 'em;">' + strHTML + '</div>';
             document.body.appendChild(menuElement);
-            
+
             if (location.pathname.indexOf('/env/') === 0) {
                 document.getElementById('gs-button-about').addEventListener('click', aboutDialog);
             }
-            
+
             // define function for toggling the page curl
             toggleCurl = function () {
                 var intFontSize = GS.pxToEm(document.body, window.innerWidth) / 4,
                     intBottomLine = window.innerHeight - (GS.emToPx(document.body, intFontSize)),
                     closedSize = (evt.deviceType === 'phone' ? '1.3em' : '0.7em'); // replace evt.touchDevice with true to test on a desktop
-                
+
                 // maximum bottom line
                 if (GS.pxToEm(document.body, intBottomLine) > intMaxHeight) {
                     intBottomLine = GS.emToPx(document.body, intMaxHeight);
                 }
-                
+
                 //curlElement.classList.add('animating');
                 //menuElement.classList.add('animating');
-                
+
                 if (bolOpen === false) {
                     document.body.insertBefore(GS.stringToElement('<div id="gs-document-curl-modal-background"></div>'), curlElement);
                     document.getElementById('gs-document-curl-modal-background').addEventListener('click', toggleCurl);
-                    
+
                     curlElement.style.fontSize = intFontSize + 'em';
                     curlElement.style.bottom = intBottomLine + 'px';
                     menuElement.style.height = intBottomLine + 'px';
-                    
+
                     //GS.animateStyle(curlElement, 'font-size', closedSize, intFontSize + 'em', function () {
                     //    curlElement.classList.remove('animating');
                     //}, 185, 14);
@@ -2915,15 +2915,15 @@ window.addEventListener('click', function (event) {
                     //GS.animateStyle(menuElement, 'height', '0px', intBottomLine + 'px', function () {
                     //    menuElement.classList.remove('animating');
                     //}, 185, 14);
-                    
+
                     bolOpen = true;
                 } else {
                     document.body.removeChild(document.getElementById('gs-document-curl-modal-background'));
-                    
+
                     curlElement.style.fontSize = closedSize;
                     curlElement.style.bottom = '0px';
                     menuElement.style.height = '0px';
-                    
+
                     //GS.animateStyle(curlElement, 'font-size', intFontSize + 'em', closedSize, function () {
                     //    curlElement.classList.remove('animating');
                     //}, 185, 14);
@@ -2935,11 +2935,11 @@ window.addEventListener('click', function (event) {
                     //GS.animateStyle(menuElement, 'height', intBottomLine + 'px', '0px', function () {
                     //    menuElement.classList.remove('animating');
                     //}, 185, 14);
-                    
+
                     bolOpen = false;
                 }
             };
-            
+
             curlElement.addEventListener('click', toggleCurl);
         }
     });
@@ -2971,11 +2971,11 @@ if ('addEventListener' in document) {
 /*
 HTMLTemplateElement.prototype.contentTemplate = function () {
     'use strict';
-    
+
     if (this.content) {
-        
+
     } else {
-        
+
     }
 };
 */
@@ -2986,7 +2986,7 @@ HTMLTemplateElement.prototype.contentTemplate = function () {
 
 window.addEventListener('design-register-element', function () {
     'use strict';
-    
+
     registerDesignSnippet('GS.showShimmed', 'GS.showShimmed', 'GS.showShimmed();');
 });
 
@@ -2996,37 +2996,37 @@ window.addEventListener('load', function () {
         fn = fn.toString().toLowerCase();   // convert function string and turn all text lowercase
         fn = fn.substring(fn.indexOf('{')); // remove everything up until the first open curly brace
         fn = fn.replace(/ /gim, '');        // remove all spaces
-        
+
         return fn;
     }
-    
+
     function nativeTest(fn) {
         // if there is not function: not native: return false
         if (!fn) {
             return false;
         }
-        
+
         // clean function for native testing
         fn = cleanFunctionForTest(fn);
-        
+
         return fn.indexOf('[nativecode]') > -1 ||                   // if '[nativecode]' is found in the cleaned text: native
                fn === cleanFunctionForTest(document.createElement); // else if the cleaned text matches a native function: native
     }
-    
+
     shimmed.matchesSelector     = !nativeTest(Element.prototype.matchesSelector) &&
                                   !nativeTest(Element.prototype.webkitMatchesSelector) &&
                                   !nativeTest(Element.prototype.mozMatchesSelector) &&
                                   !nativeTest(Element.prototype.msMatchesSelector) &&
                                   !nativeTest(Element.prototype.MSMatchesSelector);
-    
+
     shimmed.MutationObserver    = !nativeTest(window.MutationObserver);
     shimmed.WeakMap             = !nativeTest(window.WeakMap);
     shimmed.registerElement     = !nativeTest(document.registerElement);
     shimmed.DOMTokenList        = !nativeTest(window.DOMTokenList);
     shimmed.HTMLTemplateElement = Boolean(HTMLTemplateElement.bootstrap);
-    
+
     // automated functionality testing
-    
+
     functionality.matchesSelector = false;
     try {
         var bodyElement = document.body
@@ -3035,63 +3035,63 @@ window.addEventListener('load', function () {
                                 || Element.prototype.mozMatchesSelector
                                 || Element.prototype.msMatchesSelector
                                 || Element.prototype.MSMatchesSelector);
-        
+
         functionality.matchesSelector = matchesSelector.apply(bodyElement, ['body']);
-        
+
     } catch (e) {
         functionality.matchesSelector = false;
         functionality.errors.matchesSelector = e;
     }
-    
+
     functionality.MutationObserver = false;
     try {
         var testElement = document.createElement('div'), observer;
-        
+
         observer = new MutationObserver(function(mutations) {
             functionality.MutationObserver = (mutations.length > 0);
         });
-        
+
         observer.observe(testElement, {'childList': true});
         testElement.appendChild(document.createElement('div'));
     } catch (e) {
         functionality.MutationObserver = false;
         functionality.errors.MutationObserver = e;
     }
-    
+
     functionality.WeakMap = false;
     try {
         var testMap = new WeakMap(), testObject = function(){};
-        
+
         testMap.set(testObject, 'asdfasdf');
-        
+
         functionality.WeakMap = (testMap.get(testObject) === 'asdfasdf');
         functionality.WeakMap = (functionality.WeakMap && testMap.has(testObject) === true);
-        
+
         testMap.delete(testObject);
-        
+
         functionality.WeakMap = (functionality.WeakMap && testMap.has(testObject) === false);
-        
+
     } catch (e) {
         functionality.WeakMap = false;
         functionality.errors.WeakMap = e;
     }
-    
+
     functionality.registerElement = false;
     try {
         var prototype = Object.create(HTMLElement.prototype);
         prototype.testmethod = function () { return true; };
         document.registerElement('asdf-test', {'prototype': prototype});
-        
+
         var testElement;
         testElement = document.createElement('asdf-test');
-        
+
         functionality.registerElement = testElement.testmethod();
-        
+
     } catch (e) {
         functionality.registerElement = false;
         functionality.errors.registerElement = e;
     }
-    
+
     functionality.DOMTokenList = false;
     try {
         functionality.DOMTokenList = Boolean(document.body.classList);
@@ -3099,11 +3099,11 @@ window.addEventListener('load', function () {
         functionality.DOMTokenList = false;
         functionality.errors.DOMTokenList = e;
     }
-    
+
     functionality.HTMLTemplateElement = false;
     try {
         var testElement = document.createElement('template');
-        
+
         xtag.register('asdf-test-two', {
             'lifecycle': {
                 'created': function () {
@@ -3113,25 +3113,25 @@ window.addEventListener('load', function () {
                 }
             }
         });
-        
+
         testElement.innerHTML = '<div></div><p></p><asdf-test-two></asdf-test-two>';
-        
+
         functionality.HTMLTemplateElement = (xtag.query(testElement, '.find-me').length === 0);
-        
+
     } catch (e) {
         functionality.HTMLTemplateElement = false;
         functionality.errors.HTMLTemplateElement = e;
     }
-    
+
     // function to show shim and functionality results
     GS.showShimmed = function () {
         var strHTML = '', key, templateElement;
-        
+
         strHTML += '<br />\n' +
                    '<center>This dialog is for developers so that they can determine what technologies this browser supports and what technologies are being implemented manually.</center>\n' +
                    '<br />\n' +
                    '<hr />\n';
-        
+
         for (key in shimmed) {
             strHTML += '<gs-grid reflow-at="450px">\n' +
                        '    <gs-block><center>' + encodeHTML(key) + '</center></gs-block>\n' +
@@ -3144,12 +3144,12 @@ window.addEventListener('load', function () {
                        '</gs-grid>\n' +
                        '<hr />\n';
         }
-        
+
         strHTML += '<br />';
-        
-        
+
+
         templateElement = document.createElement('template');
-        
+
         templateElement.innerHTML = ml(function () {/*
             <gs-page>
                 <gs-header><center><h3>Native Detection</h3></center></gs-header>
@@ -3159,7 +3159,7 @@ window.addEventListener('load', function () {
                 <gs-footer><gs-button dialogclose>Done</gs-button></gs-footer>
             </gs-page>
         */}).replace('{{HTML}}', strHTML);
-        
+
         GS.openDialog(templateElement);
     };
 });
@@ -3171,7 +3171,7 @@ window.addEventListener('load', function () {
 
 window.addEventListener('design-register-element', function () {
     'use strict';
-    
+
     registerDesignSnippet('GS.addUnloadEvent', 'GS.addUnloadEvent', 'GS.addUnloadEvent(function () {' +
                                                                     '    $0' +
                                                                     '});');
@@ -3182,39 +3182,39 @@ window.addEventListener('design-register-element', function () {
     var arrFunctions = [],
         unloadFunction = function () {
             var i, len, ret, current;
-            
+
             for (i = 0, len = arrFunctions.length; i < len; i += 1) {
                 current = arrFunctions[i]();
-                
+
                 if (current && !ret) {
                     ret = current;
                 }
             }
-            
+
             if (ret) {
                 return ret;
             }
         };
-    
+
     window.addEventListener('load', function () {
         if (window.onbeforeunload && window.onbeforeunload !== unloadFunction) {
             console.error('Please use the GS.addUnloadEvent function to run code onbeforeunload.');
         }
     });
-    
+
     GS.addBeforeUnloadEvent = function (functionToCall) {
         if (typeof functionToCall !== 'function') {
             throw new TypeError('GS.addUnloadEvent takes one argument, and it must be a function.');
         }
-        
+
         if (!window.onbeforeunload) {
             window.onbeforeunload = unloadFunction;
-            
+
         } else if (window.onbeforeunload !== unloadFunction) {
             console.error('Please use just the GS.addBeforeUnloadEvent function to run code onbeforeunload.');
             window.onbeforeunload = unloadFunction;
         }
-        
+
         arrFunctions.push(functionToCall);
     };
 })();
@@ -3260,7 +3260,7 @@ code.google.com/p/crypto-js/wiki/License
 // if db is SQL Server: utf16 else utf8
 (function () {
     "use strict";
-    
+
     // get a cookie from the browser
     function getCookie(c_name) {
         var c_value = document.cookie, c_end,
@@ -3361,8 +3361,8 @@ window.addEventListener('design-register-element', function () {
                                                   '    $0\n' +
                                                   '</script>');
     registerDesignSnippet('<link>', '<link>', 'link href="${1}" type="text/css" rel="stylesheet" />');
-    
-    
+
+
     // CSS snippets
     registerDesignSnippet('Curved Borders', 'Curved Borders', '-webkit-border-radius: ${1:50%};\n' +
                                                              '-moz-border-radius: ${1:50%};\n' +
@@ -3384,7 +3384,7 @@ window.addEventListener('design-register-element', function () {
                                                     '-ms-transform: ${1:rotate(42deg)};\n' +
                                                     '-o-transform: ${1:rotate(42deg)};\n' +
                                                     'transform: ${1:rotate(42deg)};');
-    
+
     registerDesignSnippet('Desktop Media Query', 'Desktop Media Query', '@media only screen and (max-width: 5000px) {\n' +
                                                                         '    $0\n' +
                                                                         '}');
@@ -3403,26 +3403,26 @@ window.addEventListener('design-register-element', function () {
                                    '    } else {\n' +
                                    '        GS.ajaxErrorDialog(data);\n' +
                                    '    }\n';
-    
+
     registerDesignSnippet('JSON Ajax', 'JSON Ajax', 'GS.ajaxJSON(\'/env/${1:test.action_ship}\', \'${2:action=ship&id=}\', function (data, error) {\n' +
                                                         strNormalCallbackContent +
                                                     '});');
     registerDesignSnippet('GS.ajaxJSON', 'GS.ajaxJSON', 'GS.ajaxJSON(\'/env/${1:test.action_ship}\', \'${2:action=ship&id=}\', function (data, error) {\n' +
                                                             strNormalCallbackContent +
                                                         '});');
-    
-    
+
+
     registerDesignSnippet('TEXT Ajax', 'TEXT Ajax', 'GS.ajaxText(\'/env/${1:test.action_description}\', \'${2:action=get&id=}\', function (data, error) {\n' +
                                                         strNormalCallbackContent +
                                                     '});');
     registerDesignSnippet('GS.ajaxText', 'GS.ajaxText', 'GS.ajaxText(\'/env/${1:test.action_description}\', \'${2:action=get&id=}\', function (data, error) {\n' +
                                                             strNormalCallbackContent +
                                                         '});');
-    
+
     registerDesignSnippet('PG FUNCTION AJAX', 'PG FUNCTION AJAX', 'GS.ajaxJSON(\'/env/${1:test.action_ship}\', \'${2:action=ship&id=}\', function (data, error) {\n' +
                                                   strNormalCallbackContent +
                                               '});');
-    
+
     registerDesignSnippet('GS.ajaxErrorDialog', 'GS.ajaxErrorDialog', 'GS.ajaxErrorDialog(data,\n' +
               '                   function () {\n' +
               '                       // Try Again Button Callback\n' +
@@ -3432,8 +3432,8 @@ window.addEventListener('design-register-element', function () {
               '                       // Cance Button Callback\n' +
               '                       // if you dont need to do anything when the cancel button is clicked: delete this function\n' +
               '                   });');
-    
-    registerDesignSnippet('GS.dataFetch', 'GS.dataFetch', 
+
+    registerDesignSnippet('GS.dataFetch', 'GS.dataFetch',
             'function getData(bolClearPrevious) {\n' +
             '    var data, strLink, dataResultHandler, dataEventFunction;\n' +
             '    \n' +
@@ -3464,7 +3464,7 @@ window.addEventListener('design-register-element', function () {
             '        document.addEventListener(\'dataready_\' + encodeURIComponent(strLink), dataEventFunction);\n' +
             '    }\n' +
             '}');
-    
+
 });
 
 (function () {
@@ -3477,10 +3477,10 @@ window.addEventListener('design-register-element', function () {
         } else {
             return true;
         }
-        
+
         return false;
     }
-    
+
     function ajaxNormalizeError (request) {
         var response = request.response, jsnTemp, jsnRet = {
             'error_title': '',
@@ -3490,46 +3490,46 @@ window.addEventListener('design-register-element', function () {
             'error_context': '',
             'original_response': response
         };
-        
+
         // get error title and error hint
         if (request.bolFrontEndTimeout === true) {
             jsnRet.error_text = 'Front-end Timeout Reached';
             jsnRet.error_title = 'Front-end Timeout Reached';
             jsnRet.error_hint = 'This request took too long. Please report this to a system administrator.';
-            
+
         } else if (response.status === 403) {
             jsnRet.error_title = '403 Link Is Forbidden';
             jsnRet.error_hint = 'You have no permission to use this link. If you need this link contact a system administrator and request permission for this link.';
-            
+
         } else if (response.status === 404) {
             jsnRet.error_title = '404 Link Could Not Be Found';
             jsnRet.error_hint = 'This link does not exist. Please report this to a system administrator.';
-            
+
         } else if (response.status === 408) {
             jsnRet.error_title = '408 Request Took Too Long';
             jsnRet.error_hint = 'This link is broken. Please report this to a system administrator.';
-            
+
         } else if (response.status === 500) {
             jsnRet.error_title = '500 Internal Server Error';
             jsnRet.error_hint = 'This call to the server failed. Please report this to a system administrator.';
-            
+
         } else if (response.status === 502) {
             jsnRet.error_title = '502 Bad Gateway';
             jsnRet.error_hint = 'This link is broken. Please report this to a system administrator.';
-            
+
         } else if (response.status === 504) {
             jsnRet.error_title = '504 Gateway Timeout';
             jsnRet.error_hint = 'This link is broken. Please report this to a system administrator.';
         }
-        
+
         // get error text
         try {
             jsnTemp = JSON.parse(response.responseText || response).dat;
-            
+
             jsnRet.error_text = jsnTemp.error;
             jsnRet.error_file = jsnTemp.filename;
             jsnRet.error_context = jsnTemp.context;
-            
+
             if (!jsnRet.error_text) {
                 jsnRet.error_text = JSON.parse(response.responseText || response).dat;
             }
@@ -3540,20 +3540,20 @@ window.addEventListener('design-register-element', function () {
                 jsnRet.error_text = jsnRet.error_text || response;
             }
         }
-        
+
         jsnRet.error_file = jsnRet.error_file || '';
-        
+
         return jsnRet;
     }
-    
+
     GS.ajaxJSON = function (strLink, strParams, callback, intTimeout) {
         var request = new XMLHttpRequest();
-        
+
         callback = callback || function () {};
-        
+
         request.onreadystatechange = function() {
             var normalizedError;
-            
+
             // if expired cookie: go to login page
             if (request.readyState === 4) {
                 if (request.status === 440) {
@@ -3564,13 +3564,13 @@ window.addEventListener('design-register-element', function () {
                     } catch (e) {
                         //throw e;
                     }
-                    
+
                     if (!ajaxCheckJSONResponseForError(request)) {
                         callback(request.responseJSON);
-                        
+
                     } else {
                         normalizedError = ajaxNormalizeError(request);
-                        
+
                         // if session error: have the user log back in and refresh
                         if ((normalizedError.error_text.indexOf('Session expired') === 0 ||
                             normalizedError.error_text.indexOf('No Cookie') !== -1 ||
@@ -3579,7 +3579,7 @@ window.addEventListener('design-register-element', function () {
                             GS.normalUserLogin(function () {
                                 window.location.reload();
                             }, '', request.responseJSON.dat.default_subdomain);
-                            
+
                         // else: callback with normalized error
                         } else {
                             callback(normalizedError, 'error');
@@ -3588,11 +3588,11 @@ window.addEventListener('design-register-element', function () {
                 }
             }
         };
-        
+
         request.open('POST', strLink + '?anticache=' + ((new Date()).getMilliseconds() + Math.floor(Math.random() * 1e9)), true);
         request.setRequestHeader('Content-type','application/x-www-form-urlencoded; charset=UTF-8');
         request.send(strParams);
-        
+
         // if intTimeout has been set: start a timer to abort
         if (typeof intTimeout === 'number') {
             if (request && request.readyState !== 4) {
@@ -3602,28 +3602,28 @@ window.addEventListener('design-register-element', function () {
                 }, intTimeout);
             }
         }
-        
+
         return request;
     };
-    
+
     GS.ajaxText = function (strLink, strParams, callback, intTimeout) {
         var request = new XMLHttpRequest();
-        
+
         callback = callback || function () {};
-        
+
         request.onreadystatechange = function() {
             var normalizedError;
-            
+
             if (request.readyState === 4) {
                 if (request.status === 200) {
                     callback(request.responseText);
-                    
+
                 } else if (request.status === 440) {
                     window.location = '/index.html?error=Connection%20timed%20out&redirect=' + encodeURIComponent(window.location.pathname);
-                    
+
                 } else {
                     normalizedError = ajaxNormalizeError(request);
-                    
+
                     // if session error: have the user log back in and refresh
                     if ((normalizedError.error_text.indexOf('Session expired') === 0 ||
                         normalizedError.error_text.indexOf('No Cookie') !== -1 ||
@@ -3632,7 +3632,7 @@ window.addEventListener('design-register-element', function () {
                         GS.normalUserLogin(function () {
                             window.location.reload();
                         }); //, '', JSON.parse(request.responseText || request.response).dat.default_subdomain
-                        
+
                     // else: callback with normalized error
                     } else {
                         callback(normalizedError, 'error');
@@ -3640,11 +3640,11 @@ window.addEventListener('design-register-element', function () {
                 }
             }
         };
-        
+
         request.open('POST', strLink + '?anticache=' + ((new Date()).getMilliseconds() + Math.floor(Math.random() * 1e9)), true);
         request.setRequestHeader('Content-type','application/x-www-form-urlencoded; charset=UTF-8');
         request.send(strParams);
-        
+
         // if intTimeout has been set: start a timer to abort
         if (typeof intTimeout === 'number') {
             if (request && request.readyState !== 4) {
@@ -3654,38 +3654,38 @@ window.addEventListener('design-register-element', function () {
                 }, intTimeout);
             }
         }
-        
+
         return request;
     };
 }());
 
 (function () {
     "use strict";
-    
+
     function cleanErrorValue(strValue) {
         strValue = strValue || '';
-        
+
         if (strValue.indexOf('DB_exec failed:') !== -1) {
             strValue = strValue.replace(/[.\s\S]*DB_exec\ failed:/mi, '');
         }
-        
+
         if (strValue.indexOf('Query failed:') !== -1) {
             strValue = strValue.replace(/[.\s\S]*Query\ failed:/mi, '');
         }
-        
+
         if (strValue.indexOf('FATAL') !== -1) {
             strValue = strValue.replace(/[.\s\S]*FATAL/mi, '');
         }
-        
+
         strValue = strValue
                         .replace(/\\?\\n/gi, '\n')
                         .replace(/\\?\\t/gi, '\t')
                         .replace(/\[.*\]/gi, '')
                         .replace(/\([0-9]*\)/gi, '');
-        
+
         return GS.trim(strValue.trim(), '"');
     }
-    
+
     function errorJSONToHTML(errorJSON) {
         var errorHTML = '<pre style="word-break: break-all; white-space: pre-wrap;">' +
                     'There was an error:' +
@@ -3699,26 +3699,26 @@ window.addEventListener('design-register-element', function () {
                         ? '<br /><br />' + encodeHTML(GS.decodeFromTabDelimited(errorJSON.error_hint))
                         : '') +
                     (errorJSON.error_context
-                        ? '<br /><br />' + encodeHTML(errorJSON.error_context)                     
+                        ? '<br /><br />' + encodeHTML(errorJSON.error_context)
                         : '') +
                     (errorJSON.error_addin
-                        ? '<br /><br />' + encodeHTML(errorJSON.error_addin)                       
+                        ? '<br /><br />' + encodeHTML(errorJSON.error_addin)
                         : '') +
                 '</pre>';
         return errorHTML;
     }
-    
+
     GS.ajaxErrorDialog = function (jsnError, tryAgainCallback, cancelCallback) {
         'use strict';
         var templateElement = document.createElement('template'), strHTML;
-        
+
         var jsnErrorCopy = {};
         jsnErrorCopy.error_text    = cleanErrorValue(jsnError.error_text);
         jsnErrorCopy.error_file    = cleanErrorValue(jsnError.error_file);
         jsnErrorCopy.error_hint    = cleanErrorValue(jsnError.error_hint);
         jsnErrorCopy.error_context = cleanErrorValue(jsnError.error_context);
         jsnErrorCopy.error_addin   = cleanErrorValue(jsnError.error_addin);
-        
+
         templateElement.setAttribute('data-theme', 'error');
         strHTML = ml(function () {/*
             <gs-page>
@@ -3730,12 +3730,12 @@ window.addEventListener('design-register-element', function () {
                 <gs-footer>{{BUTTONS}}</gs-footer>
             </gs-page>
         */}).replace('{{HTML}}', errorJSONToHTML(jsnErrorCopy));
-        
-        
+
+
         var openFunction = function () {
             xtag.query(this, '.error-button-show-full-text')[0].addEventListener('click', function () {
                 var templateElement = document.createElement('template');
-                
+
                 templateElement.innerHTML = ml(function () {/*
                     <gs-page>
                         <gs-header><center><h3>Full Error Text</h3></center></gs-header>
@@ -3745,12 +3745,12 @@ window.addEventListener('design-register-element', function () {
                         <gs-footer><gs-button dialogclose>Done</gs-button></gs-footer>
                     </gs-page>
                 */}).replace('{{HTML}}', errorJSONToHTML(jsnError));
-                
+
                 GS.openDialog(templateElement);
             });
         };
-        
-        
+
+
         if (typeof tryAgainCallback === 'function') {
             templateElement.innerHTML = strHTML.replace('{{BUTTONS}}',
                         '<gs-grid>' +
@@ -3771,7 +3771,7 @@ window.addEventListener('design-register-element', function () {
             GS.openDialog(templateElement, openFunction);
         }
     };
-    
+
 }());
 
 /*
@@ -3793,15 +3793,15 @@ if (GS.dataLedger === undefined) {
 GS.dataFetch = function (strLink, bolClearPrevious) {
     'use strict';
     var arrLinkParts = strLink.split('?'), strId = encodeURIComponent(strLink);
-    
-    // if something wants to fetch data where the id does not already exist then do an ajax call 
+
+    // if something wants to fetch data where the id does not already exist then do an ajax call
     if (GS.dataLedger[strId] === undefined || bolClearPrevious === true) {
-        
+
         GS.dataLedger[strId] = {'status': 'waiting', 'response': ''};
-        
+
         GS.ajaxJSON(arrLinkParts[0], arrLinkParts[1] || '', function (data, error) {
             var event; // The custom event that will be created
-            
+
             if (document.createEvent) {
                 event = document.createEvent('HTMLEvents');
                 event.initEvent('dataready_' + strId, true, true);
@@ -3811,50 +3811,50 @@ GS.dataFetch = function (strLink, bolClearPrevious) {
                 event.eventType = 'dataready_' + strId;
                 event.eventName = 'dataready_' + strId;
             }
-            
+
             if (!error) {
                 GS.dataLedger[strId].response = (data.dat !== undefined ? data.dat : data);
                 GS.dataLedger[strId].status = 'finished';
-                
+
                 event.detail = {'response': GS.dataLedger[strId].response};
-                
+
             } else {
                 GS.dataLedger[strId].data = data;
                 GS.dataLedger[strId].status = 'error';
                 GS.dataLedger[strId].error = 'error';
-                
+
                 event.detail = {'response': data, 'error': 'error'};
             }
-            
+
             if (document.createEvent) {
                 document.dispatchEvent(event);
             } else {
                 document.fireEvent('on' + event.eventType, event);
             }
         });
-        
+
         return '';
     }
-    
+
     if (GS.dataLedger[strId].status === 'finished' || GS.dataLedger[strId].status === 'error') {
         return GS.dataLedger[strId];
     }
-    
+
     return '';
 };
 window.addEventListener('design-register-element', function () {
     'use strict';
-    
+
     registerDesignSnippet('GS.findParentTag', 'GS.findParentTag', 'GS.findParentTag(${1:element}, \'${0:tag-to-find}\');');
-    
+
     registerDesignSnippet('GS.findParentElement', 'GS.findParentElement',
                                                     'GS.findParentElement(${1:element}, ${0:\'selector, element or function\'});');
-    
+
     registerDesignSnippet('GS.insertElementAfter', 'GS.insertElementAfter',
                                                     'GS.insertElementAfter(${1:elementToInsert}, \'${0:elementToInsertAfter}\');');
-    
+
     registerDesignSnippet('GS.getElementOffset', 'GS.getElementOffset', 'GS.getElementOffset(${0:element});');
-    
+
     registerDesignSnippet('GS.animateStyle', 'GS.animateStyle',
                                             'GS.animateStyle(${1:elementToAnimate}, ' +
                                                             '${2:CSSPropertyToAnimate}, ' +
@@ -3863,22 +3863,22 @@ window.addEventListener('design-register-element', function () {
                                                             '${5:callbackAfterAnimation}, ' +
                                                             '${6:durationInMilliseconds}, ' +
                                                             '${0:numberOfFrames});');
-    
+
     registerDesignSnippet('GS.stringToElement', 'GS.stringToElement', 'GS.stringToElement(\'${0:<div>your HTML here</div>}\');');
-    
+
     registerDesignSnippet('GS.cloneElement', 'GS.cloneElement', 'GS.cloneElement(${0:element});');
-    
+
     registerDesignSnippet('GS.isElementFocusable', 'GS.isElementFocusable', 'GS.isElementFocusable(${0:element});');
-    
+
     registerDesignSnippet('GS.scrollParent', 'GS.scrollParent', 'GS.scrollParent(${0:element});');
-    
+
     registerDesignSnippet('GS.scrollIntoView', 'GS.scrollIntoView', 'GS.scrollIntoView(${0:element});');
-    
+
     registerDesignSnippet('GS.getInputSelection', 'GS.getInputSelection', 'GS.getInputSelection(${0:inputOrTextareaElement});');
-    
+
     registerDesignSnippet('GS.setInputSelection', 'GS.setInputSelection',
                                     'GS.setInputSelection(${1:inputOrTextareaElement}, ${2:startAtNumber}, ${0:endAtNumber});');
-    
+
     registerDesignSnippet('GS.getElementPositionData', 'GS.getElementPositionData', 'GS.getElementPositionData(${0:element});');
 });
 
@@ -3890,17 +3890,17 @@ window.addEventListener('design-register-element', function () {
 GS.findParentTag = function (element, strTagName) {
     'use strict';
     var currentElement = element.parentNode;
-    
+
     strTagName = strTagName.toUpperCase();
-    
+
     while (currentElement && currentElement.nodeName !== strTagName && currentElement.nodeName !== 'HTML') {
         currentElement = currentElement.parentNode;
     }
-    
+
     if (!currentElement || currentElement.nodeName !== strTagName) {
         return undefined;
     }
-    
+
     return currentElement;
 };
 
@@ -3908,30 +3908,30 @@ GS.findParentTag = function (element, strTagName) {
 GS.findParentElement = function (element, checkParameter) {
     'use strict';
     var currentElement = element;
-    
+
     // if checkParameter is a function: use it to check the element
     if (typeof checkParameter === 'function') {
         while (currentElement && !checkParameter(currentElement) && currentElement.nodeName !== 'HTML') {
             currentElement = currentElement.parentNode;
         }
-        
+
     // else if checkParameter is a string: use checkParameter as a selector string and use xtag.matchSelector
     } else if (typeof checkParameter === 'string') {
         while (currentElement && !xtag.matchSelector(currentElement, checkParameter) && currentElement.nodeName !== 'HTML') {
             currentElement = currentElement.parentNode;
         }
-        
+
     // else: assume checkParameter is an element and use ===
     } else {
         while (currentElement && currentElement !== checkParameter && currentElement.nodeName !== 'HTML') {
             currentElement = currentElement.parentNode;
         }
     }
-    
+
     if (!currentElement) {
         return undefined;
     }
-    
+
     return currentElement;
 };
 
@@ -3953,26 +3953,26 @@ GS.insertElementAfter = function (elementToInsert, target) {
 GS.getElementOffset = function (element) {
     'use strict';
     var intX = 0, intY = 0, ret;
-    
+
     if (element.getBoundingClientRect) {
         ret = element.getBoundingClientRect();
-        
+
     } else {
         while (element && element.nodeName !== 'HTML') {
             intX += element.offsetLeft - element.scrollLeft;// + element.clientLeft;
             intY += element.offsetTop - element.scrollTop;// + element.clientTop;
-            
+
             //console.log(element.offsetTop, element.scrollTop, element);
-            
+
             element = element.parentNode; //element.offsetParent
         }
-        
+
         ret = {
             left: intX,
             top: intY
         };
     }
-    
+
     return ret;
 };
 
@@ -3984,26 +3984,26 @@ GS.animateStyle = function (element, strStyleProperty, strStart, strEnd, callbac
         //strEndUnit       = strEnd.replace(/[0-9\.-]/gi, '').toLowerCase(),
         intFrameDuration = intDuration / intFrames,
         i, timeoutFunction, intCurrent, intJump;
-    
+
     //if (strStartUnit !== 'em' && strStartUnit !== 'px' && strStartUnit !== '') {
     //    throw 'animateStyle error: strStart has an invalid unit, use px or em or nothing';
-    //    
+    //
     //} else if (strEndUnit !== 'em' && strEndUnit !== 'px' && strEndUnit !== '') {
     //    throw 'animateStyle error: strEnd has an invalid unit, use px or em or nothing';
-    //    
+    //
     //} else {
     intCurrent = intStart;
     intJump = (intEnd - intStart) / intFrames;
     i = 1;
-    
+
     element.style[strStyleProperty] = strStart;
-    
+
     timeoutFunction = function () {
         setTimeout(function () {
             intCurrent += intJump;
             //element.style[strStyleProperty] = intCurrent + strStartUnit;
             //console.log(intCurrent, i, intFrames, element, element.style[strStyleProperty], intStart, intCurrent, strStartUnit);
-            
+
             if (i < intFrames) {
                 element.style[strStyleProperty] = intCurrent + strStartUnit;
                 i += 1;
@@ -4014,7 +4014,7 @@ GS.animateStyle = function (element, strStyleProperty, strStart, strEnd, callbac
             }
         }, intFrameDuration);
     };
-    
+
     timeoutFunction();
     //}
 };
@@ -4022,41 +4022,41 @@ GS.animateStyle = function (element, strStyleProperty, strStart, strEnd, callbac
 //
 GS.stringToElement = function (strHTML, optionalTargetDocument) {
     var strFirstTagName, parentElement, indexInElement, parsedElement, targetDocument;
-    
+
     if (optionalTargetDocument) {
         targetDocument = optionalTargetDocument;
     } else {
         targetDocument = document;
     }
-    
+
     //console.log(strFirstTagName);
-    
+
     strFirstTagName = strHTML.substring(strHTML.indexOf('<') + 1, strHTML.indexOf('>'));
-    
+
     //console.log(strFirstTagName);
-    
+
     if (strFirstTagName.indexOf(' ') > -1) {
         strFirstTagName = strFirstTagName.substring(0, strFirstTagName.indexOf(' '));
     }
-    
+
     //console.log(strFirstTagName);
-    
+
     if (strFirstTagName === 'body') {
         parentElement = targetDocument.createElement('html');
         indexInElement = 1;
-        
+
     } else if (strFirstTagName === 'thead' || strFirstTagName === 'tbody') {
         parentElement = targetDocument.createElement('table');
         indexInElement = 0;
-        
+
     } else if (strFirstTagName === 'tr') {
         parentElement = targetDocument.createElement('tbody');
         indexInElement = 0;
-        
+
     } else if (strFirstTagName === 'td' || strFirstTagName === 'th') {
         parentElement = targetDocument.createElement('tr');
         indexInElement = 0;
-        
+
     } else if (strFirstTagName === 'li') {
         parentElement = targetDocument.createElement('ul');
         indexInElement = 0;
@@ -4064,12 +4064,12 @@ GS.stringToElement = function (strHTML, optionalTargetDocument) {
         parentElement = targetDocument.createElement('div');
         indexInElement = 0;
     }
-    
+
     parentElement.innerHTML = strHTML;
     parsedElement = parentElement.children[indexInElement];
-    
+
     //console.log(strFirstTagName, parsedElement);
-    
+
     return parsedElement;
 };
 
@@ -4079,7 +4079,7 @@ GS.cloneElement = function (element, optionalTargetDocument) {
     if (xtag.query(element, 'template').length > 0 || optionalTargetDocument) {
         return GS.stringToElement(element.outerHTML, optionalTargetDocument);
     }
-    
+
     // else: just use cloneNode
     return element.cloneNode(true);
 };
@@ -4088,17 +4088,17 @@ GS.cloneElement = function (element, optionalTargetDocument) {
 // change the tag of an element
 GS.changeElementTag = function (element, strNewTag, alterCallback) {
     var strHTML = element.outerHTML.trim(), newElement;
-    
+
     strHTML = '<' + strNewTag + strHTML.substring(strHTML.indexOf(' '), strHTML.lastIndexOf('</')) + '</' + strNewTag + '>';
-    
+
     //console.log(strHTML);
-    
+
     newElement = GS.stringToElement(strHTML);
-    
+
     if (typeof alterCallback === 'function') {
         alterCallback.apply(newElement);
     }
-    
+
     return newElement;
 };*/
 
@@ -4130,11 +4130,11 @@ GS.isElementFocusable = function (element) {
 //// search for a parent with a scrollbar
 //GS.scrollParent = function (element) {
 //    var i = 0, currentElement = element, bolFoundScrollable = false, strOverflow;
-//    
+//
 //    if (currentElement) {
 //        while (currentElement && currentElement.nodeName !== 'HTML' && bolFoundScrollable === false && i < 75) {
 //            strOverflow = GS.getStyle(currentElement, 'overflow');
-//            
+//
 //            if (strOverflow === 'scroll' || (strOverflow === 'auto' && currentElement.clientHeight < currentElement.scrollHeight)) {
 //                bolFoundScrollable = true;
 //            } else {
@@ -4153,23 +4153,23 @@ GS.isElementFocusable = function (element) {
 //     console.log(scrollingContainer);
 //     if (scrollingContainer) {
 //         //console.log(scrollingContainer);
-        
+
 //         arrSiblings = element.parentNode.children;
-        
+
 //         for (i = 0, intScrollTop = 0, len = arrSiblings.length; i < len; i += 1) {
 //             if (arrSiblings[i] === element) {
 //                 intScrollTop += arrSiblings[i].offsetHeight / 2;
-                
+
 //                 break;
 //             } else {
 //                 intScrollTop += arrSiblings[i].offsetHeight;
 //             }
 //         }
-        
+
 //         intScrollTop = intScrollTop - (scrollingContainer.offsetHeight / 2);
-        
+
 //         //console.log(intScrollTop);
-        
+
 //         scrollingContainer.scrollTop = intScrollTop;
 //     }
 // };
@@ -4183,26 +4183,26 @@ GS.isElementFocusable = function (element) {
 //         strDirectionText = 'vertical';
 //     }
 //     var scrollingContainer = GS.scrollParent(element, strDirectionText), arrSiblings, i, len, intScrollTop;
-    
-    
+
+
 //     if (scrollingContainer) {
-        
+
 //         arrSiblings = element.parentNode.children;
-        
+
 //         for (i = 0, intScrollTop = 0, len = arrSiblings.length; i < len; i += 1) {
 //             if (arrSiblings[i] === element) {
 //                 intScrollTop += arrSiblings[i].offsetHeight / 2;
-                
+
 //                 break;
 //             } else {
 //                 intScrollTop += arrSiblings[i].offsetHeight;
 //             }
 //         }
-        
+
 //         intScrollTop = intScrollTop - (scrollingContainer.offsetHeight / 2);
-        
+
 //         //console.log(intScrollTop);
-        
+
 //         scrollingContainer.scrollTop = intScrollTop;
 //     }
 // };
@@ -4219,33 +4219,33 @@ GS.isElementFocusable = function (element) {
 GS.getInputSelection = function (input) {
     'use strict';
     var start = 0, end = 0, normalizedValue, range, textInputRange, len, endRange;
-    
+
     if (typeof input.selectionStart === "number" && typeof input.selectionEnd === "number") {
         start = input.selectionStart;
         end = input.selectionEnd;
     } else {
         range = (document.createRange() || document.selection.createRange());
-        
+
         if (range && range.parentElement() == input) {
             len = input.value.length;
             normalizedValue = input.value.replace(/\r\n/g, "\n");
-            
+
             // Create a working TextRange that lives only in the input
             textInputRange = input.createTextRange();
             textInputRange.moveToBookmark(range.getBookmark());
-            
+
             // Check if the start and end of the selection are at the very end
             // of the input, since moveStart/moveEnd doesn't return what we want
             // in those cases
             endRange = input.createTextRange();
             endRange.collapse(false);
-            
+
             if (textInputRange.compareEndPoints("StartToEnd", endRange) > -1) {
                 start = end = len;
             } else {
                 start = -textInputRange.moveStart("character", -len);
                 start += normalizedValue.slice(0, start).split("\n").length - 1;
-                
+
                 if (textInputRange.compareEndPoints("EndToEnd", endRange) > -1) {
                     end = len;
                 } else {
@@ -4255,7 +4255,7 @@ GS.getInputSelection = function (input) {
             }
         }
     }
-    
+
     return {
         start: start,
         end: end
@@ -4265,15 +4265,15 @@ GS.getInputSelection = function (input) {
 GS.setInputSelection = function (input, intStart, intEnd) {
     'use strict';
     var range;
-    
+
     if (intStart === undefined || intStart === '' || isNaN(intStart) || intStart === null) {
         intStart = input.value.length;
     }
-    
+
     if (intEnd === undefined || intEnd === '' || isNaN(intEnd) || intEnd === null) {
         intEnd = intStart;
     }
-    
+
     if (input.createTextRange) {
         range = input.createTextRange();
         range.collapse();
@@ -4305,7 +4305,7 @@ GS.getElementPositionData = function (element) {
         intRoomBelow      = intElementBottom,
         intRoomLeft       = window.innerWidth  - (intElementRight  + intElementWidth),
         intRoomRight      = intElementRight;
-    
+
     /*console.log(element, '\n' +
                 'intElementWidth:   ' + intElementWidth + '\n' +
                 'intElementHeight:  ' + intElementHeight + '\n' +
@@ -4317,7 +4317,7 @@ GS.getElementPositionData = function (element) {
                 'intRoomBelow:      ' + intRoomBelow + '\n' +
                 'intRoomLeft:       ' + intRoomLeft + '\n' +
                 'intRoomRight:      ' + intRoomRight);*/
-    
+
     return {
         'element':           element,
         'objElementOffset':  objElementOffset,
@@ -4337,28 +4337,28 @@ GS.getElementPositionData = function (element) {
 // #################################################################
 // ####################### DOCUMENT FRAGMENT #######################
 // #################################################################
-/*                                       ,--- the problem with this code is the DOM we get back is not 100% reliably inert. 
+/*                                       ,--- the problem with this code is the DOM we get back is not 100% reliably inert.
                                          V          To make it reliable I believe I have to change how my elements work.
 GS.createDocumentFragment = function (strHTML) {
     'use strict';
     var element = document.createElement('div'),
         fragment = document.createDocumentFragment(),
         arrChildren = element.childNodes;
-    
+
     // fill element with HTML
     element.innerHTML = strHTML;
-    
+
     // append the element to the body (NECCESSARY FOR THE HTML TO BE INERT, I DON'T KNOW WHY -michael)
     document.body.appendChild(element);
-    
+
     // transfer children from element to fragment
     while (arrChildren[0]) {
         fragment.appendChild(arrChildren[0]);
     }
-    
+
     // remove element from the body
     document.body.removeChild(element);
-    
+
     // return inert fragment
     return fragment;
 };
@@ -4366,11 +4366,11 @@ GS.createDocumentFragment = function (strHTML) {
 GS.getDocumentFragmentHTML = function (fragment) {
     'use strict';
     var strHTML, i, len, arrChildren = fragment.children;
-    
+
     for (strHTML = '', i = 0, len = arrChildren.length; i < len; i += 1) {
         strHTML += arrChildren[i].outerHTML;
     }
-    
+
     return strHTML;
 };
 */
@@ -4382,30 +4382,30 @@ GS.getDocumentFragmentHTML = function (fragment) {
 GS.createInertDOM = function (strHTML) {
     'use strict';
     var templateElement = document.createElement('template'), iframeElement;
-    
+
     // if the content property is on a template element: no iframe neccessary
     if ('content' in templateElement) {
         templateElement.innerHTML = strHTML;
-        
+
         return templateElement.content;
-        
+
     // else: use iframe to create inert HTML
     } else {
         if (!document.getElementById('gs-inert-dom-generator')) {
             iframeElement = document.createElement('iframe');
-            
+
             iframeElement.setAttribute('id', 'gs-inert-dom-generator');
             iframeElement.setAttribute('hidden', '');
-            
+
             document.body.appendChild(iframeElement);
-            
+
         } else {
             iframeElement = document.getElementById('gs-inert-dom-generator');
         }
-        
+
         iframeElement.contentWindow.inertDOM = iframeElement.contentWindow.document.createElement('div');
         iframeElement.contentWindow.inertDOM.innerHTML = strHTML;
-        
+
         return iframeElement.contentWindow.inertDOM;
     }
 };
@@ -4413,11 +4413,11 @@ GS.createInertDOM = function (strHTML) {
 GS.getInertDOMHTML = function (inertDOM) {
     'use strict';
     var strHTML, i, len, arrChildren = inertDOM.children;
-    
+
     for (strHTML = '', i = 0, len = arrChildren.length; i < len; i += 1) {
         strHTML += arrChildren[i].outerHTML;
     }
-    
+
     return strHTML;
 };
 */
@@ -4429,28 +4429,28 @@ GS.getInertDOMHTML = function (inertDOM) {
     'use strict';
     function getCellFromTarget(element) {
         var currentElement = element;
-        
+
         while (currentElement.nodeName !== 'TD' && currentElement.nodeName !== 'TH' && currentElement.nodeName !== 'HTML') {
             currentElement = currentElement.parentNode;
         }
-        
+
         if (currentElement && currentElement.nodeName !== 'TD' && currentElement.nodeName !== 'TH') {
             return undefined;
         }
-        
+
         return currentElement;
     }
-    
+
     function selectHandler(tableElement, dragOrigin, dragCurrentCell, dragMode) {
         var bolThead, bolFirstTh, arrRecords, arrCells, arrRecordsToAffect = [], arrCellsToAffect = [],
             arrNewSelection = [], arrCellsToRemoveFromSelection = [], i, len, intFrom, intTo;
-        
+
         arrRecords = xtag.query(tableElement, 'tr');
         arrCells = xtag.query(tableElement, 'td, th');
-        
+
         if (arrRecords.length > 0) {
             bolThead = Boolean(xtag.queryChildren(tableElement, 'thead')[0]);
-            
+
             if ((bolThead && arrRecords.length > 1) || (!bolThead && arrRecords > 0)) {
                 if (bolThead) {
                     bolFirstTh = arrRecords[1].children[0].nodeName === 'TH';
@@ -4458,54 +4458,54 @@ GS.getInertDOMHTML = function (inertDOM) {
                     bolFirstTh = arrRecords[0].children[0].nodeName === 'TH';
                 }
             }
-            
+
             // if origin & currentCell are both the top-left cell and the cell is a heading: select all cells
             if (bolThead && bolFirstTh &&
                 dragOrigin.parentNode.rowIndex === 0 && dragCurrentCell.parentNode.rowIndex === 0 &&
                 dragOrigin.cellIndex === 0 && dragCurrentCell.cellIndex === 0) {
                 arrCellsToAffect = arrCells;
-                
+
             // else if origin & currentCell are both first ths: select the records from origin to currentCell
             } else if (bolFirstTh && dragOrigin.cellIndex === 0 && dragCurrentCell.cellIndex === 0) {
                 arrRecordsToAffect =
                     arrRecords.slice(Math.min(dragOrigin.parentNode.rowIndex, dragCurrentCell.parentNode.rowIndex),
                                      Math.max(dragOrigin.parentNode.rowIndex, dragCurrentCell.parentNode.rowIndex) + 1);
-                
+
                 for (i = 0, len = arrRecordsToAffect.length; i < len; i += 1) {
                     Array.prototype.push.apply(arrCellsToAffect, xtag.toArray(arrRecordsToAffect[i].children));
                 }
-                
+
             // else if origin & currentCell are both headings: select the columns from origin to currentCell
             } else if (bolThead && dragOrigin.parentNode.rowIndex === 0 && dragCurrentCell.parentNode.rowIndex === 0) {
                 intFrom = Math.min(dragOrigin.cellIndex, dragCurrentCell.cellIndex);
                 intTo   = Math.max(dragOrigin.cellIndex, dragCurrentCell.cellIndex) + 1;
-                
+
                 for (i = 0, len = arrRecords.length; i < len; i += 1) {
                     Array.prototype.push.apply(arrCellsToAffect, xtag.toArray(arrRecords[i].children).slice(intFrom, intTo));
                 }
-                
+
             //// else if origin & currentCell are the same cell: select the record
             //} else if (dragOrigin === dragCurrentCell) {
             //    arrRecordsToAffect = arrRecords.slice(dragOrigin.parentNode.rowIndex, dragOrigin.parentNode.rowIndex + 1);
-            //    
+            //
             //    for (i = 0, len = arrRecordsToAffect.length; i < len; i += 1) {
             //        Array.prototype.push.apply(arrCellsToAffect, xtag.toArray(arrRecordsToAffect[i].children));
             //    }
-            //    
+            //
             // else select cells from origin to currentCell
             } else {
                 arrRecordsToAffect =
                     arrRecords.slice(Math.min(dragOrigin.parentNode.rowIndex, dragCurrentCell.parentNode.rowIndex),
                                      Math.max(dragOrigin.parentNode.rowIndex, dragCurrentCell.parentNode.rowIndex) + 1);
-                
+
                 intFrom = Math.min(dragOrigin.cellIndex, dragCurrentCell.cellIndex);
                 intTo   = Math.max(dragOrigin.cellIndex, dragCurrentCell.cellIndex) + 1;
-                
+
                 for (i = 0, len = arrRecordsToAffect.length; i < len; i += 1) {
                     Array.prototype.push.apply(arrCellsToAffect, xtag.toArray(arrRecordsToAffect[i].children).slice(intFrom, intTo));
                 }
             }
-            
+
             if (dragMode === 'select') {
                 // add new cells to tableElement.selectionSelectedCells
                 for (i = 0, len = tableElement.selectionSelectedCells.length; i < len; i += 1) {
@@ -4514,7 +4514,7 @@ GS.getInertDOMHTML = function (inertDOM) {
                     }
                 }
                 tableElement.selectionSelectedCells = arrCellsToAffect;
-                
+
                 // add new cells to tableElement.selectedCells
                 arrNewSelection = tableElement.selectedCells;
                 for (i = 0, len = arrCellsToAffect.length; i < len; i += 1) {
@@ -4524,11 +4524,11 @@ GS.getInertDOMHTML = function (inertDOM) {
                     arrNewSelection.splice(arrNewSelection.indexOf(arrCellsToRemoveFromSelection[i]), 1);
                 }
                 tableElement.selectedCells = arrNewSelection;
-                
+
             } else { // implied if: dragMode === 'deselect'
                 // deselect cells from arrCellsToAffect
                 arrNewSelection = tableElement.selectedCells;
-                
+
                 for (i = 0, len = arrCellsToAffect.length; i < len; i += 1) {
                     if (arrNewSelection.indexOf(arrCellsToAffect[i]) > -1) {
                         arrNewSelection.splice(arrNewSelection.indexOf(arrCellsToAffect[i]), 1);
@@ -4538,27 +4538,27 @@ GS.getInertDOMHTML = function (inertDOM) {
             }
         }
     }
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
     function getSelectedCopyHTML(element) {
         var strHTMLCopyString, intFromRecord, intToRecord, intFromCell = 9999999, intToCell = 0
           , i, len, cell_i, cell_len, arrSelected, strCellHTML, arrRecords, arrCells
           , strHTMLRecordString, strNull, bolColumns;
-        
+
         arrSelected = element.selectedCells;
-        
+
         strNull    = (element.getAttribute('null-values')  || "NULL");
         bolColumns = (element.getAttribute('column-names') || "true") === "true";
-        
+
         // loop through the selected cells and create an html string using the text of the cell
         if (arrSelected.length > 0) {
             intFromRecord = arrSelected[0].parentNode.rowIndex;
             intToRecord = arrSelected[arrSelected.length - 1].parentNode.rowIndex + 1;
-            
+
             for (i = 0, len = arrSelected.length; i < len; i += 1) {
                 if (arrSelected[i].cellIndex < intFromCell) {
                     intFromCell = arrSelected[i].cellIndex;
@@ -4568,25 +4568,25 @@ GS.getInertDOMHTML = function (inertDOM) {
                     intToCell = arrSelected[i].cellIndex + 1;
                 }
             }
-            
+
             arrRecords = xtag.query(element, 'tr');
             strHTMLCopyString = '';
-            
+
             // if bolColumns is true and the first record is not selected: add first record first
             if (bolColumns && intFromRecord > 0) {
                 arrCells = arrRecords[0].children;
                 strHTMLRecordString = '';
-                
+
                 for (cell_i = intFromCell, cell_len = intToCell; cell_i < cell_len; cell_i += 1) {
                     strCellHTML = '';
-                    
+
                     if (arrCells[cell_i].nodeName === 'TH' && arrCells[cell_i].firstElementChild) {
                         strCellHTML = arrCells[cell_i].firstElementChild.textValue ||
                                       arrCells[cell_i].firstElementChild.value ||
                                       (arrCells[cell_i].firstElementChild.checked || '').toString() ||
                                       arrCells[cell_i].firstElementChild.textContent || '';//.trim();
-                        
-                    } else if (arrCells[cell_i].lastElementChild) { 
+
+                    } else if (arrCells[cell_i].lastElementChild) {
                         strCellHTML = arrCells[cell_i].lastElementChild.textValue ||
                                       arrCells[cell_i].lastElementChild.value ||
                                       (arrCells[cell_i].lastElementChild.checked || '').toString() ||
@@ -4594,37 +4594,37 @@ GS.getInertDOMHTML = function (inertDOM) {
                     } else {
                         strCellHTML = arrCells[cell_i].textContent;//.trim();
                     }
-                    
+
                     strCellHTML = encodeHTML(strCellHTML).replace(/\n/gim, '<br />');
-                    
+
                     strCellHTML = '<' + 'td rowspan="1" colspan="1">' + (strCellHTML || '') + '</td>'
-                    
+
                     strHTMLRecordString += (cell_i === intFromCell ? '<' + 'tr>' : '');
                     strHTMLRecordString += (strCellHTML || '');
                     strHTMLRecordString += (cell_i === (intToCell - 1) ? '<' + '/tr>' : '');
                 }
-                
+
                 if (strHTMLRecordString.trim()) {
                     strHTMLCopyString += strHTMLRecordString;
                 }
             }
-            
+
             for (i = intFromRecord, len = intToRecord; i < len; i += 1) {
                 arrCells = arrRecords[i].children;
                 strHTMLRecordString = '';
-                
+
                 if (!arrRecords[i].classList.contains('insert-record')) {
                     for (cell_i = intFromCell, cell_len = intToCell; cell_i < cell_len; cell_i += 1) {
                         strCellHTML = '';
-                        
+
                         if (arrCells[cell_i].hasAttribute('selected') || (i === 0 && bolColumns)) {
                             if (arrCells[cell_i].nodeName === 'TH' && arrCells[cell_i].firstElementChild) {
                                 strCellHTML = arrCells[cell_i].firstElementChild.textValue ||
                                               arrCells[cell_i].firstElementChild.value ||
                                               (arrCells[cell_i].firstElementChild.checked || '').toString() ||
                                               arrCells[cell_i].firstElementChild.textContent || '';//.trim();
-                                
-                            } else if (arrCells[cell_i].lastElementChild) { 
+
+                            } else if (arrCells[cell_i].lastElementChild) {
                                 strCellHTML = arrCells[cell_i].lastElementChild.textValue ||
                                               arrCells[cell_i].lastElementChild.value ||
                                               (arrCells[cell_i].lastElementChild.checked || '').toString() ||
@@ -4632,16 +4632,16 @@ GS.getInertDOMHTML = function (inertDOM) {
                             } else {
                                 strCellHTML = arrCells[cell_i].textContent;//.trim();
                             }
-                            
+
                             strCellHTML = encodeHTML(strCellHTML).replace(/\n/gim, '<br />');
-                            
+
                             if (strCellHTML === 'NULL' || strCellHTML === '\N') {
                                 strCellHTML = strNull;
                             }
                         }
-                        
+
                         strCellHTML = '<' + 'td rowspan="1" colspan="1">' + (strCellHTML || '') + '</td>'
-                        
+
                         strHTMLRecordString += (cell_i === intFromCell ? '<' + 'tr>' : '');
                         strHTMLRecordString += (strCellHTML || '');
                         strHTMLRecordString += (cell_i === (intToCell - 1) ? '<' + '/tr>' : '');
@@ -4660,31 +4660,31 @@ GS.getInertDOMHTML = function (inertDOM) {
                                     '<' + 'table border="0" cellpadding="0" cellspacing="0">' + strHTMLCopyString + '<' + '/table>';
             }
         }
-        
+
         return strHTMLCopyString || '';
     }
-    
+
     function getSelectedCopyText(element) {
         var strTextCopyString, intFromRecord, intToRecord, intFromCell = 9999999, intToCell = 0,
             i, len, cell_i, cell_len, arrSelected, strCellText, arrRecords, arrCells, arrCellIndexes, strTextRecordString,
             strQuoteType, strQuoteChar, strFieldDelimiter, strRowDelimiter, strNull, bolColumns, quoteRegex;
-        
+
         strQuoteType      = (element.getAttribute('quote-type')      || "strings");
         strQuoteChar      = (element.getAttribute('quote-char')      || '"');
         strFieldDelimiter = (element.getAttribute('field-delimiter') || "\t");
         strNull           = (element.getAttribute('null-values')     || "NULL");
         bolColumns        = (element.getAttribute('column-names')    || "true") === "true";
         strRowDelimiter   = (element.getAttribute('row-delimiter')   || "\n");
-        
+
         quoteRegex = new RegExp(strQuoteChar, 'g');
-        
+
         arrSelected = element.selectedCells;
-        
+
         // loop through the selected cells and create a tsv string using the text of the cell
         if (arrSelected.length > 0) {
             intFromRecord = arrSelected[0].parentNode.rowIndex;
             intToRecord = arrSelected[arrSelected.length - 1].parentNode.rowIndex + 1;
-            
+
             for (i = 0, len = arrSelected.length; i < len; i += 1) {
                 if (arrSelected[i].cellIndex < intFromCell) {
                     intFromCell = arrSelected[i].cellIndex;
@@ -4694,24 +4694,24 @@ GS.getInertDOMHTML = function (inertDOM) {
                     intToCell = arrSelected[i].cellIndex + 1;
                 }
             }
-            
+
             arrRecords = xtag.query(element, 'tr');
             strTextCopyString = '';
-            
+
             // if bolColumns is true and the first record is not selected: add first record first
             if (bolColumns && intFromRecord > 0) {
                 arrCells = arrRecords[0].children;
                 strTextRecordString = '';
-                
+
                 for (cell_i = intFromCell, cell_len = intToCell; cell_i < cell_len; cell_i += 1) {
                     strCellText = '';
-                    
+
                     if (arrCells[cell_i].nodeName === 'TH' && arrCells[cell_i].firstElementChild) {
                         strCellText = arrCells[cell_i].firstElementChild.textValue ||
                                       arrCells[cell_i].firstElementChild.value ||
                                       (arrCells[cell_i].firstElementChild.checked || '').toString() ||
                                       arrCells[cell_i].firstElementChild.textContent || '';//.trim();
-                        
+
                     } else if (arrCells[cell_i].lastElementChild) {
                         strCellText = arrCells[cell_i].lastElementChild.textValue ||
                                       arrCells[cell_i].lastElementChild.value ||
@@ -4719,9 +4719,9 @@ GS.getInertDOMHTML = function (inertDOM) {
                     } else {
                         strCellText = arrCells[cell_i].textContent;//.trim();
                     }
-                    
+
                     strCellText = strCellText.replace(quoteRegex, (strQuoteChar + strQuoteChar));
-                    
+
                     if (strCellText === 'NULL' || strCellText === '\N') {
                         strCellText = strNull;
                     } else {
@@ -4731,29 +4731,29 @@ GS.getInertDOMHTML = function (inertDOM) {
                             strCellText = strQuoteChar + strCellText + strQuoteChar;
                         }
                     }
-                    
+
                     strTextRecordString += (cell_i !== intFromCell ? strFieldDelimiter : '');
                     strTextRecordString += (strCellText || '');
                 }
-                
+
                 strTextCopyString += strTextRecordString;
                 strTextCopyString += strRowDelimiter;
             }
-            
+
             for (i = intFromRecord, len = intToRecord; i < len; i += 1) {
                 arrCells = arrRecords[i].children;
                 strTextRecordString = '';
-                
+
                 for (cell_i = intFromCell, cell_len = intToCell; cell_i < cell_len; cell_i += 1) {
                     strCellText = '';
-                    
+
                     if (arrCells[cell_i].hasAttribute('selected')) {
-                        if (arrCells[cell_i].nodeName === 'TH' && arrCells[cell_i].firstElementChild) { 
+                        if (arrCells[cell_i].nodeName === 'TH' && arrCells[cell_i].firstElementChild) {
                             strCellText = arrCells[cell_i].firstElementChild.textValue ||
                                           arrCells[cell_i].firstElementChild.value ||
                                           (arrCells[cell_i].firstElementChild.checked || '').toString() ||
                                           arrCells[cell_i].firstElementChild.textContent;//.trim();
-                            
+
                         } else if (arrCells[cell_i].lastElementChild) {
                             strCellText = arrCells[cell_i].lastElementChild.textValue ||
                                           arrCells[cell_i].lastElementChild.value ||
@@ -4761,9 +4761,9 @@ GS.getInertDOMHTML = function (inertDOM) {
                         } else {
                             strCellText = arrCells[cell_i].textContent;//.trim();
                         }
-                        
+
                         strCellText = strCellText.replace(quoteRegex, (strQuoteChar + strQuoteChar));
-                        
+
                         if (strCellText === 'NULL' || strCellText === '\N') {
                             strCellText = strNull;
                         } else {
@@ -4778,7 +4778,7 @@ GS.getInertDOMHTML = function (inertDOM) {
                             strCellText = strQuoteChar + strCellText + strQuoteChar;
                         }
                     }
-                    
+
                     strTextRecordString += (cell_i !== intFromCell ? strFieldDelimiter : '');
                     strTextRecordString += (strCellText || '');
                 }
@@ -4790,34 +4790,34 @@ GS.getInertDOMHTML = function (inertDOM) {
                 }
             }
         }
-        
+
         return strTextCopyString || '';
     }
-    
+
     function handleClipboardData(event, strCopyString, strType) {
         var clipboardData = event.clipboardData || window.clipboardData, strMime;
-        
+
         if (!clipboardData) { return; }
         if (!clipboardData.setData) { return; }
-        
+
         if (strType === 'text') {
             if (window.clipboardData && window.clipboardData.getData) { // IE
                 strMime = 'Text';
             } else if (event.clipboardData && event.clipboardData.getData) {
                 strMime = 'text/plain';
             }
-            
+
         } else if (strType === 'html') {
             if (window.clipboardData && window.clipboardData.getData) { // IE
                 strMime = '';
             } else if (event.clipboardData && event.clipboardData.getData) {
                 strMime = 'text/html';
             }
-            
+
         } else {
             throw 'handleClipboardData Error: Type "' + strType + '" not recognized, recognized types are "text" and "html".';
         }
-        
+
         if (strMime) {
             if (strCopyString && strMime) {
                 return clipboardData.setData(strMime, strCopyString) !== false;
@@ -4826,25 +4826,25 @@ GS.getInertDOMHTML = function (inertDOM) {
             }
         }
     }
-    
-    
-    
+
+
+
     //function handleClipboardData(event, strCopyString) {
     //    var clipboardData = event.clipboardData || window.clipboardData, strMime;
-    //    
+    //
     //    if (!clipboardData) {
     //        return;
     //    }
     //    if (!clipboardData.setData) {
     //        return;
     //    }
-    //    
+    //
     //    if (window.clipboardData && window.clipboardData.getData) { // IE
     //        strMime = 'Text';
     //    } else if (event.clipboardData && event.clipboardData.getData) {
     //        strMime = 'text/plain';
     //    }
-    //    
+    //
     //    if (strCopyString) {
     //        return clipboardData.setData(strMime, strCopyString) !== false;
     //    } else {
@@ -4854,129 +4854,129 @@ GS.getInertDOMHTML = function (inertDOM) {
 
     GS.makeTableSelectable = function (tableElement, bolSingleRecord) {
         var copyElement;
-        
+
         // tableElement verification
         if (!tableElement || tableElement.nodeName !== 'TABLE') {
             throw 'GS.makeTableSelectable Error: you must provide a <table> element as the first parameter.';
         }
-        
+
         // prevent text selection
         //tableElement.setAttribute('prevent-text-selection', '');
-        
+
         // define selectedCells getter and setter on the table element itself
         Object.defineProperty(tableElement, 'selectedCells', {
             get: function () {
                 return xtag.query(this, '[selected]');
             },
-            
+
             set: function (newValue) {
                 var i, len, intIdIndex, arrCells = this.selectedCells, arrRecords, cell_i, cell_len;
-                
+
                 // clear old selection
                 for (i = 0, len = arrCells.length; i < len; i += 1) {
                     arrCells[i].removeAttribute('selected');
                 }
-                
+
                 arrCells = xtag.query(this, '[selected-secondary]');
                 for (i = 0, len = arrCells.length; i < len; i += 1) {
                     arrCells[i].removeAttribute('selected-secondary');
                 }
-                
+
                 // if newValue is not an array: make it an array
                 if (typeof newValue === 'object' && newValue.length === undefined) {
                     arrCells = [newValue];
                 } else {
                     arrCells = newValue;
                 }
-                
+
                 // set new selection
                 for (i = 0, len = arrCells.length; i < len; i += 1) {
                     arrCells[i].setAttribute('selected', '');
                 }
-                
+
                 arrRecords = this.selectedRecords;
-                
+
                 for (i = 0, len = arrRecords.length; i < len; i += 1) {
                     arrCells = arrRecords[i].children;
-                    
+
                     for (cell_i = 0, cell_len = arrCells.length; cell_i < cell_len; cell_i += 1) {
                         if (!arrCells[cell_i].hasAttribute('selected')) {
                             arrCells[cell_i].setAttribute('selected-secondary', '');
                         }
                     }
                 }
-                
+
                 GS.triggerEvent(this, 'after_selection');
             }
         });
-        
+
         // define selectedRecords getter and setter on the table element itself
         Object.defineProperty(tableElement, 'selectedRecords', {
             get: function () {
                 var i, len, intRecordIndex = -1, arrRecord = [], selected = this.selectedCells;
-                
+
                 // loop through the selected cells and create an array of trs
                 for (i = 0, len = selected.length; i < len; i += 1) {
                     if (selected[i].parentNode.rowIndex > intRecordIndex && selected[i].parentNode.parentNode.nodeName !== 'THEAD') {
                         intRecordIndex = selected[i].parentNode.rowIndex;
-                        
+
                         arrRecord.push(selected[i].parentNode);
                     }
                 }
-                
+
                 return arrRecord;
             },
-            
+
             set: function (newValue) {
                 var i, len, cell_i, cell_len, intIdIndex, arrCells = this.selectedCells, arrRecords, arrCellChildren;
-                
+
                 // clear old selection
                 for (i = 0, len = arrCells.length; i < len; i += 1) {
                     arrCells[i].removeAttribute('selected');
                 }
-                
+
                 arrCells = xtag.query(this, '[selected-secondary]');
                 for (i = 0, len = arrCells.length; i < len; i += 1) {
                     arrCells[i].removeAttribute('selected-secondary');
                 }
-                
+
                 // if newValue is not an array: make it an array
                 if (typeof newValue === 'object' && newValue.length === undefined) {
                     arrRecords = [newValue];
                 } else {
                     arrRecords = newValue;
                 }
-                
+
                 // set new selection
                 for (i = 0, len = arrRecords.length, arrCells = []; i < len; i += 1) {
                     arrCellChildren = arrRecords[i].children;
-                    
+
                     for (cell_i = 0, cell_len = arrCellChildren.length; cell_i < cell_len; cell_i += 1) {
                         arrCells.push(arrCellChildren[cell_i]);
                     }
                 }
-                
+
                 this.selectedCells = arrCells;
-                
+
                 GS.triggerEvent(this, 'after_selection');
             }
         });
-        
+
         // if we are on a touchdevice or bolSingleRecord is true: single record selection
         if (evt.touchDevice || bolSingleRecord === true) {
             tableElement.addEventListener(evt.mousedown, function (event) {
                 var target = event.target;
-                
+
                 if (target.nodeName === 'TD' || target.nodeName === 'TH' || getCellFromTarget(target)) {
                     tableElement.selectedCells = [];
-                    
+
                     // if there is a parent record to the target: select all of the cells in the record
                     if (GS.findParentTag(target, 'tr')) {
                         tableElement.selectedCells = GS.findParentTag(target, 'tr').children;
                     }
                 }
             });
-            
+
         // else: cell/record selection
         } else {
             // mousedown (on selected and unselected) + drag
@@ -5008,74 +5008,74 @@ GS.getInertDOMHTML = function (inertDOM) {
             //          a  a  a  a  a
             //
             //      yields ("'" marks an empty cell):
-            //          2  3  4 
+            //          2  3  4
             //          -------
-            //          a  a  ' 
-            //          '  a  a 
-            
+            //          a  a  '
+            //          '  a  a
+
             tableElement.addEventListener(evt.mousedown, function (event) {
                 var target = event.target, cellFromTarget = getCellFromTarget(target), closestCell, arrSelectedCells, i, len;
-                
+
                 if (GS.findParentTag(event.target, 'table')) {
                     if (cellFromTarget) {
                         closestCell = cellFromTarget;
                     }
-                    
+
                     if (closestCell) {
                         tableElement.dragAllowed = true;
                         tableElement.dragCurrentCell = closestCell;
                         tableElement.selectionSelectedCells = [];
-                        
+
                         // if shift is down and there is a previous origin: use previous origin for current origin
                         if (event.shiftKey && tableElement.selectionPreviousOrigin) {
-                            
+
                             // if there are previously selected cells: deselect the previous selected cells
                             if (tableElement.selectionPreviousSelectedCells) {
                                 arrSelectedCells = tableElement.selectedCells;
-                                
+
                                 for (i = 0, len = tableElement.selectionPreviousSelectedCells.length; i < len; i += 1) {
                                     arrSelectedCells.splice(arrSelectedCells.indexOf(tableElement.selectionPreviousSelectedCells[i]), 1);
                                 }
-                                
+
                                 tableElement.selectedCells = arrSelectedCells;
                             }
-                            
+
                             tableElement.dragOrigin = tableElement.selectionPreviousOrigin;
                             tableElement.dragMode = 'select';
-                            
+
                         // else if ctrl or cmd is down and the target cell is not selected: select cells from target cell to current cell
                         } else if (!event.shiftKey && (event.metaKey || event.ctrlKey) && !closestCell.hasAttribute('selected')) {
                             tableElement.dragOrigin = closestCell;
                             tableElement.dragMode = 'select';
-                            
+
                         // else if ctrl or cmd is down and the target cell is selected: deselect cells from target cell to current cell
                         } else if (!event.shiftKey && (event.metaKey || event.ctrlKey) && closestCell.hasAttribute('selected')) {
                             tableElement.dragOrigin = closestCell;
                             tableElement.dragMode = 'deselect';
-                            
+
                         // else: deselect all cells and start new selection
                         } else {
                             tableElement.selectedCells = [];
                             tableElement.dragOrigin = closestCell;
                             tableElement.dragMode = 'select';
                         }
-                        
+
                         selectHandler(tableElement, tableElement.dragOrigin, tableElement.dragCurrentCell, tableElement.dragMode);
                     }
                 }
             });
             tableElement.addEventListener(evt.mousemove, function (event) {
                 var target, closestCell, cellFromTarget;
-                
+
                 // if mouse is down
                 if (event.which !== 0) {
                     target = event.target;
                     cellFromTarget = getCellFromTarget(target);
-                    
+
                     if (cellFromTarget) {
                         closestCell = cellFromTarget;
                     }
-                    
+
                     // if selection is allowed at this point and closestCell is different from tableElement.dragCurrentCell
                     if (tableElement.dragAllowed && tableElement.dragCurrentCell !== closestCell) {
                         tableElement.dragCurrentCell = getCellFromTarget(closestCell);
@@ -5089,25 +5089,25 @@ GS.getInertDOMHTML = function (inertDOM) {
             });
             tableElement.addEventListener(evt.mouseup, function (event) {
                 tableElement.dragAllowed = false;
-                
+
                 if (tableElement.dragMode === 'select') {
                     tableElement.selectionPreviousOrigin = tableElement.dragOrigin;
                     tableElement.selectionPreviousSelectedCells = tableElement.selectionSelectedCells;
                 }
             });
         }
-        
+
         // add input for clipboard compatibility
         copyElement = document.createElement('input');
         copyElement.value = 'Firefox compatibility input';
         copyElement.setAttribute('gs-dynamic', '');
         copyElement.setAttribute('style', 'position: fixed; left: 50%; top: 50%; z-index: -5000; opacity: 0.00000001;');
-        
+
         tableElement.appendChild(copyElement);
-        
+
         // add tabindex so that we can listen for focus on the table
         tableElement.tabIndex = 0;
-        
+
         // when a focus event happens on the table: focus the copy input if the element that is focused is the table
         tableElement.addEventListener('focus', function (event) {
             if (document.activeElement === tableElement) {
@@ -5115,12 +5115,12 @@ GS.getInertDOMHTML = function (inertDOM) {
                 GS.setInputSelection(copyElement, 0, 'Firefox compatibility input'.length);
             }
         });
-        
+
         // clipboard handling
         document.body.addEventListener('copy', function (event) {
             var elementClosestTable = GS.findParentTag(document.activeElement, 'table')
               , strTextCopyString, strHTMLCopyString;
-            
+
             if (elementClosestTable === tableElement &&
                 (
                     document.activeElement.value === 'Firefox compatibility input' ||
@@ -5128,10 +5128,10 @@ GS.getInertDOMHTML = function (inertDOM) {
                 )) {
                 GS.setInputSelection(document.activeElement, document.activeElement.value.length,
                                             document.activeElement.value.length);
-                
+
                 strTextCopyString = getSelectedCopyText(tableElement);
                 strHTMLCopyString = getSelectedCopyHTML(tableElement);
-                
+
                 if (strTextCopyString && strHTMLCopyString) {
                     if (handleClipboardData(event, strTextCopyString, 'text')) {
                         event.preventDefault(event);
@@ -5140,7 +5140,7 @@ GS.getInertDOMHTML = function (inertDOM) {
                         event.preventDefault(event);
                     }
                 }
-                
+
                 GS.setInputSelection(document.activeElement, 0, document.activeElement.value.length);
             }
         });
@@ -5154,7 +5154,7 @@ GS.getInertDOMHTML = function (inertDOM) {
             //        document.activeElement.selectionStart === document.activeElement.selectionEnd
             //    )) {
             //    arrSelected = tableElement.selectedCells;
-            //    
+            //
             //    // loop through the selected cells and create a tsv string using the text of the cell
             //    if (arrSelected.length > 0) {
             //        for (i = 0, len = arrSelected.length; i < len; i += 1) {
@@ -5171,21 +5171,21 @@ GS.getInertDOMHTML = function (inertDOM) {
             //                intToCell = arrSelected[i].cellIndex + 1;
             //            }
             //        }
-            //        
+            //
             //        arrRecords = xtag.query(tableElement, 'tr');
             //        strCopyString = '';
-            //        
+            //
             //        for (i = intFromRecord, len = intToRecord; i < len; i += 1) {
             //            arrCells = arrRecords[i].children;
-            //            
+            //
             //            for (cell_i = intFromCell, cell_len = intToCell, strRecordString = ''; cell_i < cell_len; cell_i += 1) {
             //                if (arrCells[cell_i].hasAttribute('selected')) {
-            //                    if (arrCells[cell_i].nodeName === 'TH' && arrCells[cell_i].firstElementChild) { 
+            //                    if (arrCells[cell_i].nodeName === 'TH' && arrCells[cell_i].firstElementChild) {
             //                        strCellText = arrCells[cell_i].firstElementChild.textValue ||
             //                                      arrCells[cell_i].firstElementChild.value ||
             //                                      (arrCells[cell_i].firstElementChild.checked || '').toString() ||
             //                                      arrCells[cell_i].firstElementChild.textContent.trim();
-            //                    } else if (arrCells[cell_i].lastElementChild) { 
+            //                    } else if (arrCells[cell_i].lastElementChild) {
             //                        strCellText = arrCells[cell_i].lastElementChild.textValue ||
             //                                      arrCells[cell_i].lastElementChild.value ||
             //                                      (arrCells[cell_i].lastElementChild.checked || '').toString() ||
@@ -5196,20 +5196,20 @@ GS.getInertDOMHTML = function (inertDOM) {
             //                } else {
             //                    strCellText = '';
             //                }
-            //                
+            //
             //                strRecordString += (cell_i !== intFromCell ? '\t' : '') + (strCellText || '');
             //            }
-            //            
+            //
             //            if (strRecordString.trim()) {
             //                strCopyString += strRecordString;
             //            }
-            //            
+            //
             //            if (i + 1 !== len && strRecordString.trim()) {
             //                strCopyString += '\r\n';
             //            }
             //        }
             //    }
-            //    
+            //
             //    if (strCopyString) {
             //        if (handleClipboardData(event, strCopyString)) {
             //            event.preventDefault(event);
@@ -5220,28 +5220,28 @@ GS.getInertDOMHTML = function (inertDOM) {
 })();
 window.addEventListener('design-register-element', function () {
     'use strict';
-    
+
     registerDesignSnippet('GS.qryFromJSON', 'GS.qryFromJSON', 'GS.qryFromJSON(${0:jsnObjectToConvert});');
-    
+
     registerDesignSnippet('GS.qryToJSON', 'GS.qryToJSON', 'GS.qryToJSON(${0:strQueryStringToConvert});');
-    
+
     registerDesignSnippet('GS.qryToWhere', 'GS.qryToWhere',
                                 'GS.qryToWhere(${1:strQueryString}, ${2:strColumnNameInQueryString}, ${0:strColumnNameInTarget});');
-    
+
     registerDesignSnippet('GS.qryGetKeys', 'GS.qryGetKeys', 'GS.qryGetKeys(${0:queryString});');
-    
+
     registerDesignSnippet('GS.qryGetVals', 'GS.qryGetVals', 'GS.qryGetVals(${0:queryString});');
-    
+
     registerDesignSnippet('GS.qryGetVal', 'GS.qryGetVal', 'GS.qryGetVal(${1:queryString}, \'${0:keyToGet}\');');
-    
+
     registerDesignSnippet('GS.qrySetVal', 'GS.qrySetVal', 'GS.qrySetVal(${1:queryString}, \'${0:newKeyValuePair}\');');
-    
+
     registerDesignSnippet('GS.qryDeleteKey', 'GS.qryDeleteKey', 'GS.qryDeleteKey(${1:queryString}, \'${0:keyToDelete}\');');
-    
+
     registerDesignSnippet('GS.getQueryString', 'GS.getQueryString', 'GS.getQueryString();');
-    
+
     registerDesignSnippet('GS.pushQueryString', 'GS.pushQueryString', 'GS.pushQueryString(${0:newQueryString});');
-    
+
     registerDesignSnippet('GS.removeFromQueryString', 'GS.removeFromQueryString', 'GS.removeFromQueryString(${0:removeKeys});');
 });
 
@@ -5250,43 +5250,43 @@ window.addEventListener('design-register-element', function () {
 GS.qryFromJSON = function (jsnToConvert) {
     'use strict';
     var key, strRet = '', strType, currentValue;
-    
+
     for (key in jsnToConvert) {
         currentValue = jsnToConvert[key];
         strType = typeof currentValue;
-        
+
         if (strType === 'number' || strType === 'string' || strType === 'boolean') {
             strRet += (strRet === '' ? '' : '&') + key + '=' + encodeURIComponent(jsnToConvert[key]);
-            
+
         } else if (currentValue === null || currentValue === undefined) {
             strRet += (strRet === '' ? '' : '&') + key + '=';
-            
+
         } else if (typeof currentValue !== 'object') {
             throw 'GS.qryFromJSON Error: Invalid value: ' + JSON.stringify(currentValue);
         }
     }
-    
+
     return strRet;
 };
 
 GS.qryToJSON = function (strQueryString) {
     'use strict';
     var arrKeyValueList = [], jsnQueryString = {}, strKeyValue, i, len, strKey, strValue, jsnNavigator, arrSubParts, sub_i, sub_len;
-    
+
     if (strQueryString) {
         arrKeyValueList = strQueryString.split('&');
-        
+
         for (i = 0, len = arrKeyValueList.length; i < len; i += 1) {
             strKeyValue = arrKeyValueList[i];
             strKey      = strKeyValue.substring(0, strKeyValue.indexOf('='));
             strValue    = decodeURIComponent(strKeyValue.substring(strKeyValue.indexOf('=') + 1));
-            
+
             jsnQueryString[strKey] = strValue;
-            
+
             // if a dot is found in the key: create a sub JSON structure
             if (strKey.indexOf('.') > -1) {
                 arrSubParts = strKey.split('.');
-                
+
                 jsnNavigator = jsnQueryString;
                 for (sub_i = 0, sub_len = arrSubParts.length; sub_i < sub_len; sub_i += 1) {
                     if (sub_i < sub_len - 1) {
@@ -5294,13 +5294,13 @@ GS.qryToJSON = function (strQueryString) {
                     } else {
                         jsnNavigator[arrSubParts[sub_i]] = jsnNavigator[arrSubParts[sub_i]] || strValue;
                     }
-                    
+
                     jsnNavigator = jsnNavigator[arrSubParts[sub_i]];
                 }
             }
         }
     }
-    
+
     return jsnQueryString;
 };
 
@@ -5314,10 +5314,10 @@ GS.qryToJSON = function (strQueryString) {
 GS.qryToWhere = function (strQS, strColumnNameInQS, strColumnNameInTarget) {
     'use strict';
     var strWhere = '', key, jsnArgs;
-    
+
     if (strColumnNameInQS) {
         strColumnNameInTarget = (strColumnNameInTarget || strColumnNameInQS);
-        
+
         if (!isNaN(GS.qryGetVal(strQS, strColumnNameInQS))) {
             strWhere = strColumnNameInTarget + '=' + GS.qryGetVal(strQS, strColumnNameInQS);
         } else {
@@ -5341,7 +5341,7 @@ GS.qryToWhere = function (strQS, strColumnNameInQS, strColumnNameInTarget) {
             }
         }
     }
-    
+
     return strWhere;
 };
 
@@ -5350,34 +5350,34 @@ GS.qryToWhere = function (strQS, strColumnNameInQS, strColumnNameInTarget) {
 GS.qryGetKeys = function (strQueryString) {
     'use strict';
     var arrKeyValueList = [], arrKeys = [], i, len, strKeyValue;
-    
+
     if (strQueryString) {
         arrKeyValueList = strQueryString.split('&');
-        
+
         for (i = 0, len = arrKeyValueList.length; i < len; i += 1) {
             strKeyValue = arrKeyValueList[i];
-            
+
             arrKeys.push(strKeyValue.substring(0, strKeyValue.indexOf('=')));
         }
     }
-    
+
     return arrKeys;
 };
 
 GS.qryGetVals = function (strQueryString) {
     'use strict';
     var arrKeyValueList = [], arrValues = [], i, len, strKeyValue;
-    
+
     if (strQueryString) {
         arrKeyValueList = strQueryString.split('&');
-        
+
         for (i = 0, len = arrKeyValueList.length; i < len; i += 1) {
             strKeyValue = arrKeyValueList[i];
-            
+
             arrValues.push(decodeURIComponent(strKeyValue.substring(strKeyValue.indexOf('=') + 1)));
         }
     }
-    
+
     return arrValues;
 };
 
@@ -5386,19 +5386,19 @@ GS.qryGetVals = function (strQueryString) {
 GS.qryGetVal = function (strQueryString, strKey) {
     'use strict';
     var arrKeyValueList, strSlice, i, len;
-    
+
     if (strQueryString) {
         arrKeyValueList = strQueryString.split('&');
-        
+
         for (i = 0, len = arrKeyValueList.length; i < len; i = i + 1) {
             strSlice = arrKeyValueList[i];
-            
+
             if (strSlice.split('=')[0] === strKey) {
                 return decodeURIComponent(strSlice.substring(strSlice.indexOf('=') + 1));
             }
         }
     }
-    
+
     return '';
 };
 
@@ -5406,7 +5406,7 @@ GS.qrySetVal = function (strQueryString, strKeyValue) {
     'use strict';
     strQueryString = GS.qryDeleteKey(strQueryString, strKeyValue.split('=')[0]);
     strQueryString = strQueryString + (strQueryString ? '&' : '') + strKeyValue;
-    
+
     return strQueryString;
 };
 
@@ -5415,23 +5415,23 @@ GS.qrySetVal = function (strQueryString, strKeyValue) {
 GS.qryDeleteKey = function (strQueryString, strKey) {
     'use strict';
     var arrKeyValueList, strSlice, i, len;
-    
+
     if (strQueryString) {
         arrKeyValueList = strQueryString.split('&');
-        
+
         for (i = 0, len = arrKeyValueList.length; i < len; i = i + 1) {
             strSlice = arrKeyValueList[i];
-            
+
             if (strSlice.split('=')[0] === strKey) {
                 arrKeyValueList.splice(i, 1);
-                
+
                 break;
             }
         }
-        
+
         return arrKeyValueList.join('&');
     }
-    
+
     return '';
 };
 
@@ -5461,7 +5461,7 @@ GS.removeFromQueryString = function (keys) {
 
 window.addEventListener('design-register-element', function () {
     'use strict';
-    
+
     //registerDesignSnippet('GS.qryFromJSON', 'GS.qryFromJSON', 'GS.qryFromJSON(${0:jsnObjectToConvert});');
 });
 
@@ -5473,49 +5473,49 @@ GS.templateColumnToValue = function (templateHTML) {
         templateElementNonEncoded = document.createElement('template'),
         arrTemplateElementEncoded, arrTemplateElementNonEncoded,
         jsnTemplates = {}, arrColumnElement = [], templateHTMLEncoded, bolInCommand, i, len, strID;
-    
+
     // get template element encoded with all "&"s (that are not inside a doT command) encoded,
     //      so that html encoded characters are not lost in the next operations
-    
+
     for (i = 0, len = templateHTML.length, templateHTMLEncoded = '', bolInCommand = false; i < len; i += 1) {
         if (!bolInCommand && templateHTML[i] === '{' && templateHTML[i + 1] === '{') {
             bolInCommand = true;
             i += 1;
             templateHTMLEncoded += '{{';
-            
+
         } else if (bolInCommand && templateHTML[i] === '}' && templateHTML[i + 1] === '}') {
             bolInCommand = false;
             i += 1;
             templateHTMLEncoded += '}}';
-            
+
         } else if (!bolInCommand && templateHTML[i] === '&') {
             templateHTMLEncoded += '&amp;';
-            
+
         } else {
             templateHTMLEncoded += templateHTML[i];
         }
     }
-    
+
     //console.log(templateHTML);
     //console.log(templateHTMLEncoded);
     templateElementEncoded.innerHTML = templateHTMLEncoded; //templateHTML.replace(/&/gi, '&amp;');
-    
+
     // get template element non-encoded with everything in it, so that sub templates are not touched
     templateElementNonEncoded.innerHTML = templateHTML;
-    
+
     // go through element encoded and replace templates with tokens
     // go through element non-encoded and gather templates and make sure they reference the same tokens
     arrTemplateElementEncoded = xtag.query(templateElementEncoded.content, 'template');
     arrTemplateElementNonEncoded = xtag.query(templateElementNonEncoded.content, 'template');
     i = 0;
-    
+
     //console.log(arrTemplateElementEncoded);
     //console.log(arrTemplateElementNonEncoded);
-    
+
     //console.log(arrTemplateElementEncoded.length);
     while (arrTemplateElementEncoded.length > 0 && i < 500) {
         //console.log(arrTemplateElementNonEncoded[0].parentNode);
-        
+
         if (arrTemplateElementNonEncoded[0].parentNode &&
             arrTemplateElementNonEncoded[0].parentNode.hasAttribute &&
                 (
@@ -5532,45 +5532,45 @@ GS.templateColumnToValue = function (templateHTML) {
                                             .concat(xtag.query(arrTemplateElementEncoded[0].content, 'template'));
             arrTemplateElementNonEncoded = arrTemplateElementNonEncoded
                                                 .concat(xtag.query(arrTemplateElementNonEncoded[0].content, 'template'));
-            
+
             // append any column elements in this template to the "arrColumnElement" variable
             arrColumnElement = arrColumnElement.concat(xtag.query(arrTemplateElementEncoded[0].content, '[column]'));
         }
-        
+
         // remove the current template from the arrays
         arrTemplateElementEncoded.splice(0, 1);
         arrTemplateElementNonEncoded.splice(0, 1);
-        
+
         i += 1;
     }
-    
+
     // go through element encoded and add calculated "value" attribute to any element with a "column"
     //      attribute but no "value" attribute
     arrColumnElement = arrColumnElement.concat(xtag.query(templateElementEncoded.content, '[column]'));
-    
+
     for (i = 0, len = arrColumnElement.length; i < len; i += 1) {
         if (!arrColumnElement[i].hasAttribute('value')) {
             arrColumnElement[i].setAttribute('value', '{{! row[\'' + arrColumnElement[i].getAttribute('column').replace(/\\/gi, '\\\\').replace(/\'/gi, '\\\'') + '\'] }}');
         }
     }
-    
+
     //console.log(templateHTML);
     //console.log(arrColumnElement);
     //console.log(jsnTemplates);
     //console.log(templateElementEncoded.innerHTML);
-    
+
     // save element encoded innerHTML as template HTML
     templateHTML = templateElementEncoded.innerHTML;
-    
+
     // go through template HTML and replace template tokens with template HTML
     for (strID in jsnTemplates) {
         //                                      DO NOT DELETE, this allows single dollar signs to be inside dot notation
         //                                                                                                V
         templateHTML = templateHTML.replace(new RegExp(strID, 'g'), jsnTemplates[strID].replace(/\$/g, '$$$$'));
     }
-    
+
     //console.log(element.templateHTML);
-    
+
     return templateHTML;
 };
 
@@ -5581,7 +5581,7 @@ GS.templateWithQuerystring = function (templateText) {
                              '    {{ var qs = jo; }} {{# def.template }}\n' +
                              '#}}\n' +
                              '{{#def.snippet}}';
-    
+
     return doT.template(strWrapperTemplate, null, {'template': templateText})(GS.qryToJSON(GS.getQueryString())).trim();
 };
 
@@ -5589,24 +5589,24 @@ GS.templateWithQuerystring = function (templateText) {
 GS.templateHideSubTemplates = function (templateHTML, bolRecord) {
     'use strict';
     var templateElement, strID, arrTemplates, i, len, jsnTemplates, strRet, strStart, strEnd;
-    
+
     if (bolRecord) {
         strStart = '<table><tbody>';
         strEnd = '</tbody></table>';
         templateHTML = (strStart + templateHTML + strEnd);
     }
-    
+
     templateElement = document.createElement('template');
     templateElement.innerHTML = templateHTML;
-    
+
     // temporarily remove templates
     // recursively go through templates whose parents do not have the source attribute
     i = 0;
     arrTemplates = xtag.query(templateElement.content, 'template');
     jsnTemplates = {};
-    
+
     //console.log(arrTemplates.length);
-    
+
     while (arrTemplates.length > 0 && i < 100) {
         //console.log(arrTemplates[0], arrTemplates[0].parentNode);
         // if the current template has a source parent: remove temporarily
@@ -5616,37 +5616,37 @@ GS.templateHideSubTemplates = function (templateHTML, bolRecord) {
             strID = 'UNIqUE_PLaCEhOLDER-' + GS.GUID() + '-UNiQUE_PLaCEhOLdER';
             jsnTemplates[strID] = arrTemplates[0].outerHTML;
             arrTemplates[0].outerHTML = strID;
-            
+
         // else: add to the arrTemplates array
         } else if (arrTemplates[0].content) {
             arrTemplates.push.apply(arrTemplates, xtag.query(arrTemplates[0].content, 'template'));
         }
-        
+
         // remove the current template from the arrTemplates array
         arrTemplates.splice(0, 1);
-        
+
         i += 1;
     }
-    
+
     strRet = decodeHTML(templateElement.innerHTML);
-    
+
     if (bolRecord) {
         strRet = strRet.substring(strStart.length, strRet.length - strEnd.length);
     }
-    
+
     return {'templateHTML': strRet, 'templateData': jsnTemplates}
 };
 
 GS.templateShowSubTemplates = function (strRet, jsnTemplate) {
     'use strict';
     var strID;
-    
+
     for (strID in jsnTemplate.templateData) {
         //                                       DO NOT DELETE, this allows single dollar signs to be inside dot notation
         //                                                                  V
         strRet = strRet.replace(new RegExp(strID, 'g'), jsnTemplate.templateData[strID].replace(/\$/g, '$$$$'));
     }
-    
+
     return strRet;
 };
 
@@ -5657,21 +5657,21 @@ GS.templateWithEnvelopeData = function (templateHTML, data, i, len, rowNumberOff
             {{ var row, row_number, i, len, col_i, col_len
                  , qs = GS.qryToJSON(GS.getQueryString())
                  , rowNumberOffset = (jo.rowNumberOffset || 0);
-            
+
             if (!isNaN(jo.i)) {
                 i = jo.i;
                 len = (jo.len === undefined || jo.len === null ? jo.i + 1 : jo.len);
-                
+
             } else {
                 i = 0;
                 len = jo.data.dat.length;
             }
-            
+
             for (; i < len; i += 1) {
                 row = {};
                 row_number = (i + 1) + rowNumberOffset;
                 row.row_number = row_number;
-                
+
                 for (col_i = 0, col_len = jo.data.arr_column.length; col_i < col_len; col_i += 1) {
                     if (jo.data.dat[i][col_i] === undefined || jo.data.dat[i][col_i] === null) {
                         row[jo.data.arr_column[col_i]] = '';
@@ -5691,7 +5691,7 @@ GS.templateWithEnvelopeData = function (templateHTML, data, i, len, rowNumberOff
 
 window.addEventListener('design-register-element', function () {
     'use strict';
-    
+
     registerDesignSnippet('GS.userChangePassword', 'GS.userChangePassword', 'GS.userChangePassword();');
     //registerDesignSnippet('GS.superChangePassword', 'GS.superChangePassword', 'GS.superChangePassword();');
     //registerDesignSnippet('GS.superUserLogin', 'GS.superUserLogin', 'GS.superUserLogin(${0:loggedInCallback});');
@@ -5701,7 +5701,7 @@ window.addEventListener('design-register-element', function () {
 (function () {
     function changePassword(strLink, strRank) {
         var templateElement = document.createElement('template');
-        
+
         templateElement.innerHTML = ml(function () {/*
             <gs-page>
                 <gs-header><center><h3>Change {{RANK}} Password</h3></center></gs-header>
@@ -5722,19 +5722,19 @@ window.addEventListener('design-register-element', function () {
                 </gs-footer>
             </gs-page>
         */}).replace(/\{\{RANK\}\}/gim, strRank);
-        
+
         GS.openDialog(templateElement, function () {
             var dialog = this, keydownHandler;
-            
+
             keydownHandler = function (event) {
                 var intKeyCode = event.which || event.keyCode;
-                
+
                 if (intKeyCode === 13 &&
                     document.getElementById('old-password').value &&
                     document.getElementById('new-password').value &&
                     document.getElementById('new-password-confirm').value) {
                     GS.triggerEvent(document.getElementById('button-change-password'), 'click');
-                    
+
                 } else {
                     if (document.getElementById('old-password').value &&
                         document.getElementById('new-password').value &&
@@ -5745,25 +5745,25 @@ window.addEventListener('design-register-element', function () {
                     }
                 }
             };
-            
+
             document.getElementById('old-password').addEventListener('keydown', keydownHandler);
             document.getElementById('new-password').addEventListener('keydown', keydownHandler);
             document.getElementById('new-password-confirm').addEventListener('keydown', keydownHandler);
-            
+
             document.getElementById('button-change-password').addEventListener('click', function () {
                 var newPassword, parameters;
-                
+
                 if (document.getElementById('new-password').value === document.getElementById('new-password-confirm').value) {
                     parameters = 'action=change_pw' +
                                 '&password_old=' + encodeURIComponent(document.getElementById('old-password').value) +
                                 '&password_new=' + encodeURIComponent(document.getElementById('new-password').value);
-                    
+
                     document.getElementById('old-password').value = '';
                     document.getElementById('new-password').value = '';
                     document.getElementById('new-password-confirm').value = '';
-                    
+
                     GS.ajaxJSON(
-                        location.pathname.indexOf('/env/') === 0 ? 
+                        location.pathname.indexOf('/env/') === 0 ?
                         '/env/auth' : '/postage/auth', parameters, function (data, error) {
                         if (!error) {
                             GS.pushMessage('Password Successfully Changed', 1000);
@@ -5778,11 +5778,11 @@ window.addEventListener('design-register-element', function () {
             });
         });
     }
-    
+
     GS.userChangePassword = function () {
         changePassword('env', 'User');
     };
-    
+
     //GS.superChangePassword = function () {
     //    changePassword('postage', 'SUPERUSER');
     //};
@@ -5793,15 +5793,15 @@ window.addEventListener('design-register-element', function () {
 GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomain) {
     'use strict';
     GS.removeAllLoaders();
-    
+
     if (!window.userLogin) {
         window.userLogin = true;
-        
+
         // this action checks to see if we are logged in as a super user
         // if not, open a login dialog
         GS.ajaxJSON('/env/action_info', '', function (data, error) {
             var templateElement = document.createElement('template');
-            
+
             if (!error && data.dat) {
                 if (typeof loggedInCallback === 'function') {
                     loggedInCallback(data.dat, strDefaultSubDomain);
@@ -5826,20 +5826,20 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
                         </gs-footer>
                     </gs-page>
                 */}).replace('{{ERROR}}', (strOldError ? '<br /><div style="color: #FF0000">' + strOldError + '</div>' : ''));
-                
+
                 if (GS.getCookie('greyspots_uname')) {
                     xtag.query(templateElement.content, '#normal-uname')[0].setAttribute('value', decodeURIComponent(GS.getCookie('greyspots_uname')));
                     xtag.query(templateElement.content, '#normal-pword')[0].setAttribute('autofocus', '');
                 } else {
                     xtag.query(templateElement.content, '#normal-uname')[0].setAttribute('autofocus', '');
                 }
-                
+
                 GS.openDialog(templateElement, function () {
                     var dialog = this;
-                    
+
                     document.getElementById('normal-pword').addEventListener('keydown', function (event) {
                         var intKeyCode = event.which || event.keyCode;
-                        
+
                         if (intKeyCode === 13) {
                             GS.triggerEvent(document.getElementById('normal-login'), 'click');
                         }
@@ -5849,7 +5849,7 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
                         //    document.getElementById('normal-login').setAttribute('disabled', '');
                         //}
                     });
-                    
+
                     //document.getElementById('normal-pword').addEventListener('keyup', function () {
                     //    if (this.value) {
                     //        document.getElementById('normal-login').removeAttribute('disabled');
@@ -5857,13 +5857,13 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
                     //        document.getElementById('normal-login').setAttribute('disabled', '');
                     //    }
                     //});
-                    
+
                     document.getElementById('normal-login').addEventListener('click', function () {
                         var strUserName = document.getElementById('normal-uname').value, strLink;
-                        
+
                         if (document.getElementById('normal-pword').value) {
                             GS.addLoader('log-in', 'Logging In...');
-                            
+
                             GS.ajaxJSON('/env/auth', 'action=login' +
                                                        '&username=' + encodeURIComponent(document.getElementById('normal-uname').value) +
                                                        '&password=' + encodeURIComponent(document.getElementById('normal-pword').value),
@@ -5871,10 +5871,10 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
                                 GS.removeLoader('log-in');
                                 GS.closeDialog(dialog, '');
                                 window.userLogin = false;
-                                
+
                                 if (!error) {
                                     GS.setCookie('greyspots_uname', strUserName, 30);
-                                    
+
                                     if (typeof loggedInCallback === 'function') {
                                         if (window.location.hostname.substring(0, window.location.hostname.indexOf('.')) ===
                                                         strDefaultSubDomain) {
@@ -5883,7 +5883,7 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
                                             loggedInCallback(data.dat, strDefaultSubDomain);
                                         }
                                     }
-                                    
+
                                 } else {
                                     GS.normalUserLogin(loggedInCallback, data.error_text, strDefaultSubDomain);
                                 }
@@ -6094,7 +6094,7 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
     }
 
     function errorJSONToHTML(errorJSON) {
-        console.log(errorJSON);
+        //console.log(errorJSON);
         return '<pre style="word-break: break-all; white-space: pre-wrap;">' +
                     (errorJSON.error_title ?
                         'There was ' +
@@ -7077,7 +7077,7 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
         var strKey = (strSchema + strObject + strColumns + strWhere + strOrd + strLimit + strOffset)
           , intQueryIndex, i, len, currentEntry;
 
-        console.log(strKey, bolClearCache, cacheLedger[strKey]);
+        //console.log(strKey, bolClearCache, cacheLedger[strKey]);
 
         if (bolClearCache) {
             cacheLedger[strKey] = null;
@@ -7139,14 +7139,14 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
             cacheCallbacks[intQueryIndex].push({'callback': callback, 'ready': true});
 
         } else {
-            console.log(strKey);
-            console.log(cacheQueries.length);
+            //console.log(strKey);
+            //console.log(cacheQueries.length);
             cacheQueries.push(strKey);
             cacheCallbacks.push([{'callback': callback, 'ready': true}]);
             cacheResults.push([]);
-            console.log(cacheQueries.length);
+            //console.log(cacheQueries.length);
             intQueryIndex = (cacheQueries.length - 1);
-            console.log(intQueryIndex);
+            //console.log(intQueryIndex);
 
             GS.requestSelectFromSocket(socket, strSchema, strObject, strColumns
                                      , strWhere, strOrd, strLimit, strOffset
@@ -7191,7 +7191,7 @@ GS.encodeForTabDelimited = function (strValue, nullValue) {
 GS.decodeFromTabDelimited = function (strValue, nullValue) {
     'use strict';
     var i, len, strRet = '';
-
+    //console.log(strValue, nullValue);
     if (nullValue === undefined) {
         nullValue = '\\N';
     }
@@ -7235,47 +7235,47 @@ GS.decodeFromTabDelimited = function (strValue, nullValue) {
 
 window.addEventListener('design-register-element', function () {
     'use strict';
-    
+
     registerDesignSnippet('GS.rightPad', 'GS.rightPad',
                                     'GS.rightPad(${1:stringToPad}, \'${2:stringToPadWith}\', ${0:lengthToPadTo});');
-    
+
     registerDesignSnippet('GS.leftPad', 'GS.leftPad',
                                     'GS.leftPad(${1:stringToPad}, \'${2:stringToPadWith}\', ${0:lengthToPadTo});');
-    
+
     registerDesignSnippet('GS.pxToEm', 'GS.pxToEm', 'GS.pxToEm(${1:elementToTestIn}, ${0:pxToConvert});');
-    
+
     registerDesignSnippet('GS.emToPx', 'GS.emToPx', 'GS.emToPx(${1:elementToTestIn}, ${0:emToConvert});');
 
     registerDesignSnippet('GS.keyCode', 'GS.keyCode', 'GS.keyCode(\'${0:characterToGetTheKeyCodeOf}\');');
-    
+
     registerDesignSnippet('GS.charFromKeyCode', 'GS.charFromKeyCode', 'GS.charFromKeyCode(\'${0:eventObject}\');');
-    
+
     registerDesignSnippet('GS.getStyle', 'GS.getStyle', 'GS.getStyle(${1:element}, \'${0:CSSProperty}\');');
-    
+
     registerDesignSnippet('GS.listAdd', 'GS.listAdd', 'GS.listAdd(${1:arrayToAddTo}, \'${0:valueToAddIfUnique}\');');
-    
+
     registerDesignSnippet('GS.triggerEvent', 'GS.triggerEvent', 'GS.triggerEvent(${1:target}, \'${2:eventName}\', ${0:jsnModifiers});');
-    
+
     registerDesignSnippet('GS.strToTitle', 'GS.strToTitle', 'GS.strToTitle(${0:valueToConvert});');
-    
+
     registerDesignSnippet('GS.mousePosition', 'GS.mousePosition', 'GS.mousePosition(${0:event});');
-    
+
     registerDesignSnippet('GS.GUID', 'GS.GUID', 'GS.GUID();');
-    
+
     registerDesignSnippet('GS.safeDecodeURIComponent', 'GS.safeDecodeURIComponent', 'GS.safeDecodeURIComponent(${0:valueToDecode});');
-    
+
     registerDesignSnippet('GS.getTextHeight', 'GS.getTextHeight', 'GS.getTextHeight(${1:elementToTestIn}, ${0:bolNormalLineHeight});');
-    
+
     registerDesignSnippet('GS.getTextWidth', 'GS.getTextWidth', 'GS.getTextWidth(${1:elementToTestIn}, ${0:strTextToGetTheWidthOf});');
-    
+
     registerDesignSnippet('GS.scrollParent', 'GS.scrollParent', 'GS.scrollParent(${0:elementToStartFrom});');
-    
+
     registerDesignSnippet('GS.scrollIntoView', 'GS.scrollIntoView', 'GS.scrollIntoView(${0:elementToScrollIntoView});');
-    
+
     registerDesignSnippet('GS.envGetCell', 'GS.envGetCell', 'GS.envGetCell(${1:envelopeData}, ${2:recordNumber}, \'${0:columnName}\');');
-    
+
     registerDesignSnippet('GS.trim', 'GS.trim', 'GS.trim(${1:stringToBeTrimmed}, \'${0:stringToTrimOff}\');');
-    
+
     registerDesignSnippet('GS.setCookie', 'GS.setCookie', 'GS.setCookie(\'${1:cookieName}\', ${2:newValue}, ${0:daysUntilExpire});');
 
     registerDesignSnippet('GS.getCookie', 'GS.getCookie', 'GS.getCookie(\'${1:cookieName}\');');
@@ -7293,7 +7293,7 @@ window.addEventListener('design-register-element', function () {
     registerDesignSnippet('GS.numberSuffix', 'GS.numberSuffix', 'GS.numberSuffix(${1:intNumber});');
 
     registerDesignSnippet('GS.hitLink', 'GS.hitLink', 'GS.hitLink(${1:strLink});');
-    
+
     registerDesignSnippet('GS.log', 'GS.log', 'GS.log(\'${1:send}\', ${2:message});');
 });
 
@@ -7329,7 +7329,7 @@ GS.log = function (bolsend, message) {
         var e = new Error();
         if (!e.stack) {
             try {
-                // IE requires the Error to actually be thrown or else the 
+                // IE requires the Error to actually be thrown or else the
                 // Error's 'stack' property is undefined.
                 throw e;
             } catch (e) {
@@ -7357,7 +7357,7 @@ GS.numberSuffix = function(intNumber) {
             '6': 'th', '7': 'th',
             '8': 'th', '9': 'th'
         };
-                
+
     return strNumber + jsnSuffixes[strNumber[strNumber.length - 1]];
 }
 
@@ -7374,11 +7374,11 @@ GS.numberSuffix = function(intNumber) {
 GS.rightPad = function (str, padString, padToLength) {
     'use strict';
     str = String(str);
-    
+
     while (str.length < padToLength) {
         str += padString;
     }
-   
+
     return str;
 };
 
@@ -7392,11 +7392,11 @@ GS.rightPad = function (str, padString, padToLength) {
 GS.leftPad = function (str, padString, padToLength) {
     'use strict';
     str = String(str);
-    
+
     while (str.length < padToLength) {
         str = padString + str;
     }
-   
+
     return str;
 };
 
@@ -7412,21 +7412,21 @@ GS.pxToEm = function (elementScope, fromPX) {
 	var intPX = parseFloat(fromPX),
 	    heightTestElement = document.createElement('div'),
 	    intElementHeight;
-    
+
     elementScope = elementScope || document.body;
-    
+
     heightTestElement.style.fontSize = '1em';
     heightTestElement.style.margin = '0';
     heightTestElement.style.padding = '0';
     heightTestElement.style.lineHeight = '1';
     heightTestElement.style.border = '0';
-    
+
     heightTestElement.innerHTML = 'a';
-    
+
     elementScope.appendChild(heightTestElement);
     intElementHeight = heightTestElement.offsetHeight;
     elementScope.removeChild(heightTestElement);
-    
+
 	return parseFloat((intPX / intElementHeight).toFixed(8), 10);
 };
 
@@ -7436,21 +7436,21 @@ GS.emToPx = function (elementScope, fromEM) {
 	var intEM = parseFloat(fromEM),
 	    heightTestElement = document.createElement('div'),
 	    intElementHeight;
-    
+
     elementScope = elementScope || document.body;
-    
+
     heightTestElement.style.fontSize = '1em';
     heightTestElement.style.margin = '0';
     heightTestElement.style.padding = '0';
     heightTestElement.style.lineHeight = '1';
     heightTestElement.style.border = '0';
-    
+
     heightTestElement.innerHTML = 'a';
-    
+
     elementScope.appendChild(heightTestElement);
     intElementHeight = heightTestElement.offsetHeight;
     elementScope.removeChild(heightTestElement);
-    
+
 	return Math.round(intEM * intElementHeight); // not sure if we want to round here but the old function did
 	                                             // so I will leave it here until there is a problem -michael
 };
@@ -7464,18 +7464,18 @@ GS.emToPx = function (elementScope, fromEM) {
 GS.charFromKeyCode = function (event) {
     // (this function contains a (modified) substantial portion of code from another source
     //    here is the copyright for sake of legality)
-    
+
     // name: jQuery getChar
     // repository: https://github.com/bpeacock/key-to-charCode
     // @author Brian Peacock
     // @version 0.3
     // Copyright 2013, Brian Peacock
     // Licensed under the MIT license.
-    
+
     'use strict';
-    
+
     var code = event.which;
-    
+
     //Ignore Shift Key events & arrows
     var ignoredCodes = {
         16: true,
@@ -7488,11 +7488,11 @@ GS.charFromKeyCode = function (event) {
         18: true,
         91: true
     };
-    
+
     if (ignoredCodes[code] === true) {
         return false;
     }
-    
+
     // These are special cases that don't fit the ASCII mapping
     var exceptions = {
         186: 59, // ;
@@ -7522,9 +7522,9 @@ GS.charFromKeyCode = function (event) {
     if (exceptions[code] !== undefined) {
         code = exceptions[code];
     }
-    
+
     var ch = String.fromCharCode(code);
-    
+
     // Handle Shift
     if (event.shiftKey) {
         var special = {
@@ -7557,7 +7557,7 @@ GS.charFromKeyCode = function (event) {
     } else {
         ch = ch.toLowerCase();
     }
-    
+
     return ch;
 };
 
@@ -7798,7 +7798,7 @@ GS.getStyle = function (element, style) {
 	if (element.currentStyle !== undefined) {
         return element.currentStyle[style];
 	}
-    
+
     return document.defaultView.getComputedStyle(element, null)[style];
 };
 
@@ -7814,9 +7814,9 @@ GS.listAdd = function (arrArray, newValue) {
 GS.triggerEvent = function (target, strEventName, jsnConfig) {
     'use strict';
     var event, key;
-    
+
     //console.trace('trigger', target);
-    
+
     if (document.createEvent) {
         event = document.createEvent('HTMLEvents');
         event.initEvent(strEventName, true, true);
@@ -7824,21 +7824,21 @@ GS.triggerEvent = function (target, strEventName, jsnConfig) {
         event = document.createEventObject();
         event.eventType = strEventName;
     }
-    
+
     event.eventName = strEventName;
-    
+
     if (jsnConfig) {
         for (key in jsnConfig) {
             event[key] = jsnConfig[key];
         }
     }
-    
+
     if (document.createEvent) {
         target.dispatchEvent(event);
     } else {
         target.fireEvent("on" + event.eventType, event);
     }
-    
+
     return event;
 };
 
@@ -7846,25 +7846,25 @@ GS.triggerEvent = function (target, strEventName, jsnConfig) {
 GS.strToTitle = function (strInput) {
     'use strict';
     var i, len, chrCurrent, chrLast = '', strRet = '';
-    
+
     strInput = strInput || '';
-    
+
     for (i = 0, len = strInput.length; i < len; i += 1) {
         chrCurrent = strInput.charAt(i);
-        
+
         if (!(/[a-zA-Z]/).test(chrLast)) {
             strRet += chrCurrent.toUpperCase();
-            
+
         } else if (chrCurrent === '_') {
             strRet += ' ';
-            
+
         } else {
             strRet += chrCurrent;
         }
-        
+
         chrLast = chrCurrent;
     }
-    
+
     return strRet;
 };
 
@@ -7873,16 +7873,16 @@ GS.mousePosition = function (event) {
     'use strict';
     var pageX = (evt.touchDevice ? event.touches[0].pageX: event.pageX),// get the left and top of the mouse
         pageY = (evt.touchDevice ? event.touches[0].pageY: event.pageY);//   (or the touch position if we are on a phone)
-    
+
     return {
         'top':    pageY,
         'left':   pageX,
         'bottom': window.innerHeight - pageY,
         'right':  window.innerWidth - pageX,
-        
+
         //'x':      pageY, // alias <== messed these up
         //'y':      pageX  // alias
-        
+
         'x':      pageX, // alias
         'y':      pageY  // alias
     };
@@ -7891,11 +7891,11 @@ GS.mousePosition = function (event) {
 // original function found here: http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
 GS.GUID = function () {
     var strTime = new Date().getTime().toString();
-    
+
     function randomString() {
         return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
     }
-    
+
     return  randomString() + randomString() + '-' +
             randomString() + '-' +
             randomString() + '-' +
@@ -7910,17 +7910,17 @@ GS.getSelectedText = function () {
     if (window.getSelection) {
         return window.getSelection() + '';
     }
-    
+
     // FireFox
     if (document.getSelection) {
         return document.getSelection() + '';
     }
-    
+
     // IE 6/7
     if (document.selection) {
         return document.selection.createRange().text + '';
     }
-    
+
     console.warn('GS.getSelectedText warning: no selection collection function found (could not find a way to get the selected text)');
     return '';
 }*/
@@ -7928,10 +7928,10 @@ GS.getSelectedText = function () {
 // decode uri component safe from "URI malformed" error
 GS.safeDecodeURIComponent = function (string) {
     var strRet;
-    
+
     try {
         strRet = decodeURIComponent(string);
-        
+
     } catch (error) {
         if (error.toString().indexOf('URI malformed') > -1) {
             strRet = string;
@@ -7939,16 +7939,16 @@ GS.safeDecodeURIComponent = function (string) {
             throw error;
         }
     }
-    
+
     return strRet;
 };
 
 //
 GS.getTextHeight = function (scope, bolNormalLineHeight) {
     var divElement = document.createElement('div'), intHeight;
-    
+
     scope = scope || document.body;
-    
+
     divElement.style.visibility = 'invisible';
     divElement.style.fontSize   = '1em';
     divElement.style.margin     = '0';
@@ -7956,13 +7956,13 @@ GS.getTextHeight = function (scope, bolNormalLineHeight) {
     divElement.style.lineHeight = (bolNormalLineHeight ? 'normal' : '1');
     divElement.style.border     = '0';
     divElement.textContent      = 'a';
-    
+
     scope.appendChild(divElement);
-    
+
     intHeight = divElement.clientHeight;
-    
+
     scope.removeChild(divElement);
-    
+
     return intHeight;
 };
 
@@ -7970,9 +7970,9 @@ GS.getTextHeight = function (scope, bolNormalLineHeight) {
 //
 GS.getTextWidth = function (scope, strText, bolWhitePreserve) {
     var divElement = document.createElement('div'), intWidth;
-    
+
     scope = scope || document.body;
-    
+
     divElement.style.display       = 'inline-block';
     divElement.style.visibility    = 'invisible';
     divElement.style.fontSize      = '1em';
@@ -7982,13 +7982,13 @@ GS.getTextWidth = function (scope, strText, bolWhitePreserve) {
     divElement.style.border        = '0';
     divElement.style.whiteSpace    = (bolWhitePreserve ? 'pre' : '');
     divElement.textContent         = strText;
-    
+
     scope.appendChild(divElement);
-    
+
     intWidth = divElement.clientWidth;
-    
+
     scope.removeChild(divElement);
-    
+
     return intWidth;
 };
 
@@ -8063,32 +8063,32 @@ GS.scrollIntoView = function (element, strDirection) {
         //console.log(scrollingContainer);
         if (strDirectionText === 'horizontal') {
             arrSiblings = element.parentNode.children;
-            
+
             for (i = 0, intScrollLeft = 0, len = arrSiblings.length; i < len; i += 1) {
                 if (arrSiblings[i] === element) {
                     intScrollLeft += arrSiblings[i].offsetWidth / 2;
-                    
+
                     break;
                 } else {
                     intScrollLeft += arrSiblings[i].offsetWidth;
                 }
             }
-            
+
             intScrollLeft = intScrollLeft - (scrollingContainer.offsetWidth / 2);
             scrollingContainer.scrollLeft = intScrollLeft;
         } else {
             arrSiblings = element.parentNode.children;
-            
+
             for (i = 0, intScrollTop = 0, len = arrSiblings.length; i < len; i += 1) {
                 if (arrSiblings[i] === element) {
                     intScrollTop += arrSiblings[i].offsetHeight / 2;
-                    
+
                     break;
                 } else {
                     intScrollTop += arrSiblings[i].offsetHeight;
                 }
             }
-            
+
             intScrollTop = intScrollTop - (scrollingContainer.offsetHeight / 2);
             scrollingContainer.scrollTop = intScrollTop;
         }
@@ -8099,18 +8099,18 @@ GS.scrollIntoView = function (element, strDirection) {
 GS.envGetCell = function (data, record_number, column_name) {
     'use strict';
     var index;
-    
+
     if (data.stat) {
         data = data.dat;
     }
-    
+
     index = data.arr_column.indexOf(column_name);
-    
+
     if (index === -1) {
         console.error(column_name, data);
         throw 'Error in GS.envGetCell: column not found';
     }
-    
+
     return data.dat[record_number][index];
 };
 
@@ -8118,7 +8118,7 @@ GS.trim = function(string, strStringToTrim) {
     "use strict";
     var safeRegexString = strStringToTrim.replace(/([.?*+^$[\]\\(){}|-])/g,'\\$1'),
         trimRegex = new RegExp('^' + safeRegexString + '+|' + safeRegexString + '+$', 'g');
-    
+
     return string.replace(trimRegex, '');
 };
 
@@ -8131,14 +8131,14 @@ GS.setCookie = function (c_name, value, exdays) {
     } else {
         exDayNum = exdays;
     }
-    
+
     var hostname = location.hostname;
     var exdate = new Date(), c_value;
     hostname = hostname.substring(hostname.indexOf('.'));
     exdate.setDate(exdate.getDate() + exDayNum);
-    
+
     c_value = encodeURIComponent(value) + ((exDayNum === null || exDayNum === undefined) ? '' : '; expires=' + exdate.toUTCString()) + '; domain=' + hostname + '; path=/';
-    
+
     document.cookie = c_name + '=' + c_value;
 };
 
@@ -8147,11 +8147,11 @@ GS.getCookie = function (c_name) {
     'use strict';
     var c_value = document.cookie, c_end,
         c_start = c_value.indexOf(" " + c_name + "=");
-    
+
     if (c_start === -1) {
         c_start = c_value.indexOf(c_name + "=");
     }
-    
+
     if (c_start === -1) {
         c_value = null;
     } else {
@@ -8162,7 +8162,7 @@ GS.getCookie = function (c_name) {
         }
         c_value = decodeURIComponent(c_value.substring(c_start, c_end));
     }
-    
+
     return c_value;
 };
 
@@ -8179,16 +8179,16 @@ GS.replaceState = function (stateObj, title, url) {
 GS.searchToWhere = function (columns, searchClause) {
     //console.log(searchClause);
     var arrToken, arrNoQuotes = [], strNoQuotes = '', arrColumn, arrRequired = [], strRequired = '', arrWhere = [], strWhere = '', strRet = '', token, numTokens, col, numCols, i, len, strSearch;
-    
+
     if (!searchClause) {
         return '1=1';
     }
-    
+
     arrColumn = columns.split(',');
-    
+
     // First get all quoted tokens, leave everything else
     arrToken = searchClause.match(/[\+|\-]?"[^"]*?"/g);
-    
+
     if (arrToken) {
         for (token = 0, numTokens = arrToken.length; token < numTokens; token += 1) {
             arrToken[token] = GS.trim(arrToken[token], '+');
@@ -8203,19 +8203,19 @@ GS.searchToWhere = function (columns, searchClause) {
                         '%\' ELSE TRUE END';
                     arrToken[token] = '-' + arrToken[token];
                 } else {
-                    arrRequired[token] = 
+                    arrRequired[token] =
                         (arrRequired[token] ? arrRequired[token] + ' OR ' : '') +
                         (arrColumn[col] + ' ILIKE \'%' + GS.trim(arrToken[token], '"') + '%\'');
                 }
             }
         }
-        
+
         for (i = 0, len = arrRequired.length; i < len; i += 1) {
             strRequired = (strRequired ? strRequired + ' AND ' : '') + '(' + arrRequired[i] + ')';
         }
         //console.log('strRequired:', strRequired);
     }
-    
+
     // Get non-quoted tokens and remove extra space
     /*
     //NOT CROSS BROWSER
@@ -8268,19 +8268,19 @@ GS.searchToWhere = function (columns, searchClause) {
                 if (arrNoQuotes[token].length > 0) {
                     //console.log('4');
                     if (arrNoQuotes[token][0] === '-') {
-                        arrRequired[token] = 
+                        arrRequired[token] =
                             (arrRequired[token] ? arrRequired[token] + ' AND ' : '') +
                             ' CASE WHEN ' + arrColumn[col] +
                             ' IS NOT NULL THEN ' + arrColumn[col] +
                             ' NOT ILIKE $$%' + GS.trim(GS.trim(arrNoQuotes[token], '-'), ' ') +
                             '%$$ ELSE TRUE END ';
                     } else if (arrNoQuotes[token][0] === '+') {
-                        arrRequired[token] = 
+                        arrRequired[token] =
                             (arrRequired[token] ? arrRequired[token] + ' OR ' : '') +
                             arrColumn[col] + ' ILIKE $$%' +
                             GS.trim(GS.trim(arrNoQuotes[token], '+'), ' ') + '%$$ ';
                     } else {
-                        arrWhere[token] = 
+                        arrWhere[token] =
                             (arrWhere[token] ? arrWhere[token] + ' OR ' : '') +
                             arrColumn[col] + ' ILIKE $$%' + GS.trim(arrNoQuotes[token], ' ') + '%$$ ';
                     }
@@ -8288,7 +8288,7 @@ GS.searchToWhere = function (columns, searchClause) {
             }
         }
     }
-    
+
     if (arrRequired.length > 0) {
         for (i = 0, len = arrRequired.length; i < len; i += 1) {
             if (arrRequired[i]) {
@@ -8297,7 +8297,7 @@ GS.searchToWhere = function (columns, searchClause) {
         }
     }
     //console.log('strRequired: ', strRequired);
-    
+
     if (arrWhere.length > 0) {
         for (i = 0, len = arrWhere.length; i < len; i += 1) {
             if (arrWhere[i]) {
@@ -8306,16 +8306,16 @@ GS.searchToWhere = function (columns, searchClause) {
         }
     }
     //console.log('strWhere: ', strWhere);
-    
-    strRet = 
+
+    strRet =
         (
             strWhere && strRequired ? '(' + strWhere + ') AND (' + strRequired + ')' :
             strWhere ? strWhere :
             strRequired
         );
-    
+
     //console.log('strRet: ' + strRet);
-    
+
     return strRet;
 };
 
@@ -8393,25 +8393,25 @@ document.addEventListener('DOMContentLoaded', function () {
 
 GS.addLoader = function (loaderClassOrTarget, loaderContent) {
     var loaderElement = document.createElement('gs-loader'), loaderClass, loaderTarget;
-    
+
     // turn loaderClassOrTarget into class or target
     if (typeof loaderClassOrTarget === 'string') {
         loaderClass = loaderClassOrTarget;
-        
+
     } else if (typeof loaderClassOrTarget === 'object') {
         loaderTarget = loaderClassOrTarget;
     }
-    
+
     // if there is a loader class: add class to loader for future identification
     if (loaderClass) {
         loaderElement.classList.add('loader-' + loaderClass);
     }
-    
+
     // default loader target to body
     if (!loaderTarget) {
         loaderTarget = document.body;
     }
-    
+
     // add spinning elements and loader content to loader container
     loaderElement.innerHTML =   '<div class="loader-positioning" gs-dynamic>' +
                                     '<div class="loader" gs-dynamic></div>' +
@@ -8420,35 +8420,35 @@ GS.addLoader = function (loaderClassOrTarget, loaderContent) {
                                     '<div class="loader-inner-inner-inner spinning" gs-dynamic></div>' +
                                     (loaderContent ? '<div class="loader-content" gs-dynamic>' + loaderContent + '</div>' : '') +
                                 '</div>';
-    
+
     // prevent scrolling on a loader
     loaderElement.addEventListener('mousewheel', function (event) {
         event.preventDefault();
     });
-    
+
     // append loader to target
     loaderTarget.appendChild(loaderElement); // document.body
 };
 
 GS.removeLoader = function (loaderClassOrTarget) {
     var element, i, len, arrLoaders, loaderClass, loaderTarget;
-    
+
     if (typeof loaderClassOrTarget === 'string') {
         loaderClass = loaderClassOrTarget;
-        
+
     } else if (typeof loaderClassOrTarget === 'object') {
         loaderTarget = loaderClassOrTarget;
     }
-    
+
     if (loaderClass) {
         element = document.getElementsByClassName('loader-' + loaderClass)[0];
-        
+
     } else if (loaderTarget) {
         element = xtag.queryChildren(loaderTarget, 'gs-loader')[0];
-        
+
     } else {
         arrLoaders = xtag.queryChildren(document.body, 'gs-loader');
-        
+
         for (i = 0, len = arrLoaders.length; i < len; i += 1) {
             if (!arrLoaders[i].hasAttribute('id')) {
                 element = arrLoaders[i];
@@ -8456,7 +8456,7 @@ GS.removeLoader = function (loaderClassOrTarget) {
             }
         }
     }
-    
+
     if (element) {
         element.parentNode.removeChild(element);
     } else {
@@ -8467,9 +8467,9 @@ GS.removeLoader = function (loaderClassOrTarget) {
 GS.removeAllLoaders = function () {
     'use strict';
     var i, len, arrLoaders;
-    
+
     arrLoaders = xtag.query(document.body, 'gs-loader');
-    
+
     for (i = 0, len = arrLoaders.length; i < len; i += 1) {
         if (!arrLoaders[i].hasAttribute('id')) {
             arrLoaders[i].parentNode.removeChild(arrLoaders[i]);
@@ -8480,16 +8480,16 @@ window.addEventListener('design-register-element', function () {
     window.designElementProperty_GSBODY = function(selectedElement) {
         addFlexContainerProps(selectedElement);
         //addFlexProps(selectedElement);
-        
+
         addProp('Padded', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('padded')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'padded', (this.value === 'true'), true);
         });
     };
-    
+
     registerDesignSnippet('<gs-body>', '<gs-body>', 'gs-body>\n' +
                                                     '    $0\n' +
                                                     '</gs-body>');
-    
+
     designRegisterElement('gs-body', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-page.html');
 });
 
@@ -8586,7 +8586,7 @@ document.addEventListener('DOMContentLoaded', function () {
                        if (selectedElement.hasAttribute('iconrotateright')) { strIconRotation = 'iconrotateright';
                 } else if (selectedElement.hasAttribute('iconrotatedown'))  { strIconRotation = 'iconrotatedown';
                 } else if (selectedElement.hasAttribute('iconrotateleft'))  { strIconRotation = 'iconrotateleft'; }
-                
+
                 addProp('Icon&nbsp;Rotation', true, '<gs-select class="target" value="' + strIconRotation + '" mini>' +
                                                     '   <option value="">None</option>' +
                                                     '   <option value="iconrotateright">90 degrees</option>' +
@@ -8596,30 +8596,30 @@ document.addEventListener('DOMContentLoaded', function () {
                     selectedElement.removeAttribute('iconrotateright');
                     selectedElement.removeAttribute('iconrotatedown');
                     selectedElement.removeAttribute('iconrotateleft');
-                    
+
                     if (this.value) {
                         selectedElement.setAttribute(this.value, '');
                     }
-                    
+
                     return selectedElement;
                 });
-                
+
                 addProp('Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>', function () {
                     return setOrRemoveTextAttribute(selectedElement, 'column', this.value, false);
                 });
-                
+
                 addProp('Value', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('value') || '') + '" mini></gs-text>', function () {
                     return setOrRemoveTextAttribute(selectedElement, 'value', this.value, false);
                 });
-                
+
                 addProp('Column In Querystring', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('qs') || '') + '" mini></gs-text>', function () {
                     return setOrRemoveTextAttribute(selectedElement, 'qs', this.value, false);
                 });
-                
+
                 addProp('Jumbo', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('jumbo')) + '" mini></gs-checkbox>', function () {
                     return setOrRemoveBooleanAttribute(selectedElement, 'jumbo', (this.value === 'true'), true);
                 });
-                
+
                 addProp('Focusable', true, '<gs-checkbox class="target" value="' + (!selectedElement.hasAttribute('no-focus')) + '" mini></gs-checkbox>', function () {
                     return setOrRemoveBooleanAttribute(selectedElement, 'no-focus', (this.value === 'true'), false);
                 });
@@ -8639,7 +8639,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (selectedElement.hasAttribute('txt-info'))     { strFontAttribute = 'txt-info'; }
                 if (selectedElement.hasAttribute('txt-warning'))  { strFontAttribute = 'txt-warning'; }
                 if (selectedElement.hasAttribute('txt-danger'))   { strFontAttribute = 'txt-danger'; }
-                
+
                 addProp('Font Color', true, '<gs-select class="target" value="' + strFontAttribute + '" mini>' +
                                                 '<option value="">Default</option>' +
                                                 '<option value="txt-primary">Primary</option>' +
@@ -8653,11 +8653,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     selectedElement.removeAttribute('txt-info');
                     selectedElement.removeAttribute('txt-warning');
                     selectedElement.removeAttribute('txt-danger');
-                    
+
                     if (this.value) {
                         selectedElement.setAttribute(this.value, '');
                     }
-                    
+
                     return selectedElement;
                 });
 
@@ -8750,40 +8750,40 @@ document.addEventListener('DOMContentLoaded', function () {
                     selectedElement.removeAttribute('show-on-desktop');
                     selectedElement.removeAttribute('show-on-tablet');
                     selectedElement.removeAttribute('show-on-phone');
-                    
+
                     if (this.value) {
                         selectedElement.setAttribute(this.value, '');
                     }
-                    
+
                     return selectedElement;
                 });
-                
+
                 // addProp('Corners', true,   '<div class="target">' +
                 //                                 '<gs-grid>\n' +
                 //                                 '    <gs-block>\n' +
                 //                                 '        <gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
                 //                                                             selectedElement.hasAttribute('remove-top') ||
                 //                                                             selectedElement.hasAttribute('remove-left') ||
-                //                                                             selectedElement.hasAttribute('remove-top-left'))).toString() + 
+                //                                                             selectedElement.hasAttribute('remove-top-left'))).toString() +
                 //                                             '" remove-right remove-bottom id="round-top-left-corner________"></gs-checkbox>' +
-                                                        
+
                 //                                 '        <gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
                 //                                                             selectedElement.hasAttribute('remove-bottom') ||
                 //                                                             selectedElement.hasAttribute('remove-left') ||
-                //                                                             selectedElement.hasAttribute('remove-bottom-left'))).toString() + 
+                //                                                             selectedElement.hasAttribute('remove-bottom-left'))).toString() +
                 //                                             '" remove-right remove-top id="round-bottom-left-corner________"></gs-checkbox>' +
                 //                                 '    </gs-block>\n' +
                 //                                 '    <gs-block>\n' +
                 //                                 '        <gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
                 //                                                             selectedElement.hasAttribute('remove-top') ||
                 //                                                             selectedElement.hasAttribute('remove-right') ||
-                //                                                             selectedElement.hasAttribute('remove-top-right'))).toString() + 
+                //                                                             selectedElement.hasAttribute('remove-top-right'))).toString() +
                 //                                             '" remove-left remove-bottom id="round-top-right-corner________"></gs-checkbox>' +
-                                                        
+
                 //                                 '        <gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
                 //                                                             selectedElement.hasAttribute('remove-bottom') ||
                 //                                                             selectedElement.hasAttribute('remove-right') ||
-                //                                                             selectedElement.hasAttribute('remove-bottom-right'))).toString() + 
+                //                                                             selectedElement.hasAttribute('remove-bottom-right'))).toString() +
                 //                                             '" remove-left remove-top id="round-bottom-right-corner________"></gs-checkbox>' +
                 //                                 '    </gs-block>\n' +
                 //                                 '</gs-grid>\n' +
@@ -8793,7 +8793,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 //         bottomLeft  = document.getElementById('round-bottom-left-corner________').value === 'true',
                 //         bottomRight = document.getElementById('round-bottom-right-corner________').value === 'true',
                 //         arrStrAttr = [], i, len;
-                    
+
                 //     selectedElement.removeAttribute('remove-all');
                 //     selectedElement.removeAttribute('remove-top');
                 //     selectedElement.removeAttribute('remove-bottom');
@@ -8803,20 +8803,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 //     selectedElement.removeAttribute('remove-top-right');
                 //     selectedElement.removeAttribute('remove-bottom-left');
                 //     selectedElement.removeAttribute('remove-bottom-right');
-                    
+
                 //     if (!topLeft && !topRight && !bottomLeft && !bottomRight) {
                 //         arrStrAttr.push('remove-all');
                 //     } else if (!topLeft && !topRight) {
                 //         arrStrAttr.push('remove-top');
                 //     } else if (!bottomLeft && !bottomRight) {
                 //         arrStrAttr.push('remove-bottom');
-                        
+
                 //     } else if (!topLeft && !bottomLeft) {
                 //         arrStrAttr.push('remove-left');
                 //     } else if (!topRight && !bottomRight) {
                 //         arrStrAttr.push('remove-right');
                 //     }
-                    
+
                 //     if (!topLeft && !bottomLeft && arrStrAttr[0] !== 'remove-all') {
                 //         arrStrAttr.push('remove-left');
                 //     } else if (!topLeft && topRight) {
@@ -8843,7 +8843,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 designAdditionalFunction(selectedElement);
             };
         });
-        
+
         document.addEventListener('DOMContentLoaded', function () {
             function handleDisable(element) {
                 var i, len;
@@ -8870,23 +8870,23 @@ document.addEventListener('DOMContentLoaded', function () {
                 var len;
                 var arrAttr;
                 var jsnAttr;
-        
+
                 // we need a place to store the attributes
                 element.internal.defaultAttributes = {};
-        
+
                 // loop through attributes and store them in the internal defaultAttributes object
                 arrAttr = element.attributes;
                 i = 0;
                 len = arrAttr.length;
                 while (i < len) {
                     jsnAttr = arrAttr[i];
-        
+
                     element.internal.defaultAttributes[jsnAttr.nodeName] = (jsnAttr.nodeValue || '');
-        
+
                     i += 1;
                 }
             }
-        
+
             function pushReplacePopHandler(element) {
                 var i;
                 var len;
@@ -9002,39 +9002,39 @@ document.addEventListener('DOMContentLoaded', function () {
                         } else {
                             element.removeAttribute('tabindex');
                         }
-                        
+
                         if (!evt.touchDevice) {
                             element.addEventListener('focus', function (event) {
                                 element.classList.add('focus');
                             });
-                            
+
                             element.addEventListener('blur', function (event) {
                                 element.classList.remove('focus');
                             });
-                            
-                            
+
+
                             element.addEventListener(evt.mousedown, function (event) {
                                 element.classList.add('down');
                             });
-                            
+
                             element.addEventListener(evt.mouseout, function (event) {
                                 element.classList.remove('down');
                                 element.classList.remove('hover');
                             });
-                            
+
                             element.addEventListener(evt.mouseover, function (event) {
                                 element.classList.remove('down');
                                 element.classList.add('hover');
                             });
-                            
+
                             element.addEventListener('keydown', function (event) {
                                 if (!element.hasAttribute('disabled') && !element.classList.contains('down') &&
                                     (event.keyCode === 13 || event.keyCode === 32)) {
-                                    
+
                                     element.classList.add('down');
                                 }
                             });
-                            
+
                             element.addEventListener('keyup', function (event) {
                                 // if we are not disabled and we pressed return (13) or space (32): trigger click
                                 if (!element.hasAttribute('disabled') && element.classList.contains('down') &&
@@ -9043,12 +9043,12 @@ document.addEventListener('DOMContentLoaded', function () {
                                 }
                             });
                         }
-                        
+
                         element.addEventListener('click', function (event) {
                             element.classList.remove('down');
                             clickFunction(element);
                         });
-                        
+
                         element.addEventListener('keypress', function (event) {
                             // if we pressed return (13) or space (32): prevent default and stop propagation (to prevent scrolling of the page)
                             if (event.keyCode === 13 || event.keyCode === 32) {
@@ -9056,15 +9056,15 @@ document.addEventListener('DOMContentLoaded', function () {
                                 event.stopPropagation();
                             }
                         });
-                        
+
                         if (element.getAttribute('key')) {
                             strKey = element.getAttribute('key');
-                            
+
                             if (GS.keyCode(strKey)) {
                                 if (strKey.match(/[arfcvxzntypq]/gim)) {
                                     console.warn('gs-skype-button Warning: by setting the hot key of this button to "' + strKey + '" you may be overriding browser functionality.', element);
                                 }
-                                
+
                                 window.addEventListener('keydown', function (event) {
                                     if (String(event.keyCode || event.which) === GS.keyCode(strKey) &&
                                         (
@@ -9073,42 +9073,42 @@ document.addEventListener('DOMContentLoaded', function () {
                                         )) {
                                         event.preventDefault();
                                         event.stopPropagation();
-                                        
+
                                         element.focus();
                                         GS.triggerEvent(element, 'click');
                                     }
                                 });
-                                
+
                             } else if (strKey.length > 1) {
                                 console.error('gs-skype-button Error: \'key="' + strKey + '"\' is not a valid hot-key.', element);
                             }
                         }
-                        
+
                         handleDisable(element);
                     }
                 }
             }
-            
+
             xtag.register(strTagName, {
                 lifecycle: {
                     created: function () {
                         elementCreated(this);
                     },
-                    
+
                     inserted: function () {
                         elementInserted(this);
                     },
-                    
+
                     attributeChanged: function (strAttrName, oldValue, newValue) {
                         // if "suspend-created" has been removed: run created and inserted code
                         if (strAttrName === 'suspend-created' && newValue === null) {
                             elementCreated(this);
                             elementInserted(this);
-                            
+
                         // if "suspend-inserted" has been removed: run inserted code
                         } else if (strAttrName === 'suspend-inserted' && newValue === null) {
                             elementInserted(this);
-                            
+
                         } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
                             if (strAttrName === 'no-focus') {
                                 if (!this.hasAttribute('no-focus')) {
@@ -9139,38 +9139,38 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     }
-    
-    
-    
+
+
+
     defineButton('gs-email-button', '', ['value'], '', function (element) {
         var emailAddress = element.getAttribute('value'), linkIframe, mousedownHandler;
-        
+
         if (emailAddress) {
             linkIframe = document.createElement('iframe');
             document.body.appendChild(linkIframe);
-            
+
             linkIframe.setAttribute('src', 'mailto:' + emailAddress);
-            
+
             mousedownHandler = function () {
                 document.body.removeChild(linkIframe);
                 window.removeEventListener('mousedown', mousedownHandler);
             };
-            
+
             window.addEventListener('mousedown', mousedownHandler);
         }
     });
-    
+
     defineButton('gs-facetime-button', '', ['value'], '', function (element) {
         var appleID = element.getAttribute('value');
-        
+
         if (appleID) {
             window.open('facetime:' + appleID);
         }
     });
-    
+
     defineButton('gs-map-button', '', ['value'], '', function (element) {
         var strLocation = encodeURIComponent(element.getAttribute('value'));
-        
+
         if (strLocation) {
             if (element.hasAttribute('google') === true) {
                 window.open('https://maps.google.com/maps?q=' + strLocation);
@@ -9181,29 +9181,29 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     });
-    
+
     defineButton('gs-phone-button', '', ['value'], '', function (element) {
         var phoneNumber = element.getAttribute('value');
-        
+
         if (phoneNumber) {
             if (evt.deviceType === 'phone') {
                 window.open('tel:' + phoneNumber);
-                   
+
             } else {
                 GS.msgbox('Phone Number', '<center>' + phoneNumber + '</center>', ['Done']);
             }
         }
     });
-    
+
     defineButton('gs-tracking-button', '', ['value'], function (selectedElement) {
         var strService = '';
-        
+
                if (selectedElement.hasAttribute('usps'))  { strService = 'usps';
         } else if (selectedElement.hasAttribute('ups'))   { strService = 'ups';
         } else if (selectedElement.hasAttribute('fedex')) { strService = 'fedex';
         } else if (selectedElement.hasAttribute('royal')) { strService = 'royal';
         } else if (selectedElement.hasAttribute('amz'))   { strService = 'amz'; }
-        
+
         addProp('Service', true, '<gs-select class="target" value="' + strService + '" mini>' +
                                             '   <option value="">None</option>' +
                                             '   <option value="usps">USPS</option>' +
@@ -9217,33 +9217,33 @@ document.addEventListener('DOMContentLoaded', function () {
             selectedElement.removeAttribute('fedex');
             selectedElement.removeAttribute('royal');
             selectedElement.removeAttribute('amazon');
-            
+
             if (this.value) {
                 selectedElement.setAttribute(this.value, '');
             }
-            
+
             return selectedElement;
         });
-        
+
     }, function (element) {
         var strTrackingNumber = element.getAttribute('value');
-        
+
         if (strTrackingNumber) {
             if (element.hasAttribute('usps') === true) {
                 window.open(' https://tools.usps.com/go/TrackConfirmAction?tLabels=' + strTrackingNumber);
-                
+
             } else if (element.hasAttribute('ups') === true) {
                 window.open('http://www.ups.com/WebTracking/processInputRequest?tracknum=' + strTrackingNumber);
-                
+
             } else if (element.hasAttribute('fedex') === true) {
                 window.open('https://www.fedex.com/apps/fedextrack/index.html?tracknumbers=' + strTrackingNumber);
-                
+
             } else if (element.hasAttribute('royal') === true) {
                 window.open('https://www.royalmail.com/track-your-item?trackNumber=' + strTrackingNumber);
-                
+
             } else if (element.hasAttribute('amz') === true) {
                 window.open(decodeURIComponent(strTrackingNumber));
-                
+
             } else {
                 GS.msgbox('Please Choose...',
                           '<center>Please Choose UPS, USPS, Fedex, Royal Mail or Amazon</center>',
@@ -9264,13 +9264,13 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     });
-    
+
     defineButton('gs-skype-button', '', ['value'], '', function (element) {
         if (element.getAttribute('value')) {
             window.open('skype:' + element.getAttribute('value'));
         }
     });
-    
+
     defineButton('gs-delete-button',
                  '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-delete-button.html',
                  ['value', 'src'],
@@ -9278,11 +9278,11 @@ document.addEventListener('DOMContentLoaded', function () {
         addProp('Source', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('src') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'src', this.value, false);
         });
-        
+
         addProp('Delete Action', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('action-delete') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'action-delete', this.value);
         });
-        
+
     }, function (element) {
         if (element.getAttribute('value')) {
             var arrSrcParts = element.getAttribute('src').split('.')
@@ -9291,24 +9291,24 @@ document.addEventListener('DOMContentLoaded', function () {
               , strPkColumn, strLockColumn
               , deleteRecordData, strHashColumns, strRoles, strColumns, strRecord
               , strDeleteData, strHash, strPkValue, strLockValue;
-            
+
             element.classList.remove('down');
-            
+
             strPkColumn = element.getAttribute('column') || 'id';
             strLockColumn = strPkColumn;
             strHashColumns = strLockColumn;
-            
+
             strPkValue = GS.encodeForTabDelimited(element.getAttribute('value') || '');
             strLockValue = element.getAttribute('value') || '';
-            
+
             strRoles = 'pk\thash';
             strColumns = strPkColumn + '\thash';
-            
+
             strHash = CryptoJS.MD5(strLockValue === 'NULL' ? '' : strLockValue).toString();
-            
+
             strDeleteData = strPkValue + '\t' + strHash + '\n';
             strDeleteData = strRoles + '\n' + strColumns + '\n' + strDeleteData;
-            
+
             // create delete transaction
             GS.addLoader(element, 'Creating Delete Transaction...');
             GS.requestDeleteFromSocket(
@@ -9382,13 +9382,13 @@ document.addEventListener('DOMContentLoaded', function () {
             );
         }
     });
-    
+
     defineButton('gs-option',
                  '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-optionbox.html',
                  [],
                  function (selectedElement) {},
                  function (element) {});
-    
+
     defineButton('gs-dialog-button',
         '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-dialog-button.html',
         [],
@@ -9396,11 +9396,11 @@ document.addEventListener('DOMContentLoaded', function () {
             addProp('Template', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('template') || '') + '" mini></gs-text>', function () {
                 return setOrRemoveTextAttribute(selectedElement, 'template', this.value, false);
             });
-            
+
             addProp('Attach To Element', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('target-element') || '') + '" mini></gs-text>', function () {
                 return setOrRemoveTextAttribute(selectedElement, 'target-element', this.value, false);
             });
-            
+
             addProp('Attachment Direction', true, '<gs-select class="target" value="' + encodeHTML(selectedElement.getAttribute('direction') || '') + '" mini>' +
                                                         '<option value="">Default</option>' +
                                                         '<option value="left">Left</option>' +
@@ -9410,19 +9410,19 @@ document.addEventListener('DOMContentLoaded', function () {
                                                   '</gs-select>', function () {
                 return setOrRemoveTextAttribute(selectedElement, 'direction', this.value, false);
             });
-            
+
             addProp('Before Open JS', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('before-open') || '') + '" mini></gs-text>', function () {
                 return setOrRemoveTextAttribute(selectedElement, 'before-open', this.value, false);
             });
-            
+
             addProp('After Open JS', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('after-open') || '') + '" mini></gs-text>', function () {
                 return setOrRemoveTextAttribute(selectedElement, 'after-open', this.value, false);
             });
-            
+
             addProp('Before Close JS', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('before-close') || '') + '" mini></gs-text>', function () {
                 return setOrRemoveTextAttribute(selectedElement, 'before-close', this.value, false);
             });
-            
+
             addProp('After Close JS', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('after-close') || '') + '" mini></gs-text>', function () {
                 return setOrRemoveTextAttribute(selectedElement, 'after-close', this.value, false);
             });
@@ -9440,23 +9440,23 @@ document.addEventListener('DOMContentLoaded', function () {
               , afterOpenFunction
               , beforeCloseFunction
               , afterCloseFunction;
-            
+
             templateElement = (strTemplate ? document.getElementById(strTemplate) : xtag.queryChildren(element, 'template')[0]);
             //console.log(templateElement);
-            
+
             if (templateElement) {
                 if (strBeforeOpen) {
                     new Function(strBeforeOpen).apply(element);
                 }
                 GS.triggerEvent(element, 'before-open');
-                
+
                 afterOpenFunction = function () {
                     if (strAfterOpen) {
                         new Function(strAfterOpen).apply(this);
                     }
                     GS.triggerEvent(element, 'after-open');
                 };
-                
+
                 beforeCloseFunction = function (event, strAnswer) {
                     // if there is a before close function: run the code
                     if (strBeforeClose) {
@@ -9466,7 +9466,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                     GS.triggerEvent(element, 'before-close', {'strAnswer': strAnswer});
                 };
-                
+
                 afterCloseFunction = function (event, strAnswer) {
                     // if there is a after close function: run the code
                     if (strAfterClose) {
@@ -9476,15 +9476,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                     GS.triggerEvent(element, 'after-close', {'strAnswer': strAnswer});
                 };
-                
+
                 if (strTargetSelector || element.hasAttribute('target')) {
                     strTargetSelector = (strTargetSelector || 'this');
                     targetElement = (strTargetSelector === 'this' ? element : document.querySelector(strTargetSelector));
                     strDirection = (strDirection || 'down');
-                    
+
                     GS.openDialogToElement(targetElement, templateElement, strDirection,
                                             afterOpenFunction, beforeCloseFunction, afterCloseFunction);
-                    
+
                 } else {
                     GS.openDialog(templateElement, afterOpenFunction, beforeCloseFunction, afterCloseFunction);
                 }
@@ -9506,14 +9506,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 window.addEventListener('design-register-element', function () {
-    
+
     registerDesignSnippet('<gs-button>', '<gs-button>', 'gs-button>${1}</gs-button>');
-    
+
     designRegisterElement('gs-button', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-buttons-toggle.html');
-    
+
     window.designElementProperty_GSBUTTON = function(selectedElement) {
         var strIconPos, strIconRotation;
-        
+
         addProp('Icon', true, '<div flex-horizontal>' +
                               '     <gs-text id="prop-icon-input" class="target" value="' + (selectedElement.getAttribute('icon') || '') + '" mini flex></gs-text>' +
                               '     <gs-button id="prop-icon-picker-button" mini icononly icon="list"></gs-button>' +
@@ -9521,20 +9521,20 @@ window.addEventListener('design-register-element', function () {
                               '</div>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'icon', this.value);
         });
-        
+
         document.getElementById('prop-icon-picker-button').addEventListener('click', function () {
             var i, len, html, arrIcons = GS.iconList(), strName, templateElement;
-            
+
             for (i = 0, len = arrIcons.length, html = ''; i < len; i += 1) {
                 strName = arrIcons[i].name;
                 html += '<gs-block>' +
                             '<gs-button iconleft icon="' + strName + '" dialogclose>' + strName + '</gs-button>' +
                         '</gs-block>';
             }
-            
+
             templateElement = document.createElement('template');
             templateElement.setAttribute('data-max-width', '1100px');
-            
+
             templateElement.innerHTML = ml(function () {/*
                 <gs-page>
                     <gs-header><center><h3>Choose An Icon</h3></center></gs-header>
@@ -9544,17 +9544,17 @@ window.addEventListener('design-register-element', function () {
                     <gs-footer><gs-button dialogclose>Cancel</gs-button></gs-footer>
                 </gs-page>
             */}).replace('{{HTML}}', html);
-            
+
             GS.openDialog(templateElement, '', function (event, strAnswer) {
                 var propInput = document.getElementById('prop-icon-input');
-                
+
                 if (strAnswer !== 'Cancel') {
                     propInput.value = strAnswer;
                     GS.triggerEvent(propInput, 'change');
                 }
             });
         });
-        
+
         // iconleft
         // iconright
         // icontop
@@ -9566,7 +9566,7 @@ window.addEventListener('design-register-element', function () {
         } else if (selectedElement.hasAttribute('iconbottom')) { strIconPos = 'iconbottom';
         } else if (selectedElement.hasAttribute('icononly'))   { strIconPos = 'icononly';
         } else { strIconPos = ''; }
-        
+
         addProp('Icon Position', true, '<gs-select class="target" value="' + strIconPos + '" mini>' +
                                         '   <option value="">Default</option>' +
                                         '   <option value="iconleft">Left</option>' +
@@ -9580,14 +9580,14 @@ window.addEventListener('design-register-element', function () {
             selectedElement.removeAttribute('icontop');
             selectedElement.removeAttribute('iconbottom');
             selectedElement.removeAttribute('icononly');
-            
+
             if (this.value) {
                 selectedElement.setAttribute(this.value, '');
             }
-            
+
             return selectedElement;
         });
-        
+
         // None
         // 90 degrees  (iconrotateright)
         // 180 degrees (iconrotatedown)
@@ -9596,7 +9596,7 @@ window.addEventListener('design-register-element', function () {
         } else if (selectedElement.hasAttribute('iconrotatedown'))  { strIconRotation = 'iconrotatedown';
         } else if (selectedElement.hasAttribute('iconrotateleft'))  { strIconRotation = 'iconrotateleft';
         } else { strIconRotation = ''; }
-        
+
         addProp('Icon&nbsp;Rotation', true, '<gs-select class="target" value="' + strIconRotation + '" mini>' +
                                             '   <option value="">None</option>' +
                                             '   <option value="iconrotateright">90 degrees</option>' +
@@ -9606,14 +9606,14 @@ window.addEventListener('design-register-element', function () {
             selectedElement.removeAttribute('iconrotateright');
             selectedElement.removeAttribute('iconrotatedown');
             selectedElement.removeAttribute('iconrotateleft');
-            
+
             if (this.value) {
                 selectedElement.setAttribute(this.value, '');
             }
-            
+
             return selectedElement;
         });
-        
+
         addProp('Href', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('href') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'href', this.value, false);
         });
@@ -9625,20 +9625,20 @@ window.addEventListener('design-register-element', function () {
                 return setOrRemoveTextAttribute(selectedElement, 'target', this.value, false);
             });
         }
-        
+
         addProp('Jumbo', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('jumbo')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'jumbo', (this.value === 'true'), true);
         });
-        
+
         addProp('Focusable', true, '<gs-checkbox class="target" value="' + (!selectedElement.hasAttribute('no-focus')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'no-focus', (this.value === 'true'), false);
         });
-        
+
         // TABINDEX attribute
         addProp('Tabindex', true, '<gs-number class="target" value="' + encodeHTML(selectedElement.getAttribute('tabindex') || '0') + '" mini></gs-number>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'tabindex', this.value);
         });
-        
+
         addProp('Inline', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('inline')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'inline', (this.value === 'true'), true);
         });
@@ -9650,9 +9650,9 @@ window.addEventListener('design-register-element', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'emphasis', (this.value === 'true'), true);
         });
         */
-        
+
         //<gs-button txt-info bg-success>
-        
+
         // Font Color attributes
         var strFontAttribute = '';
         if (selectedElement.hasAttribute('txt-primary'))  { strFontAttribute = 'txt-primary'; }
@@ -9660,7 +9660,7 @@ window.addEventListener('design-register-element', function () {
         if (selectedElement.hasAttribute('txt-info'))     { strFontAttribute = 'txt-info'; }
         if (selectedElement.hasAttribute('txt-warning'))  { strFontAttribute = 'txt-warning'; }
         if (selectedElement.hasAttribute('txt-danger'))   { strFontAttribute = 'txt-danger'; }
-        
+
         addProp('Font Color', true, '<gs-select class="target" value="' + strFontAttribute + '" mini>' +
                                         '<option value="">Default</option>' +
                                         '<option value="txt-primary">Primary</option>' +
@@ -9674,14 +9674,14 @@ window.addEventListener('design-register-element', function () {
             selectedElement.removeAttribute('txt-info');
             selectedElement.removeAttribute('txt-warning');
             selectedElement.removeAttribute('txt-danger');
-            
+
             if (this.value) {
                 selectedElement.setAttribute(this.value, '');
             }
-            
+
             return selectedElement;
         });
-        
+
         // Background Color attributes
         var strBackgroundAttribute = '';
         if (selectedElement.hasAttribute('bg-primary'))  { strBackgroundAttribute = 'bg-primary'; }
@@ -9689,7 +9689,7 @@ window.addEventListener('design-register-element', function () {
         if (selectedElement.hasAttribute('bg-info'))     { strBackgroundAttribute = 'bg-info'; }
         if (selectedElement.hasAttribute('bg-warning'))  { strBackgroundAttribute = 'bg-warning'; }
         if (selectedElement.hasAttribute('bg-danger'))   { strBackgroundAttribute = 'bg-danger'; }
-        
+
         addProp('Background Color', true, '<gs-select class="target" value="' + strBackgroundAttribute + '" mini>' +
                                         '<option value="">Default</option>' +
                                         '<option value="bg-primary">Primary</option>' +
@@ -9703,44 +9703,44 @@ window.addEventListener('design-register-element', function () {
             selectedElement.removeAttribute('bg-info');
             selectedElement.removeAttribute('bg-warning');
             selectedElement.removeAttribute('bg-danger');
-            
+
             if (this.value) {
                 selectedElement.setAttribute(this.value, '');
             }
-            
+
             return selectedElement;
         });
-        
+
         addProp('Key', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('key') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'key', this.value, false);
         });
-        
+
         addProp('No Modifier Key For Hot Key', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('no-modifier-key') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'no-modifier-key', this.value === 'true', true);
         });
-        
+
         // TEXT CONTENT
         addProp('Text', true, '<gs-text class="target" value="' + (selectedElement.textContent || '') + '" mini></gs-text>', function () {
             selectedElement.textContent = this.value;
-            
+
             return selectedElement;
         });
-        
+
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
-        
+
         // DISABLED attribute
         addProp('Disabled', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('disabled') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'disabled', this.value === 'true', true);
         });
-        
+
         // DIALOGCLOSE attribute
         addProp('Dialog Close', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('dialogclose') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'dialogclose', this.value === 'true', true);
         });
-        
+
         // visibility attributes
         var strVisibilityAttribute = '';
         if (selectedElement.hasAttribute('hidden'))          { strVisibilityAttribute = 'hidden'; }
@@ -9750,7 +9750,7 @@ window.addEventListener('design-register-element', function () {
         if (selectedElement.hasAttribute('show-on-desktop')) { strVisibilityAttribute = 'show-on-desktop'; }
         if (selectedElement.hasAttribute('show-on-tablet'))  { strVisibilityAttribute = 'show-on-tablet'; }
         if (selectedElement.hasAttribute('show-on-phone'))   { strVisibilityAttribute = 'show-on-phone'; }
-        
+
         addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                         '<option value="">Visible</option>' +
                                         '<option value="hidden">Invisible</option>' +
@@ -9768,40 +9768,40 @@ window.addEventListener('design-register-element', function () {
             selectedElement.removeAttribute('show-on-desktop');
             selectedElement.removeAttribute('show-on-tablet');
             selectedElement.removeAttribute('show-on-phone');
-            
+
             if (this.value) {
                 selectedElement.setAttribute(this.value, '');
             }
-            
+
             return selectedElement;
         });
-        
+
         // addProp('Corners', true,   '<div class="target">' +
         //                                 '<gs-grid>\n' +
         //                                 '    <gs-block>\n' +
         //                                 '        <gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
         //                                                             selectedElement.hasAttribute('remove-top') ||
         //                                                             selectedElement.hasAttribute('remove-left') ||
-        //                                                             selectedElement.hasAttribute('remove-top-left'))).toString() + 
+        //                                                             selectedElement.hasAttribute('remove-top-left'))).toString() +
         //                                             '" remove-right remove-bottom id="round-top-left-corner________"></gs-checkbox>' +
-                                                
+
         //                                 '        <gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
         //                                                             selectedElement.hasAttribute('remove-bottom') ||
         //                                                             selectedElement.hasAttribute('remove-left') ||
-        //                                                             selectedElement.hasAttribute('remove-bottom-left'))).toString() + 
+        //                                                             selectedElement.hasAttribute('remove-bottom-left'))).toString() +
         //                                             '" remove-right remove-top id="round-bottom-left-corner________"></gs-checkbox>' +
         //                                 '    </gs-block>\n' +
         //                                 '    <gs-block>\n' +
         //                                 '        <gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
         //                                                             selectedElement.hasAttribute('remove-top') ||
         //                                                             selectedElement.hasAttribute('remove-right') ||
-        //                                                             selectedElement.hasAttribute('remove-top-right'))).toString() + 
+        //                                                             selectedElement.hasAttribute('remove-top-right'))).toString() +
         //                                             '" remove-left remove-bottom id="round-top-right-corner________"></gs-checkbox>' +
-                                                
+
         //                                 '        <gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
         //                                                             selectedElement.hasAttribute('remove-bottom') ||
         //                                                             selectedElement.hasAttribute('remove-right') ||
-        //                                                             selectedElement.hasAttribute('remove-bottom-right'))).toString() + 
+        //                                                             selectedElement.hasAttribute('remove-bottom-right'))).toString() +
         //                                             '" remove-left remove-top id="round-bottom-right-corner________"></gs-checkbox>' +
         //                                 '    </gs-block>\n' +
         //                                 '</gs-grid>\n' +
@@ -9811,7 +9811,7 @@ window.addEventListener('design-register-element', function () {
         //         bottomLeft  = document.getElementById('round-bottom-left-corner________').value === 'true',
         //         bottomRight = document.getElementById('round-bottom-right-corner________').value === 'true',
         //         arrStrAttr = [], i, len;
-            
+
         //     selectedElement.removeAttribute('remove-all');
         //     selectedElement.removeAttribute('remove-top');
         //     selectedElement.removeAttribute('remove-bottom');
@@ -9821,7 +9821,7 @@ window.addEventListener('design-register-element', function () {
         //     selectedElement.removeAttribute('remove-top-right');
         //     selectedElement.removeAttribute('remove-bottom-left');
         //     selectedElement.removeAttribute('remove-bottom-right');
-            
+
         //     if (!topLeft && !topRight && !bottomLeft && !bottomRight) {
         //         arrStrAttr.push('remove-all');
         //     } else if (!topLeft && !topRight) {
@@ -9833,7 +9833,7 @@ window.addEventListener('design-register-element', function () {
         //     } else if (!topRight && !bottomRight) {
         //         arrStrAttr.push('remove-right');
         //     }
-            
+
         //     if (!topLeft && !bottomLeft && arrStrAttr[0] !== 'remove-all') {
         //         arrStrAttr.push('remove-left');
         //     } else if (!topLeft && topRight) {
@@ -9841,7 +9841,7 @@ window.addEventListener('design-register-element', function () {
         //     } else if (!bottomLeft && bottomRight) {
         //         arrStrAttr.push('remove-bottom-left');
         //     }
-            
+
         //     if (!topRight && !bottomRight && arrStrAttr[0] !== 'remove-all') {
         //         arrStrAttr.push('remove-right');
         //     } else if (topLeft && !topRight) {
@@ -9849,22 +9849,22 @@ window.addEventListener('design-register-element', function () {
         //     } else if (bottomLeft && !bottomRight) {
         //         arrStrAttr.push('remove-bottom-right');
         //     }
-            
+
         //     for (i = 0, len = arrStrAttr.length; i < len; i += 1) {
         //         selectedElement.setAttribute(arrStrAttr[i], '');
         //     }
-            
+
         //     return selectedElement;
         // });
-        
+
         //addFlexContainerProps(selectedElement);
         addFlexProps(selectedElement);
-        
+
         // SUSPEND-CREATED attribute
         addProp('suspend-created', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-created') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-created', this.value === 'true', true);
         });
-        
+
         // SUSPEND-INSERTED attribute
         addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-inserted', this.value === 'true', true);
@@ -9878,10 +9878,10 @@ window.addEventListener('design-register-element', function () {
 
 document.addEventListener('DOMContentLoaded', function () {
     'use strict';
-    
+
     function refreshAnchor(element) {
         var strLink = element.getAttribute('href') || element.getAttribute('value');
-        
+
         if (element.anchorElement) {
             element.removeChild(element.anchorElement);
         }
@@ -9890,20 +9890,20 @@ document.addEventListener('DOMContentLoaded', function () {
             element.anchorElement.setAttribute('gs-dynamic', '');
             element.anchorElement.setAttribute('target', element.getAttribute('target') || '_blank');
             element.anchorElement.setAttribute('href', strLink);
-            
+
             if (element.getAttribute('onclick')) {
                 element.anchorElement.setAttribute('onclick', element.getAttribute('onclick'));
             }
-            
+
             if (element.hasAttribute('download')) {
                 element.anchorElement.setAttribute('download', element.getAttribute('download'));
             }
-            
+
             element.appendChild(element.anchorElement);
-            
+
         }
     }
-    
+
     function saveDefaultAttributes(element) {
         var i;
         var len;
@@ -9997,19 +9997,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
         element.internal.bolQSFirstRun = true;
     }
-    
+
     // dont do anything that modifies the element here
     function elementCreated(element) {
         // if "created" hasn't been suspended: run created code
         if (!element.hasAttribute('suspend-created')) {
-            
+
         }
     }
-    
+
     //
     function elementInserted(element) {
         var strKey;
-        
+
         // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
         if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
             // if this is the first time inserted has been run: continue
@@ -10028,7 +10028,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     window.addEventListener('replacestate', function () { pushReplacePopHandler(element); });
                     window.addEventListener('popstate',     function () { pushReplacePopHandler(element); });
                 }
-                
+
                 // add a tabindex to allow focus (if allowed)
                 if (!element.hasAttribute('no-focus')) {
                     if ((!element.tabIndex) || element.tabIndex === -1) {
@@ -10037,40 +10037,40 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     element.removeAttribute('tabindex');
                 }
-                
+
                 element.classList.remove('down');
                 element.classList.remove('hover');
-                
+
                 if (!evt.touchDevice) {
                     element.addEventListener('focus', function (event) {
                         element.classList.add('focus');
                     });
-                    
+
                     element.addEventListener('blur', function (event) {
                         element.classList.remove('focus');
                     });
-                    
+
                     element.addEventListener(evt.mousedown, function (event) {
                         element.classList.add('down');
                     });
-                    
+
                     element.addEventListener(evt.mouseout, function (event) {
                         element.classList.remove('down');
                         element.classList.remove('hover');
                     });
-                    
+
                     element.addEventListener(evt.mouseover, function (event) {
                         element.classList.remove('down');
                         element.classList.add('hover');
                     });
-                    
+
                     element.addEventListener('keydown', function (event) {
                         if (!element.hasAttribute('disabled') &&
                             (event.keyCode === 13 || event.keyCode === 32)) {
                             element.classList.add('down');
                         }
                     });
-                    
+
                     element.addEventListener('keyup', function (event) {
                         // if we are not disabled and we pressed return (13) or space (32): trigger click
                         if (!element.hasAttribute('disabled') && element.classList.contains('down') &&
@@ -10079,13 +10079,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     });
                 }
-                
+
                 refreshAnchor(element);
-                
+
                 element.addEventListener('click', function (event) {
                     element.classList.remove('down');
                 });
-                
+
                 element.addEventListener('keypress', function (event) {
                     // if we pressed return (13) or space (32): prevent default and stop propagation (to prevent scrolling of the page)
                     if (event.keyCode === 13 || event.keyCode === 32) {
@@ -10093,15 +10093,15 @@ document.addEventListener('DOMContentLoaded', function () {
                         event.stopPropagation();
                     }
                 });
-                
+
                 strKey = element.getAttribute('key');
-                
+
                 if (strKey) {
                     if (GS.keyCode(strKey)) {
                         if (strKey.match(/[arfcvxzntypq]/gim)) {
                             console.warn('gs-button Warning: by setting the hot key of this button to "' + strKey + '" you may be overriding browser functionality.', element);
                         }
-                        
+
                         window.addEventListener('keydown', function (event) {
                             if (
                                     String(event.keyCode || event.which) === GS.keyCode(strKey) &&
@@ -10119,12 +10119,12 @@ document.addEventListener('DOMContentLoaded', function () {
                                 ) {
                                 event.preventDefault();
                                 event.stopPropagation();
-                                
+
                                 element.focus();
                                 GS.triggerEvent(element, 'click');
                             }
                         });
-                        
+
                     } else if (strKey.length > 1) {
                         console.error('gs-button Error: \'key="' + strKey + '"\' is not a valid hot-key.', element);
                     }
@@ -10132,27 +10132,27 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     }
-    
+
     xtag.register('gs-button', {
         lifecycle: {
             created: function () {
                 elementCreated(this);
             },
-            
+
             inserted: function () {
                 elementInserted(this);
             },
-            
+
             attributeChanged: function (strAttrName, oldValue, newValue) {
                 // if "suspend-created" has been removed: run created and inserted code
                 if (strAttrName === 'suspend-created' && newValue === null) {
                     elementCreated(this);
                     elementInserted(this);
-                    
+
                 // if "suspend-inserted" has been removed: run inserted code
                 } else if (strAttrName === 'suspend-inserted' && newValue === null) {
                     elementInserted(this);
-                    
+
                 } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
                     if (strAttrName === 'no-focus') {
                         if (!this.hasAttribute('no-focus') && !this.hasAttribute('tabindex')) {
@@ -10162,7 +10162,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     } else if (strAttrName === 'disabled') {
                         this.classList.remove('down');
-                        
+
                     } else if (strAttrName === 'href' || strAttrName === 'target' || strAttrName === 'onclick' || strAttrName === 'download') {
                         refreshAnchor(this);
                     }
@@ -10324,25 +10324,25 @@ window.addEventListener('design-register-element', function () {
         //             '<gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
         //                                         selectedElement.hasAttribute('remove-top') ||
         //                                         selectedElement.hasAttribute('remove-left') ||
-        //                                         selectedElement.hasAttribute('remove-top-left'))).toString() + 
+        //                                         selectedElement.hasAttribute('remove-top-left'))).toString() +
         //                     '" remove-right remove-bottom id="round-top-left-corner________" inline></gs-checkbox>' +
 
         //             '<gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
         //                                         selectedElement.hasAttribute('remove-top') ||
         //                                         selectedElement.hasAttribute('remove-right') ||
-        //                                         selectedElement.hasAttribute('remove-top-right'))).toString() + 
+        //                                         selectedElement.hasAttribute('remove-top-right'))).toString() +
         //                     '" remove-left remove-bottom id="round-top-right-corner________" inline></gs-checkbox><br />' +
 
         //             '<gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
         //                                         selectedElement.hasAttribute('remove-bottom') ||
         //                                         selectedElement.hasAttribute('remove-left') ||
-        //                                         selectedElement.hasAttribute('remove-bottom-left'))).toString() + 
+        //                                         selectedElement.hasAttribute('remove-bottom-left'))).toString() +
         //                     '" remove-right remove-top id="round-bottom-left-corner________" inline></gs-checkbox>' +
 
         //             '<gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
         //                                         selectedElement.hasAttribute('remove-bottom') ||
         //                                         selectedElement.hasAttribute('remove-right') ||
-        //                                         selectedElement.hasAttribute('remove-bottom-right'))).toString() + 
+        //                                         selectedElement.hasAttribute('remove-bottom-right'))).toString() +
         //                     '" remove-left remove-top id="round-bottom-right-corner________" inline></gs-checkbox>' +
         //         '</div>', function () {
         //     var topLeft = document.getElementById('round-top-left-corner________').value === 'true';
@@ -10839,11 +10839,11 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 window.addEventListener('design-register-element', function () {
     'use strict';
-    
+
     registerDesignSnippet('<gs-combo>', '<gs-combo>', 'gs-combo src="${1:test.tpeople}" column="${2}"></gs-combo>');
-    
+
     designRegisterElement('gs-combo', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-combo.html');
-    
+
     window.designElementProperty_GSCOMBO = function (selectedElement) {
         addProp('Source', true,
                 '<gs-memo class="target" value="' + encodeHTML(decodeURIComponent(selectedElement.getAttribute('src') ||
@@ -10851,86 +10851,86 @@ window.addEventListener('design-register-element', function () {
                 function () {
             return setOrRemoveTextAttribute(selectedElement, 'src', encodeURIComponent(this.value));
         });
-        
+
         addProp('Columns', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('cols') || '') + '" mini></gs-text>',
                 function () {
             return setOrRemoveTextAttribute(selectedElement, 'cols', this.value);
         });
-        
+
         addProp('Initialize Source', true,
                 '<gs-memo class="target" value="' + encodeHTML(decodeURIComponent(selectedElement.getAttribute('initialize') || '')) + '" mini></gs-memo>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'initialize', encodeURIComponent(this.value));
         });
-        
+
         addProp('Hide Columns', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('hide') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'hide', this.value);
         });
-        
+
         addProp('Where', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('where') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'where', this.value);
         });
-        
+
         addProp('Order By', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('ord') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'ord', this.value);
         });
-        
+
         addProp('Limit', true, '<gs-number class="target" value="' + encodeHTML(selectedElement.getAttribute('limit') || '') + '" mini></gs-number>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'limit', this.value);
         });
-        
+
         addProp('Offset', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('offset') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'offset', this.value);
         });
         addProp('Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'column', this.value);
         });
-        
+
         addProp('Value', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('value') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'value', this.value);
         });
-        
+
         addProp('Column In Querystring', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('qs') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'qs', this.value, false);
         });
-        
+
         addProp('Allow Empty', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('allow-empty')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'allow-empty', (this.value === 'true'), true);
         });
-        
+
         addProp('Limit&nbsp;To&nbsp;List', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('limit-to-list')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'limit-to-list', (this.value === 'true'), true);
         });
-        
+
         addProp('Mini', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('mini')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'mini', (this.value === 'true'), true);
         });
-        
+
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
-        
+
         // TABINDEX attribute
         addProp('Tabindex', true, '<gs-number class="target" value="' + encodeHTML(selectedElement.getAttribute('tabindex') || '') + '" mini></gs-number>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'tabindex', this.value);
         });
-        
+
         addProp('Autocorrect', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocorrect') !== 'off') + '" mini></gs-checkbox>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'autocorrect', (this.value === 'false' ? 'off' : ''));
         });
-        
+
         addProp('Autocapitalize', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocapitalize') !== 'off') + '" mini></gs-checkbox>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'autocapitalize', (this.value === 'false' ? 'off' : ''));
         });
-        
+
         addProp('Autocomplete', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocomplete') !== 'off') + '" mini></gs-checkbox>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'autocomplete', (this.value === 'false' ? 'off' : ''));
         });
-        
+
         addProp('Spellcheck', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('spellcheck') !== 'false') + '" mini></gs-checkbox>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'spellcheck', (this.value === 'false' ? 'false' : ''));
         });
-        
+
         // visibility attributes
         var strVisibilityAttribute = '';
         if (selectedElement.hasAttribute('hidden'))          { strVisibilityAttribute = 'hidden'; }
@@ -10940,7 +10940,7 @@ window.addEventListener('design-register-element', function () {
         if (selectedElement.hasAttribute('show-on-desktop')) { strVisibilityAttribute = 'show-on-desktop'; }
         if (selectedElement.hasAttribute('show-on-tablet'))  { strVisibilityAttribute = 'show-on-tablet'; }
         if (selectedElement.hasAttribute('show-on-phone'))   { strVisibilityAttribute = 'show-on-phone'; }
-        
+
         addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                         '<option value="">Visible</option>' +
                                         '<option value="hidden">Invisible</option>' +
@@ -10958,42 +10958,42 @@ window.addEventListener('design-register-element', function () {
             selectedElement.removeAttribute('show-on-desktop');
             selectedElement.removeAttribute('show-on-tablet');
             selectedElement.removeAttribute('show-on-phone');
-            
+
             if (this.value) {
                 selectedElement.setAttribute(this.value, '');
             }
-            
+
             return selectedElement;
         });
-        
+
         // DISABLED attribute
         addProp('Disabled', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('disabled') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'disabled', this.value === 'true', true);
         });
-        
+
         // READONLY attribute
         addProp('Readonly', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('readonly') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'readonly', this.value === 'true', true);
         });
-        
+
         addProp('Refresh On Querystring Columns', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('refresh-on-querystring-values') || '') + '" mini></gs-text>', function () {
             this.removeAttribute('refresh-on-querystring-change');
             return setOrRemoveTextAttribute(selectedElement, 'refresh-on-querystring-values', this.value);
         });
-        
+
         addProp('Refresh On Querystring Change', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('refresh-on-querystring-change')) + '" mini></gs-checkbox>', function () {
             this.removeAttribute('refresh-on-querystring-values');
             return setOrRemoveBooleanAttribute(selectedElement, 'refresh-on-querystring-change', this.value === 'true', true);
         });
-        
+
         //addFlexContainerProps(selectedElement);
         addFlexProps(selectedElement);
-        
+
         //// SUSPEND-CREATED attribute
         //addProp('suspend-created', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-created') || '') + '" mini></gs-checkbox>', function () {
         //    return setOrRemoveBooleanAttribute(selectedElement, 'suspend-created', this.value === 'true', true);
         //});
-        
+
         // SUSPEND-INSERTED attribute
         addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-inserted', this.value === 'true', true);
@@ -11006,135 +11006,135 @@ document.addEventListener('DOMContentLoaded', function () {
     // scroll the dropdown to the selected record
     function scrollToSelectedRecord(element) {
         var positioningContainer, scrollingContainer, arrTrs, i, len, intScrollTop, bolFoundSelected = false;
-        
+
         if (element.currentDropDownContainer) {
             positioningContainer = xtag.queryChildren(element.currentDropDownContainer, '.gs-combo-positioning-container')[0];
             scrollingContainer = xtag.queryChildren(positioningContainer, '.gs-combo-scroll-container')[0];
             arrTrs = xtag.query(element.dropDownTable, 'tr');
-            
+
             for (i = 0, intScrollTop = 0, len = arrTrs.length; i < len; i += 1) {
                 if (arrTrs[i].hasAttribute('selected')) {
                     intScrollTop += arrTrs[i].offsetHeight / 2;
-                    
+
                     bolFoundSelected = true;
-                    
+
                     break;
                 } else {
                     intScrollTop += arrTrs[i].offsetHeight;
                 }
             }
-            
+
             if (bolFoundSelected) {
                 intScrollTop = intScrollTop - scrollingContainer.offsetHeight / 2;
             } else {
                 intScrollTop = 0;
             }
-            
+
             scrollingContainer.scrollTop = intScrollTop;
         }
     }
-    
+
     // removes selected class from old selected records
     function clearSelection(element) {
         var i, len, arrSelectedTrs;
-        
+
         // clear previous selection
         arrSelectedTrs = xtag.queryChildren(xtag.queryChildren(element.dropDownTable, 'tbody')[0], 'tr[selected]');
-        
+
         for (i = 0, len = arrSelectedTrs.length; i < len; i += 1) {
             arrSelectedTrs[i].removeAttribute('selected');
         }
     }
-    
+
     // clears old selection and adds selected class to record
     function highlightRecord(element, record) {
         // clear previous selection
         clearSelection(element);
-        
+
         // select/highlight the record that was provided
         record.setAttribute('selected', '');
     }
-    
+
     // loops through the records and finds a record using the parameter (if bolPartialMatchAllowed === true then only search the first td text)
     function findRecordFromString(element, strSearchString, bolPartialMatchAllowed) {
         var i, len, matchedRecord, arrTrs = xtag.queryChildren(xtag.queryChildren(element.dropDownTable, 'tbody')[0], 'tr');
-        
+
         // if bolPartialMatchAllowed is true: only search the first td text (case insensitive)
         if (bolPartialMatchAllowed === true) {
             strSearchString = strSearchString.toLowerCase();
-            
+
             for (i = 0, len = arrTrs.length; i < len; i += 1) {
                 if (xtag.queryChildren(arrTrs[i], 'td')[0].textContent.toLowerCase().indexOf(strSearchString) === 0) {
                     matchedRecord = arrTrs[i];
-                    
+
                     break;
                 }
             }
-            
+
         // else: search exact text and search both the value attribute (if present) and the first td text
         } else {
             for (i = 0, len = arrTrs.length; i < len; i += 1) {
                 if (arrTrs[i].getAttribute('value') === strSearchString ||
                     xtag.queryChildren(arrTrs[i], 'td')[0].textContent === strSearchString) {
                     matchedRecord = arrTrs[i];
-                    
+
                     break;
                 }
             }
         }
-        
+
         return matchedRecord;
     }
-    
+
     // highlights record, sets value of the combobox using record
     function selectRecord(element, record, bolChange) {
         // add the yellow selection to the record
         highlightRecord(element, record);
-        
+
         handleChange(element, bolChange);
     }
-    
+
     // highlights record, sets value of the combobox using value attribute
     //      if bolChange === true then:
     //          change event and check for limit to list
     function selectRecordFromValue(element, strValue, bolChange) {
         var record = findRecordFromString(element, strValue, false);
-        
+
         // if a record was found: select it
         if (record) {
             selectRecord(element, record, bolChange);
-            
+
         // else if limit to list (and no record was found):
         } else if (element.hasAttribute('limit-to-list') && bolChange) {
             if (strValue === '' && element.hasAttribute('allow-empty')) {
                 handleChange(element, bolChange);
-                
+
             } else {
                 alert('The text you entered is not in the list');
                 openDropDown(element);
                 GS.setInputSelection(element.control, 0, strValue.length);
             }
-            
+
         // else (not limit to list and no record found):
         } else {
             clearSelection(element);
-            
+
             if (!element.hasAttribute('limit-to-list')) {
                 element.control.value = strValue;
                 element.innerValue = strValue;
             }
-            
+
             handleChange(element, bolChange);
         }
     }
-    
+
     function handleChange(element, bolChange) {
         var arrSelectedTrs, strHiddenValue = '', strTextValue = '', beforechangeevent, oldRecord,
             oldInnerValue = element.innerValue, oldControlValue = element.control.value;
-        
+
         if (element.dropDownTable) {
             arrSelectedTrs = xtag.queryChildren(xtag.queryChildren(element.dropDownTable, 'tbody')[0], 'tr[selected]');
-            
+
             // if there is a selected record
             if (arrSelectedTrs.length > 0) {
                 // gather values from the selected record
@@ -11146,19 +11146,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     strTextValue = firstTd.textContent;
                 }
-                
+
             } else {
                 strTextValue = element.control.value;
             }
-            
+
         } else {
             strTextValue = element.control.value;
         }
-        
+
         // set innervalue and control value using the values we gather from the record
         element.innerValue = strHiddenValue || strTextValue;
         element.control.value = strTextValue || strHiddenValue;
-        
+
         if (bolChange) {
             if (document.createEvent) {
                 beforechangeevent = document.createEvent('HTMLEvents');
@@ -11167,38 +11167,38 @@ document.addEventListener('DOMContentLoaded', function () {
                 beforechangeevent = document.createEventObject();
                 beforechangeevent.eventType = 'beforechange';
             }
-            
+
             beforechangeevent.eventName = 'beforechange';
-            
+
             if (document.createEvent) {
                 element.dispatchEvent(beforechangeevent);
             } else {
                 element.fireEvent("on" + beforechangeevent.eventType, beforechangeevent);
             }
-            
+
             // xtag.fireEvent(element, 'beforechange', { bubbles: true, cancelable: true });
-            
+
             //console.log(beforechangeevent.defaultPrevented);
             if (beforechangeevent.defaultPrevented !== true) {
                 xtag.fireEvent(element, 'change', { bubbles: true, cancelable: true });
-                
+
             } else {
                 element.innerValue = oldInnerValue;
                 element.control.value = oldControlValue;
-                
+
                 oldRecord = findRecordFromString(element, oldInnerValue, false);
-                
+
                 if (oldRecord) {
                     highlightRecord(element, oldRecord);
                 } else {
                     clearSelection(element);
                 }
             }
-            
+
             element.ignoreChange = false;
         }
     }
-    
+
     // open dropdown
     function openDropDown(element) {
         // if we are not already dropping down
@@ -11214,57 +11214,57 @@ document.addEventListener('DOMContentLoaded', function () {
             element.droppingDown = true;
         }
     }
-    
+
     function dropDown(element) {
         var dropDownContainer = document.createElement('div'), overlay, positioningContainer, scrollContainer, observer;
-        
+
         // focus control
         element.control.focus();
-        
+
         // create the dropdown element (and its children)
         dropDownContainer.classList.add('gs-combo-dropdown-container');
         dropDownContainer.setAttribute('gs-dynamic', '');
         dropDownContainer.innerHTML =   '<div class="gs-combo-positioning-container" gs-dynamic>' +
                                         '    <div class="gs-combo-scroll-container" gs-dynamic></div>' +
                                         '</div>';
-        
+
         // append dropdown to the body
         document.body.appendChild(dropDownContainer);
-        
+
         // set variables for the various elements that we will need for calculation
         positioningContainer = xtag.queryChildren(dropDownContainer, '.gs-combo-positioning-container')[0];
         scrollContainer =      xtag.queryChildren(positioningContainer, '.gs-combo-scroll-container')[0];
-        
+
         element.currentDropDownContainer = dropDownContainer;
-        
+
         //console.log(element.currentDropDownContainer);
         //console.log(element.dropDownTable);
-        
+
         // fill dropdown with content
         if (element.dropDownTable) {
             //element.dropDownTable = GS.cloneElement(element.staticDropDownTable);
             scrollContainer.appendChild(element.dropDownTable);
-            
+
         //} else if (element.tableTemplate) {
         //    scrollContainer.innerHTML = element.tableTemplate;
-        //    
+        //
         } else {
             scrollContainer.innerHTML = element.initalHTML;
         }
-        
+
         // create an observer instance
         observer = new MutationObserver(function(mutations) {
             dropDownSize(element);
         });
-        
+
         // pass in the element node, as well as the observer options
         observer.observe(scrollContainer, {childList: true, subtree: true});
-        
+
         //console.log(scrollContainer);
-        
+
         dropDownSize(element);
     }
-    
+
     function dropDownSize(element) {
         var dropDownContainer    = element.currentDropDownContainer,
             positioningContainer = xtag.queryChildren(dropDownContainer, '.gs-combo-positioning-container')[0],
@@ -11272,7 +11272,7 @@ document.addEventListener('DOMContentLoaded', function () {
             overlay, jsnComboOffset, intComboHeight, intComboWidth, intViewportWidth, intViewportHeight,
             intFromControlToBottomHeight, intFromControlToTopHeight, intContentHeight, intNewWidth,
             strWidth = '', strHeight = '', strLeft = '', strTop = '', strBottom = '';
-        
+
         // set variables needed for position calculation
         intComboHeight               = element.offsetHeight;
         intComboWidth                = element.offsetWidth;
@@ -11282,11 +11282,11 @@ document.addEventListener('DOMContentLoaded', function () {
         intContentHeight             = scrollContainer.scrollHeight;
         intFromControlToBottomHeight = intViewportHeight - (jsnComboOffset.top + intComboHeight);
         intFromControlToTopHeight    = jsnComboOffset.top;
-        
-        
+
+
         //console.log(intFromControlToBottomHeight, intFromControlToTopHeight);
-        
-        
+
+
         // set position, height and (top or bottom) variables
         // if desktop:
         if (!evt.touchDevice) {
@@ -11296,107 +11296,107 @@ document.addEventListener('DOMContentLoaded', function () {
                 intContentHeight > intFromControlToBottomHeight) {
                 strHeight = window.innerHeight + 'px';
                 strTop =  '0px';
-                
+
             // try 200px
             } else if (intContentHeight < 500) {
                 strHeight = '200px';
-                
+
                 if (intFromControlToBottomHeight > intFromControlToTopHeight || intFromControlToBottomHeight > 200) {
                     strTop = (intFromControlToTopHeight + intComboHeight) + 'px';
                 } else {
                     strBottom = (intFromControlToBottomHeight + intComboHeight) + 'px';
                 }
-                
+
             // try height from control to bottom of viewport
             } else if (intFromControlToBottomHeight >= intFromControlToTopHeight) {
                 strHeight = intFromControlToBottomHeight + 'px';
                 strTop = (intFromControlToTopHeight + intComboHeight) + 'px';
-                
+
             // else height from control to top of viewport
             } else {// if (intFromControlToTopHeight >= intFromControlToBottomHeight) {
                 strHeight = intFromControlToTopHeight + 'px';
                 strBottom = (intFromControlToBottomHeight + intComboHeight) + 'px';
             }
-            
+
         // else mobile:
         } else {
             // try 200px bottom
             if (intFromControlToBottomHeight > 200 && intContentHeight < 500) {
                 strHeight = intFromControlToBottomHeight + 'px';
                 strTop = (intFromControlToTopHeight + intComboHeight) + 'px';
-                
+
             // try 200px top
             } else if (intFromControlToTopHeight > 200 && intContentHeight < 500) {
                 strHeight = intFromControlToTopHeight + 'px';
                 strBottom = (intFromControlToBottomHeight + intComboHeight) + 'px';
-            
+
             // else full page
             } else {
                 strHeight = window.innerHeight + 'px';
                 strTop =  '0px';
             }
         }
-        
-        
+
+
         // set width and left variables
         // try regular
         if (scrollContainer.scrollWidth <= scrollContainer.offsetWidth) {
             if (intComboWidth < 150) {
                 intNewWidth = (window.innerWidth - jsnComboOffset.left) - 20;
-                
+
                 if (intNewWidth < 300) {
                     strWidth = intNewWidth + 'px';
                 } else {
                     strWidth = '300px';
                 }
-                
+
             } else {
                 strWidth = intComboWidth + 'px';
             }
             strLeft = jsnComboOffset.left + 'px';
-            
+
         // else full width
         } else {
             strWidth = '100%';
             strLeft = '0px';
         }
-        
-        
+
+
         // set position and size using variables
         positioningContainer.style.left   = strLeft;
         positioningContainer.style.top    = strTop;
         positioningContainer.style.bottom = strBottom;
         positioningContainer.style.width  = strWidth;
         positioningContainer.style.height = strHeight;
-        
+
         if (strTop) {
             dropDownContainer.classList.add('below');
         } else {
             dropDownContainer.classList.add('above');
         }
-        
-        
+
+
         // if the table is wider than the drop down: reflow
         if (scrollContainer.clientWidth < scrollContainer.scrollWidth &&
             xtag.query(scrollContainer, 'tbody tr:first-child td, tbody tr:first-child th').length > 1) {
             scrollContainer.classList.add('reflow');
         }
-        
-        
+
+
         // if the table is shorter than the drop down: resize the dropdown to be as short as the table
         if (intContentHeight < scrollContainer.clientHeight) {
             positioningContainer.style.height = intContentHeight + 'px';
         }
-        
-        
+
+
         // make combobox float over overlay so that you can focus into the input box
         element.classList.add('open');
-        
+
         //// if there is already a placeholder: delete the old one
         //if (element.placeholderElement) {
         //    element.parentNode.removeChild(element.placeholderElement);
         //    element.placeholderElement = undefined;
-        //    
+        //
         //    element.style.left   = element.oldLeft;
         //    element.style.right  = element.oldRight;
         //    element.style.top    = element.oldTop;
@@ -11439,81 +11439,81 @@ document.addEventListener('DOMContentLoaded', function () {
         //                                                                 //     actual height of the combobox
         //
         //element.parentNode.insertBefore(element.placeholderElement, element);
-        
+
         // change element open state variable
         element.open = true;
-        
-        
+
+
         // bind drop down
         bindDropDown(element);
-        
-        
+
+
         // scroll to the selected record (if any)
         scrollToSelectedRecord(element);
     }
-    
+
     // bind dropdown events
     function bindDropDown(element) {
         var selectableTrs, closeDropDownHandler, selectRecordHandler, i, len,
             unbindSelectRecordHandler, unbindDropDownEvents, wheelHandler;
-        
+
         wheelHandler = function (event) {
             var tableElement = GS.findParentElement(event.target, '.gs-combo-dropdown-container');
-            
+
             if (tableElement !== element.currentDropDownContainer) {
                 closeDropDownHandler();
             }
         };
-        
+
         // unbind function
         unbindDropDownEvents = function () {
             var i, len;
-            
+
             for (i = 0, len = selectableTrs.length; i < len; i += 1) {
                 selectableTrs[i].removeEventListener('click', selectRecordHandler);
             }
-            
+
             window.removeEventListener('resize', closeDropDownHandler);
             window.removeEventListener('orientationchange', closeDropDownHandler);
             window.removeEventListener('mousewheel', wheelHandler);
             document.body.removeEventListener('click', closeDropDownHandler);
         };
-        
+
         // handle record click
         selectableTrs = xtag.queryChildren(xtag.queryChildren(element.dropDownTable, 'tbody')[0], 'tr');
-        
+
         selectRecordHandler = function (event) {
             selectRecord(element, GS.findParentTag(event.target, 'tr'), true);
             closeDropDownHandler();
         };
-        
+
         for (i = 0, len = selectableTrs.length; i < len; i += 1) {
             selectableTrs[i].addEventListener('click', selectRecordHandler);
         }
-        
+
         // handle dropdown close
         closeDropDownHandler = function (event) {
             closeDropDown(element);
             unbindDropDownEvents();
         };
-        
+
         window.addEventListener('resize', closeDropDownHandler);
         window.addEventListener('orientationchange', closeDropDownHandler);
         window.addEventListener('mousewheel', wheelHandler);
         document.body.addEventListener('click', closeDropDownHandler);
     }
-    
+
     // remove dropdown from screen
     function closeDropDown(element) {
         // if there is a dropdown to remove: remove the dropdown
         if (element.currentDropDownContainer) {
             document.body.removeChild(element.currentDropDownContainer);
             element.currentDropDownContainer = undefined;
-            
+
             element.classList.remove('open');
             element.open = false;
             element.droppingDown = false;
-            
+
             //element.parentNode.removeChild(element.placeholderElement);
             //element.placeholderElement = undefined;
             //
@@ -11525,44 +11525,44 @@ document.addEventListener('DOMContentLoaded', function () {
             //element.style.height = element.oldHeight;
         }
     }
-    
+
     // handle behaviours on keydown
     function handleKeyDown(element, event) {
         var intKeyCode = event.keyCode || event.which, selectedTr, trs, i, len, selectedRecordIndex, firstTd, lastChild, strTextValue;
-        
+
         if (!element.hasAttribute('disabled') && !element.hasAttribute('readonly')) {
             if ((intKeyCode === 40 || intKeyCode === 38) && !event.shiftKey && !event.metaKey && !event.ctrlKey && !element.error) {
                 if (!element.open) {
                     openDropDown(element);
-                    
+
                 } else {
                     trs = xtag.queryChildren(xtag.queryChildren(element.dropDownTable, 'tbody')[0], 'tr');
-                    
+
                     for (i = 0, len = trs.length; i < len; i += 1) {
                         if (trs[i].hasAttribute('selected')) {
                             selectedRecordIndex = i;
                             selectedTr = trs[i];
                             trs[i].removeAttribute('selected');
-                            
+
                             break;
                         }
                     }
-                    
+
                     if (intKeyCode === 40) {// next record or circle to first record or start selection at the first
                         if (!selectedTr || selectedRecordIndex === trs.length - 1) {
                             highlightRecord(element, trs[0]);
                             selectedTr = trs[0];
-                            
+
                         } else {
                             highlightRecord(element, trs[selectedRecordIndex + 1]);
                             selectedTr = trs[selectedRecordIndex + 1];
                         }
-                        
+
                     } else if (intKeyCode === 38) {// prev record or circle to last record or start selection at the last
                         if (!selectedTr || selectedRecordIndex === 0) {
                             highlightRecord(element, trs[trs.length - 1]);
                             selectedTr = trs[trs.length - 1];
-                            
+
                         } else {
                             highlightRecord(element, trs[selectedRecordIndex - 1]);
                             selectedTr = trs[selectedRecordIndex - 1];
@@ -11573,41 +11573,41 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (selectedTr) {
                     element.control.value = xtag.queryChildren(selectedTr, 'td')[0].textContent;
                 }
-                
+
                 GS.setInputSelection(element.control, 0, element.control.value.length);
-                
+
                 event.preventDefault();
                 event.stopPropagation();
-                
+
             } else if ((intKeyCode === 39) && !event.shiftKey && !event.metaKey && !event.ctrlKey && !element.error) {
                 selectedTr = xtag.queryChildren(xtag.queryChildren(element.dropDownTable, 'tbody')[0], 'tr[selected]')[0];
-                
+
                 if (selectedTr) {
                     firstTd = xtag.queryChildren(selectedTr, 'td')[0];
                     lastChild = firstTd.lastElementChild;
-                    
+
                     if (lastChild && lastChild.tagName.substring(0, 3) === 'GS-') {
                         strTextValue = lastChild.textValue || lastChild.value || lastChild.textContent;
                     } else {
                         strTextValue = firstTd.textContent;
                     }
-                    
+
                     //console.log(element.innerValue, element.control.value, selectedTr.getAttribute('value'), strTextValue);
-                    
+
                     selectRecord(element, selectedTr,
                                 element.innerValue !== (selectedTr.getAttribute('value') || strTextValue));
                 }
-                
+
                 event.stopPropagation();
-                
+
             } else if (event.keyCode === 13 || event.keyCode === 9) {
                 if (element.dropDownTable && xtag.queryChildren(xtag.queryChildren(element.dropDownTable, 'tbody')[0], 'tr[selected]').length > 0) {
                     selectRecordFromValue(element, element.control.value, true);
                     element.ignoreChange = true;
                 }
-                
+
                 closeDropDown(element);
-                
+
             } else if (!event.metaKey &&       // not command key
                        !event.ctrlKey &&       // not control key
                        event.keyCode !== 37 && // not arrow keys
@@ -11625,7 +11625,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     }
-    
+
     // search on keyup
     //      the reason we are using keyup for search is because on keydown the letter has not been typed in yet and
     //      it would be harder if we tried to use the keycode to get the letter that was typed. so on keydown
@@ -11634,14 +11634,14 @@ document.addEventListener('DOMContentLoaded', function () {
     //      to true and on keyup we read that and if it is set to true then we do a search and set it back to false
     function handleKeyUp(element, event) {
         var intKeyCode = event.keyCode || event.which, strSearch = element.control.value, matchRecord;
-        
+
         // if element.attemptSearchOnNextKeyup is true and
         //      there is a search string and
         //      the user has their text selection at the end of the of the input
         if (element.attemptSearchOnNextKeyup === true &&
             strSearch &&
             GS.getInputSelection(element.control).start === strSearch.length) {
-            
+
             // ######### FOR CROSS
             // you need to comment the code inside this block.
             // you need an if statment for >2000 records.
@@ -11664,7 +11664,7 @@ document.addEventListener('DOMContentLoaded', function () {
             //
             //      that should be good enough. if you can't get the column: stop and
             //          console.warn to tell the developer to stick <!-- row.column -->
-            //          at the top of the first td 
+            //          at the top of the first td
             // you need to run an AJAX call on the postgres object in "src" with a where clause.
             // the where clause will be something like this:
             //          (OLDWHERE) AND COLUMN ILIKE $UnCOPYQTE$ strSearch%$UnCOPYQTE$
@@ -11672,9 +11672,9 @@ document.addEventListener('DOMContentLoaded', function () {
             // use the two templates to set the value (copy the original code).
             //
             // after you're done, leave these comments for future developers
-            
-            
-            
+
+
+
             //<gs-combo src="test.tpeople" column="">
             //    <template>
             //        <table>
@@ -11693,10 +11693,10 @@ document.addEventListener('DOMContentLoaded', function () {
             //        </table>
             //    </template>
             //</gs-combo>
-            
+
             if (xtag.queryChildren(xtag.queryChildren(element.dropDownTable, 'tbody')[0], 'tr').length > 2000) {
                 var strSearchCol = '', templateElement = element.tableTemplate;
-                
+
                 templateElement = templateElement.substring(templateElement.indexOf('td'), templateElement.indexOf('/td') - 1);
                 templateElement = templateElement.substring(templateElement.indexOf('{'), templateElement.length);
                 if (templateElement.indexOf('row.') === -1) {
@@ -11708,10 +11708,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     templateElement = templateElement.substring(parseInt(templateElement.indexOf('row.'), 10) + 4, templateElement.length - 3).trim();
                 }
-                
-                
+
+
                 strSearchCol = templateElement;
-                
+
                 var strSrc     = GS.templateWithQuerystring(element.getAttribute('src'))
                   , srcParts   = strSrc[0] === '(' ? [strSrc, ''] : strSrc.split('.')
                   , strSchema  = srcParts[0]
@@ -11726,21 +11726,21 @@ document.addEventListener('DOMContentLoaded', function () {
                   , strLimit   = '1'
                   , strOffset  = GS.templateWithQuerystring(element.getAttribute('offset') || '')
                   , response_i = 0, response_len = 0, arrTotalRecords = [];
-                
+
                 //console.log(strLink);
                 //console.log(strSearchCol);
-                
-                
+
+
                 if (strSearchCol) {
                     GS.requestSelectFromSocket(GS.envSocket, strSchema, strObject, strColumns
                                              , strWhere, strOrd, strLimit, strOffset
                                              , function (data, error) {
                         var arrCells, cell_i, cell_len;
-                        
+
                         if (!error) {
                             if (data.strMessage !== 'TRANSACTION COMPLETED') {
                                 arrCells = arrRecords[i].split('\t');
-                                
+
                                 element.control.value = arrCells[0] = arrCells[0] === '\\N' ? null : GS.decodeFromTabDelimited(arrCells[0]);
                                 GS.setInputSelection(element.control, strSearch.length, element.control.value.length);
                                 if (element.open) {
@@ -11757,35 +11757,35 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     });
                 }
-                
-                
-                
+
+
+
             } else {
                 matchRecord = findRecordFromString(element, strSearch, true);
-                
-                // if we found a record and its was already selected: selected the matched record and dont 
+
+                // if we found a record and its was already selected: selected the matched record and dont
                 if (matchRecord) {
                     highlightRecord(element, matchRecord);
                     element.control.value = xtag.queryChildren(matchRecord, 'td')[0].textContent;
                     GS.setInputSelection(element.control, strSearch.length, element.control.value.length);
-                    
+
                     scrollToSelectedRecord(element);
-                    
+
                 } else {
                     clearSelection(element);
                     //selectRecordFromValue(element, strSearch, false);
                     //GS.setInputSelection(element.control, strSearch.length, element.control.value.length);
                 }
             }
-            
-            
+
+
         }
-        
+
         if (element.attemptSearchOnNextKeyup === true) {
             element.attemptSearchOnNextKeyup = false;
         }
     }
-    
+
     // handles fetching the data
     //      if bolInitalLoad === true then
     //          use: initialize query COALESCE TO source query
@@ -11807,34 +11807,34 @@ document.addEventListener('DOMContentLoaded', function () {
           , strLimit   = GS.templateWithQuerystring(element.getAttribute('limit') || '')
           , strOffset  = GS.templateWithQuerystring(element.getAttribute('offset') || '')
           , response_i = 0, response_len = 0, arrTotalRecords = [];
-        
-        
+
+
         //GS.addLoader(element, 'Loading...');
         GS.requestCachingSelect(GS.envSocket, strSchema, strObject, strColumns
                                  , strWhere, strOrd, strLimit, strOffset
                                  , function (data, error) {
             var arrRecords, arrCells, envData
               , i, len, cell_i, cell_len;
-            
+
             if (!error) {
                 if (data.strMessage !== 'TRANSACTION COMPLETED') {
                     arrRecords = GS.trim(data.strMessage, '\n').split('\n');
-                    
+
                     for (i = 0, len = arrRecords.length; i < len; i += 1) {
                         arrCells = arrRecords[i].split('\t');
-                        
+
                         for (cell_i = 0, cell_len = arrCells.length; cell_i < cell_len; cell_i += 1) {
                             arrCells[cell_i] = arrCells[cell_i] === '\\N' ? null : GS.decodeFromTabDelimited(arrCells[cell_i]);
                         }
-                        
+
                         arrTotalRecords.push(arrCells);
                     }
                 } else {
                     //GS.removeLoader(element);
                     element.arrColumnNames = data.arrColumnNames;
-                    
+
                     envData = {'arr_column': element.arrColumnNames, 'dat': arrTotalRecords};
-                    
+
                     handleData(element, bolInitalLoad, envData);
                     if (typeof callback === 'function') {
                         callback();
@@ -11846,30 +11846,30 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }, bolClearPrevious);
     }
-    
-    // handles data result from method function: getData 
+
+    // handles data result from method function: getData
     //      success:  template
     //      error:    add error classes
     function handleData(element, bolInitalLoad, data, error) {
         var divElement, tableElement, theadElement, theadCellElements, tbodyElement, tbodyCellElements, lastRecordElement,
             currentCellLabelElement, template, i, len, arrHeaders = [], strTemplate, arrHide, strHeaderCells, strRecordCells,
             tableTemplateElement, recordElements, recordElement, jsnTemplate, strHTML;
-        
+
         //GS.triggerEvent(this, 'after_select'); <== caused a MAJOR issue where code that was supposed to
         //                                              run after an envelope after_select caught all of
         //                                              the after selects of the comboboxes in the envelope
-        
+
         // clear any old error status
         element.classList.remove('error');
         element.dropDownButton.setAttribute('title', '');
         element.dropDownButton.setAttribute('icon', 'angle-down');
-        
+
         // if there was no error
         if (!error) {
             element.error = false;
-            
+
             //console.log(this, this.tableTemplate);
-            
+
             if (element.tableTemplate) {
                 //tableTemplateElement = document.createElement('template');
                 //tableTemplateElement.innerHTML = this.tableTemplate;
@@ -11878,13 +11878,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 //tbodyElement = xtag.query(tableTemplateElement.content, 'tbody')[0];
                 //
                 //console.log(theadElement, tbodyElement);
-                
+
                 strTemplate = element.tableTemplate; //this.initalHTML;
-                
+
             } else { // if (data.arr_column)
                 // create an array of hidden column numbers
                 arrHide = (element.getAttribute('hide') || '').split(/[\s]*,[\s]*/);
-                
+
                 // build up the header cells variable and the record cells variable
                 for (i = 0, len = data.arr_column.length, strHeaderCells = '', strRecordCells = ''; i < len; i += 1) {
                     // if this column is not hidden
@@ -11894,7 +11894,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         strRecordCells += '<td gs-dynamic>{{! row[\'' + data.arr_column[i] + '\'] }}</td> ';
                     }
                 }
-                
+
                 // put everything together
                 strTemplate =   '<table gs-dynamic>' +
                                     '<thead gs-dynamic>' +
@@ -11909,33 +11909,33 @@ document.addEventListener('DOMContentLoaded', function () {
                                     '</tbody>' +
                                 '<table>';
             }
-            
+
             divElement = document.createElement('div');
-            
+
             divElement.innerHTML = strTemplate;
-            
+
             tableElement = xtag.queryChildren(divElement, 'table')[0];
             theadElement = xtag.queryChildren(tableElement, 'thead')[0];
             tbodyElement = xtag.queryChildren(tableElement, 'tbody')[0];
-            
+
             // if there is a tbody
             if (tbodyElement) {
                 recordElement = xtag.queryChildren(tbodyElement, 'tr')[0];
-                
+
                 // if there is a record: template
                 if (recordElement) {
-                    
+
                     // if there is a thead element: add reflow cell headers to the tds
                     if (theadElement) {
                         theadCellElements = xtag.query(theadElement, 'td, th');
                         tbodyCellElements = xtag.query(tbodyElement, 'td, th');
-                        
+
                         for (i = 0, len = theadCellElements.length; i < len; i += 1) {
                             currentCellLabelElement = document.createElement('b');
                             currentCellLabelElement.classList.add('cell-label');
                             currentCellLabelElement.setAttribute('data-text', (theadCellElements[i].textContent || '') + ':');
                             currentCellLabelElement.setAttribute('gs-dynamic', '');
-                            
+
                             if (tbodyCellElements[i].childNodes) {
                                 tbodyCellElements[i].insertBefore(currentCellLabelElement, tbodyCellElements[i].childNodes[0]);
                             } else {
@@ -11943,26 +11943,26 @@ document.addEventListener('DOMContentLoaded', function () {
                             }
                         }
                     }
-                    
+
                     // template
                     jsnTemplate = GS.templateHideSubTemplates(tbodyElement.innerHTML, true);
                     strHTML = GS.templateWithEnvelopeData(tbodyElement.innerHTML, data);
                     tbodyElement.innerHTML = GS.templateShowSubTemplates(strHTML, jsnTemplate);
-                    
+
                     element.dropDownTable = tableElement;
                     element.ready = true;
                 }
             }
-            
+
             //if (data.arr_column) {
             if (bolInitalLoad && element.getAttribute('value')) {
                 selectRecordFromValue(element, element.getAttribute('value'), false);
-                
+
             } else if (element.value) {
                 selectRecordFromValue(element, element.value, false);
             }
             //}
-            
+
         // else there was an error: add error class, title attribute
         } else {
             console.error(data);
@@ -11971,13 +11971,13 @@ document.addEventListener('DOMContentLoaded', function () {
             element.classList.add('error');
             element.dropDownButton.setAttribute('title', 'This combobox has failed to load.');
             element.dropDownButton.setAttribute('icon', 'exclamation-circle');
-            
+
             if (element.hasAttribute('limit-to-list')) {
                 element.setAttribute('disabled', '');
             }
         }
     }
-    
+
     function refreshControl(element) {
         var i, len, divElement, arrPassThroughAttributes = [
                 'placeholder',
@@ -11990,74 +11990,74 @@ document.addEventListener('DOMContentLoaded', function () {
                 'spellcheck',
                 'readonly'
             ];
-        
+
         // if the gs-text element has a tabindex: save the tabindex and remov the attribute
         if (element.hasAttribute('tabindex')) {
             element.savedTabIndex = element.getAttribute('tabindex');
             element.removeAttribute('tabindex');
         }
-        
+
         // clear out the combobox HTML
         element.innerHTML = '';
-        
+
         // creating/setting root
         divElement = document.createElement('div');
         divElement.setAttribute('gs-dynamic', '');
         divElement.classList.add('root');
-        
+
         element.appendChild(divElement);
         element.root = divElement;
-        
+
         element.root.innerHTML = '<input gs-dynamic class="control" type="text" />' +
                                  '<gs-button gs-dynamic class="drop_down_button" icononly icon="angle-down" no-focus></gs-button>';
-        
+
         element.control = xtag.query(element, '.control')[0];
         element.dropDownButton = xtag.query(element, '.drop_down_button')[0];
-        
+
         // copy passthrough attrbutes to control
         for (i = 0, len = arrPassThroughAttributes.length; i < len; i += 1) {
             if (element.hasAttribute(arrPassThroughAttributes[i])) {
                 element.control.setAttribute(arrPassThroughAttributes[i], element.getAttribute(arrPassThroughAttributes[i]) || '');
             }
         }
-        
+
         // if we saved a tabindex: apply the tabindex to the control
         if (element.savedTabIndex !== undefined && element.savedTabIndex !== null) {
             element.control.setAttribute('tabindex', element.savedTabIndex);
         }
-        
+
         // bind change event to control
         //console.log('change bound');
         element.control.addEventListener('change', function (event) {
             event.preventDefault();
             event.stopPropagation();
-            
+
             //console.log('change detected');
             if (!element.ignoreChange) {
                 selectRecordFromValue(element, this.value, true);
             }
             element.ignoreChange = false;
         });
-        
-        
+
+
         //  on safari the change event doesn't occur if you click out while the autocomplete has
         //      completed the value (because the user technically didn't change after the javascript changed the value)
         //  to solve this the code below will mimic a change event if one does not occur at the right time
-        
+
         // there are two ways that user's cause change events:
         //      1) after making a change to the value: taking the focus out of the field
         //      2) after making a change to the value: hitting return
-        
+
         // this code counts on the fact that a browser will always emit a change event before a 'blur' or 'keyup'
         // the execution is as follows
-        
+
         // this is the basic plan:
         //  change:
         //          // changeOccured tells the event code to not do anything because a change event did fire
         //          element.changeOccured to true
         //  focus:
         //          // element.lastValue allows us to compare the value to the old value, and if there's a difference: we need a change event
-        //          set element.lastValue to current value of the control 
+        //          set element.lastValue to current value of the control
         //  blur:
         //          if element.changeOccured === true:
         //              set element.changeOccured = false
@@ -12070,36 +12070,36 @@ document.addEventListener('DOMContentLoaded', function () {
         //          else:
         //              if control.value !== lastValue: // if the value has been changed
         //                  trigger artificial change event on control
-        
-        
+
+
         element.control.addEventListener('change', function (event) {
             element.changeOccured = true;
         });
-        
+
         element.control.addEventListener('focus', function (event) {
             element.lastValue = element.control.value;
-            
+
             event.target.parentNode.parentNode.classList.add('focus');
         });
-        
+
         element.control.addEventListener('blur', function (event) {
             if (element.changeOccured === true) {
                 element.changeOccured = false;
             } else if (element.control.value !== element.lastValue) {
                 GS.triggerEvent(element.control, 'change');
             }
-            
+
             event.target.parentNode.parentNode.classList.remove('focus');
         });
-        
+
         element.control.addEventListener(evt.mouseout, function (event) {
             event.target.parentNode.parentNode.classList.remove('hover');
         });
-        
+
         element.control.addEventListener(evt.mouseover, function (event) {
             event.target.parentNode.parentNode.classList.add('hover');
         });
-        
+
         element.control.addEventListener('keyup', function (event) {
             // if the key was return
             if ((event.keyCode || event.which) === 13 && !element.hasAttribute('readonly')) {
@@ -12111,31 +12111,31 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
-    
+
     //function pushReplacePopHandler(element) {
     //    var i, len, arrPopKeys, currentValue, bolRefresh = false, strQueryString = GS.getQueryString(), strQSCol = element.getAttribute('qs');
-    //    
+    //
     //    if (strQSCol && GS.qryGetKeys(strQueryString).indexOf(strQSCol) > -1) {
     //        element.value = GS.qryGetVal(strQueryString, strQSCol);
     //    }
-    //    
+    //
     //    if (element.hasAttribute('refresh-on-querystring-values')) {
     //        arrPopKeys = element.getAttribute('refresh-on-querystring-values').split(/\s*,\s*/gim);
-    //        
+    //
     //        for (i = 0, len = arrPopKeys.length; i < len; i += 1) {
     //            currentValue = GS.qryGetVal(strQueryString, arrPopKeys[i]);
-    //            
+    //
     //            if (element.popValues[arrPopKeys[i]] !== currentValue) {
     //                bolRefresh = true;
     //            }
-    //            
+    //
     //            element.popValues[arrPopKeys[i]] = currentValue;
     //        }
-    //        
+    //
     //    } else if (element.hasAttribute('refresh-on-querystring-change')) {
     //        bolRefresh = true;
     //    }
-    //    
+    //
     //    if (bolRefresh) {
     //        getData(element);
     //    }
@@ -12183,7 +12183,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 len = arrAttrParts.length;
                 while (i < len) {
                     strQSCol = arrAttrParts[i];
-    
+
                     if (strQSCol.indexOf('!=') !== -1) {
                         strOperator = '!=';
                         arrQSParts = strQSCol.split('!=');
@@ -12191,10 +12191,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         strOperator = '=';
                         arrQSParts = strQSCol.split('=');
                     }
-    
+
                     strQSCol = arrQSParts[0];
                     strQSAttr = arrQSParts[1] || arrQSParts[0];
-    
+
                     // if the key is not present or we've got the negator: go to the attribute's default or remove it
                     if (strOperator === '!=') {
                         // if the key is not present: add the attribute
@@ -12225,7 +12225,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             } else if (GS.qryGetKeys(strQS).indexOf(strQSCol) > -1) {
                 strQSValue = GS.qryGetVal(strQS, strQSCol);
-    
+
                 if (element.internal.bolQSFirstRun !== true) {
                     if (strQSValue !== '' || !element.getAttribute('value')) {
                         element.setAttribute('value', strQSValue);
@@ -12235,25 +12235,25 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         }
-        
+
         // handle "refresh-on-querystring-values" and "refresh-on-querystring-change" attributes
         if (element.internal.bolQSFirstRun === true) {
             if (element.hasAttribute('refresh-on-querystring-values')) {
                 arrPopKeys = element.getAttribute('refresh-on-querystring-values').split(/\s*,\s*/gim);
-                
+
                 for (i = 0, len = arrPopKeys.length; i < len; i += 1) {
                     currentValue = GS.qryGetVal(strQS, arrPopKeys[i]);
-                    
+
                     if (element.popValues[arrPopKeys[i]] !== currentValue) {
                         bolRefresh = true;
                     }
-                    
+
                     element.popValues[arrPopKeys[i]] = currentValue;
                 }
             } else if (element.hasAttribute('refresh-on-querystring-change')) {
                 bolRefresh = true;
             }
-            
+
             if (bolRefresh && element.hasAttribute('src')) {
                 getData(element);
             } else if (bolRefresh && !element.hasAttribute('src')) {
@@ -12262,29 +12262,29 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             if (element.hasAttribute('refresh-on-querystring-values')) {
                 arrPopKeys = element.getAttribute('refresh-on-querystring-values').split(/\s*,\s*/gim);
-                
+
                 for (i = 0, len = arrPopKeys.length; i < len; i += 1) {
                     element.popValues[arrPopKeys[i]] = GS.qryGetVal(strQS, arrPopKeys[i]);
                 }
             }
         }
-        
+
         element.internal.bolQSFirstRun = true;
     }
-    
+
     // dont do anything that modifies the element here
     function elementCreated(element) {
         // if "created" hasn't been suspended: run created code
         if (!element.hasAttribute('suspend-created')) {
-            
+
         }
     }
-    
+
     //
     function elementInserted(element) {
         var tableTemplateElement, tableTemplateElementCopy, oldRootElement, i, len,
             recordElement, strQueryString = GS.getQueryString(), arrElement, currentElement, strQSValue;
-        
+
         // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
         if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
             // if this is the first time inserted has been run: continue
@@ -12292,11 +12292,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 element.inserted = true;
                 element.internal = {};
                 saveDefaultAttributes(element);
-                
+
                 element.open = false;
                 element.error = false;
                 element.ready = false;
-                
+
                 // handle "qs" attribute
                 if (element.getAttribute('qs') ||
                         element.getAttribute('refresh-on-querystring-values') ||
@@ -12306,56 +12306,56 @@ document.addEventListener('DOMContentLoaded', function () {
                     //if (strQSValue !== '' || !element.getAttribute('value')) {
                     //    element.setAttribute('value', strQSValue);
                     //}
-                    
+
                     element.popValues = {};
                     pushReplacePopHandler(element);
                     window.addEventListener('pushstate', function () {    pushReplacePopHandler(element); });
                     window.addEventListener('replacestate', function () { pushReplacePopHandler(element); });
                     window.addEventListener('popstate', function () {     pushReplacePopHandler(element); });
                 }
-                
+
                 //
                 tableTemplateElement = xtag.queryChildren(element, 'template')[0];
-                
+
                 if (tableTemplateElement) {
                     if (tableTemplateElement.innerHTML.indexOf('&gt;') > -1 || tableTemplateElement.innerHTML.indexOf('&lt;') > -1) {
                         console.warn('GS-COMBO WARNING: &gt; or &lt; detected in table template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
                     }
-                    
+
                     tableTemplateElementCopy = document.createElement('template');
                     tableTemplateElementCopy.innerHTML = tableTemplateElement.innerHTML;
-                    
+
                     recordElement = xtag.query(xtag.query(tableTemplateElementCopy.content, 'tbody')[0], 'tr')[0];
-                    
+
                     if (recordElement) {
                         arrElement = xtag.query(recordElement, '[column]');
-                        
+
                         for (i = 0, len = arrElement.length; i < len; i += 1) {
                             currentElement = arrElement[i];
-                            
+
                             if ((!currentElement.getAttribute('value')) && currentElement.getAttribute('column')) {
                                 currentElement.setAttribute('value', '{{! row.' + currentElement.getAttribute('column') + ' }}');
                             }
                         }
-                        
+
                         element.tableTemplate = tableTemplateElementCopy.innerHTML;
-                        
+
                         if (!element.getAttribute('src') && !element.getAttribute('source') && !element.getAttribute('initalize')) {
                             //element.staticDropDownTable = GS.cloneElement(tableTemplateElementCopy.content.children[0]);
                             //element.dropDownTable = GS.cloneElement(tableTemplateElementCopy.content.children[0]); //element.staticDropDownTable;
-                            
+
                             element.dropDownTable = GS.cloneElement(xtag.query(tableTemplateElementCopy.content, 'table')[0]);
                         }
                     }
                 }
-                
+
                 // filling root
                 refreshControl(element);
-                
+
                 //
                 element.addEventListener('click', function (event) {
                     var clickHandler;
-                    
+
                     if (event.target.classList.contains('drop_down_button')) {
                         //console.log(element.open, element.error);
                         if (!element.open && !element.error) {
@@ -12363,38 +12363,38 @@ document.addEventListener('DOMContentLoaded', function () {
                                 openDropDown(element);
                                 window.removeEventListener('click', clickHandler);
                             };
-                            
+
                             window.addEventListener('click', clickHandler);
                         } else {
                             //closeDropDown(element);
                         }
                     }
                 });
-                
+
                 element.addEventListener('keydown', function (event) {
                     if (event.target.classList.contains('control')) {
                         handleKeyDown(element, event);
                     }
                 });
-                
+
                 element.addEventListener('keyup', function (event) {
                     if (event.target.classList.contains('control')) {
                         handleKeyUp(element, event);
                     }
                 });
-                
+
                 if (xtag.queryChildren(element, '.root').length < 1) {
                     refreshControl(element);
                 }
-                
+
                 if (element.getAttribute('src') || element.getAttribute('source') || element.getAttribute('initalize')) {
                     getData(element, true);
                 } else {
                     element.ready = true;
-                    
+
                     if (element.getAttribute('value')) {
                         selectRecordFromValue(element, element.getAttribute('value'), false);
-                        
+
                     } else if (element.value) {
                         selectRecordFromValue(element, element.value, false);
                     }
@@ -12402,7 +12402,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     }
-    
+
     xtag.register('gs-combo', {
         lifecycle: {
             created: function () {
@@ -12413,24 +12413,24 @@ document.addEventListener('DOMContentLoaded', function () {
                     this.setAttribute('value', this.value);
                     delete this.value;
                 }
-                
+
                 elementCreated(this);
             },
-            
+
             inserted: function () {
                 elementInserted(this);
             },
-            
+
             attributeChanged: function (strAttrName, oldValue, newValue) {
                 // if "suspend-created" has been removed: run created and inserted code
                 if (strAttrName === 'suspend-created' && newValue === null) {
                     elementCreated(this);
                     elementInserted(this);
-                    
+
                 // if "suspend-inserted" has been removed: run inserted code
                 } else if (strAttrName === 'suspend-inserted' && newValue === null) {
                     elementInserted(this);
-                    
+
                 } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
                     if (strAttrName === 'value' && oldValue !== newValue) {
                         this.value = newValue;
@@ -12449,21 +12449,21 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                     return undefined;
                 },
-                
+
                 // set the value of the input and set the value attribute
                 set: function (newValue) {
-                    
+
                     // if we have not yet templated: just stick the value in an attribute
                     if (this.ready === false) {
                         if (newValue !== this.getAttribute('value')) {
                             this.setAttribute('value', newValue);
                         }
-                        
+
                     // else if the value is empty and allow-empty is present
                     } else if (newValue === '' && this.hasAttribute('allow-empty')) {
                         this.innerValue = '';
                         this.control.value = '';
-                        
+
                     // else select the record using the string that was sent
                     } else {
                         selectRecordFromValue(this, newValue, false);
@@ -12475,14 +12475,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 get: function () {
                     return this.control.value;
                 },
-                
+
                 // set the value of the input and set the value attribute
                 set: function (newValue) {
-                    
+
                     // if we have not yet templated: just stick the value in an attribute
                     if (this.ready === false) {
                         this.setAttribute('value', newValue);
-                        
+
                     // else select the record using the string that was sent
                     } else {
                         selectRecordFromValue(this, newValue, false);
@@ -12494,11 +12494,11 @@ document.addEventListener('DOMContentLoaded', function () {
             focus: function () {
                 this.control.focus();
             },
-            
+
             'getData': function () {
                 getData(this, undefined, true);
             },
-            
+
             'refresh': function () {
                 getData(this, undefined, true);
             }
@@ -12507,38 +12507,38 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 window.addEventListener('design-register-element', function () {
     'use strict';
-    
+
     registerDesignSnippet('<gs-container>', '<gs-container>', 'gs-container min-width="${1:sml;med;lrg;}" ${2:padded}>\n' +
                                                                 '    ${0}\n' +
                                                                 '</gs-container>');
-    
+
     designRegisterElement('gs-container', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-container-jumbo.html');
-    
+
     window.designElementProperty_GSCONTAINER = function(selectedElement) {
         var strVisibilityAttribute;
-        
+
         addProp('Min-Width Media', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('min-width') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'min-width', this.value);
         });
-        
+
         addProp('Media', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('media') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'media', this.value);
         });
-        
+
         addProp('Padded', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('padded')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'padded', (this.value === 'true'), true);
         });
-        
+
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
-        
+
         // SUSPEND-INSERTED attribute
         addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-inserted', this.value === 'true', true);
         });
-        
+
         // visibility attributes
         strVisibilityAttribute = '';
         if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
@@ -12548,7 +12548,7 @@ window.addEventListener('design-register-element', function () {
         if (selectedElement.hasAttribute('show-on-desktop'))   { strVisibilityAttribute = 'show-on-desktop'; }
         if (selectedElement.hasAttribute('show-on-tablet'))    { strVisibilityAttribute = 'show-on-tablet'; }
         if (selectedElement.hasAttribute('show-on-phone'))     { strVisibilityAttribute = 'show-on-phone'; }
-        
+
         addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                         '<option value="">Visible</option>' +
                                         '<option value="hidden">Invisible</option>' +
@@ -12566,14 +12566,14 @@ window.addEventListener('design-register-element', function () {
             selectedElement.removeAttribute('show-on-desktop');
             selectedElement.removeAttribute('show-on-tablet');
             selectedElement.removeAttribute('show-on-phone');
-            
+
             if (this.value) {
                 selectedElement.setAttribute(this.value, '');
             }
-            
+
             return selectedElement;
         });
-        
+
         //addFlexContainerProps(selectedElement);
         addFlexProps(selectedElement);
     };
@@ -12582,53 +12582,53 @@ window.addEventListener('design-register-element', function () {
 document.addEventListener('DOMContentLoaded', function () {
     'use strict';
     var arrTakenContainers = [], intScrollBarWidth;
-    
+
     function getScrollBarWidth() {
         var inner = document.createElement('div'),
             outer = document.createElement('div'),
             intWidth;
-        
+
         inner.style.height = '200px';
-        
+
         outer.style.position = 'absolute';
         outer.style.top = '0';
         outer.style.left = '0';
         outer.style.visibility = 'hidden';
         outer.style.overflow = 'scroll';
-        
+
         outer.style.width = '50px';
         outer.style.height = '100px';
-        
+
         outer.appendChild(inner);
         document.body.appendChild(outer);
-        
+
         intWidth = (outer.offsetWidth - inner.offsetWidth);
-        
+
         document.body.removeChild(outer);
-        
+
         return intWidth;
     };
-    
+
     intScrollBarWidth = getScrollBarWidth();
-    
+
     // dont do anything that modifies the element here
     function elementCreated(element) {
         // if "created" hasn't been suspended: run created code
         if (!element.hasAttribute('suspend-created')) {
-            
+
         }
     }
-    
+
     //
     function elementInserted(element) {
         var styleElement;
-        
+
         // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
         if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
             // if this is the first time inserted has been run: continue
             if (!element.inserted) {
                 element.inserted = true;
-                
+
                 // if the style element for the container CSS doesn't exist: create it
                 if (!document.getElementById('gs-dynamic-css')) {
                     styleElement = document.createElement('style');
@@ -12636,7 +12636,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     styleElement.setAttribute('gs-dynamic', '');
                     document.head.appendChild(styleElement);
                 }
-                
+
                 if (element.getAttribute('min-width')) {
                     element.handleMinWidthCSS();
                 } else if (element.getAttribute('media')) {
@@ -12645,32 +12645,32 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     }
-    
+
     xtag.register('gs-container', {
         lifecycle: {
             created: function () {
                 elementCreated(this);
             },
-            
+
             inserted: function () {
                 elementInserted(this);
             },
-            
+
             attributeChanged: function (strAttrName, oldValue, newValue) {
                 // if "suspend-created" has been removed: run created and inserted code
                 if (strAttrName === 'suspend-created' && newValue === null) {
                     elementCreated(this);
                     elementInserted(this);
-                    
+
                 // if "suspend-inserted" has been removed: run inserted code
                 } else if (strAttrName === 'suspend-inserted' && newValue === null) {
                     elementInserted(this);
-                    
+
                 } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
                     // if the "min-width" attribute changed
                     if (strAttrName === 'min-width') {
                         this.handleMinWidthCSS();
-                        
+
                     // if the "media" attribute changed
                     } else if (strAttrName === 'media') {
                         this.handleMediaCSS();
@@ -12684,115 +12684,115 @@ document.addEventListener('DOMContentLoaded', function () {
             handleMinWidthCSS: function () {
                 var strMinWidth = this.getAttribute('min-width'), arrMinWidths, strCSS, i, len,
                     arrClassesToRemove, intContainerID, intWidthNumber, strWidthOperator, strNewWidth;
-                
+
                 // remove old classes
                 arrClassesToRemove = String(this.classList).match(/container-id-[0-9]*/g) || [];
-                
+
                 for (i = 0, len = arrClassesToRemove.length; i < len; i += 1) {
                     this.classList.remove(arrClassesToRemove[i]);
                 }
-                
+
                 // sml;med;lrg
                 // medium
                 // 100;200;300;400;500;600;700;800;900;1000;1100;1200
-                
+
                 // remove all whitespace, lowercase, trim off semicolons
                 strMinWidth = GS.trim(strMinWidth.replace(/\s+/g, '').toLowerCase(), ';');
-                
+
                 // replace shortcuts (lrg => 1200px)
                 strMinWidth = strMinWidth.replace(/small|sml/g, '768px').replace(/medium|med/g, '992px').replace(/large|lrg/g, '1200px');
-                
+
                 arrMinWidths = strMinWidth.split(';'); // seperate out layouts
-                
+
                 //console.log(strMinWidth, arrMinWidths);
-                
+
                 if (arrTakenContainers.indexOf(strMinWidth) === -1) {
                     arrTakenContainers.push(strMinWidth);
                     intContainerID = arrTakenContainers.length - 1;
                     strCSS = '';
-                    
+
                     for (i = 0, len = arrMinWidths.length; i < len; i += 1) {
                         intWidthNumber = parseInt(arrMinWidths[i]);
                         strWidthOperator = arrMinWidths[i].replace(/[0-9]/g, '');
-                        
+
                         if (strWidthOperator === 'px') {
                             intWidthNumber -= intScrollBarWidth;
                         } else if (strWidthOperator === 'em') {
                             intWidthNumber -= GS.pxToEm(this.parentNode, intScrollBarWidth);
                         }
-                        
+
                         strNewWidth = intWidthNumber + strWidthOperator;
-                        
+
                         strCSS +=   '\n@media (min-width:' + arrMinWidths[i] + ') {\n' +
                                     '    gs-container.container-id-' + intContainerID +
                                                 ' { width:' + strNewWidth + '; margin-left:auto; margin-right:auto; }\n' +
                                     '}\n';
                     }
-                    
+
                     //console.log(strCSS);
-                    
+
                     // append the column CSS
                     document.getElementById('gs-dynamic-css').innerHTML +=
                             '\n/* container #' + intContainerID + ' */\n' + strCSS;
-                    
+
                 } else {
                     intContainerID = arrTakenContainers.indexOf(strMinWidth);
                 }
-                
+
                 this.classList.add('container-id-' + intContainerID);
             },
-            
+
             handleMediaCSS: function () {
                 var strMedia = this.getAttribute('media'), arrMedias, strCSS, i, len,
                     arrClassesToRemove, arrParts, strCurrentMedia, strWidth, intContainerID;
-                
+
                 // remove old classes
                 arrClassesToRemove = String(this.classList).match(/container-id-[0-9]*/g) || [];
-                
+
                 for (i = 0, len = arrClassesToRemove.length; i < len; i += 1) {
                     this.classList.remove(arrClassesToRemove[i]);
                 }
-                
+
                 // (min-width: 500) {small}; (max-width: 500) {50}
                 // (max-width: small) {small}; (min-width: small) {small}
                 // (max-width: small) {50}; (min-width: small) {500}
-                
+
                 // trim, remove all close curly braces, lowercase, trim off semicolons
                 strMedia = GS.trim(strMedia.trim().replace(/\}/g, '').toLowerCase(), ';');
-                
+
                 // replace shortcuts (lrg => 1200px)
                 strMedia = strMedia.replace(/small|sml/g, '768px').replace(/medium|med/g, '992px').replace(/large|lrg/g, '1200px');
-                
+
                 arrMedias = strMedia.split(';'); // seperate out layouts
-                
+
                 //console.log(strMedia, arrMedias);
-                
+
                 if (arrTakenContainers.indexOf(strMedia) === -1) {
                     arrTakenContainers.push(strMedia);
                     intContainerID = arrTakenContainers.length - 1;
                     strCSS = '';
-                    
-                    
+
+
                     for (i = 0, len = arrMedias.length; i < len; i += 1) {
                         arrParts = arrMedias[i].split('{');
                         strCurrentMedia = arrParts[0].trim() || 'all';
                         strWidth = arrParts[1].trim() || '900px';
-                        
+
                         strCSS +=   '\n@media ' + strCurrentMedia + ' {\n' +
                                     '    gs-container.container-id-' + intContainerID + ' ' +
                                                 '{ width:' + strWidth + '; margin-left:auto; margin-right:auto; }\n' +
                                     '}\n';
                     }
-                    
+
                     //console.log(strCSS);
-                    
+
                     // append the column CSS
                     document.getElementById('gs-dynamic-css').innerHTML += '\n/* container #' + intContainerID + ' */\n' + strCSS;
-                    
+
                 } else {
                     intContainerID = arrTakenContainers.indexOf(strMinWidth);
                 }
-                
+
                 this.classList.add('container-id-' + intContainerID);
             }
         }
@@ -12815,7 +12815,7 @@ document.addEventListener('DOMContentLoaded', function () {
 document.addEventListener("DOMContentLoaded", function () {
     "use strict";
     function buildElement(element) {
-        
+
         element.forTable = document.getElementById(element.getAttribute('for'));
 
         element.forTable.addEventListener('selection_change', function () {
@@ -12833,35 +12833,35 @@ document.addEventListener("DOMContentLoaded", function () {
             var strValue = event.target.value;
             var intValue = parseInt(strValue.substring(0, strValue.indexOf(' ')), 10);
             var intMaxRecord = tableElem.internalData.records.length;
-    
+
             var intMinColumn = (
                 tableElem.internalDisplay.recordSelectorVisible
                     ? -1
                     : 0
             );
-    
+
             // if we couldn't extract a record number from the
             //      user's value, go to the first record
             if (isNaN(intValue)) {
                 intValue = 1;
             }
-    
+
             if (intMaxRecord === 0) {
                 intValue = undefined;
             }
-    
+
             // prevent intValue from being greater than the number
             //      of records
             if (intValue > intMaxRecord) {
                 intValue = intMaxRecord;
             }
-    
+
             // intValue is from a user and therefore one-based
             if (!isNaN(intValue)) {
                 // correct one-based by subtracting one
                 intValue -= 1;
             }
-            
+
             // override all current ranges to select the new record
             if (intValue !== undefined) {
                 tableElem.internalSelection.ranges = [
@@ -12959,7 +12959,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });//jslint browser:true, white:true, multivar:true, for:true
 window.addEventListener('design-register-element', function (event) {
     'use strict';
-    
+
     registerDesignSnippet('<gs-datasheet>', '<gs-datasheet>',
             'gs-datasheet src="${1:test.tpeople}">\n' +
             '    <template for="hud"></template>\n' +
@@ -12975,9 +12975,9 @@ window.addEventListener('design-register-element', function (event) {
             '    </template>\n' +
             '    <template for="insert"></template>\n' +
             '</gs-datasheet>');
-    
+
     designRegisterElement('gs-datasheet', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-datasheet.html');
-    
+
     window.designElementProperty_GSDATASHEET = function (selectedElement) {
         addProp('Source', true,
                 '<gs-memo class="target" autoresize rows="1" value="' +
@@ -12985,87 +12985,87 @@ window.addEventListener('design-register-element', function (event) {
                 function () {
             return setOrRemoveTextAttribute(selectedElement, 'src', encodeURIComponent(this.value));
         });
-        
+
         addProp('Columns', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('cols') || '') + '" mini></gs-text>',
                 function () {
             return setOrRemoveTextAttribute(selectedElement, 'cols', this.value);
         });
-        
+
         addProp('Lock Columns', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('lock') || '') + '" mini></gs-text>',
                 function () {
             return setOrRemoveTextAttribute(selectedElement, 'lock', this.value);
         });
-        
+
         addProp('Primary Keys', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('pk') || '') + '" mini></gs-text>',
                 function () {
             return setOrRemoveTextAttribute(selectedElement, 'pk', this.value);
         });
-        
+
         addProp('Where', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('where') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'where', (this.value));
         });
-        
+
         addProp('Order By', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('ord') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'ord', this.value);
         });
-        
+
         addProp('Limit', true, '<gs-number class="target" value="' + encodeHTML(selectedElement.getAttribute('limit') || '') + '" mini></gs-number>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'limit', this.value);
         });
-        
+
         addProp('Offset', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('offset') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'offset', this.value);
         });
-        
+
         addProp('Column In Querystring', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('qs') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'qs', this.value, false);
         });
-        
+
         addProp('Parent&nbsp;Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'column', this.value);
         });
-        
+
         addProp('Line Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('child-column') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'child-column', this.value);
         });
-        
+
         addProp('Reflow At', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('reflow-at') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'reflow-at', this.value);
         });
-        
+
         addProp('Scroll To Bottom', true, '<gs-checkbox class="target" value="' + encodeHTML(selectedElement.hasAttribute('scroll-to-bottom') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'scroll-to-bottom', (this.value === 'true'), true);
         });
-        
+
         addProp('HUD Paginate', true, '<gs-checkbox class="target" value="' + (!selectedElement.hasAttribute('no-hudpaginate')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'no-hudpaginate', (this.value === 'true'), false);
         });
-        
+
         addProp('HUD Refresh', true, '<gs-checkbox class="target" value="' + (!selectedElement.hasAttribute('no-hudrefresh')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'no-hudrefresh', (this.value === 'true'), false);
         });
-        
+
         addProp('HUD Delete', true, '<gs-checkbox class="target" value="' + (!selectedElement.hasAttribute('no-huddelete')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'no-huddelete', (this.value === 'true'), false);
         });
-        
+
         addProp('Expand&nbsp;To&nbsp;Content', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('expand-to-content')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'expand-to-content', (this.value === 'true'), true);
         });
-        
+
         addProp('Null String', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('null-string') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'null-string', this.value);
         });
-        
+
         addProp('Filter Popup', true, '<gs-checkbox class="target" value="' + (!selectedElement.hasAttribute('no-filter')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'no-filter', (this.value === 'true'), false);
         });
-        
+
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
-        
+
         // visibility attributes
         var strVisibilityAttribute = '';
         if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
@@ -13075,7 +13075,7 @@ window.addEventListener('design-register-element', function (event) {
         if (selectedElement.hasAttribute('show-on-desktop'))   { strVisibilityAttribute = 'show-on-desktop'; }
         if (selectedElement.hasAttribute('show-on-tablet'))    { strVisibilityAttribute = 'show-on-tablet'; }
         if (selectedElement.hasAttribute('show-on-phone'))     { strVisibilityAttribute = 'show-on-phone'; }
-        
+
         addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                         '<option value="">Visible</option>' +
                                         '<option value="hidden">Invisible</option>' +
@@ -13093,29 +13093,29 @@ window.addEventListener('design-register-element', function (event) {
             selectedElement.removeAttribute('show-on-desktop');
             selectedElement.removeAttribute('show-on-tablet');
             selectedElement.removeAttribute('show-on-phone');
-            
+
             if (this.value) {
                 selectedElement.setAttribute(this.value, '');
             }
-            
+
             return selectedElement;
         });
-        
+
         addProp('Refresh On Querystring Columns', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('refresh-on-querystring-values') || '') + '" mini></gs-text>', function () {
             this.removeAttribute('refresh-on-querystring-change');
             return setOrRemoveTextAttribute(selectedElement, 'refresh-on-querystring-values', this.value);
         });
-        
+
         addProp('Refresh On Querystring Change', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('refresh-on-querystring-change')) + '" mini></gs-checkbox>', function () {
             this.removeAttribute('refresh-on-querystring-values');
             return setOrRemoveBooleanAttribute(selectedElement, 'refresh-on-querystring-change', this.value === 'true', true);
         });
-        
+
         //// SUSPEND-CREATED attribute
         //addProp('suspend-created', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-created') || '') + '" mini></gs-checkbox>', function () {
         //    return setOrRemoveBooleanAttribute(selectedElement, 'suspend-created', this.value === 'true', true);
         //});
-        
+
         // SUSPEND-INSERTED attribute
         addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-inserted', this.value === 'true', true);
@@ -13127,68 +13127,68 @@ document.addEventListener('DOMContentLoaded', function () {
     'use strict';
     var KEY_RETURN = 13, KEY_TAB = 9, KEY_BACKSPACE = 8, KEY_DELETE = 46
       , KEY_UP = 38, KEY_RIGHT = 39, KEY_DOWN = 40, KEY_LEFT = 37;
-    
+
     function deleteSelection(element) {
         var strSchema = GS.templateWithQuerystring(element.getAttribute('schema'))
           , strObject = GS.templateWithQuerystring(element.getAttribute('object'))
           , arrSelectRecords = element.selectedRecords, deleteRecord, deleteRecordData
           , arrPk, arrLock, strHashColumns, strRoles, strColumns, strRecord
           , strRecordToHash, strDeleteData, strTemp, i, len, col_i, col_len;
-        
+
         // if the first record is the header: remove it from the selection
         if (arrSelectRecords[0] && arrSelectRecords[0].parentNode.nodeName === 'THEAD') {
             arrSelectRecords.splice(0, 1);
         }
-        
+
         if (element.numberOfSelections === 1
                 && arrSelectRecords.length > 0
                 && arrSelectRecords[0].children[0].hasAttribute('selected')
                 && !element.deleteButton.hasAttribute('disabled')) {
-            
+
             // generate the information to send to the websocket
             arrPk = (element.getAttribute('pk') || '').split(/[\s]*,[\s]*/);
             arrLock = (element.getAttribute('lock') || '').split(/[\s]*,[\s]*/);
-            
+
             for (i = 0, len = arrPk.length, strRoles = '', strColumns = ''; i < len; i += 1) {
                 strRoles += (strRoles ? '\t' : '') + 'pk';
                 strColumns += (strColumns ? '\t' : '') + arrPk[i];
             }
-            
+
             for (i = 0, len = arrLock.length, strHashColumns = ''; i < len; i += 1) {
                 strHashColumns += (strHashColumns ? '\t' : '') + arrLock[i];
             }
-            
+
             strRoles += (strRoles ? '\t' : '') + 'hash';
             strColumns += (strColumns ? '\t' : '') + 'hash';
-            
+
             for (i = 0, len = arrSelectRecords.length, strDeleteData = ''; i < len; i += 1) {
                 strRecord = '';
                 deleteRecord = arrSelectRecords[i];
                 deleteRecordData = element.internalData.arrRecords[parseInt(deleteRecord.getAttribute('data-index'), 10)];
                 //console.log(deleteRecordData);
-                
+
                 // get 'pk' columns
                 for (col_i = 0, col_len = arrPk.length; col_i < col_len; col_i += 1) {
                     strRecord += (strRecord ? '\t' : '');
                     strRecord += GS.encodeForTabDelimited(deleteRecordData[element.internalData.arrColumnNames.indexOf(arrPk[col_i])], element.nullString);
                 }
-                
+
                 // get 'hash' columns
                 strRecordToHash = '';
                 for (col_i = 0, col_len = arrLock.length; col_i < col_len; col_i += 1) {
                     strRecordToHash += (strRecordToHash ? '\t' : '');
                     strTemp = deleteRecordData[element.internalData.arrColumnNames.indexOf(arrLock[col_i])];
-                    
+
                     // I believe that this needs to use the null-string instead of 'NULL'
                     strRecordToHash += (strTemp === 'NULL' ? '' : strTemp);
                 }
-                
+
                 strDeleteData += (strRecord + (strRecord ? '\t' : '') + GS.utfSafeMD5(strRecordToHash).toString() + '\n');
                 arrSelectRecords[i].classList.add('bg-red');
             }
-            
+
             strDeleteData = (strRoles + '\n' + strColumns + '\n' + strDeleteData);
-            
+
             // create delete transaction
             GS.addLoader(element, 'Creating Delete Transaction...');
             GS.requestDeleteFromSocket(
@@ -13203,16 +13203,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 , function (data, error, transactionID, commitFunction, rollbackFunction) {
                     var arrElements, i, len, templateElement;
                     GS.removeLoader(element);
-                    
+
                     if (!error) {
                         if (data !== 'TRANSACTION COMPLETED') {
                             arrElements = xtag.query(element, '.bg-red');
-                            
+
                             for (i = 0, len = arrElements.length; i < len; i += 1) {
                                 arrElements[i].classList.remove('bg-red');
                                 arrElements[i].classList.add('bg-amber');
                             }
-                            
+
                         // open confirm message box
                         } else {
                             templateElement = document.createElement('template');
@@ -13230,10 +13230,10 @@ document.addEventListener('DOMContentLoaded', function () {
                                     </gs-footer>
                                 </gs-page>
                             */}).replace(/\{\{numberofrecords\}\}/gi, xtag.query(element, '.bg-amber').length);
-                            
+
                             GS.openDialog(templateElement, function () {
                                 document.getElementById('datasheet-focus-me').focus();
-                                
+
                             }, function (event, strAnswer) {
                                 if (strAnswer === 'Yes') {
                                     commitFunction();
@@ -13244,7 +13244,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 }
                             });
                         }
-                        
+
                     } else {
                         rollbackFunction();
                         getData(element);
@@ -13255,41 +13255,41 @@ document.addEventListener('DOMContentLoaded', function () {
                 , function (strAnswer, data, error) {
                     var arrElements, i, len;
                     GS.removeLoader(element);
-                    
+
                     if (!error) {
                         if (strAnswer === 'COMMIT') {
                             // remove amber records, because the amber records have now been deleted
                             removeRecords(element, 'bg-amber');
-                            
+
                             // clear internal variables for selection now that the selected records have been deleted,
                             //      because if you try to shift-select to extend the selection and the origin cell has
                             //      been deleted this may cause an error
                             clearSelection(element);
-                            
+
                             // trigger after_delete so that developers can react to a successful delete
                             GS.triggerEvent(element, 'after_delete');
-                            
+
                         } else {
                             // clear bg-amber class and don't add a green fade
                             clearRecordColor(element, 'bg-amber', false);
                         }
-                        
+
                         // update record selector numbers to reflect current record numbers
                         //      because after you delete records there may be a gap in the numbers and that is not acceptable
                         arrElements = xtag.query(element, 'tbody > tr');
-                        
+
                         for (i = 0, len = arrElements.length; i < len; i += 1) {
                             if (!arrElements[i].classList.contains('insert-record')) {
                                 arrElements[i].children[0].textContent = (i + 1);
                             }
                         }
-                        
+
                     // if an error occurred
                     } else {
                         // get new data, because after an error we don't know the current state
                         //      of the data so a re-fetch will help mitigate inaccurate data errors
                         getData(element);
-                        
+
                         // open an error dialog so that the user knows there was an error
                         GS.webSocketErrorDialog(data);
                     }
@@ -13297,10 +13297,10 @@ document.addEventListener('DOMContentLoaded', function () {
             );
         }
     }
-    
+
     function insertDialog(element) {
         var templateElement = document.createElement('template'), strAddin;
-        
+
         // if there is a column attribute on this element: append child column (or column) and
         //      the value to the insert string so that we can have parent-child relationships
         if (element.getAttribute('column') || element.getAttribute('qs')) {
@@ -13312,7 +13312,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         '=' +
                         element.value;
         }
-        
+
         templateElement.innerHTML = ml(function () {/*
             <gs-page gs-dynamic>
                 <gs-header>
@@ -13335,20 +13335,20 @@ document.addEventListener('DOMContentLoaded', function () {
         */}).replace('{{HTML}}', element.insertTemplate)
             .replace('{{SRC}}', encodeHTML(element.getAttribute('src')))
             .replace('{{ADDIN}}', encodeHTML(strAddin || ''));
-        
+
         GS.openDialog(templateElement, function () {
             var dialog = this;
-            
+
             // if gs-datasheet has sequence attribute: add sequence attribute to gs-insert
             if (element.getAttribute('seq')) {
                 document.getElementById('insert-dialog-content-container').setAttribute('seq', element.getAttribute('seq'));
             }
-            
+
             GS.triggerEvent(element, 'insert_dialog_open');
-            
+
             xtag.query(dialog, '.dialog-envelope-insert')[0].addEventListener('click', function () {
                 var insertContainer = document.getElementById('insert-dialog-content-container');
-                
+
                 insertContainer.submit(function (lastval, jsnRow) {
                     getData(element);
                     GS.triggerEvent(element, 'after_insert');
@@ -13357,7 +13357,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     }
-    
+
     function clearSelection(element) {
         element.savedSelection = [];
         element.savedSelectionCopy = [];
@@ -13367,72 +13367,72 @@ document.addEventListener('DOMContentLoaded', function () {
         element.numberOfSelections = 0;
         element.selectedCells = [];
     }
-    
+
     function templateRecordsForInsert(element, strRecords, strClasses) {
         var arrRecords, arrCells, i, len, cell_i, cell_len, col_len, strHTML, intRowNumberAdd;
-        
+
         // calculate the number of cells across
         if (element.getAttribute('cols')) {
             col_len = (element.getAttribute('cols') || '').split(/[\s]*,[\s]*/).length;
         }
-        
+
         arrRecords = strRecords.split('\n');
-        
+
         // calculate how much to add to the row numbers
         intRowNumberAdd = xtag.query(element, 'tr:not(.bg-red):not(.insert-record)').length - 1;
-        
+
         for (i = 1, len = arrRecords.length - 1, strHTML = ''; i < len; i += 1) {
             arrCells = arrRecords[i].split('\t');
-            
+
             strHTML += '<tr ' + (strClasses ? ' class="' + strClasses + '"' : '');
-            
+
             for (cell_i = 0, cell_len = arrCells.length; cell_i < cell_len; cell_i += 1) {
                 strHTML += 'data-' + element.internalData.arrColumnNames[cell_i] +
                                 '="' + encodeHTML(GS.decodeFromTabDelimited(arrCells[cell_i], element.nullString)) + '"';
             }
-            
+
             strHTML += '><th>' + (intRowNumberAdd + (i)) + '</th>';
-            
+
             for (cell_i = 0, cell_len = (col_len || arrCells.length); cell_i < cell_len; cell_i += 1) {
                 strHTML += '<td><textarea rows="1" column="' + element.internalData.arrColumnNames[cell_i] + '">' +
                                 encodeHTML(GS.decodeFromTabDelimited(arrCells[cell_i], element.nullString) || '') +
                             '</textarea></td>';
             }
-            
+
             strHTML += '</tr>';
         }
-        
-        
+
+
         //    strHTML = GS.templateWithEnvelopeData(element.tableTemplate.templateHTML, {
         //                        'arr_column': data.arrColumnNames
         //                      , 'dat': element.internalData.arrRecords
         //              }, intStart, element.internalData.arrRecords.length);
-        //    
+        //
         //    strHTML = GS.templateShowSubTemplates(strHTML, element.tableTemplate);
         //
         //trMaker.children[0].classList.add('insert-record');
-        
+
         return strHTML;
     }
-    
+
     function handleData(element, data, bolFirstLoad, bolManualRefresh) {
         var strHTML, i, len, cell_i, cell_len, col_len, arrRecords
           , arrCells, disabled, arrColumns, arrElements, tbodyElement
           , trMaker, intStart, bolHeader, strWidth, numberOffset;
-        
+
         // calculate the number of cells across
         if (element.getAttribute('cols')) {
             //col_len = (element.getAttribute('cols') || '').split(/[\s]*,[\s]*/).length;
-            
+
             arrColumns = (element.getAttribute('cols') || '').split(/[\s]*,[\s]*/);
-            
+
             for (i = 0, len = arrColumns.length; i < len; i += 1) {
                 arrColumns[i] = data.arrColumnNames.indexOf(arrColumns[i]);
             }
         }
-        
+
         disabled = element.hasAttribute('disabled') || !element.hasAttribute('pk');
-        
+
         // if first callback: table and header
         if (data.intCallback === 0) {
             if (!element.hasAttribute('lock')) {
@@ -13446,26 +13446,26 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 element.deleteButton.removeAttribute('disabled');
             }
-            
+
             element.internalData = {
                 'arrColumnNames': data.arrColumnNames || []
               , 'arrColumnTypes': data.arrColumnTypes || []
               , 'arrRecords': []
             };
-            
+
             if (element.headerTemplateRecord) {
                 strHTML = GS.templateWithQuerystring(element.headerTemplateRecord);
                 element.scrollContainer.innerHTML = '<table><thead>' + strHTML + '</thead><tbody></tbody></table>';
-                
+
             } else {
                 arrElements = xtag.queryChildren(element.tableTemplateRecord, 'td, th');
                 for (i = 0, len = arrElements.length, strHTML = ''; i < len; i += 1) {
                     strHTML += '<th>' + encodeHTML(arrElements[i].getAttribute('heading') || '') + '</th>';
-                    
+
                     bolHeader = Boolean(arrElements[i].hasAttribute('heading') || '') || bolHeader;
                 }
                 strHTML = '<tr>' + strHTML + '</tr>';
-                
+
                 if (bolHeader) {
                     element.scrollContainer.innerHTML = '<table><thead>' + strHTML + '</thead><tbody></tbody></table>';
                 } else {
@@ -13473,29 +13473,29 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         }
-        
+
         // if not last callback: append data to end of table
         if (data.strMessage !== 'TRANSACTION COMPLETED') {
             arrRecords = data.strMessage.split('\n');
-            
+
             intStart = element.internalData.arrRecords.length;
-            
+
             for (i = 0, len = arrRecords.length - 1, strHTML = ''; i < len; i += 1) {
                 arrCells = arrRecords[i].split('\t');
-                
+
                 for (cell_i = 0, cell_len = arrCells.length; cell_i < cell_len; cell_i += 1) {
                     arrCells[cell_i] = GS.decodeFromTabDelimited(arrCells[cell_i], element.nullString);
                 }
-                
+
                 element.internalData.arrRecords.push(arrCells);
             }
-            
+
             if (element.paginated === true && !isNaN(element.getAttribute('offset'))) {
                 numberOffset = parseInt(element.getAttribute('offset'), 10);
             } else {
                 numberOffset = 0
             }
-            
+
             strHTML = GS.templateWithEnvelopeData(
                         element.tableTemplate.templateHTML
                       , {
@@ -13505,25 +13505,25 @@ document.addEventListener('DOMContentLoaded', function () {
                       , intStart
                       , element.internalData.arrRecords.length
                       , numberOffset);
-            
+
             strHTML = GS.templateShowSubTemplates(strHTML, element.tableTemplate);
-            
+
             trMaker = document.createElement('tbody');
             trMaker.innerHTML = strHTML;
             tbodyElement = xtag.query(element.scrollContainer, 'tbody')[0];
-            
+
             arrElements = xtag.toArray(trMaker.children);
             for (i = 0, len = arrElements.length; i < len; i += 1) {
                 tbodyElement.appendChild(arrElements[i]);
             }
             //xtag.query(element.scrollContainer, 'tbody')[0].innerHTML += strHTML;
-            
+
         // if last callback: insert record
         } else {
             arrElements = xtag.query(element.scrollContainer, 'tbody tr');
-            
+
             if (arrElements[0] && arrElements[0].children[0].nodeName === 'TH' && !isNaN(arrElements[0].children[0].textContent)) {
-                
+
                 strWidth = (
                                 GS.pxToEm(element.hudContainer,
                                     GS.getTextWidth(element.hudContainer,
@@ -13531,72 +13531,72 @@ document.addEventListener('DOMContentLoaded', function () {
                                     )
                                 ) + 1
                             ) + 'em';
-                
+
                 xtag.query(element.scrollContainer, 'thead th')[0].style.width = strWidth;
                 xtag.query(element.scrollContainer, 'tbody th')[0].style.width = strWidth;
             }
-            
+
             if (parseInt((element.getAttribute('limit') || '0'), 10) > arrElements.length) {
                 element.pageRightButton.setAttribute('disabled', '');
             } else {
                 element.pageRightButton.removeAttribute('disabled');
             }
-            
+
             //if (element.insertRecordElement) {
             //    trMaker = document.createElement('tbody');
             //    trMaker.innerHTML = element.insertRecordElement.outerHTML;
             //    trMaker.children[0].classList.add('insert-record');
             //    tbodyElement = xtag.query(element.scrollContainer, 'tbody')[0];
-            //    
+            //
             //    //if (tbodyElement.children[0]) {
             //    //    tbodyElement.insertBefore(trMaker.children[0], tbodyElement.children[0]);
             //    //} else {
             //    tbodyElement.appendChild(trMaker.children[0]);
             //    //}
             //}
-            
+
             arrElements = xtag.query(element.scrollContainer, 'tr');
-            
+
             if (arrElements[0].parentNode.hasAttribute('hidden')) {
                 element.headerContainer.innerHTML = '<table><thead hidden>' + arrElements[0].outerHTML + '</thead></table>';
             } else {
                 element.headerContainer.innerHTML = '<table><thead>' + arrElements[0].outerHTML + '</thead></table>';
             }
-            
+
             element.headerTR = element.headerContainer.children[0].children[0].children[0];
-            
+
             refreshReflow(element);
             refreshHeight(element);
             synchronize(element, undefined, true, bolManualRefresh);
             synchronizeHeaderWidths(element);
             synchronizeHeaderScroll(element);
-            
+
             if (bolFirstLoad && element.hasAttribute('scroll-to-bottom')) {
                 element.scrollContainer.scrollTop = element.scrollContainer.scrollHeight;
             }
-            
+
             GS.triggerEvent(element, 'after_select');
         }
     }
-    
+
     function synchronizeHeaderWidths(element) {
         'use strict';
         var guideTR, targetTR, arrChildren, i, len, subtractPadding;
-        
+
         targetTR = element.headerTR;
         if (element.scrollContainer) {
             guideTR = xtag.query(element.scrollContainer, 'tr')[0];
-            
+
             if (guideTR) {
                 arrChildren = xtag.toArray(guideTR.children);
                 subtractPadding = 0; //GS.emToPx(element.headerContainer, 0.2);
-                
+
                 if (element.scrollContainer.scrollHeight > element.scrollContainer.clientHeight) {
                     element.headerContainer.classList.add('scroll');
                 } else {
                     element.headerContainer.classList.remove('scroll');
                 }
-                
+
                 for (i = 0, len = arrChildren.length; i < len; i += 1) {
                     targetTR.children[i].style.width = (arrChildren[i].clientWidth - subtractPadding) + 'px';
                 }
@@ -13614,56 +13614,56 @@ document.addEventListener('DOMContentLoaded', function () {
             element.headerContainer.scrollLeft = element.scrollContainer.scrollLeft;
         }
     }
-    
-    
+
+
     // get return column list
     function getReturn(element) {
         var arrColumns = [], arrSupplementalColumns = [], arrColsAttr, strColumns, arrPK, arrLock, i, len;
-        
+
         // pk
         arrPK = (element.getAttribute('pk') || '').split(/[\s]*,[\s]*/);
-        
+
         for (i = 0, len = arrPK.length; i < len; i += 1) {
             if (arrPK[i]) {
                 GS.listAdd(arrSupplementalColumns, arrPK[i]);
             }
         }
-        
+
         // lock
         arrLock = (element.getAttribute('lock') || '').split(/[\s]*,[\s]*/);
-        
+
         for (i = 0, len = arrLock.length; i < len; i += 1) {
             if (arrLock[i]) {
                 GS.listAdd(arrSupplementalColumns, arrLock[i]);
             }
         }
-        
+
         if (element.internalData && element.internalData.arrColumnNames) {
             for (i = 0, len = element.internalData.arrColumnNames.length; i < len; i += 1) {
                 GS.listAdd(arrColumns, element.internalData.arrColumnNames[i]);
             }
         } else if (element.getAttribute('cols')) {
             arrColsAttr = element.getAttribute('cols').split(/[\s]*,[\s]*/);
-            
+
             for (i = 0, len = arrColsAttr.length; i < len; i += 1) {
                 GS.listAdd(arrColumns, arrColsAttr[i]);
             }
         }
-        
+
         if (arrColumns.length === 0 || (arrColumns.length === 1 && arrColumns[0] === '*')) {
             strColumns = '*';
-            
+
         } else {
             for (i = 0, len = arrSupplementalColumns.length; i < len; i += 1) {
                 GS.listAdd(arrColumns, arrSupplementalColumns[i]);
             }
-            
+
             strColumns = arrColumns.join('\t');
         }
-        
+
         return strColumns;
     }
-    
+
     function valueListToHTML(valueText, fieldDelimiter, recordDelimiter, bolFirstContainsHeadings, quoteCharacter, decodeFunction) {
         var i = 0, len = valueText.length, col_i, col_len,
             arrHeadings = [], arrRecords = [], arrRecord = [],
@@ -13671,18 +13671,18 @@ document.addEventListener('DOMContentLoaded', function () {
             strCell = '',
             strRecord,
             strHTML = '', strPreviousChar;
-        
+
         // if there is a recordDelimiter at the beginning: add 1 to "i" to skip over it
         if (valueText[0] === recordDelimiter) {
             i += 1;
         }
-        
+
         // make sure there is a recordDelimiter at the end
         if (valueText[len - 1] !== recordDelimiter) {
             valueText += recordDelimiter;
             len = valueText.length;
         }
-        
+
         // looper
         for (; i < len; i += 1) {
             if (valueText[i] === quoteCharacter && bolInQuote === false
@@ -13692,51 +13692,51 @@ document.addEventListener('DOMContentLoaded', function () {
                     strPreviousChar === undefined
                 )) {
                 bolInQuote = true;
-                
+
             } else if (valueText[i] === quoteCharacter && bolInQuote === true) {
                 bolInQuote = false;
-                
+
             } else if (valueText[i] === fieldDelimiter && bolInQuote === false) {
                 arrRecord.push(decodeFunction(strCell, element.nullString));
                 strCell = '';
-                
+
             } else if (valueText[i] === recordDelimiter && bolInQuote === false) {
                 arrRecord.push(decodeFunction(strCell, element.nullString));
                 strCell = '';
-                
+
                 arrRecords.push(arrRecord);
                 arrRecord = [];
-                
+
             } else {
                 strCell += valueText[i];
             }
-            
+
             strPreviousChar = valueText[i];
         }
-        
+
         // data structure to html
         for (i = 0, len = arrRecords.length; i < len; i += 1) {
             for (col_i = 0, col_len = arrRecords[i].length, strRecord = ''; col_i < col_len; col_i += 1) {
                 strRecord += '<td>' + encodeHTML(arrRecords[i][col_i]) + '</td>';
             }
-            
+
             strHTML += '<tr>' + strRecord + '</tr>';
         }
-        
+
         return '<table>' + strHTML + '</table>';
     }
-    
+
     function quoteIdent(strValue) {
         strValue = strValue || '';
-        
+
         // if first char is not a lowercase letter or there is a character that is not a lowercase letter, underscore or number
         if (!(/[a-z]/).test(strValue[0]) || (/[^a-z_]/).test(strValue)) {
             strValue = '"' + strValue.replace(/\"/gim, '""') + '"';
         }
-        
+
         return strValue;
     }
-    
+
     // disfated's answer at: http://stackoverflow.com/questions/202605/repeat-string-javascript
     function stringRepeat(pattern, count) {
         if (count < 1) return '';
@@ -13747,14 +13747,14 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         return result + pattern;
     }
-    
+
     function getSocket(element) {
         if (element.getAttribute('socket')) {
             return GS[element.getAttribute('socket')];
         }
         return GS.envSocket;
     }
-    
+
     function getData(element, refocusSelector, refocusSelection, bolFirstLoad, bolManualRefresh) {
         var strSchema = GS.templateWithQuerystring(element.getAttribute('schema') || '')
           , strObject = GS.templateWithQuerystring(element.getAttribute('object') || '')
@@ -13764,18 +13764,18 @@ document.addEventListener('DOMContentLoaded', function () {
           , strLimit  = GS.templateWithQuerystring(element.getAttribute('limit')  || '')
           , strOffset = GS.templateWithQuerystring(element.getAttribute('offset') || '0')
           , strWhereColumn;
-        
+
         // add in user where, if any
         if (element.getAttribute('user-where')) {
             strWhere = '(' + element.getAttribute('user-where') + ')' + (strWhere ? ' AND ' + strWhere : '');
         }
-        
+
         // add in a column or qs where, if any
-        
+
         // if there is a column attribute on element element: combine the where attribute with a where generated by value
         if ((element.getAttribute('column') || element.getAttribute('qs')) && element.value) {
             strWhereColumn = element.getAttribute('child-column') || element.getAttribute('column') || element.getAttribute('qs');
-            
+
             if (isNaN(element.value)) {
                 strWhere =
                     'CAST(' + strWhereColumn + ' AS ' + GS.database.type.text + ') = ' +
@@ -13785,7 +13785,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 strWhere = strWhereColumn + '=' + (element.value) + (strWhere !== '' ? ' AND (' + strWhere + ')' : '');
             }
         }
-        
+
         // disabled, hide or not the pageinate buttons
         if (strLimit === '') {
             element.pageLeftButton.setAttribute('hidden', '');
@@ -13793,33 +13793,33 @@ document.addEventListener('DOMContentLoaded', function () {
         } else if (strOffset === '' || strOffset === '0') {
             element.pageLeftButton.setAttribute('disabled', '');
         }
-        
+
         GS.addLoader(element, 'Loading...');
         GS.requestSelectFromSocket(
                         getSocket(element), strSchema, strObject, strReturn
                       , strWhere, strOrd, strLimit, strOffset
           , function (data, error) {
                 var refocusElement;
-                
+
                 if (!error) {
                     handleData(element, data, bolFirstLoad, bolManualRefresh);
-                    
+
                     if (data.strMessage === 'TRANSACTION COMPLETED') {
                         GS.removeLoader(element);
                     }
-                    
+
                     if (data.strMessage === 'TRANSACTION COMPLETED' && refocusSelector) {
                         refocusElement = xtag.query(element, refocusSelector)[0];
-                        
+
                         if (refocusElement) {
                             refocusElement.focus();
-                            
+
                             if (refocusSelection) {
                                 GS.setInputSelection(refocusElement, refocusSelection.start, refocusSelection.end);
                             }
                         }
                     }
-                    
+
                 } else {
                     GS.removeLoader(element);
                     if (!element.scrollContainer.innerHTML) {
@@ -13830,20 +13830,20 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         );
     }
-    
-    
+
+
     function getSelectedCopyHTML(element) {
         var strHTMLCopyString, intFromRecord, intToRecord, intFromCell = 9999999, intToCell = 0
           , i, len, cell_i, cell_len, arrSelected, strCellHTML, arrRecords, arrCells
           , strHTMLRecordString;
-        
+
         arrSelected = element.selectedCells;
-        
+
         // loop through the selected cells and create an html string using the text of the cell
         if (arrSelected.length > 0) {
             intFromRecord = arrSelected[0].parentNode.rowIndex;
             intToRecord = arrSelected[arrSelected.length - 1].parentNode.rowIndex + 1;
-            
+
             for (i = 0, len = arrSelected.length; i < len; i += 1) {
                 if (arrSelected[i].cellIndex < intFromCell) {
                     intFromCell = arrSelected[i].cellIndex;
@@ -13853,32 +13853,32 @@ document.addEventListener('DOMContentLoaded', function () {
                     intToCell = arrSelected[i].cellIndex + 1;
                 }
             }
-            
+
             arrRecords = xtag.query(element, 'tr');
             strHTMLCopyString = '';
-            
+
             for (i = intFromRecord, len = intToRecord; i < len; i += 1) {
                 arrCells = arrRecords[i].children;
                 strHTMLRecordString = '';
-                
+
                 if (!arrRecords[i].classList.contains('insert-record')) {
                     for (cell_i = intFromCell, cell_len = intToCell; cell_i < cell_len; cell_i += 1) {
                         strCellHTML = '';
-                        
+
                         if (arrCells[cell_i].hasAttribute('selected')) {
-                            if (arrCells[cell_i].lastElementChild) { 
+                            if (arrCells[cell_i].lastElementChild) {
                                 strCellHTML = arrCells[cell_i].lastElementChild.textValue ||
                                               arrCells[cell_i].lastElementChild.value ||
                                               (arrCells[cell_i].lastElementChild.checked || '').toString();
                             } else {
                                 strCellHTML = arrCells[cell_i].textContent.trim();
                             }
-                            
+
                             strCellHTML = encodeHTML(strCellHTML).replace(/\n/gim, '<br />');
                         }
-                        
+
                         strCellHTML = '<' + 'td rowspan="1" colspan="1">' + (strCellHTML || '') + '</td>'
-                        
+
                         strHTMLRecordString += (cell_i === intFromCell ? '<' + 'tr>' : '');
                         strHTMLRecordString += (strCellHTML || '');
                         strHTMLRecordString += (cell_i === (intToCell - 1) ? '<' + '/tr>' : '');
@@ -13888,7 +13888,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     strHTMLCopyString += strHTMLRecordString;
                 }
             }
-            
+
             if (strHTMLCopyString) {
                 strHTMLCopyString = '<' + 'style>' +
                                         'br { mso-data-placement:same-cell; } ' +
@@ -13897,21 +13897,21 @@ document.addEventListener('DOMContentLoaded', function () {
                                     '<' + 'table border="0" cellpadding="0" cellspacing="0">' + strHTMLCopyString + '<' + '/table>';
             }
         }
-        
+
         return strHTMLCopyString || '';
     }
-    
+
     function getSelectedCopyText(element) {
         var strTextCopyString, intFromRecord, intToRecord, intFromCell = 9999999, intToCell = 0,
             i, len, cell_i, cell_len, arrSelected, strCellText, arrRecords, arrCells, arrCellIndexes, strTextRecordString;
-        
+
         arrSelected = element.selectedCells;
-        
+
         // loop through the selected cells and create a tsv string using the text of the cell
         if (arrSelected.length > 0) {
             intFromRecord = arrSelected[0].parentNode.rowIndex;
             intToRecord = arrSelected[arrSelected.length - 1].parentNode.rowIndex + 1;
-            
+
             for (i = 0, len = arrSelected.length; i < len; i += 1) {
                 if (arrSelected[i].cellIndex < intFromCell) {
                     intFromCell = arrSelected[i].cellIndex;
@@ -13921,30 +13921,30 @@ document.addEventListener('DOMContentLoaded', function () {
                     intToCell = arrSelected[i].cellIndex + 1;
                 }
             }
-            
+
             arrRecords = xtag.query(element, 'tr');
             strTextCopyString = '';
-            
+
             for (i = intFromRecord, len = intToRecord; i < len; i += 1) {
                 arrCells = arrRecords[i].children;
                 strTextRecordString = '';
-                
+
                 for (cell_i = intFromCell, cell_len = intToCell; cell_i < cell_len; cell_i += 1) {
                     if (!arrCells[cell_i].parentNode.classList.contains('insert-record')) {
                         strCellText = '';
-                        
+
                         if (arrCells[cell_i].hasAttribute('selected')) {
-                            if (arrCells[cell_i].lastElementChild) { 
+                            if (arrCells[cell_i].lastElementChild) {
                                 strCellText = arrCells[cell_i].lastElementChild.textValue ||
                                               arrCells[cell_i].lastElementChild.value ||
                                               (arrCells[cell_i].lastElementChild.checked || '').toString();
                             } else {
                                 strCellText = arrCells[cell_i].textContent.trim();
                             }
-                            
+
                             strCellText = strCellText.replace(/\"/gim, '""');
                         }
-                        
+
                         strTextRecordString += (cell_i !== intFromCell ? '\t' : '');
                         strTextRecordString += (strCellText || '');
                     }
@@ -13957,34 +13957,34 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         }
-        
+
         return strTextCopyString || '';
     }
-    
+
     function handleClipboardData(event, strCopyString, strType) {
         var clipboardData = event.clipboardData || window.clipboardData, strMime;
-        
+
         if (!clipboardData) { return; }
         if (!clipboardData.setData) { return; }
-        
+
         if (strType === 'text') {
             if (window.clipboardData && window.clipboardData.getData) { // IE
                 strMime = 'Text';
             } else if (event.clipboardData && event.clipboardData.getData) {
                 strMime = 'text/plain';
             }
-            
+
         } else if (strType === 'html') {
             if (window.clipboardData && window.clipboardData.getData) { // IE
                 strMime = '';
             } else if (event.clipboardData && event.clipboardData.getData) {
                 strMime = 'text/html';
             }
-            
+
         } else {
             throw 'handleClipboardData Error: Type "' + strType + '" not recognized, recognized types are "text" and "html".';
         }
-        
+
         if (strMime) {
             if (strCopyString && strMime) {
                 return clipboardData.setData(strMime, strCopyString) !== false;
@@ -13993,15 +13993,15 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     }
-    
-    
+
+
     function selectHandler(element, dragOriginCell, dragCurrentCell, dragMode) {
         var arrRecords = xtag.query(element, 'tr'), arrCells = xtag.query(element, 'td, th'),
             dragOriginRecord = dragOriginCell.parentNode,
             dragCurrentRecord = dragCurrentCell.parentNode,
             intStartRecordIndex, intStartCellIndex, intEndRecordIndex, intEndCellIndex,
             i, len, col_i, col_len, selectionIndex;
-        
+
         // if origin & currentCell are both the top-left cell and the cell is a heading: select all cells
         if (dragOriginRecord.rowIndex === 0 && dragCurrentRecord.rowIndex === 0 &&
             dragOriginCell.cellIndex === 0 && dragCurrentCell.cellIndex === 0) {
@@ -14009,21 +14009,21 @@ document.addEventListener('DOMContentLoaded', function () {
             intStartCellIndex = 0;
             intEndRecordIndex = arrRecords.length - 1;
             intEndCellIndex = arrRecords[0].children.length - 1;
-            
+
         // else if origin is a first th: select the records from origin to currentCell
         } else if (dragOriginCell.cellIndex === 0) {
             intStartRecordIndex = Math.min(dragOriginRecord.rowIndex, dragCurrentRecord.rowIndex);
             intStartCellIndex = 0;
             intEndRecordIndex = Math.max(dragOriginRecord.rowIndex, dragCurrentRecord.rowIndex);
             intEndCellIndex = arrRecords[0].children.length - 1;
-            
+
         // else if origin is a heading: select the columns from origin to currentCell
         } else if (dragOriginRecord.rowIndex === 0) {
             intStartRecordIndex = 0;
             intStartCellIndex = Math.min(dragOriginCell.cellIndex, dragCurrentCell.cellIndex);
             intEndRecordIndex = arrRecords.length - 1;
             intEndCellIndex = Math.max(dragOriginCell.cellIndex, dragCurrentCell.cellIndex);
-            
+
         // else select cells from origin to currentCell
         } else {
             intStartRecordIndex = Math.min(dragOriginRecord.rowIndex, dragCurrentRecord.rowIndex);
@@ -14031,9 +14031,9 @@ document.addEventListener('DOMContentLoaded', function () {
             intEndRecordIndex = Math.max(dragOriginRecord.rowIndex, dragCurrentRecord.rowIndex);
             intEndCellIndex = Math.max(dragOriginCell.cellIndex, dragCurrentCell.cellIndex);
         }
-        
+
         element.savedSelection = element.savedSelectionCopy.slice(0);
-        
+
         if (dragMode === 'select') {
             for (i = intStartRecordIndex, len = intEndRecordIndex + 1; i < len; i += 1) {
                 for (col_i = intStartCellIndex, col_len = intEndCellIndex + 1; col_i < col_len; col_i += 1) {
@@ -14042,26 +14042,26 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
             }
-            
+
         } else { // implied if: dragMode === 'deselect'
             for (i = intStartRecordIndex, len = intEndRecordIndex + 1; i < len; i += 1) {
                 for (col_i = intStartCellIndex, col_len = intEndCellIndex + 1; col_i < col_len; col_i += 1) {
                     selectionIndex = element.savedSelection.indexOf(i + ',' + col_i);
-                    
+
                     if (selectionIndex > -1) {
                         element.savedSelection.splice(selectionIndex, 1);
                     }
                 }
             }
         }
-        
+
         synchronize(element);
     }
-    
+
     function synchronize(element, bolScroll, bolOnLoad, bolManualRefresh) {
         var arrRecords = xtag.query(element, 'tr'), selectCells = [], i, len,
             arrParts, arrTextareas, focusedElement, recordIndex, cellIndex;
-        
+
         // selection
         if (element.savedSelection) {
             // loop through savedSelection
@@ -14070,16 +14070,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 arrParts = element.savedSelection[i].split(',');
                 recordIndex = parseInt(arrParts[0], 10);
                 cellIndex = parseInt(arrParts[1], 10);
-                
+
                 if (recordIndex < arrRecords.length && cellIndex < arrRecords[0].children.length) {
                     selectCells.push(arrRecords[recordIndex].children[cellIndex]);
                 }
             }
-            
+
             // select cells
             element.selectedCells = selectCells;
         }
-        
+
         // focus
         if (element.lastFocusedControl) {
             element.lastFocusedControl.focus();
@@ -14088,95 +14088,95 @@ document.addEventListener('DOMContentLoaded', function () {
             focusedElement = element.copyControl;
             element.copyControl.focus();
         }
-        
+
         // if there was no control to focus and
         //      there is a selection and
         //      bolScroll is true: scroll to selected
         if (!element.lastFocusedControl && element.selectedCells.length > 0 && bolScroll) {
             GS.scrollIntoView(element.selectedCells[0].parentNode);
         }
-        
+
         // if there was a control and bolScroll is true: scroll to focused record
         if (focusedElement && bolScroll) {
             GS.scrollIntoView(GS.findParentElement(document.activeElement, 'tr'));
         }
-        
+
         if (focusedElement && element.lastTextSelection) {
             GS.setInputSelection(focusedElement, element.lastTextSelection.start, element.lastTextSelection.end);
         }
     }
-    
+
     function clearRecordColor(element, strClass, bolGreenFade) {
         var arrElements = xtag.query(element, 'tr.' + strClass), i, len;
-        
+
         if (bolGreenFade) {
             for (i = 0, len = arrElements.length; i < len; i += 1) {
                 arrElements[i].classList.remove(strClass);
                 arrElements[i].classList.add('bg-green-fade');
             }
-            
+
             setTimeout(function () {
                 for (i = 0, len = arrElements.length; i < len; i += 1) {
                     arrElements[i].classList.remove('bg-green-fade');
                 }
             }, 1000);
-            
+
         } else {
             for (i = 0, len = arrElements.length; i < len; i += 1) {
                 arrElements[i].classList.remove(strClass);
             }
         }
     }
-    
+
     function removeRecords(element, strClass) {
         var arrElements = xtag.query(element, 'tr.' + strClass), i, len;
-        
+
         for (i = 0, len = arrElements.length; i < len; i += 1) {
             arrElements[i].parentNode.removeChild(arrElements[i]);
         }
     }
-    
+
     function insertRecords(element, strColumns, strInsertData, strLocalData, bolDialog) {
         var strSchema = GS.templateWithQuerystring(element.getAttribute('schema'))
           , strObject = GS.templateWithQuerystring(element.getAttribute('object'))
           , templateElement, strSeq, arrSeq, strPk, arrPk
           , strColumn, arrColumns, i, len, col_i, col_len
           , tbodyElement, arrElements, insertRecord;
-        
+
         arrSeq = (GS.templateWithQuerystring(element.getAttribute('seq') || '')).split(/[\s]*,[\s]*/);
         arrPk = (GS.templateWithQuerystring(element.getAttribute('pk') || '')).split(/[\s]*,[\s]*/);
-        
+
         arrColumns = strColumns.split('\t');
         for (i = 0, len = arrColumns.length; i < len; i += 1) {
             strColumn = GS.decodeFromTabDelimited(arrColumns[i], element.nullString);
-            
+
             if (arrSeq.indexOf(strColumn) > -1) {
                 arrSeq[arrSeq.indexOf(strColumn)] = '';
             }
         }
-        
+
         //console.log(getReturn(element) + '\n' + strLocalData);
-        
+
         // template local record data
         tbodyElement = document.createElement('tbody');
         tbodyElement.innerHTML = templateRecordsForInsert(element, strColumns + '\n' + strLocalData, 'bg-red');
-        
+
         // add local records to the table before the insert record
         arrElements = xtag.toArray(tbodyElement.children);
         insertRecord = xtag.query(element, 'tr.insert-record')[0];
-        
+
         for (i = 0, len = arrElements.length; i < len; i += 1) {
             insertRecord.parentNode.insertBefore(arrElements[i], insertRecord);
         }
-        
+
         // scroll all the way down
         element.scrollContainer.scrollTop = element.scrollContainer.scrollHeight;
-        
+
         // get pk and sequence values
         for (i = 0, len = arrPk.length, strPk = ''; i < len; i += 1) {
             strPk += (strPk ? '\t' : '') + GS.encodeForTabDelimited(arrPk[i], element.nullString);
         }
-        
+
         for (i = 0, len = arrSeq.length, strSeq = ''; i < len; i += 1) {
             if (arrColumns.indexOf(arrPk[i]) > -1) {
                 strSeq += (i === 0 ? '' : '\t') + '';
@@ -14184,9 +14184,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 strSeq += (i === 0 ? '' : '\t') + GS.encodeForTabDelimited(arrSeq[i], element.nullString);
             }
         }
-        
+
         strInsertData = strColumns + '\n' + strInsertData;
-        
+
         GS.addLoader(element, 'Creating Insert Transaction...');
         GS.requestInsertFromSocket(
             getSocket(element), strSchema, strObject, getReturn(element), strPk, strSeq, strInsertData
@@ -14199,23 +14199,23 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             , function (data, error, transactionID, commitFunction, rollbackFunction) {
                 var tbodyElement, arrElements, arrReplaceElements, i, len, templateElement;
-                
+
                 GS.removeLoader(element);
-                
+
                 if (!error) {
                     if (data !== 'TRANSACTION COMPLETED') {
                         data = getReturn(element) + '\n' + data;
-                        
+
                         // replace red records with amber records
                         tbodyElement = document.createElement('tbody');
                         tbodyElement.innerHTML = templateRecordsForInsert(element, data, 'bg-amber');
                         arrElements = xtag.toArray(tbodyElement.children);
                         arrReplaceElements = xtag.query(element, 'tr.bg-red');
-                        
+
                         for (i = 0, len = arrElements.length; i < len; i += 1) {
                             arrReplaceElements[i].parentNode.replaceChild(arrElements[i], arrReplaceElements[i]);
                         }
-                        
+
                     // open confirm message box
                     } else {
                         if (bolDialog) {
@@ -14234,10 +14234,10 @@ document.addEventListener('DOMContentLoaded', function () {
                                     </gs-footer>
                                 </gs-page>
                             */}).replace(/\{\{numberofrecords\}\}/gi, xtag.query(element, '.bg-amber').length);
-                            
+
                             GS.openDialog(templateElement, function () {
                                 document.getElementById('datasheet-focus-me').focus();
-                                
+
                             }, function (event, strAnswer) {
                                 if (strAnswer === 'Yes') {
                                     commitFunction();
@@ -14251,7 +14251,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             commitFunction();
                         }
                     }
-                    
+
                 } else {
                     removeRecords(element, 'bg-red');
                     rollbackFunction();
@@ -14260,7 +14260,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             , function (strAnswer, data, error) {
                 GS.removeLoader(element);
-                
+
                 if (!error) {
                     if (strAnswer === 'COMMIT') {
                         clearRecordColor(element, 'bg-amber', true);
@@ -14275,24 +14275,24 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         );
     }
-    
-    
+
+
     function refreshRecordsAfterUpdate(element, arrRecordsToUpdate, data) {
         var arrColumns, arrRecords, arrValues, arrElements, arrColumnTypes,
             i, len, record_i, record_len, col_i, col_len, controlElement;
-        
+
         // if last character is a \n: remove it
         if (data[data.length - 1] === '\n') {
             data = data.substring(0, data.length - 1);
         }
-        
+
         // split records
         arrRecords = data.split('\n');
-        
+
         // seperate first record (for column names)
         arrColumns = arrRecords[0].split('\t');
         arrRecords.splice(0, 1);
-        
+
         // loop through each record
         len = arrRecordsToUpdate.length;
         record_len = arrRecords.length;
@@ -14302,33 +14302,33 @@ document.addEventListener('DOMContentLoaded', function () {
             if (arrRecordsToUpdate[i].classList.contains('bg-red') && arrRecords[record_i]) {
                 arrRecordsToUpdate[i].classList.remove('bg-red');
                 arrRecordsToUpdate[i].classList.add('bg-amber');
-                
+
                 // build json row
                 arrValues = arrRecords[record_i].split('\t');
                 for (col_i = 0, col_len = arrValues.length; col_i < col_len; col_i += 1) {
                     arrRecordsToUpdate[i].setAttribute('data-' + arrColumns[col_i], GS.decodeFromTabDelimited(arrValues[col_i], element.nullString));
-                    
+
                     controlElement = xtag.query(arrRecordsToUpdate[i], '[column="' + arrColumns[col_i] + '"]')[0];
                     if (controlElement) {
                         controlElement.value = GS.decodeFromTabDelimited(arrValues[col_i], element.nullString);
                     }
                 }
-                
+
                 record_i += 1;
             }
             i += 1;
         }
     }
-    
+
     function updateRecords(element, strHashColumns, strUpdateData, arrUpdateRecords, bolDialog) {
         var strSchema = GS.templateWithQuerystring(element.getAttribute('schema'))
           , strObject = GS.templateWithQuerystring(element.getAttribute('object'))
           , templateElement, i, len, refreshData;
-        
+
         for (i = 0, len = arrUpdateRecords.length; i < len; i += 1) {
             arrUpdateRecords[i].classList.add('bg-red');
         }
-        
+
         // create transaction
         GS.addLoader(element, 'Creating Update Transaction...');
         GS.requestUpdateFromSocket(
@@ -14346,10 +14346,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (data !== 'TRANSACTION COMPLETED') {
                         refreshData = data;
                         data = getReturn(element) + '\n' + data;
-                        
+
                         // make the records amber and refresh their data
                         refreshRecordsAfterUpdate(element, arrUpdateRecords, data);
-                        
+
                     // open confirm message box
                     } else {
                         if (bolDialog) {
@@ -14368,10 +14368,10 @@ document.addEventListener('DOMContentLoaded', function () {
                                     </gs-footer>
                                 </gs-page>
                             */}).replace(/\{\{numberofrecords\}\}/gi, xtag.query(element, '.bg-amber').length);
-                            
+
                             GS.openDialog(templateElement, function () {
                                 document.getElementById('datasheet-focus-me').focus();
-                                
+
                             }, function (event, strAnswer) {
                                 if (strAnswer === 'Yes') {
                                     commitFunction();
@@ -14385,7 +14385,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             commitFunction();
                         }
                     }
-                    
+
                 } else {
                     rollbackFunction();
                     getData(element);
@@ -14394,26 +14394,26 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             , function (strAnswer, data, error) {
                 var arrRecords, arrCells, recordData, recordIndex, i, len, col_i, col_len;
-                
+
                 GS.removeLoader(element);
-                
+
                 if (!error) {
                     if (strAnswer === 'COMMIT') {
                         clearRecordColor(element, 'bg-amber', true);
-                        
+
                         // refresh internal data
                         arrRecords = refreshData.split('\n');
-                        
+
                         for (i = 0, len = arrUpdateRecords.length; i < len; i += 1) {
                             arrCells = arrRecords[i].split('\t');
                             recordIndex = parseInt(arrUpdateRecords[i].getAttribute('data-index'), 10);
-                            
+
                             for (col_i = 0, col_len = arrCells.length; col_i < col_len; col_i += 1) {
                                 element.internalData.arrRecords[recordIndex][col_i] = GS.decodeFromTabDelimited(arrCells[col_i], element.nullString)
                             }
                         }
                         GS.triggerEvent(element, 'after_update');
-                        
+
                     } else {
                         getData(element);
                     }
@@ -14424,7 +14424,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         );
     }
-    
+
     function pasteHandler(element, event) {
         var clipboardData = (event.clipboardData || window.clipboardData)
           , templateElement = document.createElement('template')
@@ -14434,36 +14434,36 @@ document.addEventListener('DOMContentLoaded', function () {
           , strTemp, strRecordToHash, strHashColumns, strRoles, strUpdateData
           , arrRecords, arrUpdateRecords, arrUpdateColumns, updateRecord
           , updateRecordData, pasteElement;
-        
+
         if (window.clipboardData) {
             pastePlain = clipboardData.getData('Text');
         } else {
             pasteHTML = clipboardData.getData('text/html');
             pastePlain = clipboardData.getData('Text');
         }
-        
+
         // if no html: build HTML using plain
         if (!pasteHTML || (pasteHTML.indexOf('<' + 'table') === -1 && pasteHTML.indexOf('<' + 'tr') === -1)) {
             pasteHTML = valueListToHTML(pastePlain, '\t', '\n', false, '"', GS.decodeFromTabDelimited);
         }
-        
+
         //console.log('HTML:', pasteHTML);
         //console.log('PLAIN:', pastePlain);
-        
+
         // put HTML into a template element for traversal
         templateElement.innerHTML = pasteHTML;
-        
+
         arrPasteRecords = xtag.query(xtag.query(templateElement.content, 'table')[0], 'tr');
         arrSelectRecords = element.selectedRecords;
-        
+
         // if the first record is the header: remove it from the selection
         if (arrSelectRecords[0] && arrSelectRecords[0].parentNode.nodeName === 'THEAD') {
             arrSelectRecords.splice(0, 1);
         }
-        
+
         if (element.numberOfSelections === 1) {
             arrSetColumns = xtag.query(arrSelectRecords[0], 'td[selected]');
-            
+
             // if the selection starts on the insert record
             if (arrSelectRecords[0].classList.contains('insert-record')) {
                 strColumns = '';
@@ -14471,71 +14471,71 @@ document.addEventListener('DOMContentLoaded', function () {
                     strColumn = arrSetColumns[i].children[0].getAttribute('column');
                     strColumns += (strColumns ? '\t' : '') + strColumn;
                 }
-                
+
                 // extract data from paste HTML
                 strLeftPad = stringRepeat('\t', arrSetColumns[0].cellIndex - 1);
                 strRightPad = stringRepeat('\t', (element.internalData.arrColumnNames.length - ((arrSetColumns[0].cellIndex - 1) + arrSetColumns.length)));
-                
+
                 for (i = 0, len = arrPasteRecords.length, strInsertData = '', strLocalData = ''; i < len; i += 1) {
                     for (col_i = 0, col_len = arrSetColumns.length, strRecord = ''; col_i < col_len; col_i += 1) {
                         cell = arrPasteRecords[i].children[col_i];
                         strRecord += (strRecord ? '\t' : '') + GS.encodeForTabDelimited(cell.innerText || cell.textContent, element.nullString);
                     }
-                    
+
                     strInsertData += strRecord + '\n';
                     strLocalData += strLeftPad + strRecord + strRightPad + '\n';
                 }
-                
+
                 insertRecords(element, strColumns, strInsertData, strLocalData, (arrPasteRecords.length > 1));
-                
+
             // else (if the selection starts on an update record)
             } else {
                 // if the last record is the insert: remove it from the selection
                 if (arrSelectRecords[arrSelectRecords.length - 1].parentNode.nodeName === 'THEAD') {
                     arrSelectRecords.pop();
                 }
-                
+
                 arrPk = (GS.templateWithQuerystring(element.getAttribute('pk') || '')).split(/[\s]*,[\s]*/);
                 arrLock = (GS.templateWithQuerystring(element.getAttribute('lock') || '')).split(/[\s]*,[\s]*/);
-                
+
                 // gathering update headers
                 for (i = 0, len = arrPk.length, strRoles = '', strColumns = ''; i < len; i += 1) {
                     strRoles += (strRoles ? '\t' : '') + 'pk';
                     strColumns += (strColumns ? '\t' : '') + arrPk[i];
                 }
-                
+
                 for (i = 0, len = arrLock.length, strHashColumns = ''; i < len; i += 1) {
                     strHashColumns += (strHashColumns ? '\t' : '') + arrLock[i];
                 }
                 strRoles += (strRoles ? '\t' : '') + 'hash';
                 strColumns += (strColumns ? '\t' : '') + 'hash';
-                
+
                 arrUpdateColumns = [];
                 for (i = 0, len = Math.min(arrSetColumns.length, arrPasteRecords[0].children.length); i < len; i += 1) {
                     pasteElement = xtag.query(arrSetColumns[i], '[column]')[0];//arrSetColumns[i].children[0];
-                    
+
                     if (pasteElement) {
                         strColumn = pasteElement.getAttribute('column');
-                        
+
                         strRoles += (strRoles ? '\t' : '') + 'set';
                         strColumns += (strColumns ? '\t' : '') + strColumn;
-                        
+
                         arrUpdateColumns.push(strColumn);
                     }
                 }
-                
+
                 arrUpdateRecords = [];
                 for (i = 0, len = Math.min(arrSelectRecords.length, arrPasteRecords.length), strUpdateData = ''; i < len; i += 1) {
                     strRecord = '';
                     updateRecord = arrSelectRecords[i];
                     updateRecordData = element.internalData.arrRecords[parseInt(updateRecord.getAttribute('data-index'), 10)];
-                    
+
                     // get 'pk' columns
                     for (col_i = 0, col_len = arrPk.length; col_i < col_len; col_i += 1) {
                         strRecord += (strRecord ? '\t' : '');
                         strRecord += GS.encodeForTabDelimited(updateRecordData[element.internalData.arrColumnNames.indexOf(arrPk[col_i])], element.nullString);
                     }
-                    
+
                     // get 'hash' columns
                     strRecordToHash = '';
                     for (col_i = 0, col_len = arrLock.length; col_i < col_len; col_i += 1) {
@@ -14543,55 +14543,55 @@ document.addEventListener('DOMContentLoaded', function () {
                         strTemp = updateRecordData[element.internalData.arrColumnNames.indexOf(arrLock[col_i])];
                         strRecordToHash += (strTemp === 'NULL' ? '' : strTemp);
                     }
-                    
+
                     strRecord += (strRecord ? '\t' : '') + GS.utfSafeMD5(strRecordToHash).toString();
-                    
+
                     // get 'set' columns
                     for (col_i = 0, col_len = arrSetColumns.length; col_i < col_len; col_i += 1) {
                         pasteElement = xtag.query(arrSetColumns[col_i], '[column]')[0];
-                        
+
                         if (pasteElement) {
                             cell = arrPasteRecords[i].children[col_i];
                             strRecord += (strRecord ? '\t' : '') + GS.encodeForTabDelimited(cell.innerText || cell.textContent, element.nullString);
                         }
                     }
-                    
+
                     strUpdateData += strRecord + '\n';
                     arrUpdateRecords.push(arrSelectRecords[i]);
                 }
-                
+
                 strUpdateData = (strRoles + '\n' + strColumns + '\n' + strUpdateData);
                 updateRecords(element, strHashColumns, strUpdateData, arrUpdateRecords, (arrPasteRecords.length > 1));
             }
         }
     }
-    
+
     function refreshHeight(element) {
         var intHeight;
-        
+
         if (element.hasAttribute('expand-to-content') &&
                 element.hudContainer &&
                 element.scrollContainer &&
                 element.scrollContainer.children[0]) {
             element.style.height = '';
-            
+
             intHeight = (
                             element.hudContainer.scrollHeight +
                             element.scrollContainer.children[0].scrollHeight
                         );
-            
+
             element.style.height = intHeight + 'px';
             element.style.height = (intHeight + (element.scrollContainer.scrollHeight - element.scrollContainer.clientHeight)) + 'px';
         }
     }
-    
+
     function refreshReflow(element) {
         var strReflowAt = GS.templateWithQuerystring(element.getAttribute('reflow-at') || ''), intReflowAt, intElementWidth;
-        
+
         if (strReflowAt) {
             intElementWidth = element.offsetWidth;
             intReflowAt = parseInt(strReflowAt, 10);
-            
+
             if (intElementWidth < intReflowAt) {
                 element.dataContainer.classList.add('grid-reflow');
             } else {
@@ -14601,24 +14601,24 @@ document.addEventListener('DOMContentLoaded', function () {
             element.dataContainer.classList.remove('grid-reflow');
         }
     }
-    
-    
+
+
     // clean the slate and set initial html
     function prepareElement(element) {
         var tableTemplateElement, HUDTemplateElement, strHTML, recordElement, insertTemplateElement, arrParts
           , headerRecordElement;
         var i, len, arrElements, arrHeaderElements;
         var tempTemplateElement;
-        
+
         // default pk and lock
         if (!element.hasAttribute('pk'))   { element.setAttribute('pk',   'id'); }
         if (!element.hasAttribute('lock')) { element.setAttribute('lock', 'change_stamp'); }
-        
+
         // harvest the templates, error if problems
         tableTemplateElement = xtag.query(element, 'template[for="table"]')[0];
         HUDTemplateElement = xtag.query(element, 'template[for="hud"]')[0];
         insertTemplateElement = xtag.query(element, 'template[for="insert"]')[0];
-        
+
         if (
             HUDTemplateElement &&
             (
@@ -14646,32 +14646,32 @@ document.addEventListener('DOMContentLoaded', function () {
         ) {
             console.warn('GS-DATASHEET WARNING: &gt; or &lt; detected in insert template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
         }
-        
+
         if (!tableTemplateElement || tableTemplateElement.nodeName !== 'TEMPLATE') {
             throw 'gs-datasheet error: No table template provided.';
         }
-        
+
         // V----- cannot do .children on template.content
         //if (tableTemplateElement.content.children[0].nodeName !== 'TABLE') {
         //    throw 'gs-datasheet error: Table is not the first element in the provided table template.';
         //}
-        
+
         // make header template
         headerRecordElement = xtag.query(tableTemplateElement.content, 'thead tr')[0];
         if (headerRecordElement) {
-            
+
             arrHeaderElements = xtag.query(headerRecordElement, 'td, th');
             arrElements = xtag.query(tableTemplateElement.content, 'tbody td, tbody th');
-            
+
             for (i = 0, len = arrHeaderElements.length; i < len; i += 1) {
                 if (!arrElements[i].hasAttribute('heading')) {
                     arrElements[i].setAttribute('heading', arrHeaderElements[i].textContent);
                 }
             }
-            
+
             element.headerTemplateRecord = headerRecordElement.outerHTML;
         }
-        
+
         // make table template
         recordElement = xtag.query(tableTemplateElement.content, 'tbody tr')[0];
         recordElement.setAttribute('data-index', '{{= i }}');
@@ -14679,34 +14679,34 @@ document.addEventListener('DOMContentLoaded', function () {
         tempTemplateElement = document.createElement('template');
         tempTemplateElement.innerHTML = strHTML;
         recordElement = xtag.query(tempTemplateElement.content, 'tbody tr')[0];
-        
+
         element.tableTemplate = GS.templateHideSubTemplates(recordElement.outerHTML, true);
         element.tableTemplateRecord = recordElement;
-        
+
         if (insertTemplateElement && insertTemplateElement.innerHTML) {
             element.insertTemplate = insertTemplateElement.innerHTML;
         }
-        
+
         // split schema and object
         arrParts = GS.templateWithQuerystring(element.getAttribute('src')).split('.');
-        
+
         element.setAttribute('schema', arrParts[0]);
         element.setAttribute('object', arrParts[1]);
-        
+
         // replace element inner html and create element variables
         strHTML = ml(function () {/*
             <div class="root" flex-vertical flex-fill>
                 <div class="hud-container">
                     <gs-button icon="refresh" remove-right icononly no-focus title="Refresh Data." class="refresh-button"></gs-button>
                     <gs-button icon="times" remove-left icononly no-focus title="Delete Selected Records." class="delete-button"></gs-button>
-                    
+
                     <gs-button icon="plus" icononly no-focus title="Create Record." class="insert-button"></gs-button>
-                    
+
                     <gs-button icon="backward" remove-right icononly no-focus title="Go to previous page." class="paginate-left"></gs-button>
                     <gs-button icon="forward" remove-left icononly no-focus title="Go to next page." class="paginate-right"></gs-button>
-                    
+
                     {{HUDHTML}}
-                    
+
                     <gs-button icon="filter" icononly no-focus title="Edit Filters." class="filter-button" hidden></gs-button>
                     <textarea class="hidden-focus-control">Focus Control</textarea>
                 </div>
@@ -14719,26 +14719,26 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
             </div>
         */});
-        
+
         if (HUDTemplateElement) {
             strHTML = strHTML.replace(/\{\{HUDHTML\}\}/gi, HUDTemplateElement.innerHTML);
         } else {
             strHTML = strHTML.replace(/\{\{HUDHTML\}\}/gi, '');
         }
-        
+
         element.innerHTML = strHTML;
-        
+
         element.root = element.children[0];
-        
+
         element.hudContainer    = element.root.children[0];
         element.dataContainer   = element.root.children[1];
-        
+
         element.dataFlexReset   = element.dataContainer.children[0];
-        
+
         element.scrollContainer = element.dataFlexReset.children[0];
         element.headerContainer = element.dataFlexReset.children[1];
         element.insertContainer = element.dataFlexReset.children[2];
-        
+
         element.refreshButton   = xtag.queryChildren(element.hudContainer, '.refresh-button')[0];
         element.deleteButton    = xtag.queryChildren(element.hudContainer, '.delete-button')[0];
         element.insertButton    = xtag.queryChildren(element.hudContainer, '.insert-button')[0];
@@ -14746,54 +14746,54 @@ document.addEventListener('DOMContentLoaded', function () {
         element.pageRightButton = xtag.queryChildren(element.hudContainer, '.paginate-right')[0];
         element.copyControl     = xtag.queryChildren(element.hudContainer, '.hidden-focus-control')[0];
         element.filterButton    = xtag.queryChildren(element.hudContainer, '.filter-button')[0];
-        
+
         if (element.hasAttribute('no-huddelete') && element.hasAttribute('no-hudrefresh')) {
             element.hudContainer.removeChild(element.refreshButton);//.setAttribute('hidden', '');
             element.hudContainer.removeChild(element.deleteButton);//.setAttribute('hidden', '');
-            
+
         } else if (element.hasAttribute('no-huddelete')) {
             element.hudContainer.removeChild(element.deleteButton);//.setAttribute('hidden', '');
             element.refreshButton.removeAttribute('remove-right');
-            
+
         } else if (element.hasAttribute('no-hudrefresh')) {
             element.hudContainer.removeChild(element.refreshButton);//.setAttribute('hidden', '');
             element.deleteButton.removeAttribute('remove-left');
         }
-        
+
         if (element.hasAttribute('no-hudpaginate')) {
             element.hudContainer.removeChild(element.pageLeftButton);//.setAttribute('hidden', '');
             element.hudContainer.removeChild(element.pageRightButton);//.setAttribute('hidden', '');
         }
-        
+
         if (!element.insertTemplate) {
             element.insertButton.setAttribute('hidden', '');
         }
     }
-    
+
     //function pushReplacePopHandler(element) {
     //    var i, len, arrPopKeys, currentValue, bolRefresh = false, strQueryString = GS.getQueryString(), strQSCol = element.getAttribute('qs');
-    //    
+    //
     //    if (strQSCol && GS.qryGetKeys(strQueryString).indexOf(strQSCol) > -1) {
     //        element.value = GS.qryGetVal(strQueryString, strQSCol);
     //    }
-    //    
+    //
     //    if (element.hasAttribute('refresh-on-querystring-values')) {
     //        arrPopKeys = element.getAttribute('refresh-on-querystring-values').split(/\s*,\s*/gim);
-    //        
+    //
     //        for (i = 0, len = arrPopKeys.length; i < len; i += 1) {
     //            currentValue = GS.qryGetVal(strQueryString, arrPopKeys[i]);
-    //            
+    //
     //            if (element.popValues[arrPopKeys[i]] !== currentValue) {
     //                bolRefresh = true;
     //            }
-    //            
+    //
     //            element.popValues[arrPopKeys[i]] = currentValue;
     //        }
-    //        
+    //
     //    } else if (element.hasAttribute('refresh-on-querystring-change')) {
     //        bolRefresh = true;
     //    }
-    //    
+    //
     //    if (bolRefresh) {
     //        getData(element);
     //    }
@@ -14841,7 +14841,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 len = arrAttrParts.length;
                 while (i < len) {
                     strQSCol = arrAttrParts[i];
-    
+
                     if (strQSCol.indexOf('!=') !== -1) {
                         strOperator = '!=';
                         arrQSParts = strQSCol.split('!=');
@@ -14849,10 +14849,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         strOperator = '=';
                         arrQSParts = strQSCol.split('=');
                     }
-    
+
                     strQSCol = arrQSParts[0];
                     strQSAttr = arrQSParts[1] || arrQSParts[0];
-    
+
                     // if the key is not present or we've got the negator: go to the attribute's default or remove it
                     if (strOperator === '!=') {
                         // if the key is not present: add the attribute
@@ -14883,7 +14883,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             } else if (GS.qryGetKeys(strQS).indexOf(strQSCol) > -1) {
                 strQSValue = GS.qryGetVal(strQS, strQSCol);
-    
+
                 if (element.internal.bolQSFirstRun !== true) {
                     if (strQSValue !== '' || !element.getAttribute('value')) {
                         element.setAttribute('value', strQSValue);
@@ -14893,25 +14893,25 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         }
-        
+
         // handle "refresh-on-querystring-values" and "refresh-on-querystring-change" attributes
         if (element.internal.bolQSFirstRun === true) {
             if (element.hasAttribute('refresh-on-querystring-values')) {
                 arrPopKeys = element.getAttribute('refresh-on-querystring-values').split(/\s*,\s*/gim);
-                
+
                 for (i = 0, len = arrPopKeys.length; i < len; i += 1) {
                     currentValue = GS.qryGetVal(strQS, arrPopKeys[i]);
-                    
+
                     if (element.popValues[arrPopKeys[i]] !== currentValue) {
                         bolRefresh = true;
                     }
-                    
+
                     element.popValues[arrPopKeys[i]] = currentValue;
                 }
             } else if (element.hasAttribute('refresh-on-querystring-change')) {
                 bolRefresh = true;
             }
-            
+
             if (bolRefresh && element.hasAttribute('src')) {
                 getData(element);
             } else if (bolRefresh && !element.hasAttribute('src')) {
@@ -14920,21 +14920,21 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             if (element.hasAttribute('refresh-on-querystring-values')) {
                 arrPopKeys = element.getAttribute('refresh-on-querystring-values').split(/\s*,\s*/gim);
-                
+
                 for (i = 0, len = arrPopKeys.length; i < len; i += 1) {
                     element.popValues[arrPopKeys[i]] = GS.qryGetVal(strQS, arrPopKeys[i]);
                 }
             }
         }
-        
+
         element.internal.bolQSFirstRun = true;
     }
-    
-    
+
+
     // bind delegating events
     function bindElement(element) {
         var strQSValue;
-        
+
         // handle "qs" attribute
         if (element.getAttribute('qs') ||
                 element.getAttribute('refresh-on-querystring-values') ||
@@ -14944,21 +14944,21 @@ document.addEventListener('DOMContentLoaded', function () {
             //if (strQSValue !== '' || !element.getAttribute('value')) {
             //    element.setAttribute('value', strQSValue);
             //}
-            
+
             element.popValues = {};
             pushReplacePopHandler(element);
             window.addEventListener('pushstate', function () {    pushReplacePopHandler(element); });
             window.addEventListener('replacestate', function () { pushReplacePopHandler(element); });
             window.addEventListener('popstate', function () {     pushReplacePopHandler(element); });
         }
-        
+
         // on focus control: set oldvalue for update
         element.addEventListener('focus', function (event) {
             if (event.target.hasAttribute('column')) {
                 event.target.strOldValue = event.target.value;
             }
         }, true);
-        
+
         if (!evt.touchDevice) {
             // focus copy control
             element.addEventListener('mousedown', function (event) {
@@ -14975,20 +14975,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
         }
-        
+
         // copy
         element.copyControl.addEventListener('copy', function (event) {
             var strTextCopyString, strHTMLCopyString;
-            
+
             if (document.activeElement.classList.contains('hidden-focus-control') ||
                 document.activeElement.selectionStart === document.activeElement.selectionEnd) {
-                
+
                 GS.setInputSelection(document.activeElement, document.activeElement.value.length,
                                             document.activeElement.value.length);
-                
+
                 strTextCopyString = getSelectedCopyText(element);
                 strHTMLCopyString = getSelectedCopyHTML(element);
-                
+
                 if (strTextCopyString && strHTMLCopyString) {
                     if (handleClipboardData(event, strTextCopyString, 'text')) {
                         event.preventDefault(event);
@@ -14997,11 +14997,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         event.preventDefault(event);
                     }
                 }
-                
+
                 GS.setInputSelection(document.activeElement, 0, document.activeElement.value.length);
             }
         });
-        
+
         // focus
         window.addEventListener('focus', function (event) {//element
             if (GS.findParentTag(document.activeElement, 'gs-datasheet') === element) {
@@ -15010,7 +15010,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 element.lastFocusedControl = null;
             }
         });//, true
-        
+
         // paste
         element.addEventListener('paste', function (event) {
             if (document.activeElement === element.copyControl) {
@@ -15018,46 +15018,46 @@ document.addEventListener('DOMContentLoaded', function () {
                 pasteHandler(element, event);
             }
         });
-        
+
         // selection
         if (!evt.touchDevice) {
             element.dragAllowed = false;
             element.numberOfSelections = 0;
-            
+
             // on mousedown (event delagation style)
             element.addEventListener('mousedown', function (event) {
                 var target = GS.findParentElement(event.target, 'th,td'), originalTarget = event.target;
-                
+
                 // if target is a cell: begin selection
                 if (target && (target.nodeName === 'TH' || target.nodeName === 'TD')) {
                     if (GS.findParentElement(target, 'div').classList.contains('header-container')) {
                         target = xtag.query(element.scrollContainer, 'th, td')[target.cellIndex];
                         originalTarget = target;
                     }
-                    
+
                     // if shift key is down and there is currently a selection to connect to
                     element.dragOrigin = target;
                     if (event.shiftKey && xtag.query(element, '[selected]').length > 0) {
                         element.dragOrigin = element.selectionPreviousOrigin;
                     }
-                    
+
                     // if ctrl and cmd are not down: deselect all cells
                     if (!event.metaKey && !event.ctrlKey) {
                         element.selectedCells = [];
                         element.savedSelection = [];
                         element.numberOfSelections = 0;
                     }
-                    
+
                     element.savedSelectionCopy = element.savedSelection.slice(0);
                     element.dragAllowed = true;
                     element.dragCurrentCell = target;
                     element.numberOfSelections += 1;
-                    
+
                     element.dragMode = 'select';
                     if (target.hasAttribute('selected')) {
                         element.dragMode = 'deselect';
                     }
-                    
+
                     // if the original target is a cell or if the dragOrigin isn't the target cell or
                     //      if there are already selected cells: blur focused element and prevent default
                     if (originalTarget.nodeName === 'TH' || originalTarget.nodeName === 'TD' ||
@@ -15067,24 +15067,24 @@ document.addEventListener('DOMContentLoaded', function () {
                         GS.triggerEvent(element.copyControl, 'focus');
                         event.preventDefault();
                     }
-                    
+
                     selectHandler(element, element.dragOrigin, element.dragCurrentCell, element.dragMode);
                 }
             });
-            
+
             element.addEventListener('mousemove', function (event) {
                 var cellFromTarget;
-                
+
                 // if mouse is down
                 if (event.which !== 0) {
                     cellFromTarget = GS.findParentElement(event.target, 'th,td');
-                    
+
                     // if selection is allowed at this point and closestCell is different from element.dragCurrentCell
                     if (cellFromTarget && element.dragAllowed && element.dragCurrentCell !== cellFromTarget) {
                         element.lastFocusedControl = null;
                         element.copyControl.focus();
                         GS.triggerEvent(element.copyControl, 'focus');
-                        
+
                         element.dragCurrentCell = cellFromTarget;
                         selectHandler(element, element.dragOrigin, element.dragCurrentCell, element.dragMode);
                         event.preventDefault();
@@ -15094,7 +15094,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     element.selectionPreviousOrigin = element.dragOrigin;
                 }
             });
-            
+
             element.addEventListener('mouseup', function (event) {
                 if (element.dragAllowed) {
                     if (document.activeElement === element || document.activeElement === document.body) {
@@ -15106,15 +15106,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
         }
-        
+
         if (!element.hasAttribute('no-filter')) {
             // filter edit button
             element.filterButton.addEventListener('click', function () {
                 var templateElement = document.createElement('template');
-                
+
                 templateElement.setAttribute('data-max-width', '300px');
                 templateElement.setAttribute('data-overlay-close', 'true');
-                
+
                 templateElement.innerHTML = ml(function () {/*
                     <gs-body padded>
                         <label for="memo-datagrid-filters">Filters:</label>
@@ -15127,29 +15127,29 @@ document.addEventListener('DOMContentLoaded', function () {
                         </gs-grid>
                     </gs-body>
                 */});
-                
+
                 GS.openDialogToElement(element.filterButton, templateElement, 'down', function () {
                     document.getElementById('memo-datagrid-filters').value = element.getAttribute('user-where').replace(/\sAND\s/gi, '\nAND ');
-                    
+
                 }, function (event, strAnswer) {
                     var strValue = document.getElementById('memo-datagrid-filters').value;
-                    
+
                     if (strAnswer === 'Clear Filters' || (strAnswer === 'Update Filters' && strValue.trim() === '')) {
                         element.removeAttribute('user-where');
                         element.filterButton.setAttribute('hidden', '');
                         getData(element);
-                        
+
                     } else if (strAnswer === 'Update Filters') {
                         element.setAttribute('user-where', strValue);
                         getData(element);
                     }
                 });
             });
-            
+
             // filter popup
             var cellFloatingButtonFunction = function (targetCell) {
                 var jsnElementPosition = GS.getElementPositionData(targetCell), strHTML;
-                
+
                 // targetCell is a th or if targetCell doesn't have a child with the "column" attribute:
                 //      remove the floating button if it exists
                 if (targetCell.nodeName === 'TH' || xtag.query(targetCell, '[column]').length === 0) {
@@ -15157,50 +15157,50 @@ document.addEventListener('DOMContentLoaded', function () {
                         element.cellFloatingButtonContainer.parentNode.removeChild(element.cellFloatingButtonContainer);
                         element.cellFloatingButtonContainer = null;
                     }
-                    
+
                 // else: add the floating button
                 } else {
                     // if no floating button exists for this grid: create/append/bind one
                     if (!element.cellFloatingButtonContainer || !element.cellFloatingButtonContainer.parentNode) {
                         element.cellFloatingButtonContainer = document.createElement('div');
                         element.cellFloatingButtonContainer.classList.add('floating-button-container');
-                        
+
                         element.cellFloatingButtonContainer.innerHTML =
                                         '<gs-button icononly icon="filter" inline bg-primary no-focus></gs-button>';
-                        
+
                         //element.scrollContainer.appendChild(element.cellFloatingButtonContainer);
                         element.dataFlexReset.appendChild(element.cellFloatingButtonContainer);
-                        
+
                         element.cellFloatingButtonContainer.addEventListener(evt.mousedown, function () {
                             element.cellFloatingButtonContainer.targetControl.bolSubstring =
                                 document.activeElement === element.cellFloatingButtonContainer.targetControl;
                         });
-                        
+
                         element.cellFloatingButtonContainer.addEventListener('click', function () {
                             var targetControl = element.cellFloatingButtonContainer.targetControl
                               , jsnSelection, strMatchText = targetControl.value || targetControl.textContent
                               , templateElement = document.createElement('template');
-                            
+
                             //console.log(targetControl, targetControl.value, strMatchText);
-                            
+
                             if (targetControl.nodeName === 'INPUT' || targetControl.nodeName === 'TEXTAREA') {
                                 jsnSelection = GS.getInputSelection(element.cellFloatingButtonContainer.targetControl);
                             }
-                            
+
                             if (targetControl.bolSubstring && jsnSelection && jsnSelection.start !== jsnSelection.end) {
                                 strMatchText = strMatchText.substring(jsnSelection.start, jsnSelection.end);
                             }
-                            
+
                             templateElement.setAttribute('data-max-width', '250px');
                             templateElement.setAttribute('data-overlay-close', 'true');
-                            
+
                             strHTML = '<gs-body padded>';
-                            
+
                             if (evt.touchDevice) {
                                 strHTML += '<gs-button class="text-left" dialogclose>Select Range</gs-button>';
                                 strHTML += '<gs-button class="text-left" dialogclose>Select Records</gs-button><hr />';
                             }
-                            
+
                             strHTML +=
                                 '<gs-button class="text-left" dialogclose>Equals "<u>{{VALUE}}</u>"</gs-button>' +
                                 '<gs-button class="text-left" dialogclose>Doesn\'t Equal "<u>{{VALUE}}</u>"</gs-button>' +
@@ -15208,84 +15208,84 @@ document.addEventListener('DOMContentLoaded', function () {
                                 '<gs-button class="text-left" dialogclose>Doesn\'t Contain "<u>{{VALUE}}</u>"</gs-button>' +
                                 '<gs-button class="text-left" dialogclose>Starts With "<u>{{VALUE}}</u>"</gs-button>' +
                                 '<gs-button class="text-left" dialogclose>Ends With "<u>{{VALUE}}</u>"</gs-button>';
-                            
+
                             strHTML += '</gs-body>';
-                            
+
                             strHTML = strHTML.replace(/\{\{VALUE\}\}/gim, encodeHTML(strMatchText));
-                            
+
                             templateElement.innerHTML = strHTML;
-                            
+
                             GS.openDialogToElement(element.cellFloatingButtonContainer, templateElement, 'left', '',
                                                                                             function (event, strAnswer) {
                                 var clickFunction
                                   , addUserWhere = function (strNewWhere) {
                                         var strWhere = element.getAttribute('user-where');
-                                        
+
                                         strWhere = (strWhere ? (strWhere + ' AND ' + strNewWhere) : strNewWhere);
-                                        
+
                                         element.setAttribute('user-where', strWhere);
                                         element.filterButton.removeAttribute('hidden');
                                         getData(element);
                                     }
                                   , control = element.cellFloatingButtonContainer.targetCell.children[0];
-                                
+
                                 if (strAnswer === 'Select Range' || strAnswer === 'Select Records') {
                                     if (strAnswer === 'Select Records') {
                                         element.dragOrigin = element.cellFloatingButtonContainer.targetCell.parentNode.children[0];
                                     } else if (strAnswer === 'Select Range') {
                                         element.dragOrigin = element.cellFloatingButtonContainer.targetCell;
                                     }
-                                    
+
                                     element.selectedCells = [];
                                     clickFunction = function (event) {
                                         var target;
-                                        
+
                                         if (strAnswer === 'Select Records') {
                                             target = GS.findParentElement(event.target, 'tr');
                                             element.dragCurrentCell = target.children[0];
-                                            
+
                                         } else if (strAnswer === 'Select Range') {
                                             target = GS.findParentElement(event.target, 'td,th');
                                             element.dragCurrentCell = target;
                                         }
-                                        
+
                                         if (target) {
                                             element.selectionPreviousOrigin = element.dragOrigin;
                                             element.savedSelection = [];
                                             element.savedSelectionCopy = [];
                                             element.numberOfSelections = 1;
                                             element.dragMode = 'select';
-                                            
+
                                             selectHandler(element, element.dragOrigin, element.dragCurrentCell, element.dragMode);
-                                            
+
                                             document.activeElement.blur();
                                             event.preventDefault();
                                             element.removeEventListener('click', clickFunction, true);
                                         }
                                     };
-                                    
+
                                     element.addEventListener('click', clickFunction, true);
-                                    
+
                                 } else if (strAnswer.indexOf('Equals') === 0) {
                                     addUserWhere('CAST(' + control.getAttribute('column') + 'AS ' + GS.database.type.text + ') ' +
                                                         '= $$' + strMatchText + '$$');
-                                    
+
                                 } else if (strAnswer.indexOf('Doesn\'t Equal') === 0) {
                                     addUserWhere('CAST(' + control.getAttribute('column') + 'AS ' + GS.database.type.text + ') ' +
                                                         '!= $$' + strMatchText + '$$');
-                                    
+
                                 } else if (strAnswer.indexOf('Contains') === 0) {
                                     addUserWhere('CAST(' + control.getAttribute('column') + 'AS ' + GS.database.type.text + ') ' +
                                                         'LIKE $$%' + strMatchText + '%$$');
-                                    
+
                                 } else if (strAnswer.indexOf('Doesn\'t Contain') === 0) {
                                     addUserWhere('CAST(' + control.getAttribute('column') + 'AS ' + GS.database.type.text + ') ' +
                                                         'NOT LIKE $$%' + strMatchText + '%$$');
-                                    
+
                                 } else if (strAnswer.indexOf('Starts With') === 0) {
                                     addUserWhere('CAST(' + control.getAttribute('column') + 'AS ' + GS.database.type.text + ') ' +
                                                         'LIKE $$' + strMatchText + '%$$');
-                                    
+
                                 } else if (strAnswer.indexOf('Ends With') === 0) {
                                     addUserWhere('CAST(' + control.getAttribute('column') + 'AS ' + GS.database.type.text + ') ' +
                                                         'LIKE $$%' + strMatchText + '$$');
@@ -15293,7 +15293,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             });
                         });
                     }
-                    
+
                     // hover center next to the cell
                     element.cellFloatingButtonContainer.targetCell = targetCell;
                     element.cellFloatingButtonContainer.targetControl = xtag.query(targetCell, '[column]')[0];
@@ -15301,7 +15301,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     element.cellFloatingButtonContainer.children[0].removeAttribute('remove-top-right');
                     element.cellFloatingButtonContainer.children[0].removeAttribute('remove-bottom-left');
                     element.cellFloatingButtonContainer.children[0].removeAttribute('remove-bottom-right');
-                    
+
                     // top left
                     if (jsnElementPosition.intRoomAbove > element.cellFloatingButtonContainer.clientHeight &&
                         jsnElementPosition.intRoomLeft > element.cellFloatingButtonContainer.clientWidth) {
@@ -15310,9 +15310,9 @@ document.addEventListener('DOMContentLoaded', function () {
                                                     element.cellFloatingButtonContainer.clientWidth) + 4) + 'px;' +
                                     'top: ' + ((jsnElementPosition.intElementTop -
                                                     element.cellFloatingButtonContainer.clientHeight) + 4) + 'px;');
-                        
+
                         element.cellFloatingButtonContainer.children[0].setAttribute('remove-bottom-right', '');
-                        
+
                     // top right
                     } else if (jsnElementPosition.intRoomAbove > element.cellFloatingButtonContainer.clientHeight &&
                                jsnElementPosition.intRoomRight > element.cellFloatingButtonContainer.clientWidth) {
@@ -15321,9 +15321,9 @@ document.addEventListener('DOMContentLoaded', function () {
                                                     jsnElementPosition.intElementWidth) - 4) + 'px;' +
                                     'top: ' + ((jsnElementPosition.intElementTop -
                                                     element.cellFloatingButtonContainer.clientHeight) + 4) + 'px;');
-                        
+
                         element.cellFloatingButtonContainer.children[0].setAttribute('remove-bottom-left', '');
-                        
+
                     // bottom left
                     } else if (jsnElementPosition.intRoomBelow > element.cellFloatingButtonContainer.clientHeight &&
                                jsnElementPosition.intRoomLeft > element.cellFloatingButtonContainer.clientWidth) {
@@ -15332,9 +15332,9 @@ document.addEventListener('DOMContentLoaded', function () {
                                                     element.cellFloatingButtonContainer.clientWidth) + 4) + 'px;' +
                                     'top: ' + ((jsnElementPosition.intElementTop +
                                                     jsnElementPosition.intElementHeight) - 4) + 'px;');
-                        
+
                         element.cellFloatingButtonContainer.children[0].setAttribute('remove-top-right', '');
-                        
+
                     // bottom right
                     } else if (jsnElementPosition.intRoomBelow > element.cellFloatingButtonContainer.clientHeight &&
                                jsnElementPosition.intRoomRight > element.cellFloatingButtonContainer.clientWidth) {
@@ -15343,30 +15343,30 @@ document.addEventListener('DOMContentLoaded', function () {
                                                     jsnElementPosition.intElementWidth) - 4) + 'px;' +
                                     'top: ' + ((jsnElementPosition.intElementTop +
                                                     jsnElementPosition.intElementHeight) - 4) + 'px;');
-                        
+
                         element.cellFloatingButtonContainer.children[0].setAttribute('remove-top-left', '');
                     }
                 }
             };
-            
+
             element.addEventListener('after_selection', function (event) {
                 var arrSelected = element.selectedCells;
-                
+
                 if (arrSelected.length === 1) {
                     cellFloatingButtonFunction(element.dragCurrentCell || arrSelected[arrSelected.length - 1]);
-                    
+
                 } else if (element.cellFloatingButtonContainer && element.cellFloatingButtonContainer.parentNode) {
                     element.cellFloatingButtonContainer.parentNode.removeChild(element.cellFloatingButtonContainer);
                     element.cellFloatingButtonContainer = null;
                 }
             });
-            
+
             element.addEventListener('focus', function (event) {
                 if (event.target.hasAttribute('column')) {
                     cellFloatingButtonFunction(event.target.parentNode);
                 }
             }, true);// this true is for making it so that the focus event (which doesn't bubble) gets captured
-            
+
             // on mousewheel: remove floating button (scroll version of this is in the handleData function)
             element.addEventListener('mousewheel', function (event) {
                 if (element.cellFloatingButtonContainer && element.cellFloatingButtonContainer.parentNode) {
@@ -15381,21 +15381,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
         }
-        
+
         // ################################################################
         // #################### TOUCH DEVICE CLIPBOARD ####################
         // ################################################################
-        
+
         if (evt.touchDevice) {
             var rangeFloatingButtonFunction = function (arrSelected) {
                 var i, len, targetCell, arrSelectedRecords, bolCenter = true, jsnElementPosition,
                     intTopBoundry, intBottomBoundry, intLeftBoundry, intRightBoundry;
-                
+
                 // if no floating button exists for this grid: create/append/bind one
                 if (!element.rangeFloatingButtonContainer || !element.rangeFloatingButtonContainer.parentNode) {
                     element.rangeFloatingButtonContainer = document.createElement('div');
                     element.rangeFloatingButtonContainer.classList.add('floating-button-container');
-                    
+
                     element.rangeFloatingButtonContainer.innerHTML =
                                     '<gs-button icononly icon="clipboard" inline bg-primary no-focus></gs-button>' +
                                     '<div contenteditable="true" style=" position: fixed;  border: 0 none;' +
@@ -15403,17 +15403,17 @@ document.addEventListener('DOMContentLoaded', function () {
                                                                         'z-index: -5000;   opacity: 0.00000001;' +
                                                                         '-webkit-appearance: none;' +
                                                                         '-moz-appearance: none;"></div>';
-                    
+
                     element.scrollContainer.appendChild(element.rangeFloatingButtonContainer);
-                    
+
                     element.rangeFloatingButtonContainer.control = element.rangeFloatingButtonContainer.children[1];
-                    
+
                     element.rangeFloatingButtonContainer.addEventListener('click', function () {
                         element.rangeFloatingButtonContainer.control.innerHTML = getSelectedCopyHTML(element) || 'Nothing To Copy';
                         element.rangeFloatingButtonContainer.control.focus();
                         document.execCommand('selectAll', false, null);
                     });
-                    
+
                     element.rangeFloatingButtonContainer.control.addEventListener('cut', function () {
                         var strSchema = GS.templateWithQuerystring(element.getAttribute('schema'))
                           , strObject = GS.templateWithQuerystring(element.getAttribute('object'))
@@ -15421,49 +15421,49 @@ document.addEventListener('DOMContentLoaded', function () {
                           , arrSetColumns = [], arrPk, arrLock, arrLines, arrRecords, tbodyElement, arrElements
                           , tr_len, i, len, col_i, col_len, colIndex, arrRecordsToRefresh = [], updateFunction
                           , strColumns = '', strRoles = '', strColumn, strRecordToHash, strTemp;
-                        
+
                         // gathering variables for select traversal
                         arrRecords = element.selectedRecords;
-                        
+
                         // if the first record is the header: remove it
                         if (arrRecords[0] && arrRecords[0].parentNode.nodeName === 'THEAD') {
                             arrRecords[0].splice(0, 1);
                         }
-                        
+
                         arrSetColumnElements = xtag.query(arrRecords[0], '[selected]:not(th)');
-                        
+
                         arrPk = (element.getAttribute('pk') || '').split(/[\s]*,[\s]*/);
                         arrLock = (element.getAttribute('lock') || '').split(/[\s]*,[\s]*/);
-                        
+
                         // gathering update headers
                         for (i = 0, len = arrPk.length; i < len; i += 1) {
                             strRoles += (strRoles ? '\t' : '') + 'pk';
                             strColumns += (strColumns ? '\t' : '') + arrPk[i];
                         }
-                        
+
                         for (i = 0, len = arrLock.length, strHashColumns = ''; i < len; i += 1) {
                             strHashColumns += (strHashColumns ? '\t' : '') + arrLock[i];
                         }
                         strRoles += (strRoles ? '\t' : '') + 'hash';
                         strColumns += (strColumns ? '\t' : '') + 'hash';
-                        
+
                         for (i = 0, len = arrSetColumnElements.length; i < len; i += 1) {
                             strColumn = arrSetColumnElements[i].children[0].getAttribute('column');
-                            
+
                             strRoles += (strRoles ? '\t' : '') + 'set';
                             strColumns += (strColumns ? '\t' : '') + strColumn;
                             arrSetColumns.push(strColumn);
                         }
-                        
+
                         for (i = 0, len = arrRecords.length; i < len; i += 1) {
                             strRecord = '';
-                            
+
                             // get 'pk' columns
                             for (col_i = 0, col_len = arrPk.length; col_i < col_len; col_i += 1) {
                                 strRecord += (strRecord ? '\t' : '');
                                 strRecord += GS.encodeForTabDelimited(arrRecords[i].getAttribute('data-' + arrPk[col_i]), element.nullString);
                             }
-                            
+
                             // get 'hash' columns
                             strRecordToHash = '';
                             for (col_i = 0, col_len = arrLock.length; col_i < col_len; col_i += 1) {
@@ -15471,24 +15471,24 @@ document.addEventListener('DOMContentLoaded', function () {
                                 strTemp = arrRecords[i].getAttribute('data-' + arrLock[col_i]);
                                 strRecordToHash += (strTemp === 'NULL' ? '' : strTemp);
                             }
-                            
+
                             strRecord += (strRecord ? '\t' : '') + GS.utfSafeMD5(strRecordToHash).toString();
-                            
+
                             // get 'set' columns
                             for (col_i = 0, col_len = arrSetColumns.length; col_i < col_len; col_i += 1) {
                                 strRecord += (strRecord ? '\t' : '');
                             }
-                            
+
                             strRecord += '\n';
                             strUpdateData += strRecord;
                             arrRecordsToRefresh.push(arrRecords[i]);
-                            
+
                             // make the records red
                             arrRecords[i].classList.add('bg-red');
                         }
-                        
+
                         strUpdateData = (strRoles + '\n' + strColumns + '\n' + strUpdateData);
-                        
+
                         // create update transaction
                         GS.addLoader(element, 'Creating Update Transaction...');
                         GS.requestUpdateFromSocket(
@@ -15501,17 +15501,17 @@ document.addEventListener('DOMContentLoaded', function () {
                                 }
                             }, function (data, error, transactionID, commitFunction, rollbackFunction) {
                                 GS.removeLoader(element);
-                                
+
                                 if (!error) {
                                     if (data !== 'TRANSACTION COMPLETED') {
                                         data = getReturn(element) + '\n' + data;
-                                        
+
                                         // make the records amber and refresh their data
                                         refreshRecordsAfterUpdate(element, arrRecordsToRefresh, data);////
                                     } else {
                                         commitFunction();
                                     }
-                                    
+
                                 } else {
                                     rollbackFunction();
                                     getData(element);
@@ -15519,7 +15519,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 }
                             }, function (strAnswer, data, error) {
                                 GS.removeLoader(element);
-                                
+
                                 if (!error) {
                                     if (strAnswer === 'COMMIT') {
                                         clearRecordColor(element, 'bg-amber', true);
@@ -15548,16 +15548,16 @@ document.addEventListener('DOMContentLoaded', function () {
                         }, 1);
                     });
                 }
-                
+
                 // position button
                 intTopBoundry = 99999999;
                 intBottomBoundry = 99999999;
                 intLeftBoundry = 99999999;
                 intRightBoundry = 99999999;
-                
+
                 for (i = 0, len = arrSelected.length; i < len; i += 1) {
                     jsnElementPosition = GS.getElementPositionData(arrSelected[i]);
-                    
+
                     if (jsnElementPosition.intElementTop < intTopBoundry) {
                         intTopBoundry = jsnElementPosition.intElementTop;
                     }
@@ -15571,41 +15571,41 @@ document.addEventListener('DOMContentLoaded', function () {
                         intRightBoundry = jsnElementPosition.intElementRight;
                     }
                 }
-                
+
                 // top right
                 if (intTopBoundry >= 0 && intRightBoundry >= 0) {
                     element.rangeFloatingButtonContainer.style.top = (intTopBoundry + 4) + 'px';
                     element.rangeFloatingButtonContainer.style.right = (intRightBoundry + 4) + 'px';
-                    
+
                 // top left
                 } else if (intTopBoundry >= 0 && intLeftBoundry >= 0) {
                     element.rangeFloatingButtonContainer.style.top = (intTopBoundry + 4) + 'px';
                     element.rangeFloatingButtonContainer.style.left = (intLeftBoundry + 4) + 'px';
-                    
+
                 // bottom right
                 } else if (intBottomBoundry >= 0 && intRightBoundry >= 0) {
                     element.rangeFloatingButtonContainer.style.bottom = (intBottomBoundry + 4) + 'px';
                     element.rangeFloatingButtonContainer.style.right = (intRightBoundry + 4) + 'px';
-                
+
                 // bottom left
                 } else if (intBottomBoundry >= 0 && intLeftBoundry >= 0) {
                     element.rangeFloatingButtonContainer.style.bottom = (intBottomBoundry + 4) + 'px';
                     element.rangeFloatingButtonContainer.style.left = (intLeftBoundry + 4) + 'px';
                 }
             };
-            
+
             element.addEventListener('after_selection', function (event) {
                 var arrSelected = element.selectedCells;
-                
+
                 if (arrSelected.length > 0 && element.numberOfSelections === 1) {
                     rangeFloatingButtonFunction(arrSelected);
-                    
+
                 } else if (element.rangeFloatingButtonContainer && element.rangeFloatingButtonContainer.parentNode) {
                     element.rangeFloatingButtonContainer.parentNode.removeChild(element.rangeFloatingButtonContainer);
                     element.rangeFloatingButtonContainer = null;
                 }
             });
-            
+
             element.scrollContainer.addEventListener('scroll', function (event) {
                 if (element.rangeFloatingButtonContainer && element.rangeFloatingButtonContainer.parentNode) {
                     element.rangeFloatingButtonContainer.parentNode.removeChild(element.rangeFloatingButtonContainer);
@@ -15613,54 +15613,54 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
         }
-        
+
         // ######################################################################################################
         // ######################################################################################################
         // ######################################################################################################
-        
+
         // delete, refresh, page left and page right buttons
         element.addEventListener('click', function (event) {
             var target = event.target, intOffset, intLimit
-            
+
             // delete button
             if (target.classList.contains('delete-button')) {
                 deleteSelection(element);
-                
+
             // refresh button
             } else if (target.classList.contains('refresh-button')) {
                 getData(element, undefined, undefined, undefined, true);
-                
+
             // refresh button
             } else if (target.classList.contains('insert-button')) {
                 insertDialog(element);
-                
+
             } else if (target.classList.contains('paginate-left') || target.classList.contains('paginate-right')) {
                 intLimit = parseInt(element.getAttribute('limit'), 10);
                 intOffset = parseInt(element.getAttribute('offset') || '0', 10);
-                
+
                 if (target.classList.contains('paginate-left')) {
                     intOffset -= intLimit;
                 } else {
                     intOffset += intLimit;
                 }
-                
+
                 if (intOffset <= 0) {
                     intOffset = 0;
                     element.pageLeftButton.setAttribute('disabled', '');
                 } else {
                     element.pageLeftButton.removeAttribute('disabled');
                 }
-                
+
                 element.setAttribute('offset', intOffset);
                 element.paginated = true;
                 getData(element);
             }
         });
-        
+
         if (!evt.touchDevice) {
             element.addEventListener('keydown', function (event) {
                 var intKeyCode = (event.which || event.keyCode);
-                
+
                 if (!element.hasAttribute('no-huddelete')) {
                     if (event.target === element.copyControl && (intKeyCode === KEY_BACKSPACE || intKeyCode === KEY_DELETE)) {
                         deleteSelection(element);
@@ -15669,42 +15669,42 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
         }
-        
+
         // manuel update
         var updateFromEntry = function (target) {
-            
+
             var updateRecord = GS.findParentElement(target, 'tr')
               , updateRecordData = element.internalData.arrRecords[parseInt(updateRecord.getAttribute('data-index'), 10)]
               , arrPk, arrLock, i, len, col_i, col_len, strRoles, strColumns
               , strHashColumns, strRecordToHash, strTemp, strRecord, strUpdateData;
-            
+
             arrPk = (element.getAttribute('pk') || '').split(/[\s]*,[\s]*/);
             arrLock = (element.getAttribute('lock') || '').split(/[\s]*,[\s]*/);
-            
+
             // gathering update headers
             for (i = 0, len = arrPk.length, strRoles = '', strColumns = ''; i < len; i += 1) {
                 strRoles += (strRoles ? '\t' : '') + 'pk';
                 strColumns += (strColumns ? '\t' : '') + arrPk[i];
             }
-            
+
             for (i = 0, len = arrLock.length, strHashColumns = ''; i < len; i += 1) {
                 strHashColumns += (strHashColumns ? '\t' : '') + arrLock[i];
             }
             strRoles += (strRoles ? '\t' : '') + 'hash';
             strColumns += (strColumns ? '\t' : '') + 'hash';
-            
+
             strRoles += (strRoles ? '\t' : '') + 'set';
             strColumns += (strColumns ? '\t' : '') + target.getAttribute('column');
-            
+
             // get update data
             strRecord = '';
-            
+
             // get 'pk' columns
             for (col_i = 0, col_len = arrPk.length; col_i < col_len; col_i += 1) {
                 strRecord += (strRecord ? '\t' : '');
                 strRecord += GS.encodeForTabDelimited(updateRecordData[element.internalData.arrColumnNames.indexOf(arrPk[col_i])], element.nullString);
             }
-            
+
             // get 'hash' columns
             strRecordToHash = '';
             for (col_i = 0, col_len = arrLock.length; col_i < col_len; col_i += 1) {
@@ -15712,16 +15712,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 strTemp = updateRecordData[element.internalData.arrColumnNames.indexOf(arrLock[col_i])];
                 strRecordToHash += (strTemp === 'NULL' ? '' : strTemp);
             }
-            
+
             strRecord += (strRecord ? '\t' : '') + GS.utfSafeMD5(strRecordToHash).toString();
-            
+
             // get 'set' column
             strRecord += (strRecord ? '\t' : '') + GS.encodeForTabDelimited(target.value, element.nullString);
-            
+
             strUpdateData = (strRoles + '\n' + strColumns + '\n' + strRecord + '\n');
             updateRecords(element, strHashColumns, strUpdateData, [updateRecord], false);
         };
-        
+
         element.addEventListener('change', function (event) {
             var target = event.target;
 
@@ -15733,29 +15733,29 @@ document.addEventListener('DOMContentLoaded', function () {
                 updateFromEntry(target);
             }
         });
-        
+
         // manuel insert
         var insertFromInsertRecord = function () {
             var arrElements = xtag.query(element, 'tr.insert-record > td > [column]')
               , i, len, strColumns, strInsertData, strLocalData;
-            
+
             for (i = 0, len = arrElements.length, strColumns = '', strInsertData = '', strLocalData = ''; i < len; i += 1) {
                 strColumns += (strColumns ? '\t' : '') + arrElements[i].getAttribute('column');
                 strInsertData += (strInsertData ? '\t' : '') + GS.encodeForTabDelimited(arrElements[i].value || 'NULL', element.nullString);
                 strLocalData += (strLocalData ? '\t' : '') + GS.encodeForTabDelimited(arrElements[i].value || '', element.nullString);
                 arrElements[i].value = '';
             }
-            
+
             //console.log('strColumns:    ', strColumns);
             //console.log('strInsertData: ', strInsertData);
             //console.log('strLocalData:  ', strLocalData);
-            
+
             insertRecords(element, strColumns, strInsertData + '\n', strLocalData + '\n', false);
         };
-        
+
         element.addEventListener('keydown', function (event) {
             var intKeyCode = (event.which || event.keyCode), target = event.target;
-            
+
             if (target.hasAttribute('column') && GS.findParentElement(target, 'tr').classList.contains('insert-record') && !event.shiftKey) {
                 if (intKeyCode === KEY_RETURN) {
                     insertFromInsertRecord();
@@ -15763,7 +15763,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         });
-        
+
         // arrow navigation, key selection
         if (!evt.touchDevice) {
             element.addEventListener('keydown', function (event) {
@@ -15772,13 +15772,13 @@ document.addEventListener('DOMContentLoaded', function () {
                   , parentCell, parentRecord, parentTBody, jsnCursorPos, intCursorPosition, bolSelect
                   , bolFullSelection, bolCursorAtFirst, bolCursorAtTop, bolCursorAtLast, bolCursorAtBottom
                   , arrSelected, arrRecords, focusElement;
-                
+
                 // find out if we are in focus mode
                 // if we are in a cell control: we might be in focus mode (we need to check further)
                 if ((event.target.nodeName === 'INPUT' || event.target.nodeName === 'TEXTAREA') &&
                     !target.classList.contains('hidden-focus-control')) {
                     jsnCursorPos = GS.getInputSelection(event.target);
-                    
+
                     // if fill text selection and shift is down: not focus mode
                     if (!(jsnCursorPos.start === 0 && jsnCursorPos.end === event.target.value.length && event.shiftKey)) {
                         bolNavigateMode = true;
@@ -15789,7 +15789,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         bolNavigateMode = true;
                     }
                 }
-                
+
                 // if we're in navigate mode: change focused cell
                 if (bolNavigateMode) {
                     if (target.nodeName === 'INPUT' || target.nodeName === 'TEXTAREA') {
@@ -15797,13 +15797,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     } else {
                         jsnCursorPos = {'start': 0, 'end': targetValue.length};
                     }
-                    
+
                     parentCell = GS.findParentElement(target, 'th,td');
                     parentRecord = parentCell.parentNode;
                     parentTBody = parentRecord.parentNode;
-                    
+
                     bolFullSelection = (jsnCursorPos.start === 0 && jsnCursorPos.end === targetValue.length);
-                    
+
                     // if we don't have a full selection and the selection is one character position
                     if (!bolFullSelection && jsnCursorPos.start === jsnCursorPos.end) {
                         // find out where the cursor is
@@ -15816,53 +15816,53 @@ document.addEventListener('DOMContentLoaded', function () {
                         bolCursorAtLast = (intCursorPosition === targetValue.length);
                         bolCursorAtBottom = (intCursorPosition > targetValue.lastIndexOf('\n'));
                     }
-                    
+
                     // if left arrow and (full selection or the cursor is at the first character)
                     if (intKeyCode === KEY_LEFT && (bolFullSelection || bolCursorAtFirst)) {
                         if (parentCell.previousElementSibling && parentCell.previousElementSibling.nodeName !== 'TH') {
                             focusElement = parentCell.previousElementSibling;
                             bolSelect = true;
-                            
+
                         } else if (parentRecord.previousElementSibling) {
                             focusElement = parentRecord.previousElementSibling.lastElementChild;
                             bolSelect = true;
                         }
-                        
+
                     // if up arrow and (full selection or the cursor is in the top line)
                     } else if (intKeyCode === KEY_UP && (bolFullSelection || bolCursorAtTop)) {
                         if (parentRecord.previousElementSibling) {
                             focusElement = parentRecord.previousElementSibling.children[parentCell.cellIndex];
                             bolSelect = true;
-                            
+
                         } else if (parentCell.previousElementSibling && parentCell.previousElementSibling.nodeName !== 'TH') {
                             focusElement = parentTBody.lastElementChild.children[parentCell.cellIndex - 1];
                             bolSelect = true;
                         }
-                        
+
                     // if right arrow and (full selection or the cursor is at the last character)
                     } else if (intKeyCode === KEY_RIGHT && (bolFullSelection || bolCursorAtLast)) {
                         if (parentCell.nextElementSibling && parentCell.nextElementSibling.nodeName !== 'TH') {
                             focusElement = parentCell.nextElementSibling;
                             parentCell.nextElementSibling.children[0].focus();
                             bolSelect = true;
-                            
+
                         } else if (parentRecord.nextElementSibling) {
                             focusElement = parentRecord.nextElementSibling.children[1];
                             bolSelect = true;
                         }
-                        
+
                     // if down arrow  and (full selection or the cursor is in the last line)
                     } else if (intKeyCode === KEY_DOWN && (bolFullSelection || bolCursorAtBottom)) {
                         if (parentRecord.nextElementSibling) {
                             focusElement = parentRecord.nextElementSibling.children[parentCell.cellIndex];
                             bolSelect = true;
-                            
+
                         } else if (parentCell.nextElementSibling && parentCell.nextElementSibling.nodeName !== 'TH') {
                             focusElement = parentTBody.firstElementChild.children[parentCell.cellIndex + 1];
                             bolSelect = true;
                         }
                     }
-                    
+
                     // if something was selected
                     if (bolSelect) {
                         // set selected cells
@@ -15873,54 +15873,54 @@ document.addEventListener('DOMContentLoaded', function () {
                         element.selectionPreviousOrigin = element.dragOrigin;
                         element.numberOfSelections = 1;
                         element.dragMode = 'select';
-                        
+
                         selectHandler(element, element.dragOrigin, element.dragCurrentCell, element.dragMode);
-                        
+
                         // this makes it so that the keyup doesn't happen,
                         //      allowing the new text selection to stay
                         event.preventDefault();
                         event.stopPropagation();
                     }
-                    
+
                     if (focusElement) {
                         focusElement = xtag.query(focusElement, 'input, textarea, select, [tabindex]')[0];
                         if (focusElement) {
                             focusElement.focus();
-                            
+
                             // select all the text and scroll into view
                             if (focusElement !== window) {
                                 if (focusElement.nodeName === 'INPUT' || focusElement.nodeName === 'TEXTAREA') {
                                     GS.setInputSelection(focusElement, 0, focusElement.value.length);
                                 }
                                 parentRecord = GS.findParentTag(focusElement, 'tr');
-                                
+
                                 if (parentRecord && parentRecord.nodeName === 'TR') {
                                     GS.scrollIntoView(parentRecord);
                                 }
                             }
                         }
                     }
-                    
+
                 // else: change selection
                 } else if (event.target === element ||
                            event.target.hasAttribute('column') ||
                            event.target.classList.contains('hidden-focus-control')) {
-                               
+
                     // if mouse selection is not happening right now
                     if (!element.dragAllowed) {
                         arrSelected = element.selectedCells;
-                        
+
                         // if the key was tab
                         if (intKeyCode === KEY_TAB) {
                             // if is a selection origin: focus the inner control
                             if (element.dragOrigin) {
                                 element.dragOrigin.children[0].focus();
-                                
+
                                 // this makes it so that the keyup doesn't happen,
                                 //      allowing the new text selection to stay
                                 event.preventDefault();
                             }
-                            
+
                         // else if the key was return
                         } else if (intKeyCode === KEY_RETURN) {
                             // if there is only one cell selected: go into the cell control
@@ -15929,19 +15929,19 @@ document.addEventListener('DOMContentLoaded', function () {
                             } else {
                                 element.dragOrigin.children[0].focus();
                             }
-                            
+
                             GS.setInputSelection(document.activeElement, document.activeElement.value.length);
                             GS.scrollIntoView(GS.findParentTag(document.activeElement, 'tr'));
-                            
+
                             // this makes it so that the keyup doesn't happen,
                             //      allowing the new text selection to stay
                             event.preventDefault();
-                            
+
                         // else if an arrow key was pressed
                         } else if (intKeyCode === KEY_UP || intKeyCode === KEY_DOWN || intKeyCode === KEY_LEFT || intKeyCode === KEY_RIGHT) {
                             arrRecords = xtag.query(element, 'tr');
                             element.dragMode = 'select';
-                            
+
                             // if no selection: select first editable cell
                             if (arrSelected.length === 0) {
                                 //console.log('2***');
@@ -15951,80 +15951,80 @@ document.addEventListener('DOMContentLoaded', function () {
                                 element.dragCurrentCell = element.dragOrigin;
                                 element.selectionPreviousOrigin = element.dragOrigin;
                                 element.numberOfSelections = 1;
-                                
+
                                 bolSelect = true;
-                                
+
                             // if shift: expand current selection
                             } else if (event.shiftKey) {
                                 //console.log('3***', element.dragCurrentCell);
                                 element.dragOrigin = element.selectionPreviousOrigin;
                                 parentRecord = element.dragCurrentCell.parentNode;
-                                
+
                                 // if left arrow
                                 if (intKeyCode === 37 && element.dragCurrentCell.previousElementSibling) {
                                     element.dragCurrentCell = element.dragCurrentCell.previousElementSibling;
-                                    
+
                                 // if up arrow
                                 } else if (intKeyCode === 38 && arrRecords[parentRecord.rowIndex - 1]) {
                                     element.dragCurrentCell = arrRecords[parentRecord.rowIndex - 1]
                                                                     .children[element.dragCurrentCell.cellIndex];
-                                    
+
                                 // if right arrow
                                 } else if (intKeyCode === 39 && element.dragCurrentCell.nextElementSibling) {
                                     element.dragCurrentCell = element.dragCurrentCell.nextElementSibling;
-                                    
+
                                 // if down arrow
                                 } else if (intKeyCode === 40 && arrRecords[parentRecord.rowIndex + 1]) {
                                     element.dragCurrentCell = arrRecords[parentRecord.rowIndex + 1]
                                                                     .children[element.dragCurrentCell.cellIndex];
                                 }
-                                
+
                                 bolSelect = true;
-                                
+
                             // else: move selected cell based on origin cell
                             } else {
                                 //console.log('4***', arrSelected.length);
                                 if (arrSelected.length > 1) {
                                     element.dragCurrentCell = element.selectionPreviousOrigin;
                                 }
-                                
+
                                 parentRecord = element.dragCurrentCell.parentNode;
-                                
+
                                 // if left arrow
                                 if (intKeyCode === 37 && element.dragCurrentCell.previousElementSibling) {
                                     element.dragCurrentCell = element.dragCurrentCell.previousElementSibling;
-                                    
+
                                 // if up arrow
                                 } else if (intKeyCode === 38 && arrRecords[parentRecord.rowIndex - 1]) {
                                     element.dragCurrentCell = arrRecords[parentRecord.rowIndex - 1]
                                                                     .children[element.dragCurrentCell.cellIndex];
-                                    
+
                                 // if right arrow
                                 } else if (intKeyCode === 39 && element.dragCurrentCell.nextElementSibling) {
                                     element.dragCurrentCell = element.dragCurrentCell.nextElementSibling;
-                                    
+
                                 // if down arrow
                                 } else if (intKeyCode === 40 && arrRecords[parentRecord.rowIndex + 1]) {
                                     element.dragCurrentCell = arrRecords[parentRecord.rowIndex + 1]
                                                                     .children[element.dragCurrentCell.cellIndex];
                                 }
-                                
+
                                 element.savedSelection = [];
                                 element.savedSelectionCopy = [];
                                 element.dragOrigin = element.dragCurrentCell;
                                 element.selectionPreviousOrigin = element.dragCurrentCell;
                                 element.numberOfSelections = 1;
-                                
+
                                 bolSelect = true;
                             }
-                            
+
                             // if the above code has produced the info for a selection: call the select handler
                             if (bolSelect) {
                                 //console.log('5***', element, element.dragOrigin, element.dragCurrentCell, element.dragMode);
-                                
+
                                 element.lastFocusedControl = null;
                                 element.copyControl.focus();
-                                
+
                                 selectHandler(element, element.dragOrigin, element.dragCurrentCell, element.dragMode);
                                 GS.scrollIntoView(element.dragCurrentCell.parentNode);
                                 event.preventDefault();
@@ -16034,8 +16034,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
         }
-        
-        
+
+
         element.addEventListener('mousewheel', function (event) {
             synchronizeHeaderScroll(element);
         });
@@ -16048,7 +16048,7 @@ document.addEventListener('DOMContentLoaded', function () {
             synchronizeHeaderWidths(element);
         });
     }
-    
+
     function elementInserted(element) {
         // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
         if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
@@ -16057,39 +16057,39 @@ document.addEventListener('DOMContentLoaded', function () {
                 element.inserted = true;
                 element.internal = {};
                 saveDefaultAttributes(element);
-                
+
                 if (element.hasAttribute('null-string')) {
                     element.nullString = element.getAttribute('null-string') || '';
                 } else {
                     element.nullString = 'NULL';
                 }
-                
+
                 prepareElement(element);
                 bindElement(element);
                 getData(element, '', '', true);
             }
         }
     }
-    
+
     xtag.register('gs-datasheet', {
         lifecycle: {
             created: function () {},
-            
+
             inserted: function () {
                 elementInserted(this);
             },
-            
+
             attributeChanged: function (strAttrName, oldValue, newValue) {
                 var element = this;
-                
+
                 // if "suspend-created" has been removed: run created and inserted code
                 if (strAttrName === 'suspend-created' && newValue === null) {
                     elementInserted(element);
-                    
+
                 // if "suspend-inserted" has been removed: run inserted code
                 } else if (strAttrName === 'suspend-inserted' && newValue === null) {
                     elementInserted(element);
-                    
+
                 } else if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
                     if (strAttrName === 'value' && this.root) {
                         this.refresh();
@@ -16100,12 +16100,12 @@ document.addEventListener('DOMContentLoaded', function () {
         events: {},
         accessors: {
             selectedCells: {
-                
+
                 /*
                     function synchronize(element, bolScroll) {
                         var arrRecords = xtag.query(element, 'tr'), selectCells = [], i, len,
                             arrParts, arrTextareas, focusedElement, recordIndex, cellIndex;
-                        
+
                         // selection
                         if (element.savedSelection) {
                             // loop through savedSelection
@@ -16114,16 +16114,16 @@ document.addEventListener('DOMContentLoaded', function () {
                                 arrParts = element.savedSelection[i].split(',');
                                 recordIndex = parseInt(arrParts[0], 10);
                                 cellIndex = parseInt(arrParts[1], 10);
-                                
+
                                 if (recordIndex < arrRecords.length && cellIndex < arrRecords[0].children.length) {
                                     selectCells.push(arrRecords[recordIndex].children[cellIndex]);
                                 }
                             }
-                            
+
                             // select cells
                             element.selectedCells = selectCells;
                         }
-                        
+
                         // focus
                         if (element.lastFocusedControl) {
                             element.lastFocusedControl.focus();
@@ -16132,19 +16132,19 @@ document.addEventListener('DOMContentLoaded', function () {
                             focusedElement = element.copyControl;
                             focusedElement.focus();
                         }
-                        
+
                         // if there was no control to focus and
                         //      there is a selection and
                         //      bolScroll is true: scroll to selected
                         if (!element.lastFocusedControl && element.selectedCells.length > 0 && bolScroll) {
                             GS.scrollIntoView(element.selectedCells[0].parentNode);
                         }
-                        
+
                         // if there was a control and bolScroll is true: scroll to focused record
                         if (focusedElement && bolScroll) {
                             GS.scrollIntoView(GS.findParentElement(document.activeElement, 'tr'));
                         }
-                        
+
                         if (focusedElement && element.lastTextSelection) {
                             GS.setInputSelection(focusedElement, element.lastTextSelection.start, element.lastTextSelection.end);
                         }
@@ -16159,126 +16159,126 @@ document.addEventListener('DOMContentLoaded', function () {
                         element.selectedCells = [];
                     }
                 */
-                
+
                 get: function () {
                     return xtag.query(this.scrollContainer, '[selected]');
                 },
-                
+
                 set: function (newValue) {
                     var i, len, intIdIndex, arrCells = xtag.query(this, '[selected]'),
                         cell_i, cell_len, arrRowIndexes = [], arrHeaderIndexes = [],
                         arrRecordSelectors, arrHeaders;
-                    
+
                     // clear old selection
                     for (i = 0, len = arrCells.length; i < len; i += 1) {
                         arrCells[i].removeAttribute('selected');
                     }
-                    
+
                     arrCells = xtag.query(this, '[selected-secondary]');
                     for (i = 0, len = arrCells.length; i < len; i += 1) {
                         arrCells[i].removeAttribute('selected-secondary');
                     }
-                    
+
                     // if newValue is not an array: make it an array
                     if (typeof newValue === 'object' && newValue.length === undefined) {
                         arrCells = [newValue];
                     } else {
                         arrCells = newValue;
                     }
-                    
+
                     // if this call is the result of a javascript ".selectedCells = ARRAY" call and there are more than zero cells to set
                     if (!this.dragAllowed && arrCells.length > 0) {
                         this.dragOrigin = arrCells[0];
                         this.dragCurrentCell = arrCells[arrCells.length - 1];
                     }
                     if (!this.savedSelection) { this.savedSelection = []; }
-                    
+
                     // set new selection
                     for (i = 0, len = arrCells.length; i < len; i += 1) {
                         GS.listAdd(arrRowIndexes, arrCells[i].parentNode.rowIndex);
                         GS.listAdd(arrHeaderIndexes, arrCells[i].cellIndex);
-                        
+
                         this.savedSelection.push(arrCells[i].parentNode.rowIndex + ',' + arrCells[i].cellIndex);
-                        
+
                         arrCells[i].setAttribute('selected', '');
                     }
-                    
+
                     // highlight non-selected headers and row selectors
-                    
+
                     arrRecordSelectors = xtag.query(this, 'tbody th, thead th:first-child');
                     for (i = 0, len = arrRecordSelectors.length; i < len; i += 1) {
                         if (arrRowIndexes.indexOf(i) !== -1 && !arrRecordSelectors[i].hasAttribute('selected')) {
                             arrRecordSelectors[i].setAttribute('selected-secondary', '');
                         }
                     }
-                    
+
                     arrHeaders = xtag.query(this, 'thead th');
                     for (i = 0, len = arrHeaders.length; i < len; i += 1) {
                         if (arrHeaderIndexes.indexOf(i) !== -1 && !arrHeaders[i].hasAttribute('selected')) {
                             arrHeaders[i].setAttribute('selected-secondary', '');
                         }
                     }
-                    
+
                     //console.log(arrRecordSelectors, arrHeaders, arrRowIndexes, arrHeaderIndexes);
-                    
+
                     GS.triggerEvent(this, 'after_selection');
                 }
             },
-            
+
             selectedRecords: {
                 get: function () {
                     var i, len, intRecordIndex = -1, arrRecord = [], selected = this.selectedCells;
-                    
+
                     // loop through the selected cells and create an array of trs
                     for (i = 0, len = selected.length; i < len; i += 1) {
                         if (selected[i].parentNode.rowIndex > intRecordIndex && selected[i].parentNode.parentNode.nodeName !== 'THEAD') {
                             intRecordIndex = selected[i].parentNode.rowIndex;
-                            
+
                             arrRecord.push(selected[i].parentNode);
                         }
                     }
-                    
+
                     return arrRecord;
                 },
-                
+
                 set: function (newValue) {
                     var i, len, cell_i, cell_len, intIdIndex, arrCells = this.selectedCells, arrRecords, arrCellChildren;
-                    
+
                     // clear old selection
                     for (i = 0, len = arrCells.length; i < len; i += 1) {
                         arrCells[i].removeAttribute('selected');
                     }
-                    
+
                     arrCells = xtag.query(this, '[selected-secondary]');
                     for (i = 0, len = arrCells.length; i < len; i += 1) {
                         arrCells[i].removeAttribute('selected-secondary');
                     }
-                    
+
                     // if newValue is not an array: make it an array
                     if (typeof newValue === 'object' && newValue.length === undefined) {
                         arrRecords = [newValue];
                     } else {
                         arrRecords = newValue;
                     }
-                    
+
                     // set new selection
                     for (i = 0, len = arrRecords.length, arrCells = []; i < len; i += 1) {
                         arrCellChildren = arrRecords[i].children;
-                        
+
                         for (cell_i = 0, cell_len = arrCellChildren.length; cell_i < cell_len; cell_i += 1) {
                             arrCells.push(arrCellChildren[cell_i]);
                         }
                     }
-                    
+
                     this.selectedCells = arrCells;
                 }
             },
-            
+
             value: {
                 get: function () {
                     return this.getAttribute('value');
                 },
-                
+
                 set: function (newValue) {
                     return this.setAttribute('value', newValue);
                 }
@@ -16288,12 +16288,12 @@ document.addEventListener('DOMContentLoaded', function () {
             'refresh': function () {
                 getData(this);
             }
-            
+
           , 'refreshFixedHeader': function () {
                 synchronizeHeaderScroll(this);
                 synchronizeHeaderWidths(this);
             }
-            
+
           , 'refreshReflow': function () {
                 refreshReflow(this);
             }
@@ -16301,41 +16301,41 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });window.addEventListener('design-register-element', function () {
     'use strict';
-    
+
     registerDesignSnippet('<gs-date>', '<gs-date>', 'gs-date column="${1:name}"></gs-date>');
     registerDesignSnippet('<gs-date> With Label', '<gs-date>', 'label for="${1:date-insert-start_date}">${2:Start Date}:</label>\n' +
                                                                '<gs-date id="${1:date-insert-start_date}" column="${3:start_date}"></gs-date>');
-    
+
     designRegisterElement('gs-date', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-date.html');
-    
+
     window.designElementProperty_GSDATE = function(selectedElement) {
         addProp('Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'column', this.value);
         });
-        
+
         addProp('Value', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('value') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'value', this.value);
         });
-        
+
         addProp('Column In Querystring', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('qs') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'qs', this.value, false);
         });
-        
+
         addProp('Placeholder', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('placeholder') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'placeholder', this.value);
         });
-        
+
         //console.log(selectedElement.hasAttribute('mini'));
-        
+
         addProp('Mini', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('mini')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'mini', (this.value === 'true'), true);
         });
-        
+
         addProp('Date Picker', true, '<gs-checkbox class="target" value="' + (!selectedElement.hasAttribute('no-picker')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'no-picker', (this.value === 'true'), false);
         });
-        
-        addProp('Format', true, '<gs-combo class="target" value="' + encodeHTML(selectedElement.getAttribute('format') || '') + '" mini>' + 
+
+        addProp('Format', true, '<gs-combo class="target" value="' + encodeHTML(selectedElement.getAttribute('format') || '') + '" mini>' +
                         ml(function () {/*<template>
                                             <table>
                                                 <tbody>
@@ -16374,33 +16374,33 @@ document.addEventListener('DOMContentLoaded', function () {
                                 */}), function () {
             return setOrRemoveTextAttribute(selectedElement, 'format', this.value);
         });
-        
+
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
-        
+
         // TABINDEX attribute
         addProp('Tabindex', true, '<gs-number class="target" value="' + encodeHTML(selectedElement.getAttribute('tabindex') || '') + '" mini></gs-number>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'tabindex', this.value);
         });
-        
+
         addProp('Autocorrect', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocorrect') !== 'off') + '" mini></gs-checkbox>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'autocorrect', (this.value === 'false' ? 'off' : ''));
         });
-        
+
         addProp('Autocapitalize', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocapitalize') !== 'off') + '" mini></gs-checkbox>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'autocapitalize', (this.value === 'false' ? 'off' : ''));
         });
-        
+
         addProp('Autocomplete', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocomplete') !== 'off') + '" mini></gs-checkbox>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'autocomplete', (this.value === 'false' ? 'off' : ''));
         });
-        
+
         addProp('Spellcheck', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('spellcheck') !== 'false') + '" mini></gs-checkbox>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'spellcheck', (this.value === 'false' ? 'false' : ''));
         });
-        
+
         // visibility attributes
         var strVisibilityAttribute = '';
         if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
@@ -16410,7 +16410,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (selectedElement.hasAttribute('show-on-desktop'))   { strVisibilityAttribute = 'show-on-desktop'; }
         if (selectedElement.hasAttribute('show-on-tablet'))    { strVisibilityAttribute = 'show-on-tablet'; }
         if (selectedElement.hasAttribute('show-on-phone'))     { strVisibilityAttribute = 'show-on-phone'; }
-        
+
         addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                         '<option value="">Visible</option>' +
                                         '<option value="hidden">Invisible</option>' +
@@ -16428,32 +16428,32 @@ document.addEventListener('DOMContentLoaded', function () {
             selectedElement.removeAttribute('show-on-desktop');
             selectedElement.removeAttribute('show-on-tablet');
             selectedElement.removeAttribute('show-on-phone');
-            
+
             if (this.value) {
                 selectedElement.setAttribute(this.value, '');
             }
-            
+
             return selectedElement;
         });
-        
+
         // DISABLED attribute
         addProp('Disabled', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('disabled') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'disabled', this.value === 'true', true);
         });
-        
+
         // READONLY attribute
         addProp('Readonly', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('readonly') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'readonly', this.value === 'true', true);
         });
-        
+
         //addFlexContainerProps(selectedElement);
         addFlexProps(selectedElement);
-        
+
         //// SUSPEND-CREATED attribute
         //addProp('suspend-created', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-created') || '') + '" mini></gs-checkbox>', function () {
         //    return setOrRemoveBooleanAttribute(selectedElement, 'suspend-created', this.value === 'true', true);
         //});
-        
+
         // SUSPEND-INSERTED attribute
         addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-inserted', this.value === 'true', true);
@@ -16638,80 +16638,80 @@ document.addEventListener('DOMContentLoaded', function () {
         // fix date being off by one day by replacing the dashes with slashes
         strInputValue = strInputValue.replace(/-/, '/')  // replace first dash with forward slash
                                      .replace(/-/, '/'); // replace second dash with forward slash
-        
+
         dteCurrent = new Date(strInputValue);
-        
+
         if (isNaN(dteCurrent.getTime())) {
             dteCurrent = new Date();
         }
-        
+
         element.datePickerButton.setAttribute('selected', '');
-        
+
         // if no date was sent
         if (!dteDate) {
             // try using the value from the input
             if (element.control.value) {
                 dteDate = dteCurrent;
                 bolSelectOrigin = true;
-                
+
             // else just use now
             } else {
                 dteDate = new Date();
             }
         }
-        
+
         //if we are in the current month and year, Highlight the day we are on
         if (dteDate.getMonth() === dteCurrent.getMonth() && dteDate.getFullYear() === dteCurrent.getFullYear()) {
             bolSelectOrigin = true;
         }
-        
+
         // set html using date
         strHTML = getContentForDatePicker(dteDate, bolSelectOrigin);
-        
+
         divElement.innerHTML =  '<div class="gs-date-date-picker-container" gs-dynamic>' +
                                     '<div class="gs-date-date-picker" gs-dynamic>' + strHTML + '</div>' +
                                 '</div>';
-        
+
         datePickerContainer = divElement.children[0];
         element.datePickerContainer = datePickerContainer;
-        
+
         datePicker = datePickerContainer.children[0];
-        
+
         document.body.appendChild(datePickerContainer);
-        
+
         // position datePickerContainer
         intTop = jsnOffset.top + element.offsetHeight;
-        
+
         if (intTop + datePicker.offsetHeight > window.innerHeight) {
             intTop -= datePicker.offsetHeight;
             intTop -= element.offsetHeight;
-            
+
             if (intTop < 0) {
                 intTop = 0;
             }
         }
-        
+
         datePicker.style.top = intTop + 'px';
-        
+
         // if window width is wider than 450 pixels width AND the date picker will not fall off of the screen:
         if (window.innerWidth > 450 && jsnOffset.left > 450) {
             // datepicker width: 450px; right: calculated;
             datePicker.style.width = '450px';
             datePicker.style.right = window.innerWidth - (jsnOffset.left + element.datePickerButton.offsetWidth) + 'px';
-            
+
         // if window width is wider than 450 pixels width AND the date picker will not fall off of the screen:
         } else if (window.innerWidth > 450 && jsnOffset.left <= 450) {
             // datepicker width: 450px; right: calculated;
             datePicker.style.width = '450px';
             datePicker.style.left = jsnControlOffset.left + 'px';
-            
+
         // else:
         } else {
             // datepicker width: 96%; right: 2%;
             datePicker.style.width = '96%';
             datePicker.style.right = '2%';
         }
-        
+
         // next month, previous month, next year, previous year click events
         datePickerContainer.getElementsByClassName('prev-month')[0].addEventListener('click', function () {
             dteDate.setMonth((dteDate.getMonth() - 1 < 0 ? 11 : dteDate.getMonth() - 1));
@@ -16720,10 +16720,10 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         datePickerContainer.getElementsByClassName('next-month')[0].addEventListener('click', function () {
             var i, oldMonth;
-            
+
             oldMonth = dteDate.getMonth();
             dteDate.setMonth((oldMonth + 1 > 11 ? 0 : oldMonth + 1));
-            
+
             // if a month is skipped (no need to worry about the loop back to january because december and january both seem to have 31 days)
             if (dteDate.getMonth() === oldMonth + 2) {
                 // loop backwards until we reach the correct month
@@ -16733,7 +16733,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     i += 1;
                 }
             }
-            
+
             closeDatePicker(element);
             openDatePicker(element, dteDate);
         });
@@ -16747,38 +16747,38 @@ document.addEventListener('DOMContentLoaded', function () {
             closeDatePicker(element);
             openDatePicker(element, dteDate);
         });
-        
+
         // background click event
         datePickerContainer.addEventListener('click', function (event) {
             if (event.target.classList.contains('gs-date-date-picker-container')) {
                 closeDatePicker(element);
             }
         });
-        
+
         // date click events
         dateClickHandler = function () {
             var dteNewDate = new Date(this.getAttribute('data-date'));
-            
+
             closeDatePicker(element);
-            
+
             element.value = (dteNewDate.getMonth() + 1) + '/' + dteNewDate.getDate() + '/' + dteNewDate.getFullYear();
             //console.trace('test', element.value);
             handleFormat(element);
             xtag.fireEvent(element, 'change', { bubbles: true, cancelable: true });
         };
-        
+
         arrDateButtons = datePickerContainer.getElementsByClassName('day-marker');
-        
+
         for (i = 0, len = arrDateButtons.length; i < len; i += 1) {
             arrDateButtons[i].addEventListener('click', dateClickHandler);
         }
     }
-    
+
     function closeDatePicker(element) {
         element.datePickerButton.removeAttribute('selected');
         document.body.removeChild(element.datePickerContainer);
     }
-    
+
     function getContentForDatePicker(originDate, bolSelectOrigin) {
         var strHTML = '', i, looperDate, lookaheadDate, intFirstDayOfWeek = 0, dteToday = new Date(),
             arrDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
@@ -16786,10 +16786,10 @@ document.addEventListener('DOMContentLoaded', function () {
             arrMonths = [
                 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
             ];
-        
+
         looperDate = new Date(originDate);
         looperDate.setDate(1);
-        
+
         strHTML =   '<div class="month-marker" flex-horizontal gs-dynamic>' +
                         '<gs-button class="prev-month" inline icononly icon="arrow-left" gs-dynamic>Prev</gs-button>' +
                         '<span flex gs-dynamic>' + arrMonths[originDate.getMonth()] + '</span>' +
@@ -16800,38 +16800,38 @@ document.addEventListener('DOMContentLoaded', function () {
                         '<span flex gs-dynamic>' + originDate.getFullYear() + '</span>' +
                         '<gs-button class="next-year" inline icononly icon="arrow-right" gs-dynamic>Next</gs-button>' +
                     '</div>';
-        
+
         if (!isNaN(looperDate.getTime())) {
-            
+
             // reverse back to the previous intFirstDayOfWeek
             i = 0;
             while (looperDate.getDay() !== intFirstDayOfWeek && i < 20) {
                 looperDate.setDate(looperDate.getDate() - 1);
-                
+
                 i += 1;
             }
             //console.log(looperDate);
-            
+
             // add day of week markers
             strHTML += '<div class="date-picker-divider" gs-dynamic></div><div class="day-of-week-markers-container" gs-dynamic>';
             for (i = 0; i < 7; i += 1) {
                 strHTML += '<div class="day-of-week-marker" gs-dynamic>' + arrShortDays[i] + '</div>';
             }
             strHTML += '</div>';
-            
+
             // loop through till at least the end of the month (or further to find the day that is before the next intFirstDayOfWeek)
             i = 0;
-            
+
             lookaheadDate = new Date(looperDate);
             lookaheadDate.setDate(lookaheadDate.getDate() + 1);
-            
+
             while (!(looperDate.getDay()         === intFirstDayOfWeek &&
                     (looperDate.getMonth()       !== originDate.getMonth() && i > 0) &&
                      lookaheadDate.getFullYear() >=  originDate.getFullYear()) &&
                    i < 50) {
-                
+
                 strHTML +=  '<gs-button inline class="day-marker';
-                
+
                 if (looperDate.getMonth() !== originDate.getMonth()) {
                     strHTML += ' other-month';
                 }
@@ -16841,11 +16841,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     strHTML += ' today';
                 }
                 strHTML += '"';
-                
+
                 if (looperDate.getTime() === originDate.getTime() && bolSelectOrigin) {
                     strHTML += ' selected ';
                 }
-                
+
                 strHTML +=  'data-date="' + looperDate + '" gs-dynamic>';
                 if (looperDate.getFullYear() === dteToday.getFullYear() &&
                     looperDate.getMonth() === dteToday.getMonth() &&
@@ -16855,9 +16855,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     strHTML += looperDate.getDate();
                 }
                 strHTML += '</gs-button>';
-                
+
                 //console.log(looperDate, lookaheadDate);
-                
+
                 lookaheadDate.setDate(lookaheadDate.getDate() + 1);
                 looperDate.setDate(looperDate.getDate() + 1);
                 i += 1;
@@ -16871,19 +16871,19 @@ document.addEventListener('DOMContentLoaded', function () {
         ///console.log(element.value);
         if (element.value) {
             var dteValue, strValueToFormat = element.value, tempSelection = GS.getInputSelection(element.control);
-    
+
             // if there is a day of the week in the value: remove it
             if (strValueToFormat.match(/monday|tuesday|wednesday|thursday|friday|saturday|sunday/gim)) {
                 strValueToFormat = strValueToFormat.replace(/monday|tuesday|wednesday|thursday|friday|saturday|sunday/gim, '')
                                                    .replace(/  /gim, ' ')
                                                    .trim();
             }
-    
+
             if (strValueToFormat.indexOf(':') !== -1) {
                 strValueToFormat = strValueToFormat.substring(0, strValueToFormat.indexOf(':'));
                 strValueToFormat = strValueToFormat.substring(0, strValueToFormat.lastIndexOf(' '));
             }
-    
+
             // if there are only six numbers in the field assume that
             //      the first  two are the month
             //      the second two are the day   and
@@ -16897,17 +16897,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 dteValue = new Date(strValueToFormat.replace(/-/, '/').replace(/-/, '/').replace(/-.*/, ''));
                 //console.log(dteValue, dteValue.getFullYear());
             }
-            
+
             //console.trace('test', element.value, strValueToFormat, dteValue);
-            
+
             if (isNaN(dteValue.getTime())) {
                 if (bolAlertOnError !== undefined && bolAlertOnError !== false) {
                     alert('Invalid Date: ' + element.value);
                 }
-                
+
                 if (document.activeElement === element.control) {
                     GS.setInputSelection(element.control, tempSelection.start, tempSelection.end);
-                    
+
                     if (event) {
                         if (event.keyCode === GS.keyCode('backspace')) {
                             GS.setInputSelection(element.control, tempSelection.start - 1, tempSelection.start - 1);
@@ -16918,7 +16918,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         event.preventDefault();
                     }
                 }
-                
+
             } else {
                 if (element.control) {
                     element.control.value = formatDate(dteValue, getFormatString(element));
@@ -16933,14 +16933,14 @@ document.addEventListener('DOMContentLoaded', function () {
             return 'NULL';
         }
     }
-    
+
     function getFormatString(element) {
         var strFormat;
-        
+
         if (element.hasAttribute('format')) {
             strFormat = element.getAttribute('format');
         }
-        
+
         if (!strFormat) {
             strFormat = 'MM/dd/yyyy';
         } else if (strFormat.toLowerCase() === 'shortdate') {
@@ -16962,32 +16962,32 @@ document.addEventListener('DOMContentLoaded', function () {
         } else if (strFormat.toLowerCase() === 'isodatetime') {
             strFormat = 'yyyy-MM-dd\'T\'HH:mm:ss';
         }
-        
+
         return strFormat;
     }
-    
+
     function formatDate(dteValue, strFormat) {
         /* (this function contains a (modified) substantial portion of code from another source
             here is the copyright for sake of legality) (Uses code by Matt Kruse)
         Copyright (c) 2006-2009 Rostislav Hristov, Asual DZZD
-        
-        Permission is hereby granted, free of charge, to any person obtaining a 
-        copy of this software and associated documentation files 
-        (the "Software"), to deal in the Software without restriction, 
-        including without limitation the rights to use, copy, modify, merge, 
-        publish, distribute, sublicense, and/or sell copies of the Software, 
-        and to permit persons to whom the Software is furnished to do so, 
+
+        Permission is hereby granted, free of charge, to any person obtaining a
+        copy of this software and associated documentation files
+        (the "Software"), to deal in the Software without restriction,
+        including without limitation the rights to use, copy, modify, merge,
+        publish, distribute, sublicense, and/or sell copies of the Software,
+        and to permit persons to whom the Software is furnished to do so,
         subject to the following conditions:
-        
-        The above copyright notice and this permission notice shall be included 
+
+        The above copyright notice and this permission notice shall be included
         in all copies or substantial portions of the Software.
-        
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS 
-        OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
-        MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
-        IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY 
-        CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
-        TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+        OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+        MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+        IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+        CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+        TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
         SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
         var i = 0, j = 0, l = 0, c = '', token = '', x, y, yearLen,
             formatNumber = function (n, s) {
@@ -16995,7 +16995,7 @@ document.addEventListener('DOMContentLoaded', function () {
                   return (n >= 0 && n < 10 ? '0' : '') + n;
                 } else {
                     if (n >= 0 && n < 10) {
-                       return '00' + n; 
+                       return '00' + n;
                     }
                     if (n >= 10 && n <100) {
                        return '0' + n;
@@ -17026,9 +17026,9 @@ document.addEventListener('DOMContentLoaded', function () {
             m = dteValue.getMinutes(),
             s = dteValue.getSeconds(),
             S = dteValue.getMilliseconds();
-        
+
         //console.log(dteValue.getFullYear());
-        
+
         yearLen = String(y).length;
         dteValue = {
             y: y,
@@ -17045,7 +17045,7 @@ document.addEventListener('DOMContentLoaded', function () {
             H: H,
             HH: formatNumber(H)
         };
-        
+
         //console.log(dteValue);
 
         if (H === 0) {
@@ -17090,7 +17090,7 @@ document.addEventListener('DOMContentLoaded', function () {
         s = false;
 
         while (i < strFormat.length) {
-            token = '';   
+            token = '';
             c = strFormat.charAt(i);
             if (c == '\'') {
                 i++;
@@ -17117,10 +17117,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         }
-        
+
         return result;
     }
-    
+
     // dont do anything that modifies the element here
     function elementCreated(element) {
         // if "created" hasn't been suspended: run created code
@@ -17134,15 +17134,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 //element.value = undefined;
                 //element.value = null;
             }
-            
+
         }
     }
-    
+
     //
     function elementInserted(element) {
         console.warn('GS-DATE WARNING: this element is deprecated, please use the gs-datetime instead.');
         var today, strQSValue;
-        
+
         // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
         if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
             // if this is the first time inserted has been run: continue
@@ -17150,27 +17150,27 @@ document.addEventListener('DOMContentLoaded', function () {
                 element.inserted = true;
                 element.internal = {};
                 saveDefaultAttributes(element);
-                
+
                 /*
                 element.addEventListener(evt.mouseout, function (event) {
                     element.classList.remove('hover');
                 });
-                
+
                 element.addEventListener(evt.mouseover, function (event) {
                     element.classList.add('hover');
                 });
                 */
-                
+
                 if (element.hasAttribute('tabindex')) {
                     element.oldTabIndex = element.getAttribute('tabindex');
                     element.removeAttribute('tabindex');
                 }
-                
+
                 if (element.hasAttribute('value') && element.getAttribute('value').trim().toLowerCase() === 'today') {
                     today = new Date();
                     element.setAttribute('value', GS.leftPad(today.getFullYear(), '0', 4) + '/' + GS.leftPad(today.getMonth() + 1, '0', 2) + '/' + GS.leftPad(today.getDate(), '0', 2));
                 }
-                
+
                 // handle "qs" attribute
                 if (element.getAttribute('qs')) {
                     //strQSValue = GS.qryGetVal(GS.getQueryString(), element.getAttribute('qs'));
@@ -17178,13 +17178,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     //if (strQSValue !== '' || !element.getAttribute('value')) {
                     //    element.setAttribute('value', strQSValue);
                     //}
-                    
+
                     pushReplacePopHandler(element);
                     window.addEventListener('pushstate',    function () { pushReplacePopHandler(element); });
                     window.addEventListener('replacestate', function () { pushReplacePopHandler(element); });
                     window.addEventListener('popstate',     function () { pushReplacePopHandler(element); });
                 }
-                
+
                 //if (element.hasAttribute('disabled')) {
                 //    element.innerHTML = element.getAttribute('value') || element.getAttribute('placeholder') || '';
                 //} else {
@@ -17196,31 +17196,31 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
                 //}
-                
+
                 //if (element.innerHTML === '') {
                 //    element.appendChild(singleLineTemplate.cloneNode(true));
                 //    if (element.oldTabIndex) {
                 //        xtag.query(element, '.control')[0].setAttribute('tabindex', element.oldTabIndex);
                 //    }
                 //}
-                
+
                 element.refresh();
             }
         }
     }
-    
+
     function getControlState(element) {
         var jsnTextSelection, intStart, intEnd, strFormat = getFormatString(element),
             strValue = element.control.value, delimiter1index, delimiter2index,
             intCurrentSection, strCurrentSection, arrParts, intCurrentSectionSize;
-        
+
         jsnTextSelection = GS.getInputSelection(element.control);
         intStart = jsnTextSelection.start;
         intEnd = jsnTextSelection.end;
         delimiter1index = (strValue.indexOf('-') === -1 ? strValue.indexOf('/') : strValue.indexOf('-'));
         delimiter2index = (strValue.lastIndexOf('-') === -1 ? strValue.lastIndexOf('/') : strValue.lastIndexOf('-'));
         arrParts = strFormat.split(/[-|/]/g);
-        
+
         // calculate current section number
         if (intStart > delimiter2index) {
             intCurrentSection = 2;
@@ -17229,7 +17229,7 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             intCurrentSection = 0;
         }
-        
+
         // calculate current part type
         if (arrParts[intCurrentSection].indexOf('y') !== -1) {
             strCurrentSection = 'year';
@@ -17238,7 +17238,7 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             strCurrentSection = 'day';
         }
-        
+
         // calculate current section size
         if (intCurrentSection === 2) {
             intCurrentSectionSize = (strValue.length) - (delimiter2index + 1);
@@ -17247,7 +17247,7 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             intCurrentSectionSize = delimiter1index;
         }
-        
+
         return {
             'jsnTextSelection': jsnTextSelection,
             'intStart': intStart,
@@ -17262,27 +17262,27 @@ document.addEventListener('DOMContentLoaded', function () {
             'intCurrentSectionSize': intCurrentSectionSize
         };
     }
-    
+
     xtag.register('gs-date', {
         lifecycle: {
             created: function () {
                 elementCreated(this);
             },
-            
+
             inserted: function () {
                 elementInserted(this);
             },
-            
+
             attributeChanged: function (strAttrName, oldValue, newValue) {
                 // if "suspend-created" has been removed: run created and inserted code
                 if (strAttrName === 'suspend-created' && newValue === null) {
                     elementCreated(this);
                     elementInserted(this);
-                    
+
                 // if "suspend-inserted" has been removed: run inserted code
                 } else if (strAttrName === 'suspend-inserted' && newValue === null) {
                     elementInserted(this);
-                    
+
                 } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
                     if (strAttrName === 'disabled' && newValue !== null) {
                         this.innerHTML = this.getAttribute('value') || this.getAttribute('placeholder');
@@ -17307,42 +17307,42 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             click: function (event) {
                 var jsnTextSelection, intStart, strFormat, strValue, delimiter1index, delimiter2index;
-                
+
                 if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted') && !this.hasAttribute('readonly')) {
                     jsnTextSelection = GS.getInputSelection(this.control);
                     strFormat = getFormatString(this);
                     strValue = this.control.value;
-                    
+
                     // if format is dash delimited or slash delimited and
                     //      we are not on a touch device
                     if ((/^[M|y]{1,}[/|-]{1}[M|d]{1,}[/|-]{1}[d|y]{1,}$/).test(strFormat) &&
                         (strValue.substring(jsnTextSelection.start, jsnTextSelection.end).match(/[-|/]/g) || []).length === 0 &&
                         !evt.touchDevice) {
-                        
+
                         // if there is a date and it's dash or slash delimited: select date part
                         if ((/^[0-9]{1,}[-]{1}[0-9]{1,}[-]{1}[0-9]{1,}$/).test(strValue) ||
                             (/^[0-9]{1,}[/]{1}[0-9]{1,}[/]{1}[0-9]{1,}$/).test(strValue)) {
-                            
+
                             intStart = jsnTextSelection.start;
                             delimiter1index = (strValue.indexOf('-') === -1 ? strValue.indexOf('/') : strValue.indexOf('-'));
                             delimiter2index = (strValue.lastIndexOf('-') === -1 ? strValue.lastIndexOf('/') : strValue.lastIndexOf('-'));
-                            
+
                             // if greater than second delimeter
                             if (intStart > delimiter2index) {
                                 //console.log('Section 3');
                                 GS.setInputSelection(this.control, delimiter2index + 1, strValue.length);
-                                
+
                             // if in between than first and second delimeter
                             } else if (intStart > delimiter1index && intStart <= delimiter2index) {
                                 //console.log('Section 2');
                                 GS.setInputSelection(this.control, delimiter1index + 1, delimiter2index);
-                                
+
                             // else
                             } else {
                                 //console.log('Section 1');
                                 GS.setInputSelection(this.control, 0, delimiter1index);
                             }
-                            
+
                             //console.log(intStart, delimiter1index, delimiter2index);
                         }
                     }
@@ -17353,27 +17353,27 @@ document.addEventListener('DOMContentLoaded', function () {
                     intKeyCode = (event.keyCode || event.which), delimiter1index, delimiter2index,
                     intCurrentSection, strCurrentSection, arrParts, dteDate, intCurrentSectionSize,
                     jsnState;
-                
+
                 if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted') && !this.hasAttribute('readonly')) {
                     jsnTextSelection = GS.getInputSelection(this.control);
                     strValue = this.control.value;
                     strFormat = getFormatString(this);
-                    
+
                     // if format is dash delimited or slash delimited and
                     //      the selection doesn't encompass a delimeter and
                     //      we are not on a touch device
                     if ((/^[M|y]{1,}[/|-]{1}[M|d]{1,}[/|-]{1}[d|y]{1,}$/).test(strFormat) &&
                         (strValue.substring(jsnTextSelection.start, jsnTextSelection.end).match(/[-|/]/g) || []).length === 0 &&
                         !evt.touchDevice) {
-                        
+
                         // if there is a date and it's dash or slash delimited
                         if ((/^[0-9]{1,}[-]{1}[0-9]{1,}[-]{1}[0-9]{1,}$/).test(strValue) ||
                             (/^[0-9]{1,}[/]{1}[0-9]{1,}[/]{1}[0-9]{1,}$/).test(strValue)) {
-                            
+
                             // if shift, command and option keys are not down
                             if (!event.shiftKey && !event.metaKey && !event.ctrlKey) {
                                 event.stopPropagation();
-                                
+
                                 jsnState = getControlState(this)
                                 jsnTextSelection =      jsnState.jsnTextSelection
                                 intStart =              jsnState.intStart
@@ -17386,7 +17386,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 strCurrentSection =     jsnState.strCurrentSection
                                 arrParts =              jsnState.arrParts
                                 intCurrentSectionSize = jsnState.intCurrentSectionSize
-                                
+
                                 //// log
                                 //console.log('intCurrentSectionSize: ' + intCurrentSectionSize + '\n' +
                                 //            'intCurrentSection:     ' + intCurrentSection + '\n' +
@@ -17397,54 +17397,54 @@ document.addEventListener('DOMContentLoaded', function () {
                                 //            'strValue:              ' + strValue + '\n' +
                                 //            'Selection Start:       ' + jsnTextSelection.start + '\n' +
                                 //            'Selection End:         ' + jsnTextSelection.end);
-                                
+
                                 // if number: replace current date part
                                 if ((intKeyCode >= 96 && intKeyCode <= 105) || // numpad numbers
                                     (intKeyCode >= 48 && intKeyCode <= 57)) {  // other numbers
                                     this.keyupHandle = true;
-                                    
+
                                 // if (/|-):
                                 } else if (intKeyCode === 111 || intKeyCode === 191 || // "/"
                                            intKeyCode === 109 || intKeyCode === 189) { // "-"
                                     // if first part: go to second part
                                     if (intCurrentSection === 0) {
                                         intCurrentSection = 1;
-                                        
+
                                     // if second part: go to third part
                                     } else if (intCurrentSection === 1) {
                                         intCurrentSection = 2;
                                     }
-                                    
+
                                 // if horizontal arrow: move to a different date part
                                 } else if (intKeyCode === 37 || // left arrow
                                            intKeyCode === 39) { // right arrow
                                     //console.log(intCurrentSection, intKeyCode);
-                                    
+
                                     if (intCurrentSection === 2 && intKeyCode === 37) {
                                         intCurrentSection = 1;
-                                        
+
                                     } else if (intCurrentSection === 1) {
                                         if (intKeyCode === 37) {
                                             intCurrentSection = 0;
                                         } else {
                                             intCurrentSection = 2;
                                         }
-                                        
+
                                     } else if (intCurrentSection === 0 && intKeyCode === 39) {
                                         intCurrentSection = 1;
                                     }
-                                    
+
                                 // if vertical arrow: update current date part
                                 } else if (intKeyCode === 38 || // up arrow
                                            intKeyCode === 40) { // down arrow
                                     // If the date is in ISO format, new Date() will create it in GMT then convert it to the local timezone
                                     dteDate = new Date(strValue + ' 00:00:00');
-                                    
+
                                     // if current part is year
                                     if (strCurrentSection === 'year') {
                                         //console.log(dteDate, dteDate.getFullYear(), dteDate.getYear(), (intKeyCode === 38 ? 1 : -1),
                                         //                        dteDate.getYear() + (intKeyCode === 38 ? 1 : -1));
-                                        
+
                                         // We're using "getFullYear" here instead of "getYear" because "getYear" for some unknown reason
                                         //      worked fine before the 29th of october 2015 (that's the date of discovery anyway) but now
                                         //      throws a number over a thousand years off instead of the actual number.
@@ -17453,37 +17453,37 @@ document.addEventListener('DOMContentLoaded', function () {
                                         //      "getFullYear"?
                                         // Still unexplained is why when I tested not more than a week ago it worked without a hitch.
                                         dteDate.setFullYear(dteDate.getFullYear() + (intKeyCode === 38 ? 1 : -1));
-                                        
+
                                         //console.log(dteDate);
-                                        
+
                                     // if current part is month
                                     } else if (strCurrentSection === 'month') {
                                         dteDate.setMonth(dteDate.getMonth() + (intKeyCode === 38 ? 1 : -1));
-                                        
+
                                     // if current part is day
                                     } else if (strCurrentSection === 'day') {
                                         dteDate.setDate(dteDate.getDate() + (intKeyCode === 38 ? 1 : -1));
                                     }
-                                    
+
                                     // set the value
                                     strValue = formatDate(dteDate, strFormat);
                                     this.control.value = strValue;
                                     this.triggerChangeManually = true;
                                 }
-                                
+
                                 if (this.keyupHandle !== true) {
                                     // reset the section selection in case something has changed it
                                     if (intCurrentSection === 2) {
                                         GS.setInputSelection(this.control, delimiter2index + 1, strValue.length);
-                                        
+
                                     } else if (intCurrentSection === 1) {
                                         GS.setInputSelection(this.control, delimiter1index + 1, delimiter2index);
-                                        
+
                                     } else {
                                         GS.setInputSelection(this.control, 0, delimiter1index);
                                     }
                                 }
-                                
+
                                 // if not return or tab or number: prevent
                                 if (!(intKeyCode >= 96 && intKeyCode <= 105) && // numpad numbers
                                     !(intKeyCode >= 48 && intKeyCode <= 57) &&
@@ -17501,15 +17501,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     intKeyCode = (event.keyCode || event.which),
                     delimiter1index, delimiter2index, intCurrentSection, strCurrentSection,
                     arrParts, dteDate, intCurrentSectionSize, jsnState;
-                
+
                 if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted') && !this.hasAttribute('readonly')) {
                     strFormat = getFormatString(this);
-                    
+
                     // if format is dash delimited or slash delimited and
                     //      keyup has been allowed and
                     //      we are not on a touch device
                     if ((/^[M|y]{1,}[/|-]{1}[M|d]{1,}[/|-]{1}[d|y]{1,}$/).test(strFormat) && this.keyupHandle && !evt.touchDevice) {
-                        
+
                         // if shift, command and option keys are not down
                         if (!event.shiftKey && !event.metaKey && !event.ctrlKey) {
                             jsnState = getControlState(this)
@@ -17524,7 +17524,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             strCurrentSection =     jsnState.strCurrentSection
                             arrParts =              jsnState.arrParts
                             intCurrentSectionSize = jsnState.intCurrentSectionSize
-                            
+
                             //// log
                             //console.log('intCurrentSectionSize: ' + intCurrentSectionSize + '\n' +
                             //            'intCurrentSection:     ' + intCurrentSection + '\n' +
@@ -17534,17 +17534,17 @@ document.addEventListener('DOMContentLoaded', function () {
                             //            'strCurrentSection:     ' + strCurrentSection + '\n' +
                             //            'strValue:              ' + strValue + '\n' +
                             //            'strFormat:             ' + strFormat);
-                            
+
                             if ((strCurrentSection === 'day' && intCurrentSectionSize === 2) ||
                                 (strCurrentSection === 'month' && intCurrentSectionSize === 2) ||
                                 (strCurrentSection === 'year' && intCurrentSectionSize === strFormat.match(/y/g).length)) {
-                                
+
                                 if (intCurrentSection === 2) {
                                     GS.setInputSelection(this.control, delimiter2index + 1, strValue.length);
-                                    
+
                                 } else if (intCurrentSection === 1) {
                                     GS.setInputSelection(this.control, delimiter1index + 1, delimiter2index);
-                                    
+
                                 } else {
                                     GS.setInputSelection(this.control, 0, delimiter1index);
                                 }
@@ -17552,7 +17552,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
                     this.keyupHandle = false;
-                    
+
                     //console.log(intKeyCode);
                     if (intKeyCode === 13 && this.triggerChangeManually) {
                         this.triggerChangeManually = false;
@@ -17569,8 +17569,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
             }
-            
-            
+
+
             /*// on keydown and keyup sync the value attribute and the control value
             keydown: function (event) {
                 var element = this, currentDate, currentSelectionRange, currentSelectionText, currentSelectionNumber, currentSelectionFormatText,
@@ -17578,9 +17578,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     daysOfTheWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
                     monthsOfTheYear = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
                     strKeyCode = event.keyCode.toString();
-                
+
                 currentSelectionRange = GS.getInputSelection(element.control);
-                
+
                 if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
                     if (element.getAttribute('disabled') !== null && event.keyCode !== 9) {
                         event.preventDefault();
@@ -17590,7 +17590,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         //console.log(strKeyCode === GS.keyCode('up arrow')    , GS.keyCode('up arrow'));
                         //console.log(strKeyCode === GS.keyCode('right arrow') , GS.keyCode('right arrow'));
                         //console.log(strKeyCode === GS.keyCode('down arrow')  , GS.keyCode('down arrow'));
-                        
+
                         // When the user presses an arrow key:
                         // It finds the current number that the user has selected
                         //     If they pressed up or down
@@ -17598,7 +17598,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         //     If they pressed left or right
                         //         Move their selection to the left or right depending on what they pressed
                         // Then moves the selection to the current number (handling day/month name length differences)
-                        
+
                         // Fix date format
                         strDateFormat = element.getAttribute('format');
                         //console.log(strDateFormat);
@@ -17623,59 +17623,59 @@ document.addEventListener('DOMContentLoaded', function () {
                         } else if (strDateFormat.toLowerCase() === 'isodatetime') {
                             strDateFormat = 'yyyy-MM-dd\'T\'HH:mm:ss';
                         }
-                        
+
                         formatDivider = strDateFormat.match(/[^mdyehmsa]/gi).join('');
-                        
+
                         currentValue = element.control.value;
                         currentDate = new Date(currentValue.replace('\'T\'', ' ').replace(/-/g, '/'));
-                        
+
                         if (strDateFormat.indexOf('M') === -1) {
                             currentDate = new Date('2015/6/15 ' + currentValue);
                         }
-                        
+
                         arrMatch = strDateFormat.match(/(M|E)+/g);
                         if (arrMatch && arrMatch[0].length > 3) {
                             strDateFormat = strDateFormat.replace(/E+/g, new Array(daysOfTheWeek[currentDate.getDay()].length + 1).join('E'));
                             strDateFormat = strDateFormat.replace(/M+/g, new Array(monthsOfTheYear[currentDate.getDay()].length + 1).join('M'));
                         }
-                        
+
                         // If it was an arrow that was pressed
                         if (strKeyCode === GS.keyCode('left arrow') ||
                             strKeyCode === GS.keyCode('up arrow') ||
                             strKeyCode === GS.keyCode('right arrow') ||
                             strKeyCode === GS.keyCode('down arrow')) {
-                            
+
                             //console.log('test');
-                            
+
                             // Prevent the browser from moving the cursor and prevent envelope from using arrows
                             event.preventDefault();
                             event.stopPropagation();
-                            
+
                             //console.log(currentValue, formatDivider, currentSelectionRange.start, currentSelectionRange.end);
-                            
+
                             // Encompass the field in which the cursor is inside
                             while (currentSelectionRange.start >= 0 && formatDivider.indexOf(currentValue[currentSelectionRange.start - 1]) < 0) {
                                 currentSelectionRange.start -= 1;
                             }
-                            
+
                             currentSelectionRange.end = currentSelectionRange.start;
                             while ( currentSelectionRange.end < currentValue.length &&
                                     formatDivider.indexOf(currentValue[currentSelectionRange.end]) < 0) {
                                 currentSelectionRange.end += 1;
                             }
-                            
+
                             //console.log(currentValue, currentSelectionRange.start, currentSelectionRange.end);
-                            
+
                             GS.setInputSelection(element.control, currentSelectionRange.start, currentSelectionRange.end);
-                            
+
                             currentSelectionText = currentValue.substring(currentSelectionRange.start, currentSelectionRange.end);
                             currentSelectionFormatText = strDateFormat.substring(currentSelectionRange.start, currentSelectionRange.end);
-                            
+
                             // If it is up or down
                             if (strKeyCode === GS.keyCode('up arrow') ||
                                 strKeyCode === GS.keyCode('down arrow')) {
                                 var increment = strKeyCode === GS.keyCode('up arrow') ? 1 : -1;
-                                
+
                                 if (currentSelectionFormatText[0] === 'M') {
                                     currentDate.setMonth(currentDate.getMonth() +       increment);
                                     if ((currentSelectionRange.end - currentSelectionRange.start) > 2) {
@@ -17683,36 +17683,36 @@ document.addEventListener('DOMContentLoaded', function () {
                                     } else {
                                         currentSelectionRange.end = currentSelectionRange.start + currentDate.getMonth().toString().length;
                                     }
-                                    
+
                                 } else if (currentSelectionFormatText[0] === 'd') {
                                     currentDate.setDate(currentDate.getDate() + increment);
                                     currentSelectionRange.end = currentSelectionRange.start + currentDate.getDate().toString().length;
-                                    
+
                                 } else if (currentSelectionFormatText[0] === 'y') {
                                     currentDate.setFullYear(currentDate.getFullYear() + increment);
                                     currentSelectionRange.end = currentSelectionRange.start + currentDate.getFullYear().toString().length;
-                                    
+
                                 } else if (currentSelectionFormatText[0] === 'E') {
                                     currentDate.setDate(currentDate.getDate() + increment);
                                     currentSelectionRange.start = 0;
                                     currentSelectionRange.end = daysOfTheWeek[currentDate.getDay()].length;
-                                    
+
                                 } else if (currentSelectionFormatText[0] === 'h' || currentSelectionFormatText[0] === 'H') {
                                     currentDate.setHours(currentDate.getHours() + increment);
                                     currentSelectionRange.end = currentSelectionRange.start + currentDate.getHours().toString().length;
-                                    
+
                                 } else if (currentSelectionFormatText[0] === 'm') {
                                     currentDate.setMinutes(currentDate.getMinutes() + increment);
                                     currentSelectionRange.end = currentSelectionRange.start + currentDate.getMinutes().toString().length;
-                                    
+
                                 } else if (currentSelectionFormatText[0] === 's') {
                                     currentDate.setSeconds(currentDate.getSeconds() + increment);
                                     currentSelectionRange.end = currentSelectionRange.start + currentDate.getSeconds().toString().length;
-                                    
+
                                 } else if (currentSelectionFormatText[0] === 'a') {
                                     currentDate.setHours(currentDate.getHours() + 12);
                                 }
-                                
+
                                 newValue = formatDate(currentDate, strDateFormat);
                                 this.control.value = newValue;
                                 currentValue = newValue;
@@ -17723,7 +17723,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 currentSelectionRange.end = currentSelectionRange.end + 2;
                                 currentSelectionRange.start = currentSelectionRange.end;
                             }
-                            
+
                             // Copied from above
                             arrMatch = strDateFormat.match(/(M|E)+/g);
                             if (arrMatch && arrMatch[0].length > 3) {
@@ -17738,23 +17738,23 @@ document.addEventListener('DOMContentLoaded', function () {
                                     formatDivider.indexOf(currentValue[currentSelectionRange.end]) < 0) {
                                 currentSelectionRange.end += 1;
                             }
-                            
+
                             GS.setInputSelection(element.control, currentSelectionRange.start, currentSelectionRange.end);
-                            
+
                         // All number keys
                         } else if (event.keyCode >= 96 && event.keyCode <= 105) {
                             //// HARK YE ONLOOKER:
                             //// This code caps the number that is inputed by the user to the length that the format allows,
                             //// this will dissallow anyone form entering a year that is > 4 characters unless the
                             //// page's developer allows it in a custom format.
-                            //// 
+                            ////
                             //// This should be fixed around the year 9998 to have all default formats have 5 character years
-                            
+
                             currentSelectionText = currentValue.substring(currentSelectionRange.start, currentSelectionRange.end);
                             currentSelectionFormatText = strDateFormat.substring(currentSelectionRange.start, currentSelectionRange.end);
-                            
+
                             currentValue = element.value;
-                            
+
                             // This is sort of copied from above
                             // There are only two differences:
                             //     the var name
@@ -17770,20 +17770,20 @@ document.addEventListener('DOMContentLoaded', function () {
                                     formatDivider.indexOf(currentValue[currentFieldRange.end]) < 0) {
                                 currentFieldRange.end += 1;
                             }
-                            
+
                             //console.log(currentFieldRange);
-                            
+
                             //console.log(currentValue.substring(0, currentSelectionRange.start));
                             //console.log(GS.charFromKeyCode(event), currentSelectionText, currentSelectionFormatText, currentDate);
                             //console.log(currentValue.substring(currentSelectionRange.end));
-                            
+
                             // This error checking is probably unneeded, but what the hey
                             currentFieldRange.start = Math.max(currentFieldRange.start, 0);
                             arrMatch = strDateFormat.match(strDateFormat[currentFieldRange.start] + '+', 'g');
                             if (arrMatch) {
                                 // Prevent the browser from putting the number in for us
                                 event.preventDefault();
-                                
+
                                 // Get the character that they pressed
                                 newFieldValue = GS.charFromKeyCode(event);
                                 console.log(newFieldValue);
@@ -17791,18 +17791,18 @@ document.addEventListener('DOMContentLoaded', function () {
                                 // all characters in the field except the first one
                                 newFieldValue = currentValue.substring(currentFieldRange.start + 1, currentFieldRange.start + arrMatch[0].length) + newFieldValue;
                                 console.log(newFieldValue, currentValue);
-                                
+
                                 console.log(currentFieldRange.start + 1, currentFieldRange.start + arrMatch[0].length);
-                                
+
                                 // Build the value using the current field range and the new field value we built above
-                                element.value = 
+                                element.value =
                                     currentValue.substring(0, currentFieldRange.start) +
                                     newFieldValue +
                                     currentValue.substring(currentFieldRange.end);
-                                
-                                
+
+
                                 console.log(currentValue.substring(0, currentFieldRange.start), newFieldValue, currentValue.substring(currentFieldRange.end));
-                            
+
                                 // This is copied from above
                                 currentFieldRange = {
                                     start: currentSelectionRange.start
@@ -17815,7 +17815,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                         formatDivider.indexOf(currentValue[currentFieldRange.end]) < 0) {
                                     currentFieldRange.end += 1;
                                 }
-                                
+
                                 //                                                                          This indexOf does not need to be checked for -1
                                 //                                                                          Because we know for a fact that the match is in
                                 //                                                                          the string we are searching
@@ -17824,18 +17824,18 @@ document.addEventListener('DOMContentLoaded', function () {
                                 //console.log(arrMatch[0].length, strDateFormat.indexOf(arrMatch[0]), newCursorPos, arrMatch[0]);
                                 GS.setInputSelection(element.control, newCursorPos, newCursorPos);
                             }
-                            
+
                         }
-                        
+
                         //// All visible keys
                         //} else if ( event.keyCode >= 48 && event.keyCode <= 90 ||
                         //            event.keyCode >= 96 && event.keyCode <= 109 ||
                         //            event.keyCode >= 186 && event.keyCode <= 222 ||
                         //            event.keyCode === 32) {
                         //    //console.log('test');
-                        //    
+                        //
                         //    //GS.triggerEvent(element, 'change');
-                        //    
+                        //
                         //    if ((currentSelectionRange.end - currentSelectionRange.start) > 0) {
                         //        element.control.addEventListener('keyup', function ______self() {
                         //            GS.setInputSelection(this, currentSelectionRange.start + 1, currentSelectionRange.start) + 1;
@@ -17843,9 +17843,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         //        });
                         //    }
                         //}
-                        
+
                         //console.log(event.keyCode);
-                        
+
                         syncView(element);
                     }
                 }
@@ -17862,9 +17862,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     monthsOfTheYear = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
                     arrMatch, strDateFormat, formatDivider, currentValue, currentDate;
                 //console.log(currentSelectionRange.start, currentSelectionRange.end);
-                
+
                 ////// Copied from above until otherwise noted
-                
+
                 // Fix date format
                 strDateFormat = element.getAttribute('format');
                 //console.log(strDateFormat);
@@ -17889,22 +17889,22 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else if (strDateFormat.toLowerCase() === 'isodatetime') {
                     strDateFormat = 'yyyy-MM-dd\'T\'HH:mm:ss';
                 }
-                
+
                 formatDivider = strDateFormat.match(/[^mdyehmsa]/gi).join('');
-                
+
                 currentValue = element.control.value;
                 currentDate = new Date(currentValue.replace('\'T\'', ' ').replace(/-/g, '/'));
-                
+
                 if (strDateFormat.indexOf('M') === -1) {
                     currentDate = new Date('2015/6/15 ' + currentValue);
                 }
-                
+
                 arrMatch = strDateFormat.match(/(M|E)+/g);
                 if (arrMatch && arrMatch[0].length > 3) {
                     strDateFormat = strDateFormat.replace(/E+/g, new Array(daysOfTheWeek[currentDate.getDay()].length + 1).join('E'));
                     strDateFormat = strDateFormat.replace(/M+/g, new Array(monthsOfTheYear[currentDate.getDay()].length + 1).join('M'));
                 }
-                
+
                 while (currentSelectionRange.start >= 0 && formatDivider.indexOf(currentValue[currentSelectionRange.start - 1]) < 0) {
                     currentSelectionRange.start -= 1;
                 }
@@ -17914,11 +17914,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     currentSelectionRange.end += 1;
                 }
                 //console.log(currentSelectionRange.start, currentSelectionRange.end);
-                
+
                 ////// Not copied
                 element.ignoreSelect = true;
                 GS.setInputSelection(element.control, currentSelectionRange.start, currentSelectionRange.end);
-                
+
                 //console.log('CLICK EVENT FIRED');
             },
             focus: function () {
@@ -17930,16 +17930,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 //    this.ignoreSelect = false;
                 //}
                 //console.log('SELECT EVENT FIRED', GS.getInputSelection(this.control));
-                
+
                 // Copied from click handler until otherwise noted
                 var element = this, currentSelectionRange = GS.getInputSelection(element.control),
                     daysOfTheWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
                     monthsOfTheYear = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
                     arrMatch, strDateFormat, formatDivider, currentValue, currentDate;
                 //console.log(currentSelectionRange.start, currentSelectionRange.end);
-                
+
                 ////// Copied from above until otherwise noted
-                
+
                 // Fix date format
                 strDateFormat = element.getAttribute('format');
                 //console.log(strDateFormat);
@@ -17964,22 +17964,22 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else if (strDateFormat.toLowerCase() === 'isodatetime') {
                     strDateFormat = 'yyyy-MM-dd\'T\'HH:mm:ss';
                 }
-                
+
                 formatDivider = strDateFormat.match(/[^mdyehmsa]/gi).join('');
-                
+
                 currentValue = element.control.value;
                 currentDate = new Date(currentValue.replace('\'T\'', ' ').replace(/-/g, '/'));
-                
+
                 if (strDateFormat.indexOf('M') === -1) {
                     currentDate = new Date('2015/6/15 ' + currentValue);
                 }
-                
+
                 arrMatch = strDateFormat.match(/(M|E)+/g);
                 if (arrMatch && arrMatch[0].length > 3) {
                     strDateFormat = strDateFormat.replace(/E+/g, new Array(daysOfTheWeek[currentDate.getDay()].length + 1).join('E'));
                     strDateFormat = strDateFormat.replace(/M+/g, new Array(monthsOfTheYear[currentDate.getDay()].length + 1).join('M'));
                 }
-                
+
                 // Condition copied only
                 if ((currentSelectionRange.start >= 0 && formatDivider.indexOf(currentValue[currentSelectionRange.start - 1]) < 0) ||
                     (currentSelectionRange.end < currentValue.length && formatDivider.indexOf(currentValue[currentSelectionRange.end]) < 0)) {
@@ -18001,36 +18001,36 @@ document.addEventListener('DOMContentLoaded', function () {
                     } else if (this.hasAttribute('disabled')) {
                         return this.innerHTML;
                     }
-                    
+
                     return undefined;
                 },
-                
+
                 // set the value of the input and set the value attribute
                 set: function (newValue) {
                     var tempSelection = this.control ? GS.getInputSelection(this.control) : null;
-                    
+
                     if (this.control) {
                         if (newValue && typeof newValue === 'object') {
                             this.control.value = newValue.toLocaleDateString();
                         } else {
                             this.control.value = newValue || '';
                         }
-                        
+
                         if (document.activeElement === this.control) {
                            GS.setInputSelection(this.control, tempSelection.start, tempSelection.end);
                         }
-                        
-                    } else if (this.hasAttribute('disabled')) {                        
+
+                    } else if (this.hasAttribute('disabled')) {
                         if (newValue && typeof newValue === 'object') {
                             this.innerHTML = formatDate(newValue, getFormatString(this));
                         } else {
                             this.innerHTML = newValue || '';
                         }
-                        
+
                     } else {
                         this.setAttribute('value', newValue);
                     }
-                    
+
                     if (this.control) {
                         handleFormat(this);
                     }
@@ -18041,19 +18041,19 @@ document.addEventListener('DOMContentLoaded', function () {
         methods: {
             refresh: function () {
                 var element = this, arrPassThroughAttributes, i, len;
-                
+
                 // set a variable for the control element for convenience and speed
                 element.control = xtag.query(element, '.control')[0];
-                
+
                 // set a variable for the date picker button element for convenience and speed
                 element.datePickerButton = xtag.query(element, '.date-picker-button')[0];
-                
+
                 //console.log(element.control, element.getAttribute('value'), element.getAttribute('column'));
-                
+
                 if (element.control) {
                     element.control.removeEventListener('change', changeFunction);
                     element.control.addEventListener('change', changeFunction);
-                    
+
                     element.control.removeEventListener('focus', focusFunction);
                     element.control.addEventListener('focus', focusFunction);
 
@@ -18062,20 +18062,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     element.control.removeEventListener(evt.mouseout, mouseoutFunction);
                     element.control.addEventListener(evt.mouseout, mouseoutFunction);
-                    
+
                     element.control.removeEventListener(evt.mouseout, mouseoverFunction);
                     element.control.addEventListener(evt.mouseover, mouseoverFunction);
                 }
                 if (element.datePickerButton) {
                     element.datePickerButton.addEventListener('click', buttonClickFunction);
                 }
-                
+
                 // if there is a value already in the attributes of the element: set the control value
                 if (element.control && element.hasAttribute('value')) {
                     element.control.value = element.getAttribute('value');
                     handleFormat(element, undefined, false);
                 }
-                
+
                 if (element.control) {
                 // copy passthrough attributes to control
                     arrPassThroughAttributes = [
@@ -18096,7 +18096,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
             },
-            
+
             focus: function () {
                 GS.triggerEvent(this, 'focus');
                 this.control.focus();
@@ -18105,11 +18105,11 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });window.addEventListener('design-register-element', function () {
     'use strict';
-    
+
     registerDesignSnippet('<gs-datetime>', '<gs-datetime>', 'gs-datetime></gs-datetime>');
-    
+
     designRegisterElement('gs-datetime', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-datetime.html');
-    
+
     window.designElementProperty_GSDATETIME = function(selectedElement) {
         addProp('Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'column', this.value);
@@ -18207,7 +18207,7 @@ document.addEventListener('DOMContentLoaded', function () {
         addProp('Disabled', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('disabled') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'disabled', this.value === 'true', true);
         });
-        
+
         addProp('Readonly', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('readonly') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'readonly', this.value === 'true', true);
         });
@@ -19744,7 +19744,7 @@ window.addEventListener('design-register-element', function () {
                                                                           '        $0\n' +
                                                                           '    }\n' +
                                                                           '});');
-    
+
     registerDesignSnippet('GS.openDialog', 'GS.openDialog', 'GS.openDialog(\'${1:templateID}\', function () {\n' +
                                                             '    // after dialog open \n' +
                                                             '}, function (event, strAnswer) {\n' +
@@ -19753,11 +19753,11 @@ window.addEventListener('design-register-element', function () {
                                                             '        $0\n' +
                                                             '    }\n' +
                                                             '});');
-    
-    
+
+
     registerDesignSnippet('GS.closeDialog', 'GS.closeDialog', 'GS.closeDialog(${1:dialog}, ${2:\'Ok\'});');
     registerDesignSnippet('Close Dialog', 'Close Dialog', 'GS.closeDialog(${1:dialog}, ${2:\'Ok\'});');
-    
+
     registerDesignSnippet('GS.msgbox', 'GS.msgbox', 'GS.msgbox(${1:\'Are you sure...\'}, ${2:\'Are you sure you want to do this?\'}, ' +
                                                                             '${3:[\'Cancel\', \'Ok\']}, function (strAnswer) {\n' +
                                                     '    if (strAnswer === ${4:\'Ok\'}) {\n' +
@@ -19772,7 +19772,7 @@ window.addEventListener('design-register-element', function () {
                                                         '        $0\n' +
                                                         '    }\n' +
                                                         '});');
-    
+
     registerDesignSnippet('GS.inputbox', 'GS.inputbox', 'GS.inputbox(${1:\'Are you sure...\'}, ${2:\'Are you sure you want to do this?\'}, ' +
                                                                                 'function (strInputValue) {\n' +
                                                         '    // before dialog close\n' +
@@ -19783,7 +19783,7 @@ window.addEventListener('design-register-element', function () {
                                                     '    // before dialog close\n' +
                                                     '    $0\n' +
                                                     '});');
-    
+
     registerDesignSnippet('GS.openDialogToElement', 'GS.openDialogToElement',
                                         'GS.openDialogToElement(${1:document.getElementById(\'target\')}, \'${2:templateID}\', ' +
                                                                             '\'${3:right}\', function () {\n' +
@@ -19809,38 +19809,38 @@ window.addEventListener('design-register-element', function () {
 
 (function () {
     'use strict';
-    
+
     function buttonHTML(buttons) {
         var strHTML, i, len;
-        
+
         buttons = buttons || ['Ok'];
-        
+
         // change button parameter to array format if it is string format (and the string is recognized)
         if (typeof buttons === 'string') {
             if (buttons === 'okcancel' || buttons === 'cancelok') {
                 buttons = ['Cancel', 'Ok'];
-                
+
             } else if (buttons === 'ok' || buttons === 'okonly') {
                 buttons = ['Ok'];
-                
+
             } else if (buttons === 'cancel' || buttons === 'cancelonly') {
                 buttons = ['Cancel'];
-                
+
             } else if (buttons === 'yesno' || buttons === 'noyes') {
                 buttons = ['No', 'Yes'];
-                
+
             } else if (buttons === 'Yes' || buttons === 'yesonly') {
                 buttons = ['Yes'];
-                
+
             } else if (buttons === 'No' || buttons === 'noonly') {
                 buttons = ['No'];
             }
         }
-        
+
         if (typeof buttons === 'object') {
             if (buttons.length > 0) {
                 strHTML = '<gs-grid gs-dynamic>';
-                
+
                 for (i = 0, len = buttons.length; i < len; i += 1) {
                     strHTML +=
                         '<gs-block gs-dynamic>' +
@@ -20728,22 +20728,22 @@ GS.closeDialog = function (dialog, strAnswer) {
 
         scrollProtectorMouseWheel = function (event) {
             var target = GS.scrollParent(event.target); //event.target;
-            
+
             if (dialogElement.parentNode !== document.body) {
                 dialogElement.removeEventListener('mousewheel', scrollProtectorMouseWheel);
                 return true;
             }
-            
+
             //console.log(event.deltaY, event.deltaX,
             //            target.scrollTop, target.scrollLeft,
             //            target.scrollHeight, target.scrollWidth,
             //            target.clientHeight, target.clientWidth);
-            
+
             // if event.deltaY < 0 AND we are already at the top
             // if event.deltaY > 0 AND we are already at the bottom
             // if event.deltaX < 0 AND we are already at the left
             // if event.deltaX > 0 AND we are already at the right
-            
+
             if ((event.deltaY < 0 && target.scrollTop <= 0) ||
                 (event.deltaY > 0 && (target.scrollTop + target.clientHeight) >= target.scrollHeight) ||
                 (event.deltaX < 0 && target.scrollLeft <= 0) ||
@@ -20752,14 +20752,14 @@ GS.closeDialog = function (dialog, strAnswer) {
                 event.stopPropagation();
             }
         };
-        
+
         if (evt.touchDevice) {
             window.addEventListener('touchstart', scrollProtectorTouchStart);
             window.addEventListener('touchmove', scrollProtectorTouchMove);
         }
-        
+
         dialogElement.addEventListener('mousewheel', scrollProtectorMouseWheel);
-        
+
         dialogElement.addEventListener('beforeclose', function (event) {
             if (typeof beforeCloseFunction === 'function') {
                 beforeCloseFunction.apply(dialogElement, [event.originalEvent, event.data]);
@@ -20805,13 +20805,13 @@ GS.closeDialog = function (dialog, strAnswer) {
                 console.warn('dialog Warning: Too many [listen-for-return] elements, defaulting to the first one. Please have only one [listen-for-return] element per dialog.');
             }
         }
-        
+
         // if no direction was sent: set direction to down
         strDirectionRequest = strDirectionRequest || 'down';
-        
+
         // make strDirectionRequest lowercase
         strDirectionRequest.toLowerCase();
-        
+
         // if the direction does not match any valid direction: set direction to down and warn
         if (!strDirectionRequest.match(/^up$|^down$|^left$|^right$|^full$/)) {
             console.warn('GS.openDialogToElement Error: ' +
@@ -20819,11 +20819,11 @@ GS.closeDialog = function (dialog, strAnswer) {
                                 'Please use \'up\', \'down\', \'left\', \'right\' or \'full\'.');
             strDirectionRequest = 'down';
         }
-        
+
         positionHandlingFunction = function () {
             var intDialogTop = '', intDialogLeft = '', intDialogMarginTop = '', intDialogMarginLeft = '', strOldStyle,
                 arrElements, arrScrollingElements, i, len, strOverflow;
-            
+
             // if the dialog is not in the DOM: unbind and skip the contents of the function using return
             if (dialogElement.parentNode !== document.body) {
                 window.removeEventListener('resize', positionHandlingFunction);
@@ -20831,28 +20831,28 @@ GS.closeDialog = function (dialog, strAnswer) {
                 observer.disconnect();
                 return;
             }
-            
+
             // save old style attribute
             strOldStyle = dialogElement.getAttribute('style');
-            
+
             // save scroll numbers
             arrElements = xtag.query(dialogElement, '*');
             arrScrollingElements = [];
-            
+
             for (i = 0, len = arrElements.length; i < len; i += 1) {
                 strOverflow = GS.getStyle(arrElements[i], 'overflow');
-                
+
                 if (strOverflow === 'scroll' ||
                     (strOverflow === 'auto' && arrElements[i].clientHeight < arrElements[i].scrollHeight)) {
                     arrScrollingElements.push(arrElements[i]);
                 }
             }
-            
+
             for (i = 0, len = arrScrollingElements.length; i < len; i += 1) {
                 arrScrollingElements[i].oldScrollTop = arrScrollingElements[i].scrollTop;
                 arrScrollingElements[i].oldScrollLeft = arrScrollingElements[i].scrollLeft;
             }
-            
+
             // clear dialog CSS
             dialogElement.style.top        = '';
             dialogElement.style.left       = '';
@@ -20861,57 +20861,57 @@ GS.closeDialog = function (dialog, strAnswer) {
             dialogElement.style.width      = '94%';
             dialogElement.style.height     = '';
             dialogElement.style.maxHeight  = '';
-            
+
             //console.log(dialogElement.oldHeight, dialogElement.offsetHeight);
-            
+
             // if height hasn't changed: restore style
             if (dialogElement.oldHeight === dialogElement.offsetHeight) {
                 dialogElement.setAttribute('style', strOldStyle);
-                
+
                 for (i = 0, len = arrScrollingElements.length; i < len; i += 1) {
                     arrScrollingElements[i].scrollTop = arrScrollingElements[i].oldScrollTop;
                     arrScrollingElements[i].scrollLeft = arrScrollingElements[i].oldScrollLeft;
                 }
-                
+
             // else: recalculate style
             } else {
                 dialogElement.oldHeight = dialogElement.offsetHeight;
-                
+
                 // resolve dialog width and height
-                
+
                 // if dialog is taller than: window height - (intMargin * 2): add max-height and height
                 if (dialogElement.clientHeight > ((window.innerHeight / 100) * 94)) {
                     dialogElement.style.height = '94%';
                     dialogElement.style.maxHeight = strMaxHeight;
                 }
-                
+
                 intDialogResolvedWidth  = dialogElement.offsetWidth;
                 intDialogResolvedHeight = dialogElement.offsetHeight + 1; // + 1 added to fix occasional scrollbar issue
-                
+
                 // set dialog width and height to resolved width and height
                 dialogElement.style.width  = intDialogResolvedWidth  + 'px';
                 dialogElement.style.height = intDialogResolvedHeight + 'px';
-                
+
                 // get target position data
                 jsnPositionData = GS.getElementPositionData(elementTarget);
-                
+
                 // order of tests depending on direction
                 if (strDirectionRequest === 'up') { // up: up, down, left, right, full
                     arrTests = ['up', 'down', 'left', 'right'];
-                    
+
                 } else if (strDirectionRequest === 'down') { // down: down, up, left, right, full
                     arrTests = ['down', 'up', 'left', 'right'];
-                    
+
                 } else if (strDirectionRequest === 'left') { // left: left, right, down, up, full
                     arrTests = ['left', 'right', 'down', 'up'];
-                    
+
                 } else if (strDirectionRequest === 'right') { // right: right, left, down, up, full
                     arrTests = ['right', 'left', 'down', 'up'];
-                    
+
                 } else { // full: no tests (just go to full)
                     arrTests = [];
                 }
-                
+
                 // up: compare room above to dialog resolved height
                 //      pass: display
                 //      fail: next test
@@ -20924,56 +20924,56 @@ GS.closeDialog = function (dialog, strAnswer) {
                         break;
                     }
                 }
-                
+
                 // if we could not resolve to a particular direction: set direction to full screen
                 strResolvedDirection = strResolvedDirection || 'full';
                 //console.log(strResolvedDirection);
-                
+
                 // if up or down: get as close to horizontally centered on the element as possible
                 if (strResolvedDirection === 'up' || strResolvedDirection === 'down') {
                     intElementMidPoint = (jsnPositionData.intElementLeft + (jsnPositionData.intElementWidth / 2));
                     intDialogMidPoint = (intDialogResolvedWidth / 2);
                     //console.log(intElementMidPoint, jsnPositionData.left, jsnPositionData.intElementWidth);
-                    
+
                     // if centered goes past intMargin of the left edge of the screen: go to intMargin from the bottom
                     if (intElementMidPoint - intDialogMidPoint < intMargin) {
                         intDialogLeft = intMargin;
                         //console.log('1***', intMargin);
-                        
+
                     // else if centered goes past intMargin of the right edge of the screen: go to intMargin less than the width of the viewport
                     } else if (intElementMidPoint + intDialogMidPoint > window.innerWidth - intMargin) {
                         intDialogLeft = ((window.innerWidth - intDialogResolvedWidth) - intMargin);
                         //console.log('2***', window.innerWidth, intDialogResolvedWidth, intMargin);
-                        
+
                     // else centered does not go past intMargin of either edge of the screen: center
                     } else {
                         intDialogLeft = (intElementMidPoint - intDialogMidPoint);
                         //console.log('3***', intElementMidPoint, intDialogMidPoint, (intElementMidPoint - intDialogMidPoint) + 'px');
                     }
-                    
+
                 // else if left or right: get as close to vertically centered next to the element as possible
                 } else if (strResolvedDirection === 'left' || strResolvedDirection === 'right') {
                     intElementMidPoint = (jsnPositionData.intElementTop + (jsnPositionData.intElementHeight / 2));
                     intDialogMidPoint = (intDialogResolvedHeight / 2);
-                    
+
                     //console.log('0***', intElementMidPoint, intDialogMidPoint, window.innerHeight, intMargin, intDialogResolvedHeight);
-                    
+
                     // if centered goes past intMargin of the top edge of the screen: go to intMargin from the bottom
                     if (intElementMidPoint - intDialogMidPoint < intMargin) {
                         intDialogTop = intMargin;
                         //console.log('1***', intMargin);
-                        
+
                     // else if centered goes past intMargin of the bottom edge of the screen: go to intMargin less than the height of the viewport
                     } else if (intElementMidPoint + intDialogMidPoint > window.innerHeight - intMargin) {
                         intDialogTop = ((window.innerHeight - intDialogResolvedHeight) - intMargin);
                         //console.log('2***', window.innerHeight, intDialogResolvedHeight, intMargin);
-                        
+
                     // else centered does not go past intMargin of either edge of the screen: center
                     } else {
                         intDialogTop = (intElementMidPoint - intDialogMidPoint);
                         //console.log('3***', intElementMidPoint, intDialogMidPoint, (intElementMidPoint - intDialogMidPoint) + 'px');
                     }
-                    
+
                 // else full: use dialog logic to get width and height and center both vertically and horizontally
                 } else {
                     intDialogTop        = '50%';
@@ -20981,19 +20981,19 @@ GS.closeDialog = function (dialog, strAnswer) {
                     intDialogMarginTop  = '-' + (intDialogResolvedHeight / 2) + 'px';
                     intDialogMarginLeft = '-' + (intDialogResolvedWidth / 2) + 'px';
                 }
-                
+
                 // if direction is up: connect the bottom of the dialog to the top of the element
                 if (strResolvedDirection === 'up') {
                     intDialogTop = (jsnPositionData.intElementTop - intDialogResolvedHeight);
-                    
+
                 // if direction is down: connect the top of the dialog to the bottom of the element
                 } else if (strResolvedDirection === 'down') {
                     intDialogTop = (jsnPositionData.intElementTop + jsnPositionData.intElementHeight);
-                    
+
                 // if direction is left: connect the right of the dialog to the left of the element
                 } else if (strResolvedDirection === 'left') {
                     intDialogLeft = (jsnPositionData.intElementLeft - intDialogResolvedWidth);
-                    
+
                 // if direction is right: connect the left of the dialog to the right of the element
                 } else if (strResolvedDirection === 'right') {
                     intDialogLeft = (jsnPositionData.intElementLeft + jsnPositionData.intElementWidth);
@@ -21002,7 +21002,7 @@ GS.closeDialog = function (dialog, strAnswer) {
                 // prevent the dialog from vertically going outside the viewport
                 if (intDialogTop + intDialogResolvedHeight > window.innerHeight) {
                     intDialogTop -= (intDialogTop + intDialogResolvedHeight) - window.innerHeight;
-                    
+
                 }
 
                 // prevent the dialog from horizontally going outside the viewport
@@ -21082,12 +21082,12 @@ GS.closeDialog = function (dialog, strAnswer) {
                 xtagSelector += (xtagSelector ? ',' : '');
                 xtagSelector += strTag;
             }
-            
+
             // get all xtag elements
             var elem_wait = xtag.query(dialogElement, xtagSelector);
             var elem_i;
             var elem_len;
-            
+
             // begin interval (max out at 1 second)
             intervalI = 0;
             intervalID = setInterval(function () {
@@ -21145,7 +21145,7 @@ GS.closeDialog = function (dialog, strAnswer) {
 
                         this.windowResizeHandler();
                     }
-                    
+
                     this.addEventListener('click', function (event) {
                         var dialogcloseElement = GS.findParentElement(event.target, '[dialogclose]');
 
@@ -21180,31 +21180,31 @@ GS.closeDialog = function (dialog, strAnswer) {
                     element.windowResizeHandler = function () {
                         element.style.left = (window.innerWidth / 2) - (element.offsetWidth / 2) + 'px';
                     };
-                    
+
                     window.addEventListener('resize', element.windowResizeHandler);
                     window.addEventListener('orientationchange', element.windowResizeHandler);
                 }
             },
-            
+
             unbind: function () {
                 window.removeEventListener('resize', this.windowResizeHandler);
                 window.removeEventListener('orientationchange', this.windowResizeHandler);
-                
+
                 GS.triggerEvent(window, 'resize');
             },
-            
+
             destroy: function (strAnswer, originalEvent) {
                 var beforeCloseEvent;
-                
+
                 if (this.parentNode === document.body) {
                     beforeCloseEvent = GS.triggerEvent(this, 'beforeclose', {'data': strAnswer, 'originalEvent': originalEvent});
-                    
+
                     if (!beforeCloseEvent.defaultPrevented && (!originalEvent || !originalEvent.defaultPrevented)) {
                         document.body.removeChild(this.previousElementSibling);
                         document.body.removeChild(this);
-                        
+
                         GS.triggerEvent(this, 'afterclose', {'data': strAnswer, 'originalEvent': originalEvent});
-                        
+
                         if (document.getElementsByTagName('gs-dialog').length === 0) {
                             document.body.parentNode.classList.remove('no-scroll-except-for-dialog');
                         }
@@ -21213,7 +21213,7 @@ GS.closeDialog = function (dialog, strAnswer) {
             }
         }
     });
-    
+
     xtag.register('gs-dialog-overlay', {
         lifecycle: {},
         events: {},
@@ -22429,7 +22429,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         sortMousedownHandler = function () {
                             var columns = usedColumnsElement.getElementsByClassName('order_by_column'), offsetsCache = [], i, len,
                                 currentElement = this.parentNode, currentlyMarkedElement, markerElement, bolLast = false, intToIndex,
-                                currentElementClone, intCloneoffset, intFromIndex, sortMousemoveHandler, sortMouseupHandler, 
+                                currentElementClone, intCloneoffset, intFromIndex, sortMousemoveHandler, sortMouseupHandler,
                                 strColumn = currentElement.getAttribute('data-column'),
                                 strDirection = currentElement.getAttribute('data-direction');
 
@@ -23055,7 +23055,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     tableTemplateElement  = xtag.queryChildren(element, 'template[for="table"]')[0];
                 }
                 insertTemplateElement = xtag.queryChildren(element, 'template[for="insert"]')[0];
-                
+
                 if (
                     hudTemplateElement &&
                     (
@@ -23939,48 +23939,48 @@ window.addEventListener('design-register-element', function () {
         addProp('Column In Querystring', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('qs') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'qs', this.value, false);
         });
-        
+
         addProp('Path', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('path') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'path', this.value);
         });
-        
+
         addProp('Hide Folders', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('no-folders')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'no-folders', (this.value === 'true'), true);
         });
-        
+
         addProp('Hide Files', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('no-files')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'no-files', (this.value === 'true'), true);
         });
-        
+
         addProp('Side-By-Side', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('horizontal')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'horizontal', (this.value === 'true'), true);
         });
-        
+
         addProp('Mini', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('mini')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'mini', (this.value === 'true'), true);
         });
-        
+
         addProp('Disabled', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('mini')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'disabled', (this.value === 'true'), true);
         });
     };
-    
+
     registerDesignSnippet('<gs-folder>', '<gs-folder>', 'gs-folder path="${0:/}" folder="${1:role}"></gs-folder>');
-    
+
     designRegisterElement('gs-folder', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-folder.html');
 });
 
 (function () {
     'use strict';
-    
+
     // #################################################################################################
     // ############################################ UTILITY ############################################
     // #################################################################################################
-    
+
     function getPath(element) {
         var strAttributePath = GS.trim(GS.templateWithQuerystring(element.getAttribute('path') || ''), '/')
           , strInnerPath = element.arrPath.join('/'), strRet;
-        
+
         if (strAttributePath && strInnerPath) {
             strRet = '/' + strAttributePath + '/' + strInnerPath + '/';
         } else if (strAttributePath) {
@@ -23988,14 +23988,14 @@ window.addEventListener('design-register-element', function () {
         } else if (strInnerPath) {
             strRet = '/' + strInnerPath + '/';
         }
-        
+
         return strRet || '/';
     }
-    
+
     function getRealPath(element) {
         var strAttributePath = GS.trim(GS.templateWithQuerystring(element.getAttribute('path') || ''), '/')
           , arrPath = element.arrPath, strInnerPath, strRet, strPrefix;
-        
+
         if (element.arrPath[0] === 'app' || strAttributePath.indexOf('app') === 0) {
             strPrefix = '/env';
         } else if (element.arrPath[0] === 'role' || strAttributePath.indexOf('role') === 0) {
@@ -24004,9 +24004,9 @@ window.addEventListener('design-register-element', function () {
             strPrefix = '';
             arrPath.splice(0, 1);
         }
-        
+
         strInnerPath = arrPath.join('/');
-        
+
         if (strAttributePath && strInnerPath) {
             strRet = '/' + strAttributePath + '/' + strInnerPath + '/';
         } else if (strAttributePath) {
@@ -24014,29 +24014,29 @@ window.addEventListener('design-register-element', function () {
         } else if (strInnerPath) {
             strRet = '/' + strInnerPath + '/';
         }
-        
+
         return (strPrefix || '') + (strRet || '/');
     }
-    
+
     function getData(element) {
         var strPath = getPath(element)
           , bolFolders = !element.hasAttribute('no-folders')
           , bolFiles = !element.hasAttribute('no-files')
           , strHeader
           , intResponseNumber;
-        
+
         element.folderList.innerHTML = '';
         element.fileList.innerHTML = '';
-        
+
         strHeader = GS.trim('/' + element.arrPath.join('/'), '/');
-        
+
         // if there is something in the header: wrap it with slashes
         if (strHeader) {
             strHeader = '/' + strHeader + '/';
         }
-        
+
         element.pathTitle.textContent = strHeader;
-        
+
         if (element.arrPath.length > 0) {
             element.backButton.removeAttribute('disabled');
         } else {
@@ -24048,7 +24048,7 @@ window.addEventListener('design-register-element', function () {
         GS.requestFromSocket(GS.envSocket, 'FILE\tLIST\t' + GS.encodeForTabDelimited(strPath), function (data, error, errorData) {
             var arrPaths, strName, strType, arrCells, i, len, divElement
               , arrFiles = [], arrFolders = [];
-            
+
             if (!error && data.trim() && data.indexOf('Failed to get canonical path') === -1) {
                 if (data !== 'TRANSACTION COMPLETED') {
                     arrPaths = GS.trim(data, '\n').split('\n');
@@ -24056,48 +24056,48 @@ window.addEventListener('design-register-element', function () {
                         element.folderList.innerHTML = '';
                         element.fileList.innerHTML = '';
                     }
-                    
+
                     for (i = 0, len = arrPaths.length; i < len; i += 1) {
                         arrCells = arrPaths[i].split('\t');
                         strType = GS.decodeFromTabDelimited(arrCells[1]);
                         strName = GS.trim(GS.decodeFromTabDelimited(arrCells[0]), '/');
-                        
+
                         if ((strType === 'folder' && bolFolders) || (strType === 'file' && bolFiles)) {
                             divElement = document.createElement('div');
                             divElement.setAttribute('flex-horizontal', '');
                             divElement.setAttribute('flex-fill', '');
                             divElement.setAttribute('class', strType + '-line');
                             divElement.setAttribute('data-name', strName);
-                            
+
                             if (strType === 'file') {
                                 arrFiles.push(element.arrPath.join('/') + '/' + strName);
                                 divElement.innerHTML =
                                     '<gs-button class="more-file" icononly icon="bars" remove-right></gs-button>'
                                   + '<gs-button class="open-file" flex remove-left>' + encodeHTML(strName) + '</gs-button>';
-                                
+
                                 element.fileList.appendChild(divElement);
                             }
-                            
+
                             if (strType === 'folder') {
                                 arrFolders.push(element.arrPath.join('/') + '/' + strName);
                                 divElement.innerHTML =
                                     '<gs-button class="more-folder" icononly icon="bars" remove-right></gs-button>'
                                   + '<gs-button class="open-folder" flex remove-left>' + encodeHTML(strName) + '</gs-button>';
-                                
+
                                 element.folderList.appendChild(divElement);
                             }
                         }
                     }
-                    
+
                     element.arrFile = arrFiles;
                     element.arrFolder = arrFolders;
                     GS.triggerEvent(element, 'change');
-                    
+
                 } else {
                     if (element.folderList.innerHTML === '') {
                         element.folderList.innerHTML = '<center prevent-text-selection><h4><small>No Folders.</small></h4></center>';
                     }
-                    
+
                     if (element.fileList.innerHTML === '') {
                         element.fileList.innerHTML = '<center prevent-text-selection><h4><small>No Files.</small></h4></center>';
                     }
@@ -24107,15 +24107,15 @@ window.addEventListener('design-register-element', function () {
                     GS.webSocketErrorDialog(errorData);
                 }
             }
-            
+
             intResponseNumber += 1;
         });
     }
-    
+
     function prepareElement(element) {
         var bolFolders = !element.hasAttribute('no-folders')
           , bolFiles = !element.hasAttribute('no-files');
-        
+
         element.innerHTML = ml(function () {/*
             <div class="root" flex-vertical flex-fill gs-dynamic>
                 <span class="path-title"></span>
@@ -24141,32 +24141,32 @@ window.addEventListener('design-register-element', function () {
         */});
         //remove-right
         //remove-left
-        
+
         element.root             = xtag.queryChildren(element, '.root')[0];
         element.folderListHeader = xtag.query(element.root, '.folder-list-header')[0];
         element.fileListHeader   = xtag.query(element.root, '.file-list-header')[0];
-        
+
         element.folderList       = xtag.query(element.root, '.folder-list')[0];
         element.fileList         = xtag.query(element.root, '.file-list')[0];
-        
+
         element.newFolderButton  = xtag.query(element.root, '.button-new-folder')[0];
         element.newFileButton    = xtag.query(element.root, '.button-new-file')[0];
         element.uploadFileButton = xtag.query(element.root, '.button-upload-file')[0];
         element.backButton       = xtag.query(element.root, '.button-back-folder')[0];
-        
+
         element.pathTitle        = xtag.query(element.root, '.path-title')[0];
-        
+
         element.arrPath = [];
     }
-    
+
     //function pushReplacePopHandler(element) {
     //    var strQueryString = GS.getQueryString(), strQSCol = element.getAttribute('qs');
-    //    
+    //
     //    if (GS.qryGetKeys(strQueryString).indexOf(strQSCol) > -1) {
     //        getData(element);
     //    }
     //}
-    
+
     function saveDefaultAttributes(element) {
         var i;
         var len;
@@ -24257,7 +24257,7 @@ window.addEventListener('design-register-element', function () {
 
         element.internal.bolQSFirstRun = true;
     }
-    
+
     function bindElement(element) {
         if (element.hasAttribute('qs')) {
             pushReplacePopHandler(element);
@@ -24265,49 +24265,49 @@ window.addEventListener('design-register-element', function () {
             window.addEventListener('replacestate', function () { pushReplacePopHandler(element); });
             window.addEventListener('popstate',     function () { pushReplacePopHandler(element); });
         }
-        
+
         element.addEventListener('click', function (event) {
             var target = event.target;
-            
+
             if (target.classList.contains('button-new-folder')) {
                 newFolder(element, target);
-                
+
             } else if (target.classList.contains('button-new-file')) {
                 newFile(element, target);
-                
+
             } else if (target.classList.contains('open-file')) {
                 fileOpen(element, target);
-                
+
             } else if (target.classList.contains('open-folder')) {
                 folderOpen(element, target);
-                
+
             } else if (target.classList.contains('button-back-folder')) {
                 backFolder(element, target);
-                
+
             } else if (target.classList.contains('more-folder')) {
                 folderMenu(element, target);
-                
+
             } else if (target.classList.contains('more-file')) {
                 fileMenu(element, target);
-                
+
             } else if (target.classList.contains('button-upload-file')) {
                 fileUpload(element, target);
             }
         });
     }
-    
-    
+
+
     // ################################################################################################
     // ####################################### FOLDER FUNCTIONS #######################################
     // ################################################################################################
-    
+
     function folderMenu(element, target) {
         'use strict';
         var lineElement = GS.findParentElement(target, '.folder-line')
           , strFolderName = lineElement.getAttribute('data-name')
           , strPath = (getPath(element) + strFolderName)
           , templateElement = document.createElement('template');
-        
+
         templateElement.setAttribute('data-overlay-close', 'true');
         templateElement.setAttribute('data-max-width', '250px');
         templateElement.innerHTML = ml(function () {/*
@@ -24318,21 +24318,21 @@ window.addEventListener('design-register-element', function () {
                 <gs-button dialogclose>Cancel</gs-button>
             </gs-body>
         */});
-        
+
         GS.openDialogToElement(target, templateElement, 'right', '', function (event, strAnswer) {
             if (strAnswer === 'Rename Folder') {
                 folderRename(element, target, strPath, strFolderName);
-                
+
             } else if (strAnswer === 'Delete Folder') {
                 folderDelete(element, target, strPath, strFolderName);
             }
         });
     }
-    
+
     function folderRename(element, target, strOldPath, strFolderName) {
         'use strict';
         var templateElement = document.createElement('template');
-        
+
         templateElement.setAttribute('data-overlay-close', 'true');
         templateElement.setAttribute('data-max-width', '250px');
         templateElement.innerHTML = ml(function () {/*
@@ -24346,19 +24346,19 @@ window.addEventListener('design-register-element', function () {
                 </gs-grid>
             </gs-body>
         */});
-        
+
         GS.openDialogToElement(target, templateElement, 'right', function () {
             document.getElementById('gs-file-manager-text-folder-name').value = strFolderName;
-            
+
         }, function (event, strAnswer) {
             var strNewPath;
-            
+
             if (strAnswer === 'Rename') {
                 strNewPath = getPath(element) + document.getElementById('gs-file-manager-text-folder-name').value;
-                
+
                 //console.log('strOldPath:', strOldPath);
                 //console.log('strNewPath:', strNewPath);
-                
+
                 GS.requestFromSocket(GS.envSocket
                                    , 'FILE\tMOVE\t' + GS.encodeForTabDelimited(strOldPath) + '\t' +
                                                       GS.encodeForTabDelimited(strNewPath) + '\n'
@@ -24374,11 +24374,11 @@ window.addEventListener('design-register-element', function () {
             }
         });
     }
-    
+
     function folderDelete(element, target, strPath, strFolderName) {
         'use strict';
         var templateElement = document.createElement('template');
-        
+
         templateElement.setAttribute('data-overlay-close', 'true');
         templateElement.setAttribute('data-max-width', '250px');
         templateElement.innerHTML = ml(function () {/*
@@ -24391,11 +24391,11 @@ window.addEventListener('design-register-element', function () {
                 </gs-grid>
             </gs-body>
         */}).replace(/\{\{STRPATH\}\}/gi, strFolderName);
-        
+
         GS.openDialogToElement(target, templateElement, 'right', '', function (event, strAnswer) {
             if (strAnswer === 'Yes') {
                 //console.log('Delete:', strPath);
-                
+
                 GS.requestFromSocket(GS.envSocket
                                    , 'FILE\tDELETE\t' + GS.encodeForTabDelimited(strPath) + '\n'
                                    , function (data, error, errorData) {
@@ -24410,11 +24410,11 @@ window.addEventListener('design-register-element', function () {
             }
         });
     }
-    
+
     function newFolder(element, target) {
         'use strict';
         var templateElement = document.createElement('template');
-        
+
         templateElement.setAttribute('data-overlay-close', 'true');
         templateElement.setAttribute('data-max-width', '250px');
         templateElement.innerHTML = ml(function () {/*
@@ -24428,14 +24428,14 @@ window.addEventListener('design-register-element', function () {
                 </gs-grid>
             </gs-body>
         */});
-        
+
         GS.openDialogToElement(target, templateElement, 'down', '', function (event, strAnswer) {
             var strPath;
-            
+
             if (strAnswer === 'Create') {
                 strPath = getPath(element) + document.getElementById('gs-file-manager-text-folder-name').value;
                 //console.log('Create:', strPath);
-                
+
                 GS.requestFromSocket(GS.envSocket
                                    , 'FILE\tCREATE_FOLDER\t' + GS.encodeForTabDelimited(strPath) + '\n'
                                    , function (data, error, errorData) {
@@ -24450,25 +24450,25 @@ window.addEventListener('design-register-element', function () {
             }
         });
     }
-    
+
     function folderOpen(element, target) {
         'use strict';
         var lineElement = GS.findParentElement(target, '.folder-line');
-        
+
         element.arrPath.push(lineElement.getAttribute('data-name'));
         getData(element);
     }
-    
+
     function backFolder(element, target) {
         'use strict';
         element.arrPath.pop();
         getData(element);
     }
-    
+
     // ################################################################################################
     // ######################################## FILE FUNCTIONS ########################################
     // ################################################################################################
-    
+
     function fileMenu(element, target) {
         'use strict';
         var lineElement = GS.findParentElement(target, '.file-line')
@@ -24477,9 +24477,9 @@ window.addEventListener('design-register-element', function () {
           //, strFileExtension = strFileName.substring(intPeriodIndex)
           , strPath = getPath(element) + strFileName
           , templateElement = document.createElement('template');
-        
+
         //console.log(strFileExtension);
-        
+
         templateElement.setAttribute('data-overlay-close', 'true');
         templateElement.setAttribute('data-max-width', '250px');
         templateElement.innerHTML = ml(function () {/*
@@ -24491,24 +24491,24 @@ window.addEventListener('design-register-element', function () {
                 <gs-button dialogclose>Cancel</gs-button>
             </gs-body>
         */});
-        
+
         GS.openDialogToElement(target, templateElement, 'right', '', function (event, strAnswer) {
             if (strAnswer === 'Rename File') {
                 fileRename(element, target, strPath, strFileName);
-                
+
             } else if (strAnswer === 'Delete File') {
                 fileDelete(element, target, strPath, strFileName);
-                
+
             } else if (strAnswer === 'Edit File') {
                 fileEdit(element, target, strPath, strFileName);
             }
         });
     }
-    
+
     function fileRename(element, target, strOldPath, strFileName) {
         'use strict';
         var templateElement = document.createElement('template');
-        
+
         templateElement.setAttribute('data-overlay-close', 'true');
         templateElement.setAttribute('data-max-width', '250px');
         templateElement.innerHTML = ml(function () {/*
@@ -24522,19 +24522,19 @@ window.addEventListener('design-register-element', function () {
                 </gs-grid>
             </gs-body>
         */});
-        
+
         GS.openDialogToElement(target, templateElement, 'right', function () {
             document.getElementById('gs-file-manager-text-file-name').value = strFileName;
-            
+
         }, function (event, strAnswer) {
             var strNewPath;
-            
+
             if (strAnswer === 'Rename') {
                 strNewPath = getPath(element) + document.getElementById('gs-file-manager-text-file-name').value;
-                
+
                 //console.log('strOldPath:', strOldPath);
                 //console.log('strNewPath:', strNewPath);
-                
+
                 GS.requestFromSocket(GS.envSocket
                                    , 'FILE\tMOVE\t' + GS.encodeForTabDelimited(strOldPath) + '\t' +
                                                       GS.encodeForTabDelimited(strNewPath) + '\n'
@@ -24550,11 +24550,11 @@ window.addEventListener('design-register-element', function () {
             }
         });
     }
-    
+
     function fileDelete(element, target, strPath, strFileName) {
         'use strict';
         var templateElement = document.createElement('template');
-        
+
         templateElement.setAttribute('data-overlay-close', 'true');
         templateElement.setAttribute('data-max-width', '250px');
         templateElement.innerHTML = ml(function () {/*
@@ -24567,11 +24567,11 @@ window.addEventListener('design-register-element', function () {
                 </gs-grid>
             </gs-body>
         */}).replace(/\{\{STRPATH\}\}/gi, strFileName);
-        
+
         GS.openDialogToElement(target, templateElement, 'right', '', function (event, strAnswer) {
             if (strAnswer === 'Yes') {
                 //console.log('Delete:', strPath);
-                
+
                 GS.requestFromSocket(GS.envSocket
                                    , 'FILE\tDELETE\t' + GS.encodeForTabDelimited(strPath) + '\n'
                                    , function (data, error, errorData) {
@@ -24586,16 +24586,16 @@ window.addEventListener('design-register-element', function () {
             }
         });
     }
-    
+
     function fileEdit(element, target, strPath, strFileName) {
         'use strict';
         window.open('/env/app/all/file_manager/file_edit.html?socket=true&link=' + encodeURIComponent(strPath));
     }
-    
+
     function newFile(element, target) {
         'use strict';
         var templateElement = document.createElement('template');
-        
+
         templateElement.setAttribute('data-overlay-close', 'true');
         templateElement.setAttribute('data-max-width', '250px');
         templateElement.innerHTML = ml(function () {/*
@@ -24609,17 +24609,17 @@ window.addEventListener('design-register-element', function () {
                 </gs-grid>
             </gs-body>
         */});
-        
+
         GS.openDialogToElement(target, templateElement, 'down', '', function (event, strAnswer) {
             var strPath;
             var strName = document.getElementById('gs-file-manager-text-file-name').value || '';
-            
+
             //console.log('Name:', strName);
-            
+
             if (strAnswer === 'Create' && strName) {
                 strPath = getPath(element) + strName;
                 //console.log('Create:', strPath);
-                
+
                 if (document.getElementById('gs-file-manager-text-file-name').value.trim()) {
                     GS.requestFromSocket(GS.envSocket
                                        , 'FILE\tCREATE_FILE\t' + GS.encodeForTabDelimited(strPath) + '\n'
@@ -24636,160 +24636,19 @@ window.addEventListener('design-register-element', function () {
             }
         });
     }
-    
+
     function fileOpen(element, target) {
         'use strict';
         var lineElement = GS.findParentElement(target, '.file-line');
-        
+
         window.open(location.protocol + '//' + location.host + getRealPath(element) + '' + lineElement.getAttribute('data-name'));
     }
-    
-    function fileUpload(element, target) {
-        var templateElement = document.createElement('template');
-        var strHTML;
-        
-        strHTML = ml(function () {/*
-            <gs-page>
-                <gs-header><center><h3>Upload a File</h3></center></gs-header>
-                <gs-body padded>
-                    <form class="upload-form" action="/env/upload" method="POST" target="upload_response_gs_folder"
-                                enctype="multipart/form-data">
-                        <label>File:</label>
-                        <gs-text class="upload-file" name="file_content" type="file"></gs-text>
-                    */});
-        
-        if (element.hasAttribute('upload-choose-file-name')) {
-            strHTML += ml(function () {/*
-                        <br />
-                        <label>File Name:</label>
-                        <gs-text class="upload-name" disabled autocorrect="off" autocapitalize="off" autocomplete="off" spellcheck="false"></gs-text>
-            */});
-        } else {
-            strHTML += ml(function () {/*
-                        <gs-text class="upload-name" hidden></gs-text>
-            */});
-        }
-        
-        strHTML +=  ml(function () {/*
-                        <input class="upload-path" name="file_name" hidden />
-                    </form>
-                    <iframe class="upload-frame" name="upload_response_gs_folder" hidden></iframe>
-                </gs-body>
-                <gs-footer>
-                    <gs-grid>
-                        <gs-block><gs-button dialogclose>Cancel</gs-button></gs-block>
-                        <gs-block><gs-button class="upload-button">Upload File</gs-button></gs-block>
-                    </gs-grid>
-                </gs-footer>
-            </gs-page>
-        */});
 
-        templateElement.innerHTML = strHTML;
 
-        GS.openDialog(templateElement, function () {
-            var dialog = this,
-                formElement = xtag.query(dialog, '.upload-form')[0],
-                fileControl = xtag.query(dialog, '.upload-file')[0],
-                nameControl = xtag.query(dialog, '.upload-name')[0],
-                pathControl = xtag.query(dialog, '.upload-path')[0],
-                uploadButton = xtag.query(dialog, '.upload-button')[0],
-                responseFrame = xtag.query(dialog, '.upload-frame')[0],
-                strFileExtension;
-            
-            // upload existing file
-            uploadButton.addEventListener('click', function(event) {
-                var strFile = fileControl.value
-                  , strName = nameControl.value;
-                
-                //console.log(element.innerPath + nameControl.value);
-                pathControl.setAttribute('value', getPath(element) + nameControl.value + '.' + strFileExtension);
-                
-                if (strName === '' && strFile === '') { // no values (no file and no file name)
-                    GS.msgbox('Error', 'No values in form. Please fill in the form.', 'okonly');
-                    
-                } else if (strFile === '') { // one value missing (no file)
-                    GS.msgbox('Error', 'No file selected. Please select a file using the file input.', 'okonly');
-                    
-                } else if (strName === '') { // one value missing (no file name)
-                    GS.msgbox('Error', 'No value in file path textbox. Please fill in file name textbox.', 'okonly');
-                    
-                } else { // values are filled in submit the form
-                    responseFrame.loadListen = true;
-                    formElement.submit();
-                    GS.addLoader('file-upload', 'Uploading file...');
-                }
-            });
-            
-            fileControl.addEventListener('change', function(event) {
-                var strValue = this.value;
-                
-                strFileExtension = strValue.substring(strValue.lastIndexOf('.') + 1);
-                
-                nameControl.removeAttribute('disabled');
-                nameControl.value = strValue.substring(strValue.lastIndexOf('\\') + 1, strValue.lastIndexOf('.')) || 'filename';
-                nameControl.focus();
-            });
-            
-            nameControl.addEventListener('keydown', function(event) {
-                if (event.keyCode === 13) {
-                    GS.triggerEvent('click', uploadButton);
-                }
-            });
-            
-            // response frame binding
-            responseFrame.addEventListener('load', function (event) {
-                var strResponseText = responseFrame.contentWindow.document.body.textContent,
-                    jsnResponse, strResponse, bolError, strError;
-                
-                if (responseFrame.loadListen === true) {
-                    // get error text
-                    try {
-                        jsnResponse = JSON.parse(strResponseText);
-                        
-                    } catch (err) {
-                        strResponse = strResponseText;
-                    }
-                    
-                    if (strResponse.trim() === 'Upload Succeeded') {
-                        GS.closeDialog(dialog, 'cancel');
-                    } else {
-                        if (jsnResponse) {
-                            if (jsnResponse.stat === true) {
-                                bolError = false;
-                            } else {
-                                bolError = true;
-                                if (jsnResponse.dat && jsnResponse.dat.error) {
-                                    strError = jsnResponse.dat.error;
-                                } else {
-                                    strError = jsnResponse.dat;
-                                }
-                            }
-                        } else {
-                            bolError = true;
-                            strError = strResponse;
-                        }
-                        
-                        // if no error destroy new file popup
-                        if (!bolError) {
-                            GS.closeDialog(dialog, 'cancel');
-                            
-                        // if error open error popup
-                        } else {
-                            GS.msgbox('Error', strError, 'okonly');
-                        }
-                    }
-                    
-                    getData(element);
-                    GS.removeLoader('file-upload');
-                }
-            });
-        });
-    }
-    
     // ################################################################################################
     // ############################################# XTAG #############################################
     // ################################################################################################
-    
+
     function elementInserted(element) {
         // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
         if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
@@ -24798,38 +24657,38 @@ window.addEventListener('design-register-element', function () {
                 element.inserted = true;
                 element.internal = {};
                 saveDefaultAttributes(element);
-                
+
                 prepareElement(element);
                 bindElement(element);
-                
-                //// if no "qs" set or "qs" key set in query string <- non-standard behaviour, you could want 
+
+                //// if no "qs" set or "qs" key set in query string <- non-standard behaviour, you could want
                 //if ((!element.hasAttribute('qs') || GS.qryGetVal(GS.getQueryString(), element.getAttribute('qs')))) {
                 //    getData(element);
                 //}
-                
+
                 getData(element);
                 //pushReplacePopHandler(element);
             }
         }
     }
-    
+
     xtag.register('gs-folder', {
         lifecycle: {
             inserted: function () {
                 elementInserted(this);
             },
-            
+
             attributeChanged: function (strAttrName, oldValue, newValue) {
                 // if "suspend-created" has been removed: run created and inserted code
                 if (strAttrName === 'suspend-created' && newValue === null) {
                     elementInserted(this);
-                    
+
                 // if "suspend-inserted" has been removed: run inserted code
                 } else if (strAttrName === 'suspend-inserted' && newValue === null) {
                     elementInserted(this);
-                    
+
                 } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
-                    
+
                 }
             }
         },
@@ -24840,32 +24699,32 @@ window.addEventListener('design-register-element', function () {
 }());
 window.addEventListener('design-register-element', function () {
     'use strict';
-    
+
     registerDesignSnippet('<gs-font>', '<gs-font>', 'gs-font min-width="${1}">\n' +
                                                     '    ${0}\n' +
                                                     '</gs-font>');
-    
+
     designRegisterElement('gs-font', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-font.html');
-    
+
     window.designElementProperty_GSFONT = function (selectedElement) {
         addProp('Min-Width Media', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('min-width') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'min-width', this.value);
         });
-        
+
         addProp('Media', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('media') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'media', this.value);
         });
-        
+
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
-        
+
         // SUSPEND-INSERTED attribute
         addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-inserted', this.value === 'true', true);
         });
-        
+
         // visibility attributes
         var strVisibilityAttribute = '';
         if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
@@ -24875,7 +24734,7 @@ window.addEventListener('design-register-element', function () {
         if (selectedElement.hasAttribute('show-on-desktop'))   { strVisibilityAttribute = 'show-on-desktop'; }
         if (selectedElement.hasAttribute('show-on-tablet'))    { strVisibilityAttribute = 'show-on-tablet'; }
         if (selectedElement.hasAttribute('show-on-phone'))     { strVisibilityAttribute = 'show-on-phone'; }
-        
+
         addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                         '<option value="">Visible</option>' +
                                         '<option value="hidden">Invisible</option>' +
@@ -24893,14 +24752,14 @@ window.addEventListener('design-register-element', function () {
             selectedElement.removeAttribute('show-on-desktop');
             selectedElement.removeAttribute('show-on-tablet');
             selectedElement.removeAttribute('show-on-phone');
-            
+
             if (this.value) {
                 selectedElement.setAttribute(this.value, '');
             }
-            
+
             return selectedElement;
         });
-        
+
         //addFlexContainerProps(selectedElement);
         addFlexProps(selectedElement);
     };
@@ -24909,25 +24768,25 @@ window.addEventListener('design-register-element', function () {
 document.addEventListener('DOMContentLoaded', function () {
     'use strict';
     var arrTakenFonts = [];
-    
+
     // dont do anything that modifies the element here
     function elementCreated(element) {
         // if "created" hasn't been suspended: run created code
         if (!element.hasAttribute('suspend-created')) {
-            
+
         }
     }
-    
+
     //
     function elementInserted(element) {
         var styleElement;
-        
+
         // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
         if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
             // if this is the first time inserted has been run: continue
             if (!element.inserted) {
                 element.inserted = true;
-                
+
                 // if the style element for the container CSS doesn't exist: create it
                 if (!document.getElementById('gs-dynamic-css')) {
                     styleElement = document.createElement('style');
@@ -24935,7 +24794,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     styleElement.setAttribute('gs-dynamic', '');
                     document.head.appendChild(styleElement);
                 }
-                
+
                 if (element.getAttribute('min-width')) {
                     element.handleMinWidthCSS();
                 } else if (element.getAttribute('media')) {
@@ -24944,32 +24803,32 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     }
-    
+
     xtag.register('gs-font', {
         lifecycle: {
             created: function () {
                 elementCreated(this);
             },
-            
+
             inserted: function () {
                 elementInserted(this);
             },
-            
+
             attributeChanged: function (strAttrName, oldValue, newValue) {
                 // if "suspend-created" has been removed: run created and inserted code
                 if (strAttrName === 'suspend-created' && newValue === null) {
                     elementCreated(this);
                     elementInserted(this);
-                    
+
                 // if "suspend-inserted" has been removed: run inserted code
                 } else if (strAttrName === 'suspend-inserted' && newValue === null) {
                     elementInserted(this);
-                    
+
                 } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
                     // if the "min-width" attribute changed
                     if (strAttrName === 'min-width') {
                         this.handleMinWidthCSS();
-                        
+
                     // if the "media" attribute changed
                     } else if (strAttrName === 'media') {
                         this.handleMediaCSS();
@@ -24983,110 +24842,110 @@ document.addEventListener('DOMContentLoaded', function () {
             handleMinWidthCSS: function () {
                 var strMinWidth = this.getAttribute('min-width'), arrMinWidths, strCSS, i, len, arrClassesToRemove, intContainerID,
                     arrParts, strMedia, strResult;
-                
+
                 // remove old classes
                 arrClassesToRemove = String(this.classList).match(/font-id-[0-9]*/g) || [];
-                
+
                 for (i = 0, len = arrClassesToRemove.length; i < len; i += 1) {
                     this.classList.remove(arrClassesToRemove[i]);
                 }
-                
+
                 // all {15px}; lrg {25px};
                 // all {15px}; lrg {25px};
                 // all {20px}; sml {25px}; med {30px}; lrg {35px};
-                
+
                 // all close curly braces, remove all whitespace, lowercase, trim off semicolons
                 strMinWidth = GS.trim(strMinWidth.replace(/\}/g, '').replace(/\s+/g, '').toLowerCase(), ';');
-                
+
                 // replace shortcuts (lrg => 1200px)
                 strMinWidth = strMinWidth.replace(/all/g, '0px')
                                          .replace(/small|sml/g, '768px')
                                          .replace(/medium|med/g, '992px')
                                          .replace(/large|lrg/g, '1200px');
-                
+
                 arrMinWidths = strMinWidth.split(';'); // seperate out layouts
-                
+
                 //console.log(strMinWidth, arrMinWidths);
-                
+
                 if (arrTakenFonts.indexOf(strMinWidth) === -1) {
                     arrTakenFonts.push(strMinWidth);
                     intContainerID = arrTakenFonts.length - 1;
                     strCSS = '';
-                    
+
                     for (i = 0, len = arrMinWidths.length; i < len; i += 1) {
                         arrParts = arrMinWidths[i].split('{');
                         strMedia = arrParts[0];
                         strResult = arrParts[1];
-                        
+
                         strCSS +=   '\n@media (min-width:' + strMedia + ') {\n' +
                                     '    gs-font.font-id-' + intContainerID + ' { font-size:' + strResult + '; }\n' +
                                     '}\n';
                     }
-                    
+
                     //console.log(strCSS);
-                    
+
                     // append the column CSS
                     document.getElementById('gs-dynamic-css').innerHTML += '\n/* font #' + intContainerID + ' */\n' + strCSS;
-                    
+
                 } else {
                     intContainerID = arrTakenFonts.indexOf(strMinWidth);
                 }
-                
+
                 this.classList.add('font-id-' + intContainerID);
             },
-            
+
             handleMediaCSS: function () {
                 var strMedia = this.getAttribute('media'), arrMedias, strCSS, i, len,
                     arrClassesToRemove, arrParts, strCurrentMedia, strWidth, intContainerID;
-                
+
                 // remove old classes
                 arrClassesToRemove = String(this.classList).match(/font-id-[0-9]*/g) || [];
-                
+
                 for (i = 0, len = arrClassesToRemove.length; i < len; i += 1) {
                     this.classList.remove(arrClassesToRemove[i]);
                 }
-                
+
                 // print {20px}; all and (max-width: 500px) {20px}; (min-width: 500px) {25px};
-                
+
                 // trim, remove all close curly braces, lowercase, trim off semicolons
                 strMedia = GS.trim(strMedia.trim().replace(/\}/g, '').toLowerCase(), ';');
-                
+
                 // replace shortcuts (lrg => 1200px)
                 strMedia = strMedia.replace(/all/g, '0px')
                                    .replace(/small|sml/g, '768px')
                                    .replace(/medium|med/g, '992px')
                                    .replace(/large|lrg/g, '1200px');
-                
+
                 arrMedias = strMedia.split(';'); // seperate out layouts
-                
+
                 //console.log(strMedia, arrMedias);
-                
+
                 if (arrTakenFonts.indexOf(strMedia) === -1) {
                     arrTakenFonts.push(strMedia);
                     intContainerID = arrTakenFonts.length - 1;
                     strCSS = '';
-                    
-                    
+
+
                     for (i = 0, len = arrMedias.length; i < len; i += 1) {
                         arrParts = arrMedias[i].split('{');
                         strCurrentMedia = arrParts[0].trim() || 'all';
                         strWidth = arrParts[1].trim() || '900px';
-                        
+
                         strCSS +=   '\n@media ' + strCurrentMedia + ' {\n' +
                                     '    gs-font.font-id-' + intContainerID + ' ' +
                                                 '{ font-size: ' + strWidth + '; }\n' +
                                     '}\n';
                     }
-                    
+
                     //console.log(strCSS);
-                    
+
                     // append the column CSS
                     document.getElementById('gs-dynamic-css').innerHTML += '\n/* font #' + intContainerID + ' */\n' + strCSS;
-                    
+
                 } else {
                     intContainerID = arrTakenFonts.indexOf(strMinWidth);
                 }
-                
+
                 this.classList.add('font-id-' + intContainerID);
             }
         }
@@ -25167,73 +25026,73 @@ document.addEventListener('DOMContentLoaded', function () {
 });//jslint white:true miltivar:true
 window.addEventListener('design-register-element', function () {
     'use strict';
-    
+
     registerDesignSnippet('<gs-form>', '<gs-form>', 'gs-form src="${1:test.tpeople}">\n' +
                                                     '    <template>\n' +
                                                     '        ${2}\n' +
                                                     '    </template>\n' +
                                                     '</gs-form>');
-    
+
     designRegisterElement('gs-form', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-form.html');
-    
+
     window.designElementProperty_GSFORM = function (selectedElement) {
         addProp('Source', true, '<gs-memo class="target" value="' + encodeHTML(decodeURIComponent(selectedElement.getAttribute('src') ||
                                                                                         selectedElement.getAttribute('source') || '')) + '" mini></gs-memo>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'src', encodeURIComponent(this.value));
         });
-        
+
         addProp('Columns', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('cols') || '') + '" mini></gs-text>',
                 function () {
             return setOrRemoveTextAttribute(selectedElement, 'cols', this.value);
         });
-        
+
         addProp('Where', true, '<gs-text class="target" value="' + encodeHTML(decodeURIComponent(selectedElement.getAttribute('where') || '')) + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'where', encodeURIComponent(this.value));
         });
-        
+
         addProp('Column In Querystring', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('qs') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'qs', this.value, false);
         });
-        
+
         addProp('Lock', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('lock') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'lock', this.value);
         });
-        
+
         addProp('Order By', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('ord') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'ord', this.value);
         });
-        
+
         addProp('Limit', true, '<gs-number class="target" value="' + encodeHTML(selectedElement.getAttribute('limit') || '') + '" mini></gs-number>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'limit', this.value);
         });
-        
+
         addProp('Offset', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('offset') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'offset', this.value);
         });
-        
+
         addProp('Save&nbsp;While&nbsp;Typing', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('save-while-typing')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'save-while-typing', (this.value === 'true'), true);
         });
-        
+
         addProp('Suppress<br />"No&nbsp;Record&nbsp;Found"<br />Error', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suppress-no-record-found')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suppress-no-record-found', (this.value === 'true'), true);
         });
-        
+
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
-        
+
         // SUSPEND-CREATED attribute
         addProp('suspend-created', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-created') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-created', this.value === 'true', true);
         });
-        
+
         // SUSPEND-INSERTED attribute
         addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-inserted', this.value === 'true', true);
         });
-        
+
         // visibility attributes
         var strVisibilityAttribute = '';
         if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
@@ -25243,7 +25102,7 @@ window.addEventListener('design-register-element', function () {
         if (selectedElement.hasAttribute('show-on-desktop'))   { strVisibilityAttribute = 'show-on-desktop'; }
         if (selectedElement.hasAttribute('show-on-tablet'))    { strVisibilityAttribute = 'show-on-tablet'; }
         if (selectedElement.hasAttribute('show-on-phone'))     { strVisibilityAttribute = 'show-on-phone'; }
-        
+
         addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                         '<option value="">Visible</option>' +
                                         '<option value="hidden">Invisible</option>' +
@@ -25261,24 +25120,24 @@ window.addEventListener('design-register-element', function () {
             selectedElement.removeAttribute('show-on-desktop');
             selectedElement.removeAttribute('show-on-tablet');
             selectedElement.removeAttribute('show-on-phone');
-            
+
             if (this.value) {
                 selectedElement.setAttribute(this.value, '');
             }
-            
+
             return selectedElement;
         });
-        
+
         addProp('Refresh On Querystring Columns', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('refresh-on-querystring-values') || '') + '" mini></gs-text>', function () {
             this.removeAttribute('refresh-on-querystring-change');
             return setOrRemoveTextAttribute(selectedElement, 'refresh-on-querystring-values', this.value);
         });
-        
+
         addProp('Refresh On Querystring Change', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('refresh-on-querystring-change')) + '" mini></gs-checkbox>', function () {
             this.removeAttribute('refresh-on-querystring-values');
             return setOrRemoveBooleanAttribute(selectedElement, 'refresh-on-querystring-change', this.value === 'true', true);
         });
-        
+
         addFlexContainerProps(selectedElement);
         addFlexProps(selectedElement);
     };
@@ -25286,18 +25145,18 @@ window.addEventListener('design-register-element', function () {
 
 document.addEventListener('DOMContentLoaded', function () {
     'use strict';
-    
+
     function triggerAfterUpdate(element) {
         GS.triggerEvent(element, 'after_update');
         if (element.hasAttribute('afterupdate')) {
             new Function(element.getAttribute('afterupdate')).apply(element);
         }
     }
-    
+
     // ##################################################################
     // ######################## UPDATE FUNCTIONS ########################
     // ##################################################################
-    
+
     function emergencyUpdate(element) {
         if (element.currentSaveAjax) {
             element.currentSaveAjax.abort();
@@ -25305,7 +25164,7 @@ document.addEventListener('DOMContentLoaded', function () {
         element.bolCurrentlySaving = false;
         updateDataWithoutTemplate(element, false);
     }
-    
+
     function updateData(element, updateElement, strColumn, newValue) {
         var data, parentRecord, strID, strHash
           , srcParts = GS.templateWithQuerystring(element.getAttribute('src')).split('.')
@@ -25314,23 +25173,23 @@ document.addEventListener('DOMContentLoaded', function () {
           , strReturnCols = element.arrColumns.join('\t')
           , strHashCols = element.lockColumn
           , updateFrameData, strRoles, strColumns, arrTotalRecords = [];
-        
+
         parentRecord = GS.findParentElement(updateElement, '.form-record');
-        
+
         strID = parentRecord.getAttribute('data-id');
         strHash = CryptoJS.MD5(parentRecord.getAttribute('data-' + element.lockColumn)).toString();
-        
+
         strRoles   = 'pk\thash\tset';
         strColumns = 'id\thash\t' + GS.encodeForTabDelimited(strColumn);
         updateFrameData = strID + '\t' + strHash + '\t' + GS.encodeForTabDelimited(newValue);
-        
+
         updateFrameData = (strRoles + '\n' + strColumns + '\n' + updateFrameData);
         GS.triggerEvent(element, 'before_update');
-        
+
         GS.requestUpdateFromSocket(
             GS.envSocket, strSchema, strObject
           , strReturnCols, strHashCols, updateFrameData
-            
+
           , function (data, error, transactionID) {
                 if (error) {
                     getData(element);
@@ -25340,26 +25199,26 @@ document.addEventListener('DOMContentLoaded', function () {
             }
           , function (data, error, transactionID, commitFunction, rollbackFunction) {
                 GS.removeLoader(element);
-                
+
                 if (!error) {
                     if (data === 'TRANSACTION COMPLETED') {
                         commitFunction();
                     } else {
                         var arrRecords, arrCells, i, len, cell_i, cell_len;
-                        
+
                         arrRecords = GS.trim(data, '\n').split('\n');
-                        
+
                         for (i = 0, len = arrRecords.length; i < len; i += 1) {
                             arrCells = arrRecords[i].split('\t');
-                            
+
                             for (cell_i = 0, cell_len = arrCells.length; cell_i < cell_len; cell_i += 1) {
                                 arrCells[cell_i] = arrCells[cell_i] === '\\N' ? null : GS.decodeFromTabDelimited(arrCells[cell_i]);
                             }
-                            
+
                             arrTotalRecords.push(arrCells);
                         }
                     }
-                    
+
                 } else {
                     rollbackFunction();
                     getData(element);
@@ -25368,23 +25227,23 @@ document.addEventListener('DOMContentLoaded', function () {
             }
           , function (strAnswer, data, error) {
                 GS.removeLoader(element);
-                
+
                 if (!error) {
                     if (strAnswer === 'COMMIT') {
                         var idIndex, i, len;
-                        
+
                         idIndex = element.lastSuccessData.arr_column.indexOf('id');
-                        
+
                         for (i = 0, len = element.lastSuccessData.dat.length; i < len; i += 1) {
                             if (String(element.lastSuccessData.dat[i][idIndex]) === strID) {
                                 element.lastSuccessData.dat[i] = arrTotalRecords[0];
                                 break;
                             }
                         }
-                        
+
                         triggerAfterUpdate(element);
                         handleData(element, element.lastSuccessData);
-                        
+
                         GS.triggerEvent(element, 'after_update');
                     } else {
                         getData(element);
@@ -25396,7 +25255,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         );
     }
-    
+
     function updateDataWithoutTemplate(element, bolErrorHandling) {
         if (element.bolCurrentlySaving === false && !element.bolErrorOpen) {
             var data, parentRecord, strID, strHash
@@ -25406,45 +25265,45 @@ document.addEventListener('DOMContentLoaded', function () {
               , strReturnCols = element.arrColumns.join('\t')
               , strHashCols = element.lockColumn
               , updateFrameData, strRoles, strColumns, arrTotalRecords = [], functionUpdateRecord, col_key, key, strColumn, newValue, idIndex, i, len;
-            
+
             functionUpdateRecord = function (strID, strColumn, recordIndex, strParameters) {
                 var strWhere, strChangeStamp, strValue;
-                
+
                 element.bolCurrentlySaving = true;
                 element.jsnUpdate[strID][strColumn] = undefined;
-                
+
                 // run ajax
                 removeMessage(element, 'waiting');
                 addMessage(element, 'saving');
                 element.state = 'saving';
-                
+
                 strWhere        = GS.qryGetVal(strParameters, 'where');
                 strColumn       = GS.qryGetVal(strParameters, 'column');
                 strValue        = GS.qryGetVal(strParameters, 'value');
-                
+
                 strID           = GS.qryGetVal(strWhere,      'id');
                 strChangeStamp  = GS.qryGetVal(strWhere,      element.lockColumn);
-                
+
                 strHash = CryptoJS.MD5(strChangeStamp).toString();
-                
+
                 //parentRecord = GS.findParentElement(updateElement, '.form-record');
-                
+
                 strRoles   = 'pk\thash\tset';
                 strColumns = 'id\thash\t' + GS.encodeForTabDelimited(strColumn);
                 updateFrameData = strID + '\t' + strHash + '\t' + GS.encodeForTabDelimited(strValue);
-                
+
                 updateFrameData = (strRoles + '\n' + strColumns + '\n' + updateFrameData);
-                
-                
-                
+
+
+
                 //console.log(strParameters);
                 //console.log(updateFrameData);
                 //console.log(strSchema, strObject, strReturnCols, strHashCols);
-                
+
                 GS.requestUpdateFromSocket(
                     GS.envSocket, strSchema, strObject
                   , strReturnCols, strHashCols, updateFrameData
-                    
+
                   , function (data, error, transactionID) {
                         if (error) {
                             getData(element);
@@ -25457,20 +25316,20 @@ document.addEventListener('DOMContentLoaded', function () {
                                 commitFunction();
                             } else {
                                 var arrRecords, arrCells, i, len, cell_i, cell_len;
-                                
+
                                 arrRecords = GS.trim(data, '\n').split('\n');
-                                
+
                                 for (i = 0, len = arrRecords.length; i < len; i += 1) {
                                     arrCells = arrRecords[i].split('\t');
-                                    
+
                                     for (cell_i = 0, cell_len = arrCells.length; cell_i < cell_len; cell_i += 1) {
                                         arrCells[cell_i] = arrCells[cell_i] === '\\N' ? null : GS.decodeFromTabDelimited(arrCells[cell_i]);
                                     }
-                                    
+
                                     arrTotalRecords.push(arrCells);
                                 }
                             }
-                            
+
                         } else {
                             rollbackFunction();
                             getData(element);
@@ -25481,14 +25340,14 @@ document.addEventListener('DOMContentLoaded', function () {
                         var col_key, key, bolSaveWaiting;
                         removeMessage(element, 'saving');
                         element.state = 'saved';
-                        
+
                         GS.removeLoader(element);
-                        
+
                         if (!error) {
                             if (strAnswer === 'COMMIT') {
                                 element.lastSuccessData.dat[recordIndex] = arrTotalRecords[0];
                                 element.bolCurrentlySaving = false;
-                                
+
                                 // if there is another save in the pipeline: bolSaveWaiting = true
                                 for (key in element.jsnUpdate) {
                                     for (col_key in element.jsnUpdate[key]) {
@@ -25498,11 +25357,11 @@ document.addEventListener('DOMContentLoaded', function () {
                                         }
                                     }
                                 }
-                                
+
                                 // if there is a save waiting: update again
                                 if (bolSaveWaiting) {
                                     updateDataWithoutTemplate(element);
-                                    
+
                                 } else {
                                     triggerAfterUpdate(element);
                                 }
@@ -25515,10 +25374,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 );
             };
-            
+
             // loop through the jsnUpdate variable and make one update for every record that needs an update
             console.log(JSON.stringify(element.jsnUpdate));
-            
+
             for (key in element.jsnUpdate) {
                 for (col_key in element.jsnUpdate[key]) {
                     if (element.jsnUpdate[key][col_key] !== undefined) {
@@ -25526,7 +25385,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         strColumn = col_key;
                         newValue = element.jsnUpdate[key][col_key];
                         idIndex = element.lastSuccessData.arr_column.indexOf('id');
-                        
+
                         for (i = 0, len = element.lastSuccessData.dat.length; i < len; i += 1) {
                             if (String(element.lastSuccessData.dat[i][idIndex]) === strID) {
                                 functionUpdateRecord(strID, strColumn, i,
@@ -25536,23 +25395,23 @@ document.addEventListener('DOMContentLoaded', function () {
                                             ) +
                                             '&column=' + strColumn +
                                             '&value=' +  encodeURIComponent(newValue));
-                                
+
                                 break;
                             }
                         }
-                        
+
                         break;
                     }
                 }
             }
         }
     }
-    
-    
+
+
     // #################################################################
     // ######################### DATA HANDLING #########################
     // #################################################################
-    
+
     // handles fetching the data
     //      if bolInitalLoad === true then
     //          use: initialize query COALESCE TO source query
@@ -25569,29 +25428,29 @@ document.addEventListener('DOMContentLoaded', function () {
           , strLimit   = GS.templateWithQuerystring(element.getAttribute('limit') || '1')
           , strOffset  = GS.templateWithQuerystring(element.getAttribute('offset') || '')
           , response_i = 0, response_len = 0, arrTotalRecords = [];
-        
+
         GS.triggerEvent(element, 'before_select');
         GS.requestSelectFromSocket(GS.envSocket, strSchema, strObject, strColumns
                                  , strWhere, strOrd, strLimit, strOffset
                                  , function (data, error) {
             var arrRecords, arrCells, i, len, cell_i, cell_len;
-            
+
             if (!error) {
                 if (data.strMessage !== 'TRANSACTION COMPLETED') {
                     arrRecords = GS.trim(data.strMessage, '\n').split('\n');
-                    
+
                     for (i = 0, len = arrRecords.length; i < len; i += 1) {
                         arrCells = arrRecords[i].split('\t');
-                        
+
                         for (cell_i = 0, cell_len = arrCells.length; cell_i < cell_len; cell_i += 1) {
                             arrCells[cell_i] = arrCells[cell_i] === '\\N' ? null : GS.decodeFromTabDelimited(arrCells[cell_i]);
                         }
-                        
+
                         arrTotalRecords.push(arrCells);
                     }
                 } else {
                     element.arrColumns = data.arrColumnNames;
-                    
+
                     handleData(element, {
                         "arr_column": data.arrColumnNames
                       , "dat": arrTotalRecords
@@ -25603,17 +25462,17 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
-    
-    // handles data result from method function: getData 
+
+    // handles data result from method function: getData
     //      success:  template
     //      error:    add error classes
     function handleData(element, data, error, strAction, failCallback) {
         var arrElements, i, len, arrHeaders = [], intColumnElementFocusNumber, jsnSelection, matchElement,
             templateElement = document.createElement('template'), focusTimerID, focusToElement, timer_i;
-        
+
         // clear any old error status
         element.classList.remove('error');
-        
+
         if (!error && data.dat.length === 0 && !element.hasAttribute('limit') && !element.hasAttribute('suppress-no-record-found')) {
             templateElement.setAttribute('data-theme', 'error');
             templateElement.innerHTML = ml(function () {/*
@@ -25630,30 +25489,30 @@ document.addEventListener('DOMContentLoaded', function () {
                     </gs-footer>
                 </gs-page>
             */});
-            
+
             GS.openDialog(templateElement, '', function (event, strAnswer) {
                 if (strAnswer === 'Try Again') {
                     element.refresh();
                 }
             });
         }
-        
+
         // if there was no error
         if (!error) {
             element.error = false;
-            
+
             // save success data
             element.lastSuccessData = data;
-            
+
             if (GS.findParentElement(document.activeElement, 'gs-form') === element) {
                 //console.log('Hey');
                 arrElements = xtag.query(element, '[column]');
                 matchElement = GS.findParentElement(document.activeElement, '[column]');
-                
+
                 if (document.activeElement.nodeName === 'INPUT' || document.activeElement.nodeName === 'TEXTAREA') {
                     jsnSelection = GS.getInputSelection(document.activeElement);
                 }
-                
+
                 if (matchElement) {
                     for (i = 0, len = arrElements.length; i < len; i += 1) {
                         if (arrElements[i] === matchElement) {
@@ -25663,29 +25522,29 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
             }
-            
+
             element.innerHTML = dataTemplateRecords(element, data);
-            
+
             // if template is not native: handle templates inside the form
             if (shimmed.HTMLTemplateElement) {
                 HTMLTemplateElement.bootstrap(element);
             }
-            
+
             // handle autofocus
             arrElements = xtag.query(element, '[autofocus]');
-            
+
             if (arrElements.length > 0 && !evt.touchDevice) {
                 arrElements[0].focus();
-                
+
                 if (arrElements.length > 1) {
                     console.warn('dialog Warning: Too many [autofocus] elements, defaulting to the first one. Please have only one [autofocus] element per form.');
                 }
             }
-            
+
             // if there is a intColumnElementFocusNumber: restore focus
             if (intColumnElementFocusNumber) {
                 arrElements = xtag.query(element, '[column]');
-                
+
                 //console.log(intColumnElementFocusNumber, jsnSelection);
                 //
                 //console.log('arrElements: ', arrElements);
@@ -25694,19 +25553,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 //console.log('jsnSelection: ', jsnSelection);
                 //
                 //console.log('element upgrade: ', arrElements[intColumnElementFocusNumber].__upgraded__);
-                
+
                 //console.log('1***');
                 if (arrElements.length > intColumnElementFocusNumber) {
                     //console.log('2***', document.activeElement);
                     focusToElement = arrElements[intColumnElementFocusNumber];
-                    
+
                     // if element registration is not shimmed, we can just focus into the target element
                     if (shimmed.registerElement === false) {
                         focusToElement.focus();
                         if (jsnSelection) {
                             GS.setInputSelection(document.activeElement, jsnSelection.start, jsnSelection.end);
                         }
-                        
+
                     // else, we have to check on a loop to see if the element has been upgraded,
                     //      the reason I need to use a loop here is because there is no event for
                     //      when an element is upgraded (if there was then 1000 custom elements
@@ -25729,51 +25588,51 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
             }
-            
+
             //console.log('current element', document.activeElement);
-            
+
             // trigger after_select
             GS.triggerEvent(element, 'after_select');
             //console.log(element, 'after_select');
-            
+
         // else there was an error: add error class, title attribute
         } else {
             element.error = true;
             element.classList.add('error');
-            
+
             element.innerHTML = 'This form encountered an error.'
-            
+
             //GS.ajaxErrorDialog(event.detail.response);
             GS.ajaxErrorDialog(data);
         }
     }
-    
-    
+
+
     function dataTemplateRecords(element, data) {
         var jsnTemplate, strRet;
-        
+
         jsnTemplate = GS.templateHideSubTemplates(element.templateHTML);
-        
+
         //console.log(jsnTemplate.templateHTML);
-        
+
         strRet = GS.templateWithEnvelopeData('<div class="form-record" ' + (data.dat.length === 1 ? 'style="height: 100%;" ' : '') +
                                                 'data-id="{{! row.id }}" data-' + element.lockColumn + '="{{! row.' + element.lockColumn + ' }}" gs-dynamic>' +
                                                 jsnTemplate.templateHTML +
                                             '</div>',
                                             data);
-        
+
         strRet = GS.templateShowSubTemplates(strRet, jsnTemplate);
-        
+
         //console.log(strRet);
-        
+
         return strRet;
     }
-    
-    
+
+
     // #################################################################
     // ########################### UTILITIES ###########################
     // #################################################################
-    
+
     function addMessage(element, strMessageName) {
         if (strMessageName === 'saving') {
             if (element.savingMessage) {
@@ -25782,9 +25641,9 @@ document.addEventListener('DOMContentLoaded', function () {
             element.savingMessage = document.createElement('div');
             element.savingMessage.classList.add('message');
             element.savingMessage.innerHTML = 'Saving...';
-            
+
             element.appendChild(element.savingMessage);
-            
+
         } else if (strMessageName === 'waiting') {
             if (element.waitingMessage) {
                 removeMessage(element, 'waiting');
@@ -25792,62 +25651,62 @@ document.addEventListener('DOMContentLoaded', function () {
             element.waitingMessage = document.createElement('div');
             element.waitingMessage.classList.add('message');
             element.waitingMessage.innerHTML = 'Waiting<br />to save...';
-            
+
             element.appendChild(element.waitingMessage);
         }
     }
-    
+
     function removeMessage(element, strMessageName) {
         if (strMessageName === 'saving' && element.savingMessage) {
             element.removeChild(element.savingMessage);
             element.savingMessage = undefined;
-            
+
         } else if (strMessageName === 'waiting' && element.waitingMessage) {
             element.removeChild(element.waitingMessage);
             element.waitingMessage = undefined;
         }
     }
-    
+
     function columnParentsUntilForm(form, element) {
         var intColumnParents = 0, currentElement = element, maxLoops = 50, i = 0;
-        
+
         while (currentElement.parentNode !== form && currentElement.parentNode && i < maxLoops) {
             if (currentElement.parentNode.hasAttribute('column') === true //If something with a column attribute
                 || currentElement.parentNode.hasAttribute('src') === true) { //or something with a src attribute
                 intColumnParents += 1;
             }
-            
+
             currentElement = currentElement.parentNode;
             i += 1;
         }
-        
+
         return intColumnParents;
     }
-    
+
     //function pushReplacePopHandler(element) {
     //    var i, len, arrPopKeys, bolRefresh = false, currentValue, strQueryString = GS.getQueryString(), strQSCol = element.getAttribute('qs');
-    //    
+    //
     //    if (strQSCol && GS.qryGetKeys(strQueryString).indexOf(strQSCol) > -1) {
     //        element.setAttribute('where', 'id=' + GS.qryGetVal(strQueryString, strQSCol));
     //        bolRefresh = true;
-    //        
+    //
     //    } else if (element.hasAttribute('refresh-on-querystring-values')) {
     //        arrPopKeys = element.getAttribute('refresh-on-querystring-values').split(/\s*,\s*/gim);
-    //        
+    //
     //        for (i = 0, len = arrPopKeys.length; i < len; i += 1) {
     //            currentValue = GS.qryGetVal(strQueryString, arrPopKeys[i]);
-    //            
+    //
     //            if (element.popValues[arrPopKeys[i]] !== currentValue) {
     //                bolRefresh = true;
     //            }
-    //            
+    //
     //            element.popValues[arrPopKeys[i]] = currentValue;
     //        }
-    //        
+    //
     //    } else if (element.hasAttribute('refresh-on-querystring-change')) {
     //        bolRefresh = true;
     //    }
-    //    
+    //
     //    if (bolRefresh) {
     //        element.refresh();
     //    }
@@ -25895,7 +25754,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 len = arrAttrParts.length;
                 while (i < len) {
                     strQSCol = arrAttrParts[i];
-    
+
                     if (strQSCol.indexOf('!=') !== -1) {
                         strOperator = '!=';
                         arrQSParts = strQSCol.split('!=');
@@ -25903,10 +25762,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         strOperator = '=';
                         arrQSParts = strQSCol.split('=');
                     }
-    
+
                     strQSCol = arrQSParts[0];
                     strQSAttr = arrQSParts[1] || arrQSParts[0];
-    
+
                     // if the key is not present or we've got the negator: go to the attribute's default or remove it
                     if (strOperator === '!=') {
                         // if the key is not present: add the attribute
@@ -25937,7 +25796,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             } else if (GS.qryGetKeys(strQS).indexOf(strQSCol) > -1) {
                 strQSValue = GS.qryGetVal(strQS, strQSCol);
-    
+
                 if (element.internal.bolQSFirstRun !== true) {
                     console.log(element.getAttribute('value'));
                     if (strQSValue !== '' || !element.getAttribute('value')) {
@@ -25950,19 +25809,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         }
-        
+
         // handle "refresh-on-querystring-values" and "refresh-on-querystring-change" attributes
         if (element.internal.bolQSFirstRun === true) {
             if (element.hasAttribute('refresh-on-querystring-values')) {
                 arrPopKeys = element.getAttribute('refresh-on-querystring-values').split(/\s*,\s*/gim);
-                
+
                 for (i = 0, len = arrPopKeys.length; i < len; i += 1) {
                     currentValue = GS.qryGetVal(strQS, arrPopKeys[i]);
-                    
+
                     if (element.popValues[arrPopKeys[i]] !== currentValue) {
                         bolRefresh = true;
                     }
-                    
+
                     element.popValues[arrPopKeys[i]] = currentValue;
                 }
             } else if (element.hasAttribute('refresh-on-querystring-change')) {
@@ -25971,34 +25830,34 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             if (element.hasAttribute('refresh-on-querystring-values')) {
                 arrPopKeys = element.getAttribute('refresh-on-querystring-values').split(/\s*,\s*/gim);
-                
+
                 for (i = 0, len = arrPopKeys.length; i < len; i += 1) {
                     element.popValues[arrPopKeys[i]] = GS.qryGetVal(strQS, arrPopKeys[i]);
                 }
             }
-            
+
             if (GS.getQueryString() || element.hasAttribute('refresh-on-querystring-change') || element.hasAttribute('src')) {
                 bolRefresh = true;
             }
         }
-        
+
         if (bolRefresh && element.hasAttribute('src')) {
             getData(element);
         } else if (bolRefresh && !element.hasAttribute('src')) {
             console.warn('gs-combo Warning: element has "refresh-on-querystring-values" or "refresh-on-querystring-change", but no "src".', element);
         }
-        
+
         element.internal.bolQSFirstRun = true;
     }
-    
+
     // dont do anything that modifies the element here
     function elementCreated(element) {
         // if "created" hasn't been suspended: run created code
         if (!element.hasAttribute('suspend-created')) {
-            
+
         }
     }
-    
+
     //
     function elementInserted(element) {
         // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
@@ -26011,13 +25870,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 element.inserted = true;
                 element.internal = {};
                 saveDefaultAttributes(element);
-                
+
                 var //templateElement = document.createElement('template'),
                     //templateElementSubTemplateSafe = document.createElement('template'),
                     firstChildElement = element.children[0],
                     //arrElements, i, len, arrColumnElement, arrTemplates,
                     strQueryString = GS.getQueryString(), changeHandler;
-                
+
                 // if this form has the "save-while-typing" attribute
                 if (element.hasAttribute('save-while-typing')) {
                     GS.addBeforeUnloadEvent(function () {
@@ -26032,39 +25891,39 @@ document.addEventListener('DOMContentLoaded', function () {
                         document.activeElement.blur();
                     });
                 }
-                
+
                 // lock attribute and defaulting
                 element.lockColumn = element.getAttribute('lock') || 'change_stamp';
-                
+
                 // if the first child is a template element: save its HTML
                 if (firstChildElement.nodeName === 'TEMPLATE') {
                     element.templateHTML = firstChildElement.innerHTML;
-                    
+
                 // else: save the innerHTML of the form and send a warning
                 } else {
                     console.warn('Warning: gs-form is now built to use a template element. ' +
                                  'Please use a template element to contain the template for this form. ' + // this warning was added: March 12th 2015
                                  'A fix has been included so that it is not necessary to use the template element, but that code may be removed at a future date.');
-                    
+
                     element.templateHTML = element.innerHTML;
                 }
-                
+
                 // if there is no HTML: throw an error
                 if (!element.templateHTML.trim()) { throw 'GS-FORM error: no template HTML.'; }
-                
+
                 if (element.templateHTML.indexOf('&gt;') > -1 || element.templateHTML.indexOf('&lt;') > -1) {
                     console.warn('GS-FORM WARNING: &gt; or &lt; detected in record template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
                 }
-                
+
                 // add a doT.js coded "value" attribute to any element with a "column" attribute but no "value" attribute
                 element.templateHTML = GS.templateColumnToValue(element.templateHTML);
-                
+
                 // handle "qs" attribute
                 if (element.getAttribute('qs') ||
                         element.getAttribute('refresh-on-querystring-values') ||
                         element.hasAttribute('refresh-on-querystring-change')) {
                     element.popValues = {};
-                    
+
                     //if (element.getAttribute('qs')) {
                     //    if (GS.qryGetVal(strQueryString, element.getAttribute('qs'))) {
                     //        element.setAttribute('where', 'id=' + GS.qryGetVal(strQueryString, element.getAttribute('qs')));
@@ -26072,25 +25931,25 @@ document.addEventListener('DOMContentLoaded', function () {
                     //        element.setAttribute('where', 'false');
                     //    }
                     //}
-                    
+
                     //if (GS.getQueryString() || element.hasAttribute('refresh-on-querystring-change')) {
                     pushReplacePopHandler(element);
                     //}
-                    
+
                     window.addEventListener('pushstate',    function () { pushReplacePopHandler(element); });
                     window.addEventListener('replacestate', function () { pushReplacePopHandler(element); });
                     window.addEventListener('popstate',     function () { pushReplacePopHandler(element); });
                 } else {
                     getData(element);
                 }
-                
+
                 element.addEventListener('keydown', function (event) {
                     var intKeyCode = event.which || event.keyCode, jsnSelection;
-                    
+
                     if (document.activeElement.nodeName === 'INPUT' || document.activeElement.nodeName === 'TEXTAREA') {
                         jsnSelection = GS.getInputSelection(event.target);
                     }
-                    
+
                     if ((intKeyCode === 37 && (!jsnSelection || jsnSelection.start === 0)) ||
                         (intKeyCode === 39 && (!jsnSelection || jsnSelection.end === event.target.value.length))) {
                         var focusToElement, i, len, arrElementsFocusable, currentElement;
@@ -26099,7 +25958,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             arrElementsFocusable = xtag.query(document, 'input:not([disabled]), ' +
                                 'select:not([disabled]), memo:not([disabled]), button:not([disabled]), ' +
                                 '[tabindex]:not([disabled]), [column]');
-                            
+
                             for (i = 0,len = arrElementsFocusable.length;i < len;i++) {
                                 currentElement = arrElementsFocusable[i];
                                 //console.log(currentElement === event.target, currentElement, event.target);
@@ -26120,7 +25979,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             arrElementsFocusable = xtag.query(document, 'input:not([disabled]), ' +
                                 'select:not([disabled]), memo:not([disabled]), button:not([disabled]), ' +
                                 '[tabindex]:not([disabled]), [column]');
-                            
+
                             for (i = 0,len = arrElementsFocusable.length;i < len;i++) {
                                 currentElement = arrElementsFocusable[i];
                                 if (currentElement === event.target) {
@@ -26133,96 +25992,96 @@ document.addEventListener('DOMContentLoaded', function () {
                                 }
                             }
                         }
-                        
+
                         //console.log('focusable', GS.isElementFocusable(focusToElement));
                         if (focusToElement && GS.isElementFocusable(focusToElement)) {
                             //console.log('focus');
                             event.preventDefault();
-                            
+
                             focusToElement.focus();
-                            
+
                             if (document.activeElement.nodeName === 'INPUT' || document.activeElement.nodeName === 'TEXTAREA') {
                                 GS.setInputSelection(document.activeElement, 0, document.activeElement.value.length);
                             }
                         }
                     }
                 });
-                
+
                 // bind save code
                 if (element.hasAttribute('save-while-typing')) {
                     element.bolCurrentlySaving = false;
                     element.jsnUpdate = {};
                     element.state = 'saved';
                     //element.currentSaveAjax = false;
-                    
+
                     // possible states:
                     //      'saved'
                     //      'waiting to save'
                     //      'saving'
-                    
+
                     // JSON object for holding columns to update
                     // on keydown, keyup, change add to JSON object
                     // keep updating until all columns have been saved (undefined marks an empty column)
-                    
+
                     changeHandler = function (event) {
                         var intKeyCode = event.which || event.keyCode, newValue,
                             targetColumnParent = GS.findParentElement(event.target, '[column]'),
                             parentRecordElement, strID;
-                        
+
                         //console.log(event.target, targetColumnParent);
-                        
+
                         if (targetColumnParent.getAttribute('column') && columnParentsUntilForm(element, targetColumnParent) === 0 &&
                             element.column(targetColumnParent.getAttribute('column')) !== targetColumnParent.value) {
-                            
+
                             //event.stopPropagation();
                             if (element.saveTimerID) {
                                 clearTimeout(element.saveTimerID);
                                 element.saveTimerID = undefined;
                             }
-                            
+
                             addMessage(element, 'waiting');
                             element.state = 'waiting to save';
-                            
+
                             if (targetColumnParent.value !== null && targetColumnParent.value !== null) {
                                 newValue = targetColumnParent.value;
                             } else {
                                 newValue = targetColumnParent.checked;
                             }
-                            
+
                             parentRecordElement = GS.findParentElement(targetColumnParent, '.form-record[data-id]');
                             strID = parentRecordElement.getAttribute('data-id');
-                            
+
                             if (!element.jsnUpdate[strID]) {
                                 element.jsnUpdate[strID] = element.jsnUpdate[strID] = {};
                             }
                             element.jsnUpdate[strID][targetColumnParent.getAttribute('column')] = newValue;
-                            
+
                             element.saveTimerID = setTimeout(function () {
                                 updateDataWithoutTemplate(element);
                                 element.saveTimerID = undefined;
                             }, 300);
                         }
                     };
-                    
+
                     element.addEventListener('keydown', changeHandler);
                     element.addEventListener('keyup', changeHandler);
                     element.addEventListener('change', changeHandler);
-                    
+
                 } else {
                     element.addEventListener('change', function (event) {
                         var newValue;
-                        
+
                         if (event.target.getAttribute('column')
                                 && columnParentsUntilForm(element, event.target) === 0
                                 && GS.findParentTag(event.target, 'gs-form') === element) {
                             //event.stopPropagation();
-                            
+
                             if (event.target.value !== null) {
                                 newValue = event.target.value;
                             } else {
                                 newValue = event.target.checked;
                             }
-                            
+
                             updateData(element, event.target, event.target.getAttribute('column'), newValue);
                         }
                     });
@@ -26230,32 +26089,32 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     }
-    
+
     xtag.register('gs-form', {
         lifecycle: {
             created: function () {
                 elementCreated(this);
             },
-            
+
             inserted: function () {
                 elementInserted(this);
             },
-            
+
             attributeChanged: function (strAttrName, oldValue, newValue) {
                 // if "suspend-created" has been removed: run created and inserted code
                 if (strAttrName === 'suspend-created' && newValue === null) {
                     elementCreated(this);
                     elementInserted(this);
-                    
+
                 // if "suspend-inserted" has been removed: run inserted code
                 } else if (strAttrName === 'suspend-inserted' && newValue === null) {
                     elementInserted(this);
-                    
+
                 } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
                     // attribute code
                 }
             },
-            
+
             removed: function () {
                 if (this.hasAttribute('save-while-typing') && this.saveTimerID) {
                     clearTimeout(this.saveTimerID);
@@ -26269,12 +26128,12 @@ document.addEventListener('DOMContentLoaded', function () {
             refresh: function () {
                 getData(this);
             },
-            
+
             column: function (strColumn) {
                 //console.log(this.lastSuccessData);
                 return GS.envGetCell(this.lastSuccessData, 0, strColumn);
             },
-            
+
             addMessage: function (strMessageName) {
                 return addMessage(this, strMessageName);
             },
@@ -26373,14 +26232,14 @@ window.addEventListener('design-register-element', function () {
             selectedElement.removeAttribute('show-on-desktop');
             selectedElement.removeAttribute('show-on-tablet');
             selectedElement.removeAttribute('show-on-phone');
-            
+
             if (this.value) {
                 selectedElement.setAttribute(this.value, '');
             }
-            
+
             return selectedElement;
         });
-        
+
         //addFlexContainerProps(selectedElement);
         addFlexProps(selectedElement);
     };
@@ -26444,14 +26303,14 @@ window.addEventListener('design-register-element', function () {
             selectedElement.removeAttribute('show-on-desktop');
             selectedElement.removeAttribute('show-on-tablet');
             selectedElement.removeAttribute('show-on-phone');
-            
+
             if (this.value) {
                 selectedElement.setAttribute(this.value, '');
             }
-            
+
             return selectedElement;
         });
-        
+
         addFlexContainerProps(selectedElement);
         //addFlexProps(selectedElement);
     };
@@ -26460,15 +26319,15 @@ window.addEventListener('design-register-element', function () {
 document.addEventListener('DOMContentLoaded', function () {
     'use strict';
     var arrTakenGrids = [];
-    
+
     function handleObserver(element) {
         var observer = new MutationObserver(function(mutations) {
             element.handleBlocks();
         });
-        
+
         observer.observe(element, {childList: true});
     }
-    
+
     // dont do anything that modifies the element here
     function elementCreated(element) {
         // if "created" hasn't been suspended: run created code
@@ -26508,42 +26367,42 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     }
-    
+
     xtag.register('gs-grid', {
         lifecycle: {
             created: function () {
                 elementCreated(this);
             },
-            
+
             inserted: function () {
                 elementInserted(this);
             },
-            
+
             attributeChanged: function (strAttrName, oldValue, newValue) {
                 // if "suspend-created" has been removed: run created and inserted code
                 if (strAttrName === 'suspend-created' && newValue === null) {
                     elementCreated(this);
                     elementInserted(this);
-                    
+
                 // if "suspend-inserted" has been removed: run inserted code
                 } else if (strAttrName === 'suspend-inserted' && newValue === null) {
                     elementInserted(this);
-                    
+
                 } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
                     // if the "widths" attribute changed
                     if (strAttrName === 'widths' && this.bolIgnoreAttribute !== true) {
                         this.handleCSS();
                         this.handleBlocks();
-                        
+
                     // if the "reflow-at" attribute changed
                     } else if (strAttrName === 'reflow-at') {
                         this.handleCSS();
-                        
+
                     // if the "min-width" attribute changed
                     } else if (strAttrName === 'min-width') {
                         this.handleCSS();
                         this.handleBlocks();
-                        
+
                     // if the "media" attribute changed
                     } else if (strAttrName === 'media') {
                         this.handleCSS();
@@ -26555,141 +26414,141 @@ document.addEventListener('DOMContentLoaded', function () {
         events: {},
         accessors: {},
         methods: {
-            
+
             getWidthsParameters: function (strWidths) {
                 var arrWidths, intGridWidth, i, len;
-                
+
                 arrWidths = strWidths
                         .replace(/[^0-9,]/gim, '') // remove everything except commas and numbers
                         .replace(/,{1,}/gim, ',')  // replace multiple commas right next to each other with a single comma
                         .replace(/^,|,$/gim, '')   // remove commas at the end and the beginning of the line
                         .split(',');               // split on commas to make an array of numbers (which are currently type 'string')
-                
+
                 // if the array doesn't have content: error
                 if (arrWidths.length === 0) {
                     throw 'gs-grid Error: no valid widths found. Please put a comma seperated list of widths in the "widths" attribute.';
                 }
-                
+
                 // convert the array of strings to an array of integers
                 for (i = 0, len = arrWidths.length; i < len; i += 1) {
                     arrWidths[i] = parseInt(arrWidths[i], 10);
                 }
-                
+
                 // add up the array of integers to come up with a grid width
                 for (i = 0, len = arrWidths.length, intGridWidth = 0; i < len; i += 1) {
                     intGridWidth += arrWidths[i];
                 }
-                
+
                 return {
                     'arrWidths': arrWidths,
                     'intGridWidth': intGridWidth
                 };
             },
-            
+
             handleCSS: function () {
                 var jsnWidthsParameters;
-                
+
                 if (this.getAttribute('widths')) {
                     jsnWidthsParameters = this.getWidthsParameters(this.getAttribute('widths'));
-                    
+
                     this.handleWidthsCSS(jsnWidthsParameters.arrWidths, jsnWidthsParameters.intGridWidth);
-                    
+
                 } else if (this.getAttribute('min-width')) {
                     this.handleMinWidthCSS();
-                    
+
                 } else if (this.getAttribute('media')) {
                     this.handleMediaCSS();
                 }
             },
-            
+
             handleBlocks: function () {
                 var jsnWidthsParameters;
-                
+
                 if (this.getAttribute('widths')) {
                     jsnWidthsParameters = this.getWidthsParameters(this.getAttribute('widths'));
-                    
+
                     this.handleWidthsBlocks(jsnWidthsParameters.arrWidths, jsnWidthsParameters.intGridWidth);
-                    
+
                 } else if (this.getAttribute('min-width')) {
                     this.handleMinWidthBlocks();
-                    
+
                 } else if (this.getAttribute('media')) {
                     this.handleMediaBlocks();
                 }
             },
-            
-            
-            
-            
+
+
+
+
             handleWidthsCSS: function (arrWidths, intGridWidth) {
                 var styleElement = document.getElementById('gs-dynamic-css'),
                     i, len, strCurrentWidth, intCurrentWidth, widthIncreaseAmount, strCSS,
                     strReflowAt = this.getAttribute('reflow-at') || '', arrClassesToRemove;
-                
+
                 // reflow-at shortcuts
                 strReflowAt = strReflowAt.replace(/small|sml/g,  '992px');
                 strReflowAt = strReflowAt.replace(/medium|med/g, '1200px');
                 strReflowAt = strReflowAt.replace(/large|lrg/g,  '10000px');
-                
+
                 // remove old classes
                 arrClassesToRemove = String(this.classList).match(/width-[0-9]*/g) || [];
-                
+
                 for (i = 0, len = arrClassesToRemove.length; i < len; i += 1) {
                     this.classList.remove(arrClassesToRemove[i]);
                 }
-                
+
                 // make sure that this grid hasn't been done before
                 if (!styleElement.classList.contains('col-' + intGridWidth)) {
                     // column CSS
-                    
+
                     // calculate the amount to increase every block width setting by
                     widthIncreaseAmount = 100 / intGridWidth;
-                    
+
                     // create a style for every block
                     for (i = 0, len = intGridWidth, intCurrentWidth = 0, strCSS = ''; i < len; i += 1) {
                         intCurrentWidth += widthIncreaseAmount;
                         strCurrentWidth = String(parseFloat(intCurrentWidth.toFixed(5).toString(), 10));
-                        
+
                         strCSS += 'gs-grid.width-' + intGridWidth + ' > gs-block[width="' + (i + 1) + '"] { width: ' + strCurrentWidth + '%; }\n';
                     }
-                    
+
                     // add col-NUM to the styleElement's "class" attribute
                     styleElement.classList.add('col-' + intGridWidth);
-                    
+
                     // append the column CSS
                     styleElement.innerHTML += '\n/* grid width: ' + intGridWidth + ' */\n' +
                                               strCSS +
                                               'gs-grid.width-' + intGridWidth + ' > gs-block.first-of-row { padding-left: 0; }\n' +
                                               'gs-grid.width-' + intGridWidth + ' > gs-block.last-of-row { padding-right: 0; }\n';
                 }
-                
+
                 // reflow CSS
-                
+
                 // remove class from the gs-grid that allowed the generated reflow CSS to apply
                 this.classList.remove('reflow-' + this.strReflowAt);
-                
+
                 // clean reflow-at attribute variable
                 strReflowAt = strReflowAt.replace(/[^0-9a-z]/gi, '');
-                
+
                 // if reflow-at contains anything
                 if (strReflowAt) {
                     // if reflow-at doesn't have a unit specified: add 'px' to the end of it
                     if (strReflowAt.replace(/[0-9]/gi, '') === '') {
                         strReflowAt += 'px';
                     }
-                    
+
                     // save the current reflow width so that we can use it later
                     this.strReflowAt = strReflowAt;
-                    
+
                     // add class to the gs-grid so that the generated reflow CSS will apply
                     this.classList.add('reflow-' + strReflowAt);
-                    
+
                     // if the reflow CSS for this grid width doesn't already exist: append it
                     if (!styleElement.classList.contains('reflow-' + strReflowAt)) {
-                        
+
                         // add reflow-SIZE to the styleElement's "class" attribute
                         styleElement.classList.add('reflow-' + strReflowAt);
-                        
+
                         // append the reflow CSS
                         styleElement.innerHTML += '\n/* grid reflow width: ' + strReflowAt + ' */\n' +
                                                   '@media only all and (max-width: ' + strReflowAt + ') {\n' +
@@ -26699,41 +26558,41 @@ document.addEventListener('DOMContentLoaded', function () {
                                                   '}\n';
                     }
                 }
-                
+
                 // apply CSS for blocks
                 this.classList.add('width-' + intGridWidth);
             },
-            
+
             handleMinWidthCSS: function () {
                 var strMinWidth = this.getAttribute('min-width'), arrMinWidths, strCSS, strCurrentCSS,
                     i, len, arrParts, strWidth, strResult, intCurrentGridID, bolMedia, intCurrentWidth,
                     strCurrentWidth, intGridWidth, widthIncreaseAmount, grid_i, grid_len, intLayout, arrArrGridWidths,
                     column_i, column_len, arrWidths = [], width_i, strNextWidth;
-                
+
                 // 0 {1,1}; 1000 {2,1}; 10000 {2,1}; 12000 {1,1}
                 // all {reflow}; sml {1,1}; med {1,1,1}; lrg {reflow}
-                
+
                 strMinWidth = strMinWidth.replace(/\s+/g, ''); // remove all whitespace
                 strMinWidth = strMinWidth.replace(/\}/g, ''); // remove all close curly braces
                 strMinWidth = strMinWidth.toLowerCase(); // lowercase
                 strMinWidth = GS.trim(strMinWidth, ';'); // trim off semicolons
-                
+
                 // replace shortcuts (lrg => 1200px)
                 strMinWidth = strMinWidth.replace(/all/g,        '0px');
                 strMinWidth = strMinWidth.replace(/small|sml/g,  '768px');
                 strMinWidth = strMinWidth.replace(/medium|med/g, '992px');
                 strMinWidth = strMinWidth.replace(/large|lrg/g,  '1200px');
-                
+
                 arrMinWidths = strMinWidth.split(';'); // seperate out layouts
-                
+
                 //console.log(strMinWidth, arrMinWidths);
-                
+
                 if (arrTakenGrids.indexOf(strMinWidth) === -1) {
                     arrTakenGrids.push(strMinWidth);
                     intCurrentGridID = arrTakenGrids.length - 1;
                     strCSS = '';
                     arrArrGridWidths = [];
-                    
+
                     for (i = 0, len = arrMinWidths.length, intLayout = 0; i < len; i += 1) {
                         arrParts = arrMinWidths[i].split('{');
                         strWidth = arrParts[0] || '0px';
@@ -26741,39 +26600,39 @@ document.addEventListener('DOMContentLoaded', function () {
                                                                     .join('1').split('').join(',');
                         bolMedia = parseInt(strWidth) > 0;
                         strCurrentCSS = '';
-                        
+
                         if (strResult === 'reflow') {
                             intLayout += 1;
                             arrArrGridWidths.push('reflow');
-                            
+
                             // reflow css
-                            strCurrentCSS += 
+                            strCurrentCSS +=
                                 '    gs-grid.grid-id-' + intCurrentGridID + '            { width: 100%; }\n' +
                                 '    gs-grid.grid-id-' + intCurrentGridID + ' > gs-block.reflow-layout-' + intLayout +
                                                                                             ' { width: auto; float: none; }\n' +
                                 '    gs-grid.grid-id-' + intCurrentGridID + ' > gs-block.reflow-layout-' + intLayout +
                                                                                             ' { padding-left: 0; padding-right: 0; }\n';
-                            
+
                         } else {
                             intLayout += 1;
                             arrArrGridWidths.push(strResult.split(','));
-                            
+
                             // grid css
                             intGridWidth = this.getWidthsParameters(strResult).intGridWidth;
-                            
+
                             // calculate the amount to increase every block width setting by
                             widthIncreaseAmount = 100 / intGridWidth;
-                            
+
                             // create a style for every block
                             for (grid_i = 0, grid_len = intGridWidth, intCurrentWidth = 0; grid_i < grid_len; grid_i += 1) {
                                 intCurrentWidth += widthIncreaseAmount;
                                 strCurrentWidth = String(parseFloat(intCurrentWidth.toFixed(5).toString(), 10));
-                                
+
                                 strCurrentCSS += '    gs-grid.grid-id-' + intCurrentGridID + ' > gs-block.width-' + (grid_i + 1) + '-layout-' + intLayout + ' { ' +
                                                      'width: ' + strCurrentWidth + '%; float: left; ' +
                                                  '}\n';
                             }
-                            
+
                             strCurrentCSS =
                                 '    gs-grid.grid-id-' + intCurrentGridID + ' > gs-block.clearfix-layout-' + intLayout +
                                             ' { clear: left; }\n\n' +
@@ -26784,41 +26643,41 @@ document.addEventListener('DOMContentLoaded', function () {
                                             ' { padding-right: 0; }\n\n' +
                                 strCurrentCSS;
                         }
-                        
+
                         //if (bolMedia) {
                         strNextWidth = '';
                         if (arrMinWidths[i + 1]) {
                             strNextWidth = arrMinWidths[i + 1].split('{')[0];
-                            
+
                             // subtract 1 from the next width so that max-width doesn't allow the
                             //      media to apply at the same time as the next media
                             strNextWidth = (parseInt(strNextWidth) - 1) + strNextWidth.replace(/[0-9]/g, '');
                         }
-                        
+
                         strCurrentCSS = '\n@media (min-width:' + strWidth + ')' + (strNextWidth ? ' and (max-width:' + strNextWidth + ')' : '') + ' {\n' +
                                             strCurrentCSS +
                                         '}\n';
                         //}
-                        
+
                         strCSS += strCurrentCSS;
                     }
                     //console.log(strCSS);
-                    
+
                     // append the column CSS
                     document.getElementById('gs-dynamic-css').innerHTML += '\n/* grid #' + intCurrentGridID + ' */\n' + strCSS;
-                    
+
                 } else {
                     intCurrentGridID = arrTakenGrids.indexOf(strMinWidth);
                     arrArrGridWidths = [];
-                    
+
                     for (i = 0, len = arrMinWidths.length, intLayout = 0; i < len; i += 1) {
                         arrParts = arrMinWidths[i].split('{');
                         strWidth = arrParts[0] || '0px';
                         strResult = arrParts[1] || new Array(xtag.queryChildren(element, 'gs-block').length + 1)
                                                                     .join('1').split('').join(',');
-                        
+
                         intLayout += 1;
-                        
+
                         if (strResult !== 'reflow') {
                             arrArrGridWidths.push(strResult.split(','));
                         } else {
@@ -26826,16 +26685,16 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
                 }
-                
+
                 //
                 this.intLayouts = intLayout;
                 this.arrArrWidths = arrArrGridWidths;
-                
+
                 for (i = 0, len = this.arrArrWidths.length; i < len; i += 1) {
                     if (this.arrArrWidths[i] !== 'reflow') {
                         arrWidths.push(0);
                         width_i = arrWidths.length - 1;
-                        
+
                         for (column_i = 0, column_len = this.arrArrWidths[i].length; column_i < column_len; column_i += 1) {
                             this.arrArrWidths[i][column_i] = parseInt(this.arrArrWidths[i][column_i], 10);
                             arrWidths[width_i] += 1;
@@ -26844,79 +26703,79 @@ document.addEventListener('DOMContentLoaded', function () {
                         arrWidths.push('reflow');
                     }
                 }
-                
+
                 this.arrWidths = arrWidths;
-                
+
                 // add class so that the CSS can apply
                 this.classList.add('grid-id-' + intCurrentGridID);
             },
-            
+
             handleMediaCSS: function () {
                 var strMinWidth = this.getAttribute('media'), arrMinWidths, strCSS, strCurrentCSS,
                     i, len, arrParts, strMedia, strResult, intCurrentGridID, bolMedia, intCurrentWidth,
                     strCurrentWidth, intGridWidth, widthIncreaseAmount, grid_i, grid_len, intLayout, arrArrGridWidths,
                     column_i, column_len, arrWidths = [], width_i;
-                
+
                 strMinWidth = strMinWidth.trim().replace(/\}/g, ''); // remove all close curly braces
                 strMinWidth = strMinWidth.toLowerCase(); // lowercase
                 strMinWidth = GS.trim(strMinWidth, ';'); // trim off semicolons
-                
+
                 // all {reflow}; all and (min-width: small) {2,2,2}; all and (min-width: med) {3,3}; all and (min-width: large) {reflow};
-                
+
                 // replace shortcuts (lrg => 1200px)
                 strMinWidth = strMinWidth.replace(/small|sml/g,  '768px');
                 strMinWidth = strMinWidth.replace(/medium|med/g, '992px');
                 strMinWidth = strMinWidth.replace(/large|lrg/g,  '1200px');
-                
+
                 arrMinWidths = strMinWidth.split(';'); // seperate out layouts
-                
+
                 if (arrTakenGrids.indexOf(strMinWidth) === -1) {
                     arrTakenGrids.push(strMinWidth);
                     intCurrentGridID = arrTakenGrids.length - 1;
                     strCSS = '';
                     arrArrGridWidths = [];
-                    
+
                     //console.log(strMinWidth, arrMinWidths);
-                    
+
                     for (i = 0, len = arrMinWidths.length, intLayout = 0; i < len; i += 1) {
                         arrParts = arrMinWidths[i].split('{');
                         strMedia = arrParts[0].trim() || 'all';
                         strResult = arrParts[1].trim() || new Array(xtag.queryChildren(element, 'gs-block').length + 1)
                                                                     .join('1').split('').join(',');
                         strCurrentCSS = '';
-                        
+
                         if (strResult === 'reflow') {
                             intLayout += 1;
                             arrArrGridWidths.push('reflow');
-                            
+
                             // reflow css
-                            strCurrentCSS += 
+                            strCurrentCSS +=
                                 '    gs-grid.grid-id-' + intCurrentGridID + '            { width: 100%; }\n' +
                                 '    gs-grid.grid-id-' + intCurrentGridID + ' > gs-block.reflow-layout-' + intLayout +
                                                                                             ' { width: auto; float: none; }\n' +
                                 '    gs-grid.grid-id-' + intCurrentGridID + ' > gs-block.reflow-layout-' + intLayout +
                                                                                             ' { padding-left: 0; padding-right: 0; }\n';
-                            
+
                         } else {
                             intLayout += 1;
                             arrArrGridWidths.push(strResult.split(','));
-                            
+
                             // grid css
                             intGridWidth = this.getWidthsParameters(strResult).intGridWidth;
-                            
+
                             // calculate the amount to increase every block width setting by
                             widthIncreaseAmount = 100 / intGridWidth;
-                            
+
                             // create a style for every block
                             for (grid_i = 0, grid_len = intGridWidth, intCurrentWidth = 0; grid_i < grid_len; grid_i += 1) {
                                 intCurrentWidth += widthIncreaseAmount;
                                 strCurrentWidth = String(parseFloat(intCurrentWidth.toFixed(5).toString(), 10));
-                                
+
                                 strCurrentCSS += '    gs-grid.grid-id-' + intCurrentGridID + ' > gs-block.width-' + (grid_i + 1) + '-layout-' + intLayout + ' { ' +
                                                      'width: ' + strCurrentWidth + '%; float: left; ' +
                                                  '}\n';
                             }
-                            
+
                             strCurrentCSS =
                                 '    gs-grid.grid-id-' + intCurrentGridID + ' > gs-block.clearfix-layout-' + intLayout +
                                             ' { clear: left; }\n\n' +
@@ -26927,29 +26786,29 @@ document.addEventListener('DOMContentLoaded', function () {
                                             ' { padding-right: 0; }\n\n' +
                                 strCurrentCSS;
                         }
-                        
+
                         strCurrentCSS = '\n@media ' + strMedia + ' {\n' +
                                             strCurrentCSS +
                                         '}\n';
-                        
+
                         strCSS += strCurrentCSS;
                     }
-                    
+
                     // append the column CSS
                     document.getElementById('gs-dynamic-css').innerHTML += '\n/* grid #' + intCurrentGridID + ' */\n' + strCSS;
-                    
+
                 } else {
                     intCurrentGridID = arrTakenGrids.indexOf(strMinWidth);
                     arrArrGridWidths = [];
-                    
+
                     for (i = 0, len = arrMinWidths.length, intLayout = 0; i < len; i += 1) {
                         arrParts = arrMinWidths[i].split('{');
                         strWidth = arrParts[0] || '0px';
                         strResult = arrParts[1] || new Array(xtag.queryChildren(element, 'gs-block').length + 1)
                                                                     .join('1').split('').join(',');
-                        
+
                         intLayout += 1;
-                        
+
                         if (strResult !== 'reflow') {
                             arrArrGridWidths.push(strResult.split(','));
                         } else {
@@ -26957,16 +26816,16 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
                 }
-                
+
                 //
                 this.intLayouts = intLayout;
                 this.arrArrWidths = arrArrGridWidths;
-                
+
                 for (i = 0, len = this.arrArrWidths.length; i < len; i += 1) {
                     if (this.arrArrWidths[i] !== 'reflow') {
                         arrWidths.push(0);
                         width_i = arrWidths.length - 1;
-                        
+
                         for (column_i = 0, column_len = this.arrArrWidths[i].length; column_i < column_len; column_i += 1) {
                             this.arrArrWidths[i][column_i] = parseInt(this.arrArrWidths[i][column_i], 10);
                             arrWidths[width_i] += 1;
@@ -26975,34 +26834,34 @@ document.addEventListener('DOMContentLoaded', function () {
                         arrWidths.push('reflow');
                     }
                 }
-                
+
                 this.arrWidths = arrWidths;
-                
+
                 //
                 this.classList.add('grid-id-' + intCurrentGridID);
             },
-            
-            
-            
-            
-            
+
+
+
+
+
             handleWidthsBlocks: function (arrWidths, intGridWidth) {
                 var i, len, unset_i, arrElements, intNumberOfWidths = arrWidths.length, intCurrentRowWidth = 0, intNextToAdd;
-                
+
                 // mark initally set blocks
                 arrElements = xtag.queryChildren(this, 'gs-block[width]');
-                
+
                 for (i = 0, len = arrElements.length; i < len; i += 1) {
                     arrElements[i].initallySet = true;
                 }
-                
+
                 // get all child blocks
                 arrElements = xtag.queryChildren(this, 'gs-block');
-                
+
                 // loop through the blocks
                 for (i = 0, unset_i = 0, len = arrElements.length; i < len; i += 1) {
                     intNextToAdd = parseInt(arrElements[i].getAttribute('width'), 10) || arrWidths[unset_i % intNumberOfWidths];
-                    
+
                     // if this block wasn't initally set: remove the width attribute
                     if (!arrElements[i].initallySet) {
                         arrElements[i].removeAttribute('width');
@@ -27010,39 +26869,39 @@ document.addEventListener('DOMContentLoaded', function () {
                     arrElements[i].classList.remove('first-of-row');
                     arrElements[i].classList.remove('last-of-row');
                     arrElements[i].style.clear = '';
-                    
+
                     // if this is the first block in the row
                     if (intCurrentRowWidth === 0) {
                         // set the clear to left, this fixes an issue where a tall cell will move a cell over to the right
                         arrElements[i].style.clear = 'left';
                         arrElements[i].classList.add('first-of-row');
                     }
-                    
+
                     // if this is the last block in the row
                     //console.log(intCurrentRowWidth, intNextToAdd, intGridWidth);
                     if ((intCurrentRowWidth + intNextToAdd) === intGridWidth) {
                         arrElements[i].classList.add('last-of-row');
                     }
-                    
+
                     // if this block doesn't have a set width: set its width (if there are more unset width blocks than widths: the widths repeat)
                     if (!arrElements[i].hasAttribute('width')) {
                         arrElements[i].setAttribute('width', arrWidths[unset_i % intNumberOfWidths]);
                         unset_i += 1;
                     }
-                    
+
                     intCurrentRowWidth += intNextToAdd;
                     intCurrentRowWidth = intCurrentRowWidth % intGridWidth;
                 }
             },
-            
-            
-            
+
+
+
             iterateBlocks: function (intLayouts, arrArrWidths, arrIntGridWidth) {
                 var arrBlocks = xtag.queryChildren(this, 'gs-block'), i, len, block_i, block_len, width_i;
-                
+
                 for (i = 0, len = intLayouts; i < len; i += 1) {
                     width_i = 0;
-                    
+
                     //console.log(arrArrWidths[i]);
                     if (arrArrWidths[i] !== 'reflow') {
                         for (block_i = 0, block_len = arrBlocks.length; block_i < block_len; block_i += 1) {
@@ -27054,9 +26913,9 @@ document.addEventListener('DOMContentLoaded', function () {
                             } else if ((width_i + 1) === arrIntGridWidth[i]) {
                                 arrBlocks[block_i].classList.add('last-of-row-layout-' + (i + 1));
                             }
-                            
+
                             arrBlocks[block_i].classList.add('width-' + arrArrWidths[i][width_i] + '-layout-' + (i + 1));
-                            
+
                             //console.log(width_i, arrArrWidths[i][width_i], arrIntGridWidth[i]);
                             width_i += 1;
                             width_i = width_i % arrIntGridWidth[i];
@@ -27067,20 +26926,20 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
                 }
-                
-                
+
+
             },
-            
+
             handleMinWidthBlocks: function () {
                 this.iterateBlocks(this.intLayouts, this.arrArrWidths, this.arrWidths);
             },
-            
+
             handleMediaBlocks: function () {
                 this.iterateBlocks(this.intLayouts, this.arrArrWidths, this.arrWidths);
             }
         }
     });
-    
+
     xtag.register('gs-block', {
         lifecycle: {},
         events: {},
@@ -27189,9 +27048,9 @@ window.addEventListener('design-register-element', function () {
     registerDesignSnippet('Centered Header', '<gs-header>', '<gs-header><center><h3>$0</h3></center></gs-header>');
     registerDesignSnippet('Header', '<gs-header>', '<gs-header><h3>$0</h3></gs-header>');
     registerDesignSnippet('<gs-header>', '<gs-header>', 'gs-header><h3>$0</h3></gs-header>');
-    
+
     designRegisterElement('gs-header', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-page.html');
-    
+
     window.designElementProperty_GSHEADER = function(selectedElement) {
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
@@ -27239,14 +27098,14 @@ window.addEventListener('design-register-element', function () {
             selectedElement.removeAttribute('show-on-desktop');
             selectedElement.removeAttribute('show-on-tablet');
             selectedElement.removeAttribute('show-on-phone');
-            
+
             if (this.value) {
                 selectedElement.setAttribute(this.value, '');
             }
-            
+
             return selectedElement;
         });
-        
+
         addFlexContainerProps(selectedElement);
         //addFlexProps(selectedElement);
     };
@@ -27259,11 +27118,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (this.border_line) {
                     this.removeChild(this.border_line);
                 }
-                
+
                 this.border_line = document.createElement('div');
                 this.border_line.classList.add('border-line');
                 this.border_line.setAttribute('gs-dynamic', '');
-                
+
                 this.appendChild(this.border_line);
             },
             removed: function () {
@@ -27279,24 +27138,24 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 window.addEventListener('design-register-element', function () {
     'use strict';
-    
+
     registerDesignSnippet('<gs-img>', '<gs-img>', 'gs-img src="${1}"></gs-img>');
-    
+
     designRegisterElement('gs-img', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-image.html');
-    
+
     window.designElementProperty_GSIMG = function(selectedElement) {
         addProp('Min-Width Media', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('min-width') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'min-width', this.value);
         });
-        
+
         addProp('Media', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('media') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'media', this.value);
         });
-        
+
         addProp('Source', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('src') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'src', this.value);
         });
-        
+
         addProp('Alignment', true, '<gs-select class="target" value="' + encodeHTML(selectedElement.getAttribute('align') || '') + '" mini>' +
                                    '    <option value="left">Left</option>' +
                                    '    <option value="">Center</option>' +
@@ -27304,16 +27163,16 @@ window.addEventListener('design-register-element', function () {
                                    '</gs-select>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'align', this.value);
         });
-        
+
         addProp('Image Cover', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('image-cover') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'image-cover', this.value === 'true', true);
         });
-        
+
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
-        
+
         // SUSPEND-INSERTED attribute
         addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-inserted', this.value === 'true', true);
@@ -27360,14 +27219,14 @@ window.addEventListener('design-register-element', function () {
             selectedElement.removeAttribute('show-on-desktop');
             selectedElement.removeAttribute('show-on-tablet');
             selectedElement.removeAttribute('show-on-phone');
-            
+
             if (this.value) {
                 selectedElement.setAttribute(this.value, '');
             }
-            
+
             return selectedElement;
         });
-        
+
         //addFlexContainerProps(selectedElement);
         addFlexProps(selectedElement);
     };
@@ -27376,25 +27235,25 @@ window.addEventListener('design-register-element', function () {
 document.addEventListener('DOMContentLoaded', function () {
     'use strict';
     var arrTakenlayouts = [];
-    
+
     // dont do anything that modifies the element here
     function elementCreated(element) {
         // if "created" hasn't been suspended: run created code
         if (!element.hasAttribute('suspend-created')) {
-            
+
         }
     }
-    
+
     //
     function elementInserted(element) {
         var styleElement;
-        
+
         // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
         if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
             // if this is the first time inserted has been run: continue
             if (!element.inserted) {
                 element.inserted = true;
-                
+
                 // if the style element for the grid column CSS doesn't exist: create it
                 if (!document.getElementById('gs-dynamic-css')) {
                     styleElement = document.createElement('style');
@@ -27402,9 +27261,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     styleElement.setAttribute('gs-dynamic', '');
                     document.head.appendChild(styleElement);
                 }
-                
+
                 element.handleSrc();
-                
+
                 if (element.getAttribute('min-width')) {
                     element.handleMinWidthCSS();
                 } else if (element.getAttribute('media')) {
@@ -27413,36 +27272,36 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     }
-    
+
     xtag.register('gs-img', {
         lifecycle: {
             created: function () {
                 elementCreated(this);
             },
-            
+
             inserted: function () {
                 elementInserted(this);
             },
-            
+
             attributeChanged: function (strAttrName, oldValue, newValue) {
                 // if "suspend-created" has been removed: run created and inserted code
                 if (strAttrName === 'suspend-created' && newValue === null) {
                     elementCreated(this);
                     elementInserted(this);
-                    
+
                 // if "suspend-inserted" has been removed: run inserted code
                 } else if (strAttrName === 'suspend-inserted' && newValue === null) {
                     elementInserted(this);
-                    
+
                 } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
                     // if the "min-width" attribute changed
                     if (strAttrName === 'min-width') {
                         this.handleMinWidthCSS();
-                        
+
                     // if the "media" attribute changed
                     } else if (strAttrName === 'media') {
                         this.handleMediaCSS();
-                        
+
                     // if the "src" attribute changed
                     } else if (strAttrName === 'src') {
                         this.handleSrc();
@@ -27455,52 +27314,52 @@ document.addEventListener('DOMContentLoaded', function () {
         methods: {
             handleSrc: function () {
                 var strSrc = this.getAttribute('src');
-                
+
                 if (strSrc) {
                     this.style.backgroundImage = 'url("' + strSrc + '")';
                 } else {
                     this.style.backgroundImage = '';
                 }
             },
-            
+
             handleMinWidthCSS: function () {
                 var strMinWidth = this.getAttribute('min-width'), arrLayouts, strCSS, strCurrentMinWidth,
                     i, len, arrClassesToRemove, intImageID, arrParts, strDimensions, strWidth, strHeight;
-                
+
                 // remove old classes
                 arrClassesToRemove = String(this.classList).match(/image-id-[0-9]*/g) || [];
-                
+
                 for (i = 0, len = arrClassesToRemove.length; i < len; i += 1) {
                     this.classList.remove(arrClassesToRemove[i]);
                 }
-                
+
                 // all {150px}; lrg {75px};
                 // all {150px, 75px}; lrg {75px, 150px};
-                
+
                 // remove all whitespace, remove all close curly braces, lowercase, trim off semicolons
                 strMinWidth = GS.trim(strMinWidth.replace(/\s+/g, '').replace(/\}/g, '').toLowerCase(), ';');
-                
+
                 // replace shortcuts (lrg => 1200px)
                 strMinWidth = strMinWidth.replace(/all/g, '0px')
                                          .replace(/small|sml/g, '768px')
                                          .replace(/medium|med/g, '992px')
                                          .replace(/large|lrg/g, '1200px');
-                
+
                 // seperate out layouts
                 arrLayouts = strMinWidth.split(';');
-                
+
                 //console.log(strMinWidth, arrLayouts);
-                
+
                 if (arrTakenlayouts.indexOf(strMinWidth) === -1) {
                     arrTakenlayouts.push(strMinWidth);
                     intImageID = arrTakenlayouts.length - 1;
                     strCSS = '';
-                    
+
                     for (i = 0, len = arrLayouts.length; i < len; i += 1) {
                         arrParts = arrLayouts[i].split('{');
                         strCurrentMinWidth = arrParts[0] || '0px';
                         strDimensions = arrParts[1];
-                        
+
                         if (strDimensions.indexOf(',') === -1) {
                             strWidth = strDimensions;
                             strHeight = strDimensions;
@@ -27509,58 +27368,58 @@ document.addEventListener('DOMContentLoaded', function () {
                             strWidth = arrParts[0];
                             strHeight = arrParts[1];
                         }
-                        
+
                         strCSS +=   '\n@media (min-width:' + strCurrentMinWidth + ') {\n' +
                                     '    gs-img.image-id-' + intImageID + ' { width:' + strWidth + '; height: ' + strHeight + '; }\n' +
                                     '}\n';
                     }
-                    
+
                     //console.log(strCSS);
-                    
+
                     // append the column CSS
                     document.getElementById('gs-dynamic-css').innerHTML += '\n/* image #' + intImageID + ' */\n' + strCSS;
-                    
+
                 } else {
                     intImageID = arrTakenlayouts.indexOf(strMinWidth);
                 }
-                
+
                 this.classList.add('image-id-' + intImageID);
             },
-            
+
             handleMediaCSS: function () {
                 var strMedia = this.getAttribute('media'), arrLayouts, strCSS, i, len,
                     arrClassesToRemove, arrParts, strCurrentMedia, strWidth, intImageID,
                     arrParts, strCurrentMedia, strDimensions, strWidth, strHeight;
-                
+
                 // remove old classes
                 arrClassesToRemove = String(this.classList).match(/image-id-[0-9]*/g) || [];
-                
+
                 for (i = 0, len = arrClassesToRemove.length; i < len; i += 1) {
                     this.classList.remove(arrClassesToRemove[i]);
                 }
-                
+
                 // print {200px}; all and (max-width: 500px) {500px}; (min-width 500px) {600px};
-                
+
                 // trim, remove all close curly braces, lowercase, trim off semicolons
                 strMedia = GS.trim(strMedia.trim().replace(/\}/g, '').toLowerCase(), ';');
-                
+
                 // replace shortcuts (lrg => 1200px)
                 strMedia = strMedia.replace(/small|sml/g, '768px').replace(/medium|med/g, '992px').replace(/large|lrg/g, '1200px');
-                
+
                 arrLayouts = strMedia.split(';'); // seperate out layouts
-                
+
                 //console.log(strMedia, arrLayouts);
-                
+
                 if (arrTakenlayouts.indexOf(strMedia) === -1) {
                     arrTakenlayouts.push(strMedia);
                     intImageID = arrTakenlayouts.length - 1;
                     strCSS = '';
-                    
+
                     for (i = 0, len = arrLayouts.length; i < len; i += 1) {
                         arrParts = arrLayouts[i].split('{');
                         strCurrentMedia = arrParts[0].trim() || 'all';
                         strDimensions = arrParts[1].trim();
-                        
+
                         if (strDimensions.indexOf(',') === -1) {
                             strWidth = strDimensions;
                             strHeight = strDimensions;
@@ -27569,21 +27428,21 @@ document.addEventListener('DOMContentLoaded', function () {
                             strWidth = arrParts[0];
                             strHeight = arrParts[1];
                         }
-                        
+
                         strCSS +=   '\n@media ' + strCurrentMedia + ' {\n' +
                                     '    gs-img.image-id-' + intImageID + ' { width:' + strWidth + '; height: ' + strHeight + '; }\n' +
                                     '}\n';
                     }
-                    
+
                     //console.log(strCSS);
-                    
+
                     // append the column CSS
                     document.getElementById('gs-dynamic-css').innerHTML += '\n/* image #' + intImageID + ' */\n' + strCSS;
-                    
+
                 } else {
                     intImageID = arrTakenlayouts.indexOf(strMinWidth);
                 }
-                
+
                 this.classList.add('image-id-' + intImageID);
             }
         }
@@ -27593,9 +27452,9 @@ window.addEventListener('design-register-element', function () {
     registerDesignSnippet('<gs-insert>', '<gs-insert>', 'gs-insert src="${1:test.tpeople}">\n' +
                                                         '    ${2}\n' +
                                                         '</gs-insert>');
-    
+
     designRegisterElement('gs-insert', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-insert.html');
-    
+
     window.designElementProperty_GSINSERT = function(selectedElement) {
         addProp('Source&nbsp;Query', true,
                         '<gs-memo rows="1" autoresize class="target" value="' + encodeHTML(selectedElement.getAttribute('src') ||
@@ -27603,27 +27462,27 @@ window.addEventListener('design-register-element', function () {
                 function () {
             return setOrRemoveTextAttribute(selectedElement, 'src', this.value);
         });
-        
+
         addProp('Additional&nbsp;Values', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('addin') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'addin', this.value);
         });
-        
+
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
-        
+
         addProp('Primary Keys', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('pk') || '') + '" mini></gs-text>',
                 function () {
             return setOrRemoveTextAttribute(selectedElement, 'pk', this.value);
         });
-        
+
         addProp('Sequences', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('seq') || '') + '" mini></gs-text>',
                 function () {
             return setOrRemoveTextAttribute(selectedElement, 'seq', this.value);
         });
-        
-        
+
+
         // visibility attributes
         var strVisibilityAttribute = '';
         if (selectedElement.hasAttribute('hidden')) {
@@ -27647,7 +27506,7 @@ window.addEventListener('design-register-element', function () {
         if (selectedElement.hasAttribute('show-on-phone')) {
             strVisibilityAttribute = 'show-on-phone';
         }
-        
+
         addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                         '<option value="">Visible</option>' +
                                         '<option value="hidden">Invisible</option>' +
@@ -27665,14 +27524,14 @@ window.addEventListener('design-register-element', function () {
             selectedElement.removeAttribute('show-on-desktop');
             selectedElement.removeAttribute('show-on-tablet');
             selectedElement.removeAttribute('show-on-phone');
-            
+
             if (this.value) {
                 selectedElement.setAttribute(this.value, '');
             }
-            
+
             return selectedElement;
         });
-        
+
         addFlexContainerProps(selectedElement);
         addFlexProps(selectedElement);
     };
@@ -27680,7 +27539,7 @@ window.addEventListener('design-register-element', function () {
 
 document.addEventListener('DOMContentLoaded', function () {
     'use strict';
-    
+
     xtag.register('gs-insert', {
         lifecycle: {},
         events: {},
@@ -27694,19 +27553,19 @@ document.addEventListener('DOMContentLoaded', function () {
                   , strSeqCols, strPkCols, strAddIn
                   , strColumns = '', strResponseColumns, strInsertRecord = '', strInsertData
                   , arrElement, arrKey, arrValue, i, len, strResponse, parentSrcElement;
-                
+
                 // addin insert data
                 strAddIn = GS.templateWithQuerystring(element.getAttribute('addin'));
                 if (strAddIn) {
                     arrKey = GS.qryGetKeys(strAddIn);
                     arrValue = GS.qryGetKeys(strAddIn);
-                    
+
                     for (i = 0, len = arrKey.length; i < len; i += 1) {
                         strColumns += (strColumns ? '\t' : '') + GS.encodeForTabDelimited(arrKey[i]);
                         strInsertRecord += (strInsertRecord ? '\t' : '') + GS.encodeForTabDelimited(arrValue[i]);
                     }
                 }
-                
+
                 // control insert data
                 arrElement = xtag.query(element, '[column]');
                 for (i = 0, len = arrElement.length; i < len; i += 1) {
@@ -27722,26 +27581,26 @@ document.addEventListener('DOMContentLoaded', function () {
                         strInsertRecord += (strInsertRecord ? '\t' : '') + GS.encodeForTabDelimited(arrElement[i].value);
                     }
                 }
-                
+
                 strPkCols = GS.templateWithQuerystring(element.getAttribute('pk') || 'id');
                 strSeqCols = GS.templateWithQuerystring(element.getAttribute('seq') || '');
                 strInsertData = (strColumns + '\n' + strInsertRecord);
                 strResponseColumns = (strPkCols + (strPkCols ? '\t' : '') + strColumns);
-                
+
                 GS.requestInsertFromSocket(
                         GS.envSocket, strSchema, strObject, strResponseColumns, strPkCols, strSeqCols, strInsertData
                         // beginCallback
                       , function () {}
-                        
+
                         // confirmCallback
                       , function (data, error, transactionID, commitFunction, rollbackFunction) {
                             var arrCells, i, len, arrElements, jsnSelection, focusElement, focusColumnParent, focusColumnParentIndex;
-                            
+
                             if (data !== 'TRANSACTION COMPLETED') {
                                 if (!error) {
                                     strResponse = data;
                                     commitFunction();
-                                    
+
                                 } else {
                                     GS.webSocketErrorDialog(data);
                                     rollbackFunction();
@@ -27750,24 +27609,24 @@ document.addEventListener('DOMContentLoaded', function () {
                                 commitFunction();
                             }
                         }
-                        
+
                         // finalCallback
                       , function (strType, data, error) {
                             var arrColumns, arrCells, jsnRow = {}, i, len;
-                            
+
                             if (strType === 'COMMIT') {
                                 arrColumns = strResponseColumns.split('\t');
                                 arrCells = (strResponse || '').split('\n')[0].split('\t');
-                                
+
                                 if (arrColumns.length !== arrCells.length) {
                                     throw 'gs-insert Error: Insert API call isn\'t returning correctly. (' + arrColumns.join(',') + ') -> (' + arrCells.join(',') + ')';
                                 } else {
                                     for (i = 0, len = arrColumns.length; i < len; i += 1) {
                                         jsnRow[GS.decodeFromTabDelimited(arrColumns[i])] = GS.decodeFromTabDelimited(arrCells[i]);
                                     }
-                                    
+
                                     GS.triggerEvent(element, 'after_insert');
-                                    
+
                                     if (typeof callback === 'function') {
                                         callback(GS.decodeFromTabDelimited(arrCells[0]), jsnRow);
                                     }
@@ -27786,7 +27645,7 @@ window.addEventListener('design-register-element', function () {
     registerDesignSnippet('<gs-interval>', '<gs-interval>', 'gs-interval column="${1:complete_time}"></gs-interval>');
     registerDesignSnippet('<gs-interval> With Label', '<gs-interval>', 'label for="${1:interval-insert-complete_time}">${2:Time to complete}:</label>\n' +
                                                                '<gs-interval id="${1:interval-insert-complete_time}" column="${3:complete_time}"></gs-interval>');
-    
+
     designRegisterElement('gs-interval', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-interval.html');
 
     window.designElementProperty_GSINTERVAL = function (selectedElement) {
@@ -27906,7 +27765,7 @@ window.addEventListener('design-register-element', function () {
         addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-inserted', this.value === 'true', true);
         });
-        
+
         addProp('Readonly', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('readonly') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'readonly', this.value === 'true', true);
         });
@@ -28271,7 +28130,7 @@ document.addEventListener('DOMContentLoaded', function () {
     //    }
     //}
 
-    
+
     function saveDefaultAttributes(element) {
         var i;
         var len;
@@ -28570,9 +28429,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 if (!element.hasAttribute('readonly')) {
                     element.numberOfCharsTyped = 0;
-    
+
                     jsnTextSelection = GS.getInputSelection(element.control);
-    
+
                     i = 0;
                     len = strValue.length;
                     arrDelimiterIndexes = [0];
@@ -28583,11 +28442,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         i += 1;
                     }
                     arrDelimiterIndexes.push(strValue.length);
-    
+
                     event.preventDefault();
-    
+
                     intCursor = jsnTextSelection.start;
-    
+
                     // find out what section the cursor is in
                     i = 1;
                     len = arrDelimiterIndexes.length;
@@ -28598,7 +28457,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                         i += 1;
                     }
-    
+
                     // select the section of the value that the cursor is in
                     if (intSection === 1) {
                         GS.setInputSelection(element.control, arrDelimiterIndexes[intSection - 1], arrDelimiterIndexes[intSection]);
@@ -28625,7 +28484,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 if (!element.hasAttribute('readonly')) {
                     jsnTextSelection = GS.getInputSelection(element.control);
-    
+
                     i = 0;
                     len = strValue.length;
                     arrDelimiterIndexes = [0];
@@ -28636,10 +28495,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         i += 1;
                     }
                     arrDelimiterIndexes.push(strValue.length);
-    
+
                     // get cursor position
                     intCursor = jsnTextSelection.start;
-    
+
                     // find out what section the cursor is in
                     i = 1;
                     len = arrDelimiterIndexes.length;
@@ -28650,17 +28509,17 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                         i += 1;
                     }
-    
+
                     // if key was an arrow
                     if (intKeyCode >= 37 && intKeyCode <= 40) {
                         element.numberOfCharsTyped = 0;
                         event.preventDefault();
-    
+
                         // left     37
                         // top      38
                         // right    39
                         // down     40
-    
+
                         // handle/right arrows moving the cursor
                         if (intKeyCode === 37) {
                             intSection -= 1;
@@ -28669,14 +28528,14 @@ document.addEventListener('DOMContentLoaded', function () {
                             intSection += 1;
                             intSection = Math.min(intSection, arrDelimiterIndexes.length - 1);
                         }
-    
+
                         // select the section of the value that the cursor is in
                         if (intSection === 1) {
                             GS.setInputSelection(element.control, arrDelimiterIndexes[intSection - 1], arrDelimiterIndexes[intSection]);
                         } else {
                             GS.setInputSelection(element.control, arrDelimiterIndexes[intSection - 1] + 1, arrDelimiterIndexes[intSection]);
                         }
-    
+
                         // find out what section that the cursor is in (hours, minutes or seconds)
                         if (intSection === 0 || intSection === 1) {
                             strPlace = 'hours';
@@ -28685,10 +28544,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         } else if (intSection === 3 || intSection === 4) {
                             strPlace = 'seconds';
                         }
-    
+
                         // update text selection variable
                         jsnTextSelection = GS.getInputSelection(element.control);
-    
+
                         // handle up and down arrows incrementing/decrementing
                         //      the value of the currently selected section
                         if (intKeyCode === 38) { // up
@@ -28699,7 +28558,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             } else if (strPlace === 'seconds') {
                                 element.internal.value.seconds += 1;
                             }
-    
+
                             if (String(element.internal.value.hours).length > element.internal.places.hours) {
                                 element.internal.value.hours = parseInt(
                                     '999999999999999'.substring(0, element.internal.places.hours),
@@ -28714,7 +28573,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 element.internal.value.hours += 1;
                                 element.internal.value.minutes = 0;
                             }
-    
+
                         } else if (intKeyCode === 40) { // down
                             if (strPlace === 'hours') {
                                 element.internal.value.hours -= 1;
@@ -28723,7 +28582,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             } else if (strPlace === 'seconds') {
                                 element.internal.value.seconds -= 1;
                             }
-    
+
                             if (element.internal.value.seconds < 0) {
                                 if (element.internal.value.minutes > 0) {
                                     element.internal.value.minutes -= 1;
@@ -28748,19 +28607,19 @@ document.addEventListener('DOMContentLoaded', function () {
                                 element.internal.value.hours = 0;
                             }
                         }
-    
+
                         if (intKeyCode === 38 || intKeyCode === 40) {
                             //trinkleValueDown(element);
                             //displayValue(element);
                             valueUpdateAttribute(element);
                             GS.setInputSelection(element.control, jsnTextSelection.start, jsnTextSelection.end);
                         }
-    
+
                     // if key was a number
                     } else if ((intKeyCode >= 48 && intKeyCode <= 57) || (intKeyCode >= 96 && intKeyCode <= 105)) {
                         element.numberOfCharsTyped = element.numberOfCharsTyped || 0;
                         event.preventDefault();
-    
+
                         // get the character that was typed
                         strChar = String.fromCharCode(intKeyCode);
                         if (intKeyCode === 96) { strChar = '0'; }
@@ -28773,14 +28632,14 @@ document.addEventListener('DOMContentLoaded', function () {
                         if (intKeyCode === 103) { strChar = '7'; }
                         if (intKeyCode === 104) { strChar = '8'; }
                         if (intKeyCode === 105) { strChar = '9'; }
-    
+
                         // select the section of the value that the cursor is in
                         if (intSection === 1) {
                             GS.setInputSelection(element.control, arrDelimiterIndexes[intSection - 1], arrDelimiterIndexes[intSection]);
                         } else {
                             GS.setInputSelection(element.control, arrDelimiterIndexes[intSection - 1] + 1, arrDelimiterIndexes[intSection]);
                         }
-    
+
                         // find out what section that the cursor is in (hours, minutes or seconds)
                         if (intSection === 0 || intSection === 1) {
                             strPlace = 'hours';
@@ -28789,34 +28648,34 @@ document.addEventListener('DOMContentLoaded', function () {
                         } else if (intSection === 3 || intSection === 4) {
                             strPlace = 'seconds';
                         }
-    
+
                         // update text selection variable
                         jsnTextSelection = GS.getInputSelection(element.control);
-    
+
                         // when you type in a number,
                         //      if no data is set saying "this is where the typing begins":
                         //              insert the number as the first character of the section
                         //              after that set data to say where the typing begins
                         //      no matter what is typed: stay in the same section
                         strSection = strValue.substring(jsnTextSelection.start, jsnTextSelection.end);
-    
+
                         strSection =
                                 strSection.substring(0, element.numberOfCharsTyped) +
                                 strChar +
                                 strSection.substring(element.numberOfCharsTyped + 1);
-    
+
                         strValue =
                                 strValue.substring(0, jsnTextSelection.start) +
                                 strSection +
                                 strValue.substring(jsnTextSelection.end);
-    
+
                         //console.log(element.numberOfCharsTyped);
                         element.numberOfCharsTyped += 1;
-    
+
                         if (element.numberOfCharsTyped === strSection.length) {
                             element.numberOfCharsTyped = 0;
                         }
-    
+
                         if (strPlace === 'hours') {
                             element.internal.value.hours = parseInt(strSection, 10);
                         }
@@ -28826,9 +28685,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         if (strPlace === 'seconds') {
                             element.internal.value.seconds = parseInt(strSection, 10);
                         }
-    
+
                         //console.log(strValue, element.control.value, translateValueToNumber(element, strValue));
-    
+
                         if (strValue !== element.control.value) {
                             //trinkleValueDown(element);
                             //displayValue(element);
@@ -29210,13 +29069,13 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 window.addEventListener('design-register-element', function () {
     'use strict';
-    
+
     registerDesignSnippet('<gs-jumbo>', '<gs-jumbo>', 'gs-jumbo>\n' +
                                                                 '    ${0}\n' +
                                                                 '</gs-jumbo>');
-    
+
     designRegisterElement('gs-jumbo', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-container-jumbo.html');
-    
+
     window.designElementProperty_GSJUMBO = function(selectedElement) {
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
@@ -29264,20 +29123,20 @@ window.addEventListener('design-register-element', function () {
             selectedElement.removeAttribute('show-on-desktop');
             selectedElement.removeAttribute('show-on-tablet');
             selectedElement.removeAttribute('show-on-phone');
-            
+
             if (this.value) {
                 selectedElement.setAttribute(this.value, '');
             }
-            
+
             return selectedElement;
         });
-        
+
     };
 });
 
 document.addEventListener('DOMContentLoaded', function () {
     'use strict';
-    
+
     xtag.register('gs-jumbo', {});
 });
 window.addEventListener('design-register-element', function () {
@@ -29440,17 +29299,17 @@ window.addEventListener('design-register-element', function () {
         addProp('Letter Dividers', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('letter-dividers') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'letter-dividers', this.value === 'true', true);
         });
-        
+
         addProp('Refresh On Querystring Columns', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('refresh-on-querystring-values') || '') + '" mini></gs-text>', function () {
             this.removeAttribute('refresh-on-querystring-change');
             return setOrRemoveTextAttribute(selectedElement, 'refresh-on-querystring-values', this.value);
         });
-        
+
         addProp('Refresh On Querystring Change', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('refresh-on-querystring-change')) + '" mini></gs-checkbox>', function () {
             this.removeAttribute('refresh-on-querystring-values');
             return setOrRemoveBooleanAttribute(selectedElement, 'refresh-on-querystring-change', this.value === 'true', true);
         });
-        
+
         //addFlexContainerProps(selectedElement);
         addFlexProps(selectedElement);
     };
@@ -29520,9 +29379,9 @@ document.addEventListener('DOMContentLoaded', function () {
         return currentElement;
     }
     //snapback
-    
+
     //boladd should be true if event.metaKey is true
-    
+
     //if boladd is true:
     //  selected records that were clicked become non-selected
     //  non-select records that were clicked become selected
@@ -29682,7 +29541,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             bolRemoveClicked = true;
                         }
                     }
-                    
+
                     if (bolRemoveClicked) {
                         if (clickFrom < newClicked) {
                             for (var i = element.secondLastClicked - 2; i > 0; i--) {
@@ -29780,7 +29639,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 //             //console.log(arrAllRecords[i]);
                 //         }
                 //     }
-                    
+
                 // } else {
                 //     if (newNumber < currentNumber) {
                 //         for (var i = newNumber - 1, len = currentNumber; i < len; i++) {
@@ -29828,7 +29687,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 for (i = 0, len = arrRecordsToAffect.length; i < len; i += 1) {
                     arrRecordsToAffect[i].setAttribute('selected-secondary', '');
                 }
-                
+
                 //console.log('origin: ', element.originTR.rowIndex);
                 //console.log('destination: ', record[0].rowIndex);
                 //console.log('arrRecordsToAffect', arrRecordsToAffect);
@@ -29862,11 +29721,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 //console.trace('triggerchange 2');
                 element.triggerChange();
             }
-            
+
             if (element.originTR) {
                 element.originTR.classList.add('originTR');
             }
-            
+
             //Save last clicked tr no for Shift-selecting
             if (typeof handle === 'object' && handle.tagName && strType === 'down') {
                 //console.log(typeof handle, handle);
@@ -29888,52 +29747,52 @@ document.addEventListener('DOMContentLoaded', function () {
     // handle behaviours on keydown
     function handleKeyDown(event) {
         var element = event.target.parentNode, intKeyCode = event.keyCode || event.which, selectedTr, trs, i, len, selectedRecordIndex;
-        
+
         if (!element.hasAttribute('disabled')) {
             if (!element.hasAttribute('no-select')) {
                 if ((intKeyCode === 40 || intKeyCode === 38) && (!event.shiftKey) && !event.metaKey && !event.ctrlKey && !element.error) {
                     //console.log(element.parentNode);
                     trs = xtag.query(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr:not(.divider)');
-                    
+
                     for (i = 0, len = trs.length; i < len; i += 1) {
                         if (trs[i].hasAttribute('selected')) {
                             selectedRecordIndex = i;
                             selectedTr = trs[i];
                             trs[i].removeAttribute('selected');
-                            
+
                             break;
                         }
                     }
-                    
+
                     if (intKeyCode === 40) {// next record or circle to first record or start selection at the first
                         if (!selectedTr || selectedRecordIndex === trs.length - 1) {
                             highlightRecord(element, trs[0]);
                             selectedTr = trs[0];
-                            
+
                         } else {
                             highlightRecord(element, trs[selectedRecordIndex + 1]);
                             selectedTr = trs[selectedRecordIndex + 1];
                         }
-                        
+
                     } else if (intKeyCode === 38) {// prev record or circle to last record or start selection at the last
                         if (!selectedTr || selectedRecordIndex === 0) {
                             highlightRecord(element, trs[trs.length - 1]);
                             selectedTr = trs[trs.length - 1];
-                            
+
                         } else {
                             highlightRecord(element, trs[selectedRecordIndex - 1]);
                             selectedTr = trs[selectedRecordIndex - 1];
                         }
                     }
-                    
+
                     //GS.scrollIntoView(selectedTr);
                     element.scrollToSelectedRecord();
                     event.preventDefault();
                     event.stopPropagation();
-                    
+
                 } else if (event.keyCode === 13) {
                     selectedTr = xtag.query(xtag.query(element.tableElement, 'tbody')[0], 'tr[selected]')[0];
-                    
+
                     if (element.tableElement && selectedTr) {
                         selectRecord(element, selectedTr, true);
                     }
@@ -29945,31 +29804,31 @@ document.addEventListener('DOMContentLoaded', function () {
                 event.stopPropagation();
             }
         }
-        
+
         //console.log('handleKeyDown', intKeyCode, event);
     }
-    
+
     function handleFocusout(event) {
         //TODO: XLD
         /*
         var element = event.target, selectedTr;
-        
+
         if (element.tableElement) {
             selectedTr = xtag.queryChildren(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr[selected]')[0];
-            
+
             if (selectedTr) {
                 selectRecord(element, selectedTr, true);
             }
         }
         */
     }
-    
-    
+
+
     // #################################################################
     // ######################### DATA HANDLING #########################
     // #################################################################
-    
-    
+
+
     // handles fetching the data
     //      if bolInitalLoad === true then
     //          use: initialize query COALESCE TO source query
@@ -29991,35 +29850,35 @@ document.addEventListener('DOMContentLoaded', function () {
           , strLimit   = GS.templateWithQuerystring(element.getAttribute('limit') || '')
           , strOffset  = GS.templateWithQuerystring(element.getAttribute('offset') || '')
           , response_i = 0, response_len = 0, arrTotalRecords = [];
-        
+
         GS.addLoader(element, 'Loading...');
         GS.requestSelectFromSocket(GS.envSocket, strSchema, strObject, strColumns
                                  , strWhere, strOrd, strLimit, strOffset
                                  , function (data, error) {
             var arrRecords, arrCells, envData
               , i, len, cell_i, cell_len;
-            
+
             //console.log(data);
-            
+
             if (!error) {
                 if (data.strMessage !== 'TRANSACTION COMPLETED') {
                     arrRecords = GS.trim(data.strMessage, '\n').split('\n');
-                    
+
                     for (i = 0, len = arrRecords.length; i < len; i += 1) {
                         arrCells = arrRecords[i].split('\t');
-                        
+
                         for (cell_i = 0, cell_len = arrCells.length; cell_i < cell_len; cell_i += 1) {
                             arrCells[cell_i] = arrCells[cell_i] === '\\N' ? null : GS.decodeFromTabDelimited(arrCells[cell_i]);
                         }
-                        
+
                         arrTotalRecords.push(arrCells);
                     }
                 } else {
                     GS.removeLoader(element);
                     element.arrColumnNames = data.arrColumnNames;
-                    
+
                     envData = {'arr_column': element.arrColumnNames, 'dat': arrTotalRecords};
-                    
+
                     handleData(element, bolInitalLoad, envData);
                     GS.triggerEvent(element, 'after_select');
                     if (typeof callback === 'function') {
@@ -30032,31 +29891,31 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
-    
-    // handles data result from method function: getData 
+
+    // handles data result from method function: getData
     //      success:  template
     //      error:    add error classes
     function handleData(element, bolInitalLoad, data, error) {
         var strTemplate, divElement, tableElement, theadElement, theadCellElements, tbodyElement, tbodyCellElements, lastRecordElement,
             recordElements, recordElement, currentCellLabelElement, template, i, len, arrHeaders = [], arrHide, intVisibleColumns, strHeaderCells, strRecordCells, jsnTemplate, strHTML;
-        
+
         // clear any old error status
         element.classList.remove('error');
         element.setAttribute('title', '');
-        
+
         //console.log(error, data, bolInitalLoad);
-        
+
         // if there was no error
         if (!error) {
             element.error = false;
-            
+
             if (element.tableTemplate) {// element.tableTemplateElement
                 strTemplate = element.tableTemplate;// element.tableTemplateElement
-                
+
             } else {
                 // create an array of hidden column numbers
                 arrHide = (element.getAttribute('hide') || '').split(/[\s]*,[\s]*/);
-                
+
                 // build up the header cells variable and the record cells variable
                 for (i = 0, len = data.arr_column.length, strHeaderCells = '', strRecordCells = '', intVisibleColumns = 0; i < len; i += 1) {
                     // if this column is not hidden
@@ -30067,10 +29926,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         intVisibleColumns += 1;
                     }
                 }
-                
+
                 // put everything together
                 strTemplate =   '<table gs-dynamic>';
-                
+
                 if (intVisibleColumns > 1) { // data.arr_column.length (didn't take into account hidden columns)
                     strTemplate +=  '<thead gs-dynamic>' +
                                         '<tr gs-dynamic>' +
@@ -30078,7 +29937,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                         '</tr>' +
                                     '</thead>';
                 }
-                
+
                 strTemplate +=      '<tbody gs-dynamic>' +
                                         '<tr data-record_no="{{! row.row_number }}" value="{{! row[\'' + data.arr_column[0] + '\'] }}" gs-dynamic>' +
                                             strRecordCells +
@@ -30086,31 +29945,31 @@ document.addEventListener('DOMContentLoaded', function () {
                                     '</tbody>' +
                                 '<table>';
             }
-            
+
             divElement = document.createElement('div');
             divElement.innerHTML = strTemplate;
-            
+
             tableElement = xtag.queryChildren(divElement, 'table')[0];
             theadElement = xtag.queryChildren(tableElement, 'thead')[0];
             tbodyElement = xtag.queryChildren(tableElement, 'tbody')[0];
-            
+
             // if there is a tbody
             if (tbodyElement) {
                 recordElement = xtag.queryChildren(tbodyElement, 'tr')[0];
-                
+
                 // if there is a record: template
                 if (recordElement) {
-                    
+
                     // if there is a thead element: add reflow cell headers to the tds
                     if (theadElement) {
                         theadCellElements = xtag.query(theadElement, 'td, th');
                         tbodyCellElements = xtag.query(tbodyElement, 'td, th');
-                        
+
                         for (i = 0, len = theadCellElements.length; i < len; i += 1) {
                             currentCellLabelElement = document.createElement('b');
                             currentCellLabelElement.classList.add('cell-label');
                             currentCellLabelElement.setAttribute('data-text', (theadCellElements[i].textContent || '') + ':');
-                            
+
                             if (tbodyCellElements[i].childNodes) {
                                 tbodyCellElements[i].insertBefore(currentCellLabelElement, tbodyCellElements[i].childNodes[0]);
                             } else {
@@ -30118,69 +29977,69 @@ document.addEventListener('DOMContentLoaded', function () {
                             }
                         }
                     }
-                    
+
                     // template
                     jsnTemplate = GS.templateHideSubTemplates(tbodyElement.innerHTML, true);
                     strHTML = GS.templateWithEnvelopeData(jsnTemplate.templateHTML, data);
                     tbodyElement.innerHTML = GS.templateShowSubTemplates(strHTML, jsnTemplate);
-                    
+
                     element.tableElement = tableElement;
                     element.syncView();
                     element.internalData.records = data;
                 }
             }
-            
+
             //console.log('1***', bolInitalLoad, element.getAttribute('value'));
-            
+
             //if (bolInitalLoad && element.getAttribute('value')) {
             //    //console.log('2***', bolInitalLoad, element.getAttribute('value'));
             //    selectRecord(element, element.getAttribute('value'), false);
             //    element.scrollToSelectedRecord();
-            //    
+            //
             //// select first record
             //} else
-            
+
             if (bolInitalLoad && !element.getAttribute('value') && element.hasAttribute('select-first')) {
                 selectRecord(element, xtag.query(element, 'tbody tr')[0].getAttribute('value'), false);
                 element.scrollToSelectedRecord();
             }
-            
+
         // else there was an error: add error class, title attribute
         } else {
             element.error = true;
             element.classList.add('error');
             element.setAttribute('title', 'This listbox has failed to load.');
-            
+
             element.setAttribute('disabled', '');
-            
+
             GS.ajaxErrorDialog(data);
         }
     }
-    
+
     function getParentCell(element) {
         var currentElement = element;
-        
+
         while (currentElement.nodeName !== 'TD' && currentElement.nodeName !== 'TH' && currentElement.nodeName !== 'HTML') {
             currentElement = currentElement.parentNode;
         }
-        
+
         if (currentElement.nodeName !== 'TD' && currentElement.nodeName !== 'TH') {
             return undefined;
         }
-        
+
         return currentElement;
     }
-    
+
     function windowResizeHandler() {
         var i, len, arrElement;
-        
+
         arrElement = document.getElementsByTagName('gs-listbox');
-        
+
         for (i = 0, len = arrElement.length; i < len; i += 1) {
             if (GS.pxToEm(document.body, this.oldWidth) !== GS.pxToEm(document.body, this.offsetWidth) && // <== if the width (in ems) changes
                 arrElement[i].hasAttribute('letter-scrollbar') &&
                 arrElement[i].tableElement) {
-                
+
                 if (arrElement[i].hasAttribute('letter-dividers') || arrElement[i].hasAttribute('letter-scrollbar')) {
                     arrElement[i].refreshDividingPoints();
                 }
@@ -30189,35 +30048,35 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     }
-    
+
     window.addEventListener('resize', windowResizeHandler);  // I want to debounce this event but that would require a timer -michael
     window.addEventListener('orientationchange', windowResizeHandler);
-    
+
     //function pushReplacePopHandler(element) {
     //    var i, len, currentValue, bolRefresh = false, strQueryString = GS.getQueryString(), arrPopKeys, strQSCol = element.getAttribute('qs');
-    //    
+    //
     //    if (strQSCol && GS.qryGetKeys(strQueryString).indexOf(strQSCol) > -1 && element.value !== GS.qryGetVal(strQueryString, strQSCol)) {
     //        element.value = GS.qryGetVal(strQueryString, strQSCol);
     //    }
-    //    
+    //
     //    // if this element has a refresh-on-querystring-values attribute: check for changes
     //    if (element.hasAttribute('refresh-on-querystring-values')) {
     //        arrPopKeys = element.getAttribute('refresh-on-querystring-values').split(/\s*,\s*/gim);
-    //        
+    //
     //        for (i = 0, len = arrPopKeys.length; i < len; i += 1) {
     //            currentValue = GS.qryGetVal(strQueryString, arrPopKeys[i]);
-    //            
+    //
     //            if ((element.popValues[arrPopKeys[i]] || '') !== currentValue) {
     //                bolRefresh = true;
     //            }
-    //            
+    //
     //            element.popValues[arrPopKeys[i]] = currentValue;
     //        }
-    //        
+    //
     //    } else if (element.hasAttribute('refresh-on-querystring-change')) {
     //        bolRefresh = true;
     //    }
-    //    
+    //
     //    if (bolRefresh) {
     //        element.refresh();
     //    }
@@ -30267,7 +30126,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 len = arrAttrParts.length;
                 while (i < len) {
                     strQSCol = arrAttrParts[i];
-    
+
                     if (strQSCol.indexOf('!=') !== -1) {
                         strOperator = '!=';
                         arrQSParts = strQSCol.split('!=');
@@ -30275,10 +30134,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         strOperator = '=';
                         arrQSParts = strQSCol.split('=');
                     }
-    
+
                     strQSCol = arrQSParts[0];
                     strQSAttr = arrQSParts[1] || arrQSParts[0];
-    
+
                     // if the key is not present or we've got the negator: go to the attribute's default or remove it
                     if (strOperator === '!=') {
                         // if the key is not present: add the attribute
@@ -30309,7 +30168,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             } else if (GS.qryGetKeys(strQS).indexOf(strQSCol) > -1) {
                 strQSValue = GS.qryGetVal(strQS, strQSCol);
-    
+
                 if (element.internal.bolQSFirstRun !== true) {
                     if (strQSValue !== '' || !element.getAttribute('value')) {
                         element.supressChange = true;
@@ -30320,25 +30179,25 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         }
-        
+
         // handle "refresh-on-querystring-values" and "refresh-on-querystring-change" attributes
         if (element.internal.bolQSFirstRun === true) {
             if (element.hasAttribute('refresh-on-querystring-values')) {
                 arrPopKeys = element.getAttribute('refresh-on-querystring-values').split(/\s*,\s*/gim);
-                
+
                 for (i = 0, len = arrPopKeys.length; i < len; i += 1) {
                     currentValue = GS.qryGetVal(strQS, arrPopKeys[i]);
-                    
+
                     if (element.popValues[arrPopKeys[i]] !== currentValue) {
                         bolRefresh = true;
                     }
-                    
+
                     element.popValues[arrPopKeys[i]] = currentValue;
                 }
             } else if (element.hasAttribute('refresh-on-querystring-change')) {
                 bolRefresh = true;
             }
-            
+
             if (bolRefresh && element.hasAttribute('src')) {
                 getData(element);
             } else if (bolRefresh && !element.hasAttribute('src')) {
@@ -30347,16 +30206,16 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             if (element.hasAttribute('refresh-on-querystring-values')) {
                 arrPopKeys = element.getAttribute('refresh-on-querystring-values').split(/\s*,\s*/gim);
-                
+
                 for (i = 0, len = arrPopKeys.length; i < len; i += 1) {
                     element.popValues[arrPopKeys[i]] = GS.qryGetVal(strQS, arrPopKeys[i]);
                 }
             }
         }
-        
+
         element.internal.bolQSFirstRun = true;
     }
-    
+
     // dont do anything that modifies the element here
     function elementCreated(element) {
         // if "created" hasn't been suspended: run created code
@@ -30494,7 +30353,7 @@ document.addEventListener('DOMContentLoaded', function () {
     //
     function elementInserted(element) {
         var tableTemplateElement, arrElement, recordElement, tableTemplateElementCopy, strQSValue, i, len, currentElement;
-        
+
         // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
         if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
             // if this is the first time inserted has been run: continue
@@ -30534,8 +30393,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (tableTemplateElement && (tableTemplateElement.innerHTML.indexOf('&gt;') > -1 || tableTemplateElement.innerHTML.indexOf('&lt;') > -1)) {
                     console.warn('GS-LISTBOX WARNING: &gt; or &lt; detected in table template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
                 }
-                
-                
+
+
                 if (element.getAttribute('src') || element.getAttribute('source')) {
                     if (element.innerHTML.trim() !== '') {
                         var trSet = xtag.query(tableTemplateElement.content, 'tbody > tr');//:not(.divider)');
@@ -30546,7 +30405,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
                 }
-                
+
                 if (tableTemplateElement) {
                     // add a doT.js coded "value" attribute to any element with a "column" attribute but no "value" attribute
                     element.tableTemplate = GS.templateColumnToValue(tableTemplateElement.innerHTML);
@@ -30584,27 +30443,27 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     }
-    
+
     xtag.register('gs-listbox', {
         lifecycle: {
             created: function () {
                 elementCreated(this);
             },
-            
+
             inserted: function () {
                 elementInserted(this);
             },
-            
+
             attributeChanged: function (strAttrName, oldValue, newValue) {
                 // if "suspend-created" has been removed: run created and inserted code
                 if (strAttrName === 'suspend-created' && newValue === null) {
                     elementCreated(this);
                     elementInserted(this);
-                    
+
                 // if "suspend-inserted" has been removed: run inserted code
                 } else if (strAttrName === 'suspend-inserted' && newValue === null) {
                     elementInserted(this);
-                    
+
                 } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
                     if (strAttrName === 'value' && newValue !== oldValue) {
                         this.value = newValue;
@@ -30641,13 +30500,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
                 },
-                
+
                 set: function (strNewValue) {
                     selectRecord(this, strNewValue);
                     this.scrollToSelectedRecord();
                 }
             },
-            
+
             selectedRecord: {
                 get: function () {
                     var element = this;
@@ -30661,19 +30520,19 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
                 },
-                
+
                 set: function (newValue) {
                     selectRecord(this, newValue);
                     this.scrollToSelectedRecord();
                 }
             },
-            
+
             textValue: {
                 get: function () {
                     var element = this;
                     if (element.tableElement) {
                         var arrRecords = xtag.queryChildren(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr[selected]');
-                        
+
                         if (this.hasAttribute('multi-select')) {
                             var strResult, i;
                             for (i = 0; i < arrRecords.length; i++) {
@@ -30688,7 +30547,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
                 },
-                
+
                 set: function () {
                     selectRecord(this, strNewValue);
                     this.scrollToSelectedRecord();
@@ -30700,7 +30559,7 @@ document.addEventListener('DOMContentLoaded', function () {
             refresh: function (callback) {
                 getData(this, callback);
             },
-            
+
             column: function (strColumn) {
                 //console.log('no', Number(this.innerSelectedRecord.rowIndex) - 1);
                 //console.log('data', this.internalData.records);
@@ -30718,81 +30577,81 @@ document.addEventListener('DOMContentLoaded', function () {
                     return this.internalData.records.dat[this.selectedRecord.rowIndex - 1][this.internalData.records.arr_column.indexOf(strColumn)];
                 }
             },
-            
+
             // #################################################################
             // ########### SELECTION / HIGHLIGHTING / RECORD / VALUE ###########
             // #################################################################
-            
+
             // scroll the dropdown to the selected record
             scrollToSelectedRecord: function () {
                 var selectedTr;
-                
+
                 if (this.tableElement) {
                     selectedTr = xtag.query(this.tableElement, 'tr[selected]')[0];
-                    
+
                     if (selectedTr) {
                         GS.scrollIntoView(selectedTr);
                     }
                 }
-                
+
                 /*var scrollingContainer, arrTrs, i, len, intScrollTop, bolFoundSelected = false;
-                
+
                 if (this.tableElement) {
                     scrollingContainer = this;
                     arrTrs = xtag.query(this.tableElement, 'tr');
-                    
+
                     for (i = 0, intScrollTop = 0, len = arrTrs.length; i < len; i += 1) {
                         if (arrTrs[i].hasAttribute('selected')) {
                             intScrollTop += arrTrs[i].offsetHeight / 2;
-                            
+
                             bolFoundSelected = true;
-                            
+
                             break;
                         } else {
                             intScrollTop += arrTrs[i].offsetHeight;
                         }
                     }
-                    
+
                     if (bolFoundSelected) {
                         intScrollTop = intScrollTop - scrollingContainer.offsetHeight / 2;
                     } else {
                         intScrollTop = 0;
                     }
-                    
+
                     scrollingContainer.scrollTop = intScrollTop;
                 }*/
             },
-            
+
             // ################################################################
             // ####################### LETTER SCROLLBAR #######################
             // ################################################################
-            
+
             letterScrollbarHandler: function () {
                 var element = this, i, len, intTextHeight, intLettersDropped, intSkipperHeight,
                     intElementHeight, intDistance, strHTML, arrSkippers;
-                
+
                 // if there is no letter scrollbar container: create it
                 if (xtag.queryChildren(element, '.letter-scrollbar-container').length === 0) {
                     element.letterScrollbarContainer = document.createElement('div');
                     element.letterScrollbarContainer.classList.add('letter-scrollbar-container');
                     element.letterScrollbarContainer.setAttribute('gs-dynamic', '');
                     element.appendChild(element.letterScrollbarContainer);
-                    
+
                 // else: clear out the old letterScrollbarContainer
                 } else {
                     element.letterScrollbarContainer.innerHTML = '';
                 }
-                
+
                 if (element.clientHeight < element.scrollContainer.scrollHeight) {
                     intTextHeight = GS.getTextHeight(element.letterScrollbarContainer);
                     intSkipperHeight = intTextHeight * this.arrDividingPoints.length;
                     intElementHeight = element.clientHeight / this.arrDividingPoints.length;
-                    
+
                     if (intElementHeight < intTextHeight) {
                         intElementHeight = intTextHeight;
                     }
-                    
-                    if (intSkipperHeight > element.clientHeight) { 
+
+                    if (intSkipperHeight > element.clientHeight) {
                         intLettersDropped = 0;
                         while (intSkipperHeight > element.clientHeight && intLettersDropped < 100) {
                             intSkipperHeight -= intTextHeight;
@@ -30800,23 +30659,23 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                         intDistance = Math.ceil(this.arrDividingPoints.length / intLettersDropped);
                     }
-                    
+
                     for (i = 0, len = this.arrDividingPoints.length, strHTML = ''; i < len; i += 1) {
                         if (intLettersDropped === undefined || (intLettersDropped > 0 && i % intDistance !== 0)) {
                             strHTML += '<div class="skipper" gs-dynamic ' +
-                                            'style="height: ' + intElementHeight + 'px; line-height: ' + intElementHeight + 'px;" ' + 
+                                            'style="height: ' + intElementHeight + 'px; line-height: ' + intElementHeight + 'px;" ' +
                                             'data-target-offset="' + this.arrDividingPoints[i].offset + '">' +
                                             '<span gs-dynamic>' + this.arrDividingPoints[i].letter + '</span>' +
                                         '</div>';
                         }
                     }
-                    
+
                     element.letterScrollbarContainer.innerHTML = strHTML;
-                    
+
                     if (element.paddingElement && element.paddingElement.parentNode === element.scrollContainer) {
                         element.scrollContainer.removeChild(element.paddingElement);
                     }
-                    
+
                     element.paddingElement = document.createElement('div');
                     element.paddingElement.setAttribute('gs-dynamic', '');
                     if (this.arrDividingPoints.length > 0) {
@@ -30824,16 +30683,16 @@ document.addEventListener('DOMContentLoaded', function () {
                                                         (element.scrollContainer.scrollHeight - parseInt(this.arrDividingPoints[this.arrDividingPoints.length - 1].offset, 10))) + 'px';
                     }
                     element.scrollContainer.appendChild(element.paddingElement);
-                    
+
                     // bind skipper click, mousedown-then-drag
                     arrSkippers = element.letterScrollbarContainer.children;
-                    
+
                     if (element.mousedownHandler) {
                         window.removeEventListener(evt.mousedown, element.mousedownHandler);
                         window.removeEventListener(evt.mousemove, element.mousemoveHandler);
                         window.removeEventListener(evt.mouseup, element.mouseupHandler);
                     }
-                    
+
                     //element.clickHandler = function () {
                     //    //console.log('-webkit-overflow-scrolling: touch;',   element.scrollContainer.scrollTop);
                     //    element.style.webkitOverflowScrolling = 'initial';
@@ -30841,7 +30700,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     //    element.scrollContainer.scrollTop = parseInt(this.getAttribute('data-target-offset'), 10);
                     //    //console.log('-webkit-overflow-scrolling: initial;', element.scrollContainer.scrollTop);
                     //    element.style.webkitOverflowScrolling = 'touch';
-                    
+
                     element.clickHandler = function () {
                         //console.log('-webkit-overflow-scrolling: touch;',   element.scrollContainer.scrollTop);
                         element.style.webkitOverflowScrolling = 'initial';
@@ -30849,9 +30708,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         element.scrollContainer.scrollTop = parseInt(this.getAttribute('data-target-offset'), 10);
                         //console.log('-webkit-overflow-scrolling: initial;', element.scrollContainer.scrollTop);
                         element.style.webkitOverflowScrolling = 'touch';
-                        
+
                         //alert('Here I am');
-                        
+
                         //element.scrollContainer.className = element.scrollContainer.className;
                         //element.scrollContainer.style.outline = '1px solid #000000';
                         //element.scrollContainer.style.outline = '';
@@ -30867,18 +30726,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     };
                     element.mousemoveHandler = function (event) {
                         var jsnMousePosition, targetElement;
-                        
+
                         if (event.which !== 0 || evt.touchDevice) {
                             jsnMousePosition = GS.mousePosition(event);
                             targetElement = document.elementFromPoint(jsnMousePosition.left, jsnMousePosition.top);
-                            
+
                             if (targetElement) {
                                 if (targetElement.nodeName === 'SPAN') {
                                     targetElement = targetElement.parentNode;
                                 }
-                                
+
                                 //console.log(targetElement, jsnMousePosition);
-                                
+
                                 if (targetElement.classList.contains('skipper')) {
                                     element.style.webkitOverflowScrolling = 'initial';
                                     event.preventDefault();
@@ -30893,56 +30752,56 @@ document.addEventListener('DOMContentLoaded', function () {
                         element.style.webkitOverflowScrolling = 'touch';
                         window.removeEventListener(evt.mousemove, element.mousemoveHandler);
                     };
-                    
+
                     //window
                     element.addEventListener(evt.mousedown, element.mousedownHandler);
                     //window
                     element.addEventListener(evt.mouseup, element.mouseupHandler);
-                    
+
                     for (i = 0, len = arrSkippers.length; i < len; i += 1) {
                         arrSkippers[i].addEventListener('click', element.clickHandler);
                     }
                     //}
                 }
             },
-            
-            
+
+
             // #################################################################
             // ########################### UTILITIES ###########################
             // #################################################################
-            
+
             refreshDividingPoints: function () {
                 var tbodyElement, arrElement, arrLetter, dividerElement, strLetter, intOffset, numColumns, theadElement, i, len;
-                
+
                 tbodyElement = xtag.queryChildren(this.tableElement, 'tbody')[0];
-                
+
                 arrElement = xtag.queryChildren(tbodyElement, 'tr.divider');
-                
+
                 for (i = 0, len = arrElement.length; i < len; i += 1) {
                     tbodyElement.removeChild(arrElement[i]);
                 }
-                
+
                 this.arrDividingPoints = [];
-                
+
                 arrElement = xtag.queryChildren(tbodyElement, 'tr');
-                
+
                 if (arrElement.length > 0) {
                     numColumns = arrElement[0].children.length;
-                    
-                    
+
+
                     //console.log(theadElement, (theadElement ? theadElement.offsetHeight : 0));
                     theadElement = xtag.queryChildren(this.tableElement, 'thead')[0];
                     intOffset = (theadElement ? theadElement.offsetHeight : 0);
-                    
+
                     for (i = 0, len = arrElement.length, arrLetter = []; i < len; i += 1) {
                         strLetter = xtag.queryChildren(arrElement[i], 'td')[0].textContent.substring(0, 1).toUpperCase();
-                        
+
                         if (arrLetter.indexOf(strLetter) === -1) {
                             this.arrDividingPoints.push({
                                 'letter': strLetter,
                                 'offset': intOffset
                             });
-                            
+
                             if (this.hasAttribute('letter-dividers')) {
                                 dividerElement = document.createElement('tr');
                                 dividerElement.classList.add('divider');
@@ -30951,62 +30810,62 @@ document.addEventListener('DOMContentLoaded', function () {
                                 //if (!this.hasAttribute('letter-dividers')) { <== messed with odd and even record colors when letter-scrollbar but not letter-dividers -michael
                                 //    dividerElement.setAttribute('hidden', '');
                                 //}
-                                
+
                                 dividerElement.innerHTML = '<td colspan="' + numColumns + '" gs-dynamic>' + encodeHTML(strLetter) + '</td>';
-                                
+
                                 tbodyElement.insertBefore(dividerElement, arrElement[i]);
-                                
+
                                 intOffset += dividerElement.offsetHeight;
                             }
-                            
+
                             arrLetter.push(strLetter);
                         }
-                        
+
                         intOffset += arrElement[i].offsetHeight;
                     }
                 }
             },
-            
+
             syncView: function () {
                 var element = this, tbodyElement, i, len, arrElements, clickHandler, mousedownHandler, mousemoveHandler, mouseupHandler, mouseoutHandler, mouseoverHandler;
-                
+
                 element.removeEventListener('keydown', handleKeyDown);
                 element.addEventListener('keydown', handleKeyDown);
-                
+
                 element.removeEventListener('focusout', handleFocusout);
                 element.addEventListener('focusout', handleFocusout);
-                
+
                 element.innerHTML = '';
-                
+
                 element.scrollContainer = document.createElement('div');
                 element.scrollContainer.setAttribute('gs-dynamic', '');
                 element.scrollContainer.classList.add('root');
                 element.scrollContainer.classList.add('scroll-container');
                 element.scrollContainer.appendChild(element.tableElement);
-                
+
                 element.appendChild(element.scrollContainer);
                 tbodyElement = xtag.queryChildren(element.tableElement, 'tbody')[0];
-                
+
                 // add dividers
                 if (element.hasAttribute('letter-dividers') || element.hasAttribute('letter-scrollbar')) {
                     element.refreshDividingPoints();
-                    
+
                     // if we have the letter-scrollbar attribute: add the letter scrollbar
                     if (element.hasAttribute('letter-scrollbar')) {
                         element.letterScrollbarHandler();
                     }
                 }
-                
+
                 // this fixes the fact that this function was clearing the selection
                 if (this.getAttribute('value')) {
                     selectRecord(this, this.getAttribute('value'));
                     this.scrollToSelectedRecord();
                 }
-                
+
                 // click handling code
                 // get list of record elements
                 arrElements = xtag.toArray(tbodyElement.children);
-                
+
                 if (element.hasAttribute('multi-select')) {
                     // if we are not on a touch device: hover and down events
                     if (!evt.touchDevice) {
@@ -31037,7 +30896,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             this.classList.remove('down');
                             this.classList.add('hover');
                         };
-                    
+
                         // add click event with click event function to all record elements that are not dividers
                         for (i = 0, len = arrElements.length; i < len; i += 1) {
                             if (!arrElements[i].classList.contains('divider')) {
@@ -31060,14 +30919,14 @@ document.addEventListener('DOMContentLoaded', function () {
                         this.classList.remove('down');
                         selectRecord(element, this, true);
                     };
-                    
+
                     // add click event with click event function to all record elements that are not dividers
                     for (i = 0, len = arrElements.length; i < len; i += 1) {
                         if (!arrElements[i].classList.contains('divider')) {
                             arrElements[i].addEventListener('click', clickHandler);
                         }
                     }
-                    
+
                     // if we are not on a touch device: hover and down events
                     if (!evt.touchDevice) {
                         mousedownHandler = function () {
@@ -31081,7 +30940,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             this.classList.remove('down');
                             this.classList.add('hover');
                         };
-                    
+
                         // add click event with click event function to all record elements that are not dividers
                         for (i = 0, len = arrElements.length; i < len; i += 1) {
                             if (!arrElements[i].classList.contains('divider')) {
@@ -31092,10 +30951,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
                 }
-                
+
                 //tbodyElement.addEventListener('click', function (event) {
                 //    var parentRecord = GS.findParentTag(event.target, 'TR');
-                //    
+                //
                 //    if (parentRecord && !parentRecord.classList.contains('divider')) {
                 //        selectRecord(element, parentRecord, true);
                 //    }
@@ -31120,10 +30979,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
                 bindCopy(element);
                 //console.log(element.tableTemplate);
-                
-                
+
+
             },
-            
+
             triggerChange: function () {
                 if (this.supressChange === true) {
                     this.supressChange = false;
@@ -31139,88 +30998,88 @@ document.addEventListener('DOMContentLoaded', function () {
 });//element.clientHeight < element.scrollHeight
 
 window.addEventListener('design-register-element', function () {
-    
+
     registerDesignSnippet('<gs-memo>', '<gs-memo>', 'gs-memo column="${1:name}"></gs-memo>');
     registerDesignSnippet('<gs-memo> With Label', '<gs-memo>', 'label for="${1:memo-insert-note}">${2:Notes}:</label>\n' +
                                                                '<gs-memo id="${1:memo-insert-note}" column="${3:note}"></gs-memo>');
-    
+
     designRegisterElement('gs-memo', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-memo.html');
-    
+
     window.designElementProperty_GSMEMO = function(selectedElement) {
         addProp('Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'column', this.value);
         });
-        
+
         addProp('Value', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('value') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'value', this.value);
         });
-        
+
         addProp('Column In Querystring', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('qs') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'qs', this.value, false);
         });
-        
+
         addProp('Rows', true, '<gs-number class="target" value="' + encodeHTML(selectedElement.getAttribute('rows') || '') + '" mini></gs-number>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'rows', this.value);
         });
-        
+
         addProp('Placeholder', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('placeholder') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'placeholder', this.value);
         });
-        
+
         //console.log(selectedElement.hasAttribute('mini'));
-        
+
         addProp('Autoresize', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('autoresize')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'autoresize', (this.value === 'true'), true);
         });
-        
+
         addProp('Allow tab', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('allow-tab-char')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'allow-tab-char', (this.value === 'true'), true);
         });
-        
+
         addProp('Resize Handle', true, '<gs-checkbox class="target" value="' + (!selectedElement.hasAttribute('no-resize-handle')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'no-resize-handle', (this.value === 'true'), false);
         });
-        
+
         addProp('Mini', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('mini')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'mini', (this.value === 'true'), true);
         });
-        
+
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
-        
+
         // TABINDEX attribute
         addProp('Tabindex', true, '<gs-number class="target" value="' + encodeHTML(selectedElement.getAttribute('tabindex') || '') + '" mini></gs-number>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'tabindex', this.value);
         });
-        
+
         addProp('Autocorrect', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocorrect') !== 'off') + '" mini></gs-checkbox>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'autocorrect', (this.value === 'false' ? 'off' : ''));
         });
-        
+
         addProp('Autocapitalize', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocapitalize') !== 'off') + '" mini></gs-checkbox>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'autocapitalize', (this.value === 'false' ? 'off' : ''));
         });
-        
+
         addProp('Autocomplete', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocomplete') !== 'off') + '" mini></gs-checkbox>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'autocomplete', (this.value === 'false' ? 'off' : ''));
         });
-        
+
         addProp('Spellcheck', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('spellcheck') !== 'false') + '" mini></gs-checkbox>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'spellcheck', (this.value === 'false' ? 'false' : ''));
         });
-        
+
         // SUSPEND-CREATED attribute
         addProp('suspend-created', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-created') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-created', this.value === 'true', true);
         });
-        
+
         // SUSPEND-INSERTED attribute
         addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-inserted', this.value === 'true', true);
         });
-        
+
         // visibility attributes
         var strVisibilityAttribute = '';
         if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
@@ -31230,7 +31089,7 @@ window.addEventListener('design-register-element', function () {
         if (selectedElement.hasAttribute('show-on-desktop'))   { strVisibilityAttribute = 'show-on-desktop'; }
         if (selectedElement.hasAttribute('show-on-tablet'))    { strVisibilityAttribute = 'show-on-tablet'; }
         if (selectedElement.hasAttribute('show-on-phone'))     { strVisibilityAttribute = 'show-on-phone'; }
-        
+
         addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                         '<option value="">Visible</option>' +
                                         '<option value="hidden">Invisible</option>' +
@@ -31248,23 +31107,23 @@ window.addEventListener('design-register-element', function () {
             selectedElement.removeAttribute('show-on-desktop');
             selectedElement.removeAttribute('show-on-tablet');
             selectedElement.removeAttribute('show-on-phone');
-            
+
             if (this.value) {
                 selectedElement.setAttribute(this.value, '');
             }
-            
+
             return selectedElement;
         });
-        
+
         // DISABLED attribute
         addProp('Disabled', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('disabled') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'disabled', this.value === 'true', true);
         });
-        
+
         addProp('Readonly', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('readonly') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'readonly', this.value === 'true', true);
         });
-        
+
         //addFlexContainerProps(selectedElement);
         addFlexProps(selectedElement);
     };
@@ -31273,7 +31132,7 @@ window.addEventListener('design-register-element', function () {
 // trigger resize to text on window resize
 window.addEventListener('resize', function () {
     var i, len, arrElements = document.getElementsByTagName('gs-memo');
-    
+
     for (i = 0, len = arrElements.length; i < len; i += 1) {
         //if (arrElements[i].control.clientHeight < arrElements[i].control.scrollHeight) {
         arrElements[i].handleResizeToText();
@@ -31286,26 +31145,26 @@ if (!evt.touchDevice) {
     window.gsMemo = {};
     window.gsMemo.bolFirstMouseMoveWhileDown = true;
     window.gsMemo.currentMouseTarget = null;
-    
+
     window.addEventListener('mousemove', function (event) {
         var mousePosition, intWhich;// = GS.mousePosition(event);
-        
+
         // firefox sometimes doesn't permit access to "event.which"
         //      so this try/catch statement will prevent the error and nothing will run
         try {
             intWhich = event.which;
         } catch (e) {}
-        
+
         if (window.bolFirstMouseMoveWhileDown === true && intWhich !== undefined && intWhich !== 0) {
             mousePosition = GS.mousePosition(event);
-            
+
             window.bolFirstMouseMoveWhileDown = false;
             window.gsMemo.currentMouseTarget = document.elementFromPoint(mousePosition.x, mousePosition.y);
-            
+
         } else if (intWhich !== undefined && intWhich === 0) {
             window.bolFirstMouseMoveWhileDown = true;
         }
-        
+
         if (window.gsMemo.currentMouseTarget &&
             intWhich !== undefined && intWhich !== 0 &&
             window.gsMemo.currentMouseTarget.nodeName === 'TEXTAREA' &&
@@ -31313,9 +31172,9 @@ if (!evt.touchDevice) {
             window.bolFirstMouseMoveWhileDown === false &&
                 (window.gsMemo.currentMouseTarget.lastWidth !== window.gsMemo.currentMouseTarget.clientWidth ||
                 window.gsMemo.currentMouseTarget.lastHeight !== window.gsMemo.currentMouseTarget.clientHeight)) {// && //element.control === window.lastMouseDownElement) {
-            
+
             //GS.triggerEvent(window.gsMemo.currentMouseTarget.parentNode, 'size-changed');
-            
+
             window.gsMemo.currentMouseTarget.style.margin = '';
             window.gsMemo.currentMouseTarget.style.marginLeft = '';
             window.gsMemo.currentMouseTarget.style.marginRight = '';
@@ -31323,16 +31182,16 @@ if (!evt.touchDevice) {
             window.gsMemo.currentMouseTarget.style.marginBottom = '';
             window.gsMemo.currentMouseTarget.lastWidth  = window.gsMemo.currentMouseTarget.clientWidth;
             window.gsMemo.currentMouseTarget.lastHeight = window.gsMemo.currentMouseTarget.clientHeight;
-            
+
             GS.triggerEvent(window.gsMemo.currentMouseTarget.parentNode, 'size-changed');
-            
+
             //console.log('mousemove (' + new Date().getTime() + ')');
         }
     });
-    
+
     window.addEventListener('mouseup', function (event) {
         //var mousePosition = GS.mousePosition(event);
-        
+
         window.bolFirstMouseMoveWhileDown = true;
         //console.log('3***'); //, document.elementFromPoint(mousePosition.x, mousePosition.y)); //event.target);
         //window.lastMouseDownElement = element.control;
@@ -31341,19 +31200,19 @@ if (!evt.touchDevice) {
 
 document.addEventListener('DOMContentLoaded', function () {
     'use strict';
-    
+
     var multiLineTemplateElement = document.createElement('template'),
         multiLineTemplate;
-    
+
     multiLineTemplateElement.innerHTML = '<textarea class="control" gs-dynamic></textarea>';
-    
+
     multiLineTemplate = multiLineTemplateElement.content;
-    
+
     // re-target change event from control to element
     function changeFunction(event) {
         event.preventDefault();
         event.stopPropagation();
-        
+
         GS.triggerEvent(event.target.parentNode, 'change');
     }
 
@@ -31393,7 +31252,7 @@ document.addEventListener('DOMContentLoaded', function () {
     //         //console.log('test');
     //     }
     // }
-    
+
     //
     function keydownFunction(event) {
         var element = event.target;
@@ -31414,7 +31273,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     }
-    
+
     //
     function keyupFunction(event) {
         var element = event.target;
@@ -31424,21 +31283,21 @@ document.addEventListener('DOMContentLoaded', function () {
             element.parentNode.handleResizeToText();
         }
     }
-    
+
     function insertFunction(event) {
         var element = event.target;
         element.parentNode.handleResizeToText();
     }
-    
+
     ////
     //function createPushReplacePopHandler(element) {
     //    var strQueryString = GS.getQueryString(), strQSCol = element.getAttribute('qs');
-    //    
+    //
     //    if (GS.qryGetKeys(strQueryString).indexOf(strQSCol) > -1) {
     //        element.value = GS.qryGetVal(strQueryString, strQSCol);
     //    }
     //}
-    
+
     function saveDefaultAttributes(element) {
         var i;
         var len;
@@ -31532,7 +31391,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         element.internal.bolQSFirstRun = true;
     }
-    
+
     // dont do anything that modifies the element here
     function elementCreated(element) {
         // if "created" hasn't been suspended: run created code
@@ -31597,21 +31456,21 @@ document.addEventListener('DOMContentLoaded', function () {
             created: function () {
                 elementCreated(this);
             },
-            
+
             inserted: function () {
                 elementInserted(this);
             },
-            
+
             attributeChanged: function (strAttrName, oldValue, newValue) {
                 // if "suspend-created" has been removed: run created and inserted code
                 if (strAttrName === 'suspend-created' && newValue === null) {
                     elementCreated(this);
                     elementInserted(this);
-                    
+
                 // if "suspend-inserted" has been removed: run inserted code
                 } else if (strAttrName === 'suspend-inserted' && newValue === null) {
                     elementInserted(this);
-                    
+
                 } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
                     //console.log(this.getAttribute('id'), strAttrName, oldValue, newValue);
                     if (strAttrName === 'disabled' && newValue !== null) {
@@ -31624,7 +31483,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                         // set a variable with the control element for convenience and speed
                         this.control = xtag.queryChildren(this, '.control')[0];
-                        
+
                         this.control.lastWidth = this.control.clientWidth;
                         this.control.lastHeight = this.control.clientHeight;
                         this.syncView();
@@ -31645,7 +31504,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         return this.innerHTML;
                     }
                 },
-                
+
                 // set the value of the input and set the value attribute
                 set: function (strNewValue) {
                     if (this.getAttribute('value') !== strNewValue) {
@@ -31668,7 +31527,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         return this.innerHTML;
                     }
                 },
-                
+
                 // set the value attribute
                 set: function (newValue) {
                     //this.setAttribute('value', newValue);
@@ -31682,11 +31541,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     this.control.focus();
                 }
             },
-            
+
             // sync control and resize to text
             syncView: function () {
                 var element = this, arrPassThroughAttributes, i, len;
-                
+
                 /*
                 if (this.innerHTML === '') {
                     this.appendChild(multiLineTemplate.cloneNode(true));
@@ -31697,51 +31556,51 @@ document.addEventListener('DOMContentLoaded', function () {
                     this.appendChild(multiLineTemplate.cloneNode(true));
                     // set a variable with the control element for convenience and speed
                     this.control = xtag.queryChildren(this, '.control')[0];
-                    
+
                     this.control.lastWidth = this.control.clientWidth;
                     this.control.lastHeight = this.control.clientHeight;
                 }
                 */
-                
+
                 if (this.hasAttribute('rows')) {
                     if (this.control) {
                         this.control.setAttribute('rows', this.getAttribute('rows'));
                     }
                 }
-                
+
                 if (this.control) {
                     this.control.removeEventListener('change', changeFunction);
                     this.control.addEventListener('change', changeFunction);
-                    
+
                     this.control.removeEventListener('focus', focusFunction);
                     this.control.addEventListener('focus', focusFunction);
-                    
+
                     this.control.removeEventListener('blur', blurFunction);
                     this.control.addEventListener('blur', blurFunction);
 
                     this.control.removeEventListener(evt.mouseout, mouseoutFunction);
                     this.control.addEventListener(evt.mouseout, mouseoutFunction);
-                    
+
                     this.control.removeEventListener(evt.mouseout, mouseoverFunction);
                     this.control.addEventListener(evt.mouseover, mouseoverFunction);
-                    
+
                     this.control.removeEventListener('keydown', keydownFunction);
                     this.control.addEventListener('keydown', keydownFunction);
-                    
+
                     this.control.removeEventListener('insert', insertFunction);
                     this.control.addEventListener('insert', insertFunction);
                 }
-                
+
                 if (this.control) {
                     this.control.value = this.getAttribute('value');
                 } else {
                     this.innerHTML = this.getAttribute('value') || this.getAttribute('placeholder') || '';
                 }
-                    
+
                 if (this.getAttribute('value')) {
                     this.handleResizeToText();
                 }
-                
+
                 if (this.control) {
                     arrPassThroughAttributes = [
                         'placeholder',
@@ -31761,32 +31620,32 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
                 }
-                
+
                 // copy passthrough attributes to control
             },
-            
+
             // if element is multiline and autoresize is not turned off: resize the element to fit the content
             handleResizeToText: function () {
                 var element = this, intMinHeight;
-                
+
                 if (element.control) {
                     if (element.hasAttribute('autoresize')) {
                         element.control.style.height = '';
                         intMinHeight = element.control.offsetHeight;
                         element.control.style.height = ''; // '0';
-                        
+
                         if (element.control.scrollHeight > intMinHeight) {
                             element.control.style.height = element.control.scrollHeight + 'px';
                         } else {
                             element.control.style.height = intMinHeight + 'px';
                         }
                     }
-                    
-                    
+
+
                     if (element.control.lastWidth !== element.control.clientWidth && element.control.lastHeight !== element.control.clientHeight) {
                         element.control.lastWidth = element.control.clientWidth;
                         element.control.lastHeight = element.control.clientHeight;
-                        
+
                         GS.triggerEvent(element, 'size-changed');
                     }
                 }
@@ -31796,26 +31655,26 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 window.addEventListener('design-register-element', function () {
     'use strict';
-    
+
     registerDesignSnippet('<gs-scroller>', '<gs-scroller>', 'gs-scroller>\n' +
                                                         '    <gs-scroller-inner style="width: ${1:1000px}; height: ${2:1000px};">\n' +
                                                         '        ${0}\n' +
                                                         '    </gs-scroller-inner>\n' +
                                                         '</gs-scroller>');
-    
+
     designRegisterElement('gs-scroller', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-scroller.html');
-    
+
     window.designElementProperty_GSSCROLLER = function (selectedElement) {
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
-        
+
         // SUSPEND-INSERTED attribute
         addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-inserted', this.value === 'true', true);
         });
-        
+
         // visibility attributes
         var strVisibilityAttribute = '';
         if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
@@ -31825,7 +31684,7 @@ window.addEventListener('design-register-element', function () {
         if (selectedElement.hasAttribute('show-on-desktop'))   { strVisibilityAttribute = 'show-on-desktop'; }
         if (selectedElement.hasAttribute('show-on-tablet'))    { strVisibilityAttribute = 'show-on-tablet'; }
         if (selectedElement.hasAttribute('show-on-phone'))     { strVisibilityAttribute = 'show-on-phone'; }
-        
+
         addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                         '<option value="">Visible</option>' +
                                         '<option value="hidden">Invisible</option>' +
@@ -31843,11 +31702,11 @@ window.addEventListener('design-register-element', function () {
             selectedElement.removeAttribute('show-on-desktop');
             selectedElement.removeAttribute('show-on-tablet');
             selectedElement.removeAttribute('show-on-phone');
-            
+
             if (this.value) {
                 selectedElement.setAttribute(this.value, '');
             }
-            
+
             return selectedElement;
         });
     };
@@ -31863,142 +31722,142 @@ Math.easeOutQuad = function (current_time, start_value, end_change, end_time) {
 
 document.addEventListener('DOMContentLoaded', function () {
     'use strict';
-    
+
     // using element, direction and X delta: move element using quadratic equation
     function easeOutX(dragElement, target, bolRight, intXDelta, intervalEaseXID) {
         var intFrames = Math.ceil(intXDelta / 0.25), intFrame = 0, intInterval = 20
           , intTotalTime = (intFrames * intInterval);
-        
+
         //console.log(bolRight, intXDelta);
-        
+
         if (intXDelta > 5) {
             intervalEaseXID = setInterval(function () {
                 var intLeft;
-                
+
                 if (intFrame < intFrames) {
                     intLeft = parseInt(dragElement.style.left, 10);
-                    
+
                     if (bolRight) {
                         intLeft = intLeft - Math.easeOutQuad((intFrame * intInterval), intXDelta, -intXDelta, intTotalTime);
                     } else {
                         intLeft = intLeft + Math.easeOutQuad((intFrame * intInterval), intXDelta, -intXDelta, intTotalTime);
                     }
-                    
+
                     setElementLeft(dragElement, target, intLeft);
                 } else {
                     clearTimeout(intervalEaseXID);
                 }
-                
+
                 intFrame += 1;
             }, intInterval);
         }
         return intervalEaseXID;
     }
-    
+
     // using element, direction and Y delta: move element using quadratic equation
     function easeOutY(dragElement, target, bolBottom, intYDelta, intervalEaseYID) {
         var intFrames = Math.ceil(intYDelta / 0.25), intFrame = 0, intInterval = 20
           , intTotalTime = (intFrames * intInterval);
-        
+
         if (intYDelta > 5) {
             intervalEaseYID = setInterval(function () {
                 var intTop;
-                
+
                 if (intFrame < intFrames) {
                     intTop = parseInt(dragElement.style.top, 10);
-                    
+
                     if (bolBottom) {
                         intTop = intTop - Math.easeOutQuad((intFrame * intInterval), intYDelta, -intYDelta, intTotalTime);
                     } else {
                         intTop = intTop + Math.easeOutQuad((intFrame * intInterval), intYDelta, -intYDelta, intTotalTime);
                     }
-                    
+
                     setElementTop(dragElement, target, intTop);
                 } else {
                     clearTimeout(intervalEaseYID);
                 }
-                
+
                 intFrame += 1;
             }, intInterval);
         }
         return intervalEaseYID;
     }
-    
+
     // set left and respect boundries
     function setElementLeft(dragElement, target, intLeft) {
         var intWidth = dragElement.offsetWidth, minRight = target.offsetWidth;
-        
+
         // target right edge must never get < container right edge
         if ((intLeft + intWidth) < minRight) {
             intLeft = (minRight - intWidth);
         }
-        
+
         // target left edge must never get > container left edge
         if (intLeft > 0) {
             intLeft = 0;
         }
-        
+
         dragElement.style.left = intLeft + 'px';
     }
-    
+
     // set top and respect boundries
     function setElementTop(dragElement, target, intTop) {
         var intHeight = dragElement.offsetHeight, minBottom = target.offsetHeight;
-        
+
         // target bottom edge must never get < container bottom edge
         if ((intTop + intHeight) < minBottom) {
             intTop = (minBottom - intHeight);
         }
-        
+
         // target top edge must never get > container top edge
         if (intTop > 0) {
             intTop = 0;
         }
-        
+
         dragElement.style.top = intTop + 'px';
     }
-    
+
     function handleVerticalBoundries(dragElement, target) {
         var intTop = parseFloat(dragElement.style.top)
           , intHeight = dragElement.offsetHeight
           , minBottom = target.offsetHeight;
-        
+
         // target bottom edge must never get < container bottom edge
         if ((intTop + intHeight) < minBottom) {
             intTop = (minBottom - intHeight);
         }
-        
+
         // target top edge must never get > container top edge
         if (intTop > 0) {
             intTop = 0;
         }
-        
+
         dragElement.style.top = intTop + 'px';
     }
-    
+
     function handleHorizontalBoundries(dragElement, target) {
         var intLeft = parseFloat(dragElement.style.left)
           , intWidth = dragElement.offsetWidth
           , minRight = target.offsetWidth;
-        
+
         // target right edge must never get < container right edge
         if ((intLeft + intWidth) < minRight) {
             intLeft = (minRight - intWidth);
         }
-        
+
         // target left edge must never get > container left edge
         if (intLeft > 0) {
             intLeft = 0;
         }
-        
+
         dragElement.style.left = intLeft + 'px';
     }
-    
+
     function bindEvents(element) {
         var target = element, dragElement = element.children[0], intervalEaseXID
           , intervalEaseYID, lastClearTime, intScrollDelta = 0, minZoom = 0.5
           , maxZoom = 6;
-        
+
         // zoom with mousewheel
         target.addEventListener('wheel', function (event) {
             var intDelta = event.deltaY, intNewZoom, currentTime
@@ -32010,34 +31869,34 @@ document.addEventListener('DOMContentLoaded', function () {
               , intOldWidth = dragElement.offsetWidth
               , intNewHeight, intNewWidth, intWidthDifference, intHeightDifference
               , intRelativeX, intRelativeY, intPercentX, intPercentY;
-            
+
             event.preventDefault();
             event.stopPropagation();
-            
+
             // get mouse position over dragElement in ems
             mousePXY = (jsnMousePosition.y - jsnOffsets.top);
             mousePXX = (jsnMousePosition.x - jsnOffsets.left);
-            
+
             mouseEMY = GS.pxToEm(dragElement, mousePXY);
             mouseEMX = GS.pxToEm(dragElement, mousePXX);
             //console.log(jsnOffsets.top, jsnMousePosition.y, mouseEMY);
             //console.log(jsnOffsets.left, jsnMousePosition.x, mouseEMX);
-            
+
             //console.log(event, event.deltaY, intDelta);
             if (lastClearTime) {
                 currentTime = new Date().getTime();
-                
+
                 //console.log(currentTime - lastClearTime);
                 if ((currentTime - lastClearTime) > 200) {
                     intScrollDelta = 0;
                     lastClearTime = new Date().getTime();
                 }
             }
-            
+
             // need to add clear if change direction
-            
+
             lastClearTime = new Date().getTime();
-            
+
             // if negative delta: increase custom delta by 0.1
             //      (unless we're at the maximum zoom, in which case: reset the delta)
             if (intDelta < 0) {
@@ -32048,7 +31907,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     intScrollDelta = 0;
                 }
-                
+
             // if positive delta: decrease custom delta by 0.1
             //      (unless we're at the minimum zoom, in which case: reset the delta)
             } else {
@@ -32060,54 +31919,54 @@ document.addEventListener('DOMContentLoaded', function () {
                     intScrollDelta = 0;
                 }
             }
-            
+
             // add new delta to current zoom
             intNewZoom = (intCurrentZoom + intScrollDelta);
-            
+
             // if the new zoom is above 6em: cap it off at 6em
             intNewZoom = (intNewZoom > maxZoom ? maxZoom : intNewZoom);
-            
+
             // if the new zoom is below minZoom: cap it off at minZoom
             intNewZoom = (intNewZoom < minZoom ? minZoom : intNewZoom);
-            
+
             //console.log('1:' + intNewZoom, '2:' + intScrollDelta, '3:' + intCurrentZoom);
-            
+
             // apply new zoom
             dragElement.style.fontSize = intNewZoom + 'em';
-            
+
             if (intCurrentZoom !== intNewZoom) {
                 // get new height
                 intNewWidth = dragElement.offsetWidth;
                 intNewHeight = dragElement.offsetHeight;
-                
+
                 // adjust to mouse position
-                
+
                 // get full height difference
                 intWidthDifference = (intNewWidth - intOldWidth);
                 intHeightDifference = (intNewHeight - intOldHeight);
-                
+
                 // get relative x and y
                 jsnTargetOffset = GS.getElementOffset(dragElement);
                 intRelativeX = (jsnMousePosition.x - jsnTargetOffset.left);
                 intRelativeY = (jsnMousePosition.y - jsnTargetOffset.top);
-                
+
                 // get percentage of x and y
                 intPercentX = ((intRelativeX / intOldWidth) * 100);
                 intPercentY = ((intRelativeY / intOldHeight) * 100);
-                
+
                 //console.log(intNewWidth, intOldWidth, intWidthDifference, intRelativeX, intPercentX);
                 //console.log(intNewHeight, intOldHeight, intHeightDifference, intRelativeY, intPercentY);
-                
+
                 // percentage of height difference
                 dragElement.style.left = (parseFloat(dragElement.style.left || '0') - ((intWidthDifference / 100) * intPercentX)) + 'px';
                 dragElement.style.top = (parseFloat(dragElement.style.top || '0') - ((intHeightDifference / 100) * intPercentY)) + 'px';
             }
-            
+
             // handle boundries
             handleVerticalBoundries(dragElement, target);
             handleHorizontalBoundries(dragElement, target);
         });
-        
+
         // scrolling by dragging
         target.addEventListener(evt.mousedown, function (event) {
             var jsnMousePosition = GS.mousePosition(event)
@@ -32120,74 +31979,74 @@ document.addEventListener('DOMContentLoaded', function () {
               , lastX = 0, lastY = 0, currentX = 0, currentY = 0
               , deltaX, deltaY
               , mousemoveHandler, mouseupHandler;
-            
+
             // stop text selection
             event.preventDefault();
-            
+
             // stop easing functions
             clearTimeout(intervalEaseXID);
             clearTimeout(intervalEaseYID);
-            
+
             // add "down" class
             dragElement.classList.add('down');
-            
+
             mousemoveHandler = function (event) {
                 var jsnMousePosition;
-                
+
                 if (event.which === 0 && !evt.touchDevice) {
                     mouseupHandler(event);
-                    
+
                 } else {
                     // handle move
                     jsnMousePosition = GS.mousePosition(event);
-                    
+
                     // saving the current postition and the previous position for calculating the delta
                     lastX = currentX;
                     lastY = currentY;
                     currentX = jsnMousePosition.x;// - jsnTargetOffsets.left;
                     currentY = jsnMousePosition.y;// - jsnTargetOffsets.top;
-                    
+
                     // moving element
                     //console.log(offsetX, currentX, startX);//, jsnTargetOffsets.left);
                     //console.log(offsetY, currentY, startY);//, jsnTargetOffsets.top);
                     setElementLeft(dragElement, target, (offsetX + (currentX - startX)));
                     setElementTop(dragElement, target, (offsetY + (currentY - startY)));
-                    
+
                     event.preventDefault();
                 }
             };
-            
+
             mouseupHandler = function (event) {
                 // calculate delta
                 deltaX = lastX - currentX;
                 deltaY = lastY - currentY;
-                
+
                 // ease out
                 intervalEaseXID = easeOutX(dragElement, target, (deltaX > 0), Math.abs(deltaX), intervalEaseXID);
                 intervalEaseYID = easeOutY(dragElement, target, (deltaY > 0), Math.abs(deltaY), intervalEaseYID);
-                
+
                 // remove "down" class
                 dragElement.classList.remove('down');
-                
+
                 // unbind mousemove and mouseup
                 document.body.removeEventListener(evt.mousemove, mousemoveHandler);
                 document.body.removeEventListener(evt.mouseup, mouseupHandler);
             };
-            
+
             document.body.addEventListener(evt.mousemove, mousemoveHandler);
             document.body.addEventListener(evt.mouseup, mouseupHandler);
         });
     }
-    
-    
+
+
     // dont do anything that modifies the element here
     function elementCreated(element) {
         // if "created" hasn't been suspended: run created code
         if (!element.hasAttribute('suspend-created')) {
-            
+
         }
     }
-    
+
     //
     function elementInserted(element) {
         // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
@@ -32195,25 +32054,25 @@ document.addEventListener('DOMContentLoaded', function () {
             // if this is the first time inserted has been run: continue
             if (!element.inserted) {
                 element.inserted = true;
-                
+
                 if (element.children.length > 1) {
                     throw 'gs-scroller Error: Too many children. gs-scroller elements must have one child and it must be a <gs-scroller-inner> element.';
-                    
+
                 } else if (element.children.length === 0) {
                     throw 'gs-scroller Error: No children. gs-scroller elements must have one child and it must be a <gs-scroller-inner> element.';
-                    
+
                 } else if (element.children[0].nodeName !== 'GS-SCROLLER-INNER') {
                     throw 'gs-scroller Error: Invalid child. gs-scroller elements must have one child and it must be a <gs-scroller-inner> element.';
                 }
-                
+
                 // if we're not on a touch device: bind events and set the title text
                 if (!evt.touchDevice) {
                     // bind events
                     bindEvents(element);
-                    
+
                     // title text
                     element.children[0].setAttribute('title', 'Click and drag to move around, scroll to zoom.');
-                    
+
                 // else: make the element scrollable
                 } else {
                     element.classList.add('scrollable');
@@ -32221,30 +32080,30 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     }
-    
+
     xtag.register('gs-scroller-inner', {});
     xtag.register('gs-scroller', {
         lifecycle: {
             created: function () {
                 elementCreated(this);
             },
-            
+
             inserted: function () {
                 elementInserted(this);
             },
-            
+
             attributeChanged: function (strAttrName, oldValue, newValue) {
                 // if "suspend-created" has been removed: run created and inserted code
                 if (strAttrName === 'suspend-created' && newValue === null) {
                     elementCreated(this);
                     elementInserted(this);
-                    
+
                 // if "suspend-inserted" has been removed: run inserted code
                 } else if (strAttrName === 'suspend-inserted' && newValue === null) {
                     elementInserted(this);
-                    
+
                 } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
-                    
+
                 }
             }
         },
@@ -32373,7 +32232,7 @@ window.addEventListener('design-register-element', function () {
         addProp('Disabled', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('disabled') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'disabled', this.value === 'true', true);
         });
-        
+
         addProp('Readonly', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('readonly') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'readonly', this.value === 'true', true);
         });
@@ -32432,7 +32291,7 @@ document.addEventListener('DOMContentLoaded', function () {
     //        element.value = GS.qryGetVal(strQueryString, strQSCol);
     //    }
     //}
-    
+
     function saveDefaultAttributes(element) {
         var i;
         var len;
@@ -32697,12 +32556,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 groupingSize--;
             }
             if (groupingSize > 0) {
-                var count = 0, 
+                var count = 0,
                     formattedInteger = '';
                 i = integer.length;
                 while (i--) {
                     if (count !== 0 && count % groupingSize === 0) {
-                        formattedInteger = grouping + formattedInteger;    
+                        formattedInteger = grouping + formattedInteger;
                     }
                     formattedInteger = integer.substr(i, 1) + formattedInteger;
                     count++;
@@ -32725,7 +32584,7 @@ document.addEventListener('DOMContentLoaded', function () {
                (bolCurrencySymbol ? locale.currencySymbol : '') +
                (negative ? '-' : '') + result;
     }
-    
+
     // dont do anything that modifies the element here
     function elementCreated(element) {
         // if "created" hasn't been suspended: run created code
@@ -32873,7 +32732,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         return parseFloat(this.innerHTML.replace(/[^-0-9.]*/g, ''), 10); // this.control.value;
                     }
                 },
-                
+
                 // set the value of the input and set the value attribute
                 set: function (strNewValue) {
                     var selection;
@@ -32895,26 +32754,26 @@ document.addEventListener('DOMContentLoaded', function () {
             focus: function () {
                 this.control.focus();
             },
-            
+
             refresh: function () {
                 var arrPassThroughAttributes, i, len;
-                
+
                 // set a variable with the control element for convenience and speed
                 this.control = xtag.query(this, '.control')[0];
-                
+
                 if (this.control) {
                     this.control.removeEventListener('change', changeFunction);
                     this.control.addEventListener('change', changeFunction);
-                    
+
                     this.control.removeEventListener('focus', focusFunction);
                     this.control.addEventListener('focus', focusFunction);
-                    
+
                     this.control.removeEventListener('blur', blurFunction);
                     this.control.addEventListener('blur', blurFunction);
-                    
+
                     this.control.removeEventListener(evt.mouseout, mouseoutFunction);
                     this.control.addEventListener(evt.mouseout, mouseoutFunction);
-    
+
                     this.control.removeEventListener(evt.mouseover, mouseoverFunction);
                     this.control.addEventListener(evt.mouseover, mouseoverFunction);
                 }
@@ -32927,7 +32786,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                     handleFormat(this, undefined, false);
                 }
-                
+
                 if (this.control) {
                     // copy passthrough attributes to control
                     arrPassThroughAttributes = [
@@ -32955,49 +32814,49 @@ window.addEventListener('design-register-element', function () {
     registerDesignSnippet('<gs-optionbox>', '<gs-optionbox>', 'gs-optionbox column="${1}">\n' +
                                                               '    <gs-option value="${2}">${3}</gs-option>\n' +
                                                               '</gs-optionbox>');
-    
+
     designRegisterElement('gs-optionbox', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-optionbox.html');
-    
+
     window.designElementProperty_GSOPTIONBOX = function(selectedElement) {
         addProp('Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'column', this.value);
         });
-        
+
         addProp('Value', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('value') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'value', this.value);
         });
-        
+
         addProp('Clearable', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('clearable') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'clearable', this.value === 'true', true);
         });
-        
+
         addProp('Column In Querystring', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('qs') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'qs', this.value, false);
         });
-        
+
         addProp('Mini', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('mini') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'mini', this.value === 'true', true);
         });
-        
+
         addProp('No Targets', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('no-target') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'no-target', this.value === 'true', true);
         });
-        
+
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
-        
+
         // SUSPEND-CREATED attribute
         addProp('suspend-created', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-created') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-created', this.value === 'true', true);
         });
-        
+
         // SUSPEND-INSERTED attribute
         addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-inserted', this.value === 'true', true);
         });
-        
+
         // visibility attributes
         var strVisibilityAttribute = '';
         if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
@@ -33007,7 +32866,7 @@ window.addEventListener('design-register-element', function () {
         if (selectedElement.hasAttribute('show-on-desktop'))   { strVisibilityAttribute = 'show-on-desktop'; }
         if (selectedElement.hasAttribute('show-on-tablet'))    { strVisibilityAttribute = 'show-on-tablet'; }
         if (selectedElement.hasAttribute('show-on-phone'))     { strVisibilityAttribute = 'show-on-phone'; }
-        
+
         addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                         '<option value="">Visible</option>' +
                                         '<option value="hidden">Invisible</option>' +
@@ -33025,23 +32884,23 @@ window.addEventListener('design-register-element', function () {
             selectedElement.removeAttribute('show-on-desktop');
             selectedElement.removeAttribute('show-on-tablet');
             selectedElement.removeAttribute('show-on-phone');
-            
+
             if (this.value) {
                 selectedElement.setAttribute(this.value, '');
             }
-            
+
             return selectedElement;
         });
-        
+
         // DISABLED attribute
         addProp('Disabled', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('disabled') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'disabled', this.value === 'true', true);
         });
-        
+
         addProp('Readonly', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('readonly') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'readonly', this.value === 'true', true);
         });
-        
+
         //addFlexContainerProps(selectedElement);
         addFlexProps(selectedElement);
     };
@@ -33050,12 +32909,12 @@ window.addEventListener('design-register-element', function () {
         addProp('Hidden Value:', true, '<gs-text class="target" value="' + (selectedElement.getAttribute('value') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'value', this.value);
         });
-        
+
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + (selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
-        
+
         addFlexContainerProps(selectedElement);
         //addFlexProps(selectedElement);
     };*/
@@ -33063,18 +32922,18 @@ window.addEventListener('design-register-element', function () {
 
 document.addEventListener('DOMContentLoaded', function () {
     'use strict';
-    
+
     // removes selected attribute from old selected option adds selected attribute to option
     function highlightOption(element, option) {
         var i, len, arrSelectedOptions, arrTempSelectedOptions;
-        
+
         // clear previous selection
         arrSelectedOptions = xtag.query(element, 'gs-option[selected]');
         arrTempSelectedOptions = xtag.query(element, 'gs-option[tempselect]');
         for (i = 0, len = arrSelectedOptions.length; i < len; i += 1) {
             arrSelectedOptions[i].removeAttribute('selected');
         }
-        
+
         for (i = 0, len = arrTempSelectedOptions.length; i < len; i += 1) {
             arrTempSelectedOptions[i].removeAttribute('tempselect');
         }
@@ -33112,7 +32971,7 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             option = handle;
         }
-        
+
         highlightOption(element, option);
 
         if (option) {
@@ -33434,21 +33293,21 @@ document.addEventListener('DOMContentLoaded', function () {
             created: function () {
                 elementCreated(this);
             },
-            
+
             inserted: function () {
                 elementInserted(this);
             },
-            
+
             attributeChanged: function (strAttrName, oldValue, newValue) {
                 // if "suspend-created" has been removed: run created and inserted code
                 if (strAttrName === 'suspend-created' && newValue === null) {
                     elementCreated(this);
                     elementInserted(this);
-                    
+
                 // if "suspend-inserted" has been removed: run inserted code
                 } else if (strAttrName === 'suspend-inserted' && newValue === null) {
                     elementInserted(this);
-                    
+
                 } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
                     if (strAttrName === 'value' && newValue !== oldValue) {
                         selectOption(this, newValue);
@@ -33462,18 +33321,18 @@ document.addEventListener('DOMContentLoaded', function () {
             //        handleKeyDown(event);
             //    }
             //},
-            
+
             'click': function (event) {
                 if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted') && !this.hasAttribute('readonly')) {
                     var parentOption = getParentOption(event.target);
-                    
+
                     //console.log(parentOption);
-                    
+
                     //  else if (this.hasAttribute('clearable') && newValue === oldValue) {
                     //     console.log('running');
                     //     selectOption(this, undefined);
                     // }
-                    
+
                     if (parentOption && !parentOption.hasAttribute('selected')) {
                         selectOption(this, parentOption, true);
                     } else if (this.hasAttribute('clearable')) {
@@ -33481,15 +33340,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
             }//,
-            
+
             //'focusout': function () {
             //    if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
             //        var selectedOption = xtag.query(this, 'gs-option[selected]')[0],
             //            tempSelectedOption = xtag.query(this, 'gs-option[tempselect]')[0];
-            //        
+            //
             //        if (tempSelectedOption) {
             //            selectOption(this, tempSelectedOption, true);
-            //            
+            //
             //        } else if (selectedOption) {
             //            selectOption(this, selectedOption, true);
             //        }
@@ -33501,27 +33360,27 @@ document.addEventListener('DOMContentLoaded', function () {
                 get: function () {
                     return this.innerValue;
                 },
-                
+
                 set: function (strNewValue) {
                     selectOption(this, strNewValue);
                 }
             },
-            
+
             selectedOption: {
                 get: function () {
                     return this.innerSelectedOption;
                 },
-                
+
                 set: function (newValue) {
                     selectOption(this, newValue);
                 }
             },
-            
+
             textValue: {
                 get: function () {
                     return this.innerSelectedOption.textContent;
                 },
-                
+
                 set: function (newValue) {
                     selectOption(this, newValue);
                 }
@@ -33550,25 +33409,25 @@ window.addEventListener('design-register-element', function () {
                                                          '    </gs-body>\n' +
                                                          '    <gs-footer>${2}</gs-footer>\n' +
                                                          '</gs-page>');
-    
+
     designRegisterElement('gs-page', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-page.html');
-    
+
     window.designElementProperty_GSPAGE = function (selectedElement) {
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
-        
+
         // SUSPEND-CREATED attribute
         addProp('suspend-created', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-created') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-created', this.value === 'true', true);
         });
-        
+
         // SUSPEND-INSERTED attribute
         addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-inserted', this.value === 'true', true);
         });
-        
+
         // visibility attributes
         var strVisibilityAttribute = '';
         if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
@@ -33578,7 +33437,7 @@ window.addEventListener('design-register-element', function () {
         if (selectedElement.hasAttribute('show-on-desktop'))   { strVisibilityAttribute = 'show-on-desktop'; }
         if (selectedElement.hasAttribute('show-on-tablet'))    { strVisibilityAttribute = 'show-on-tablet'; }
         if (selectedElement.hasAttribute('show-on-phone'))     { strVisibilityAttribute = 'show-on-phone'; }
-        
+
         addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                         '<option value="">Visible</option>' +
                                         '<option value="hidden">Invisible</option>' +
@@ -33596,14 +33455,14 @@ window.addEventListener('design-register-element', function () {
             selectedElement.removeAttribute('show-on-desktop');
             selectedElement.removeAttribute('show-on-tablet');
             selectedElement.removeAttribute('show-on-phone');
-            
+
             if (this.value) {
                 selectedElement.setAttribute(this.value, '');
             }
-            
+
             return selectedElement;
         });
-        
+
         //addFlexContainerProps(selectedElement);
         addFlexProps(selectedElement);
     };
@@ -33611,7 +33470,7 @@ window.addEventListener('design-register-element', function () {
 
 document.addEventListener('DOMContentLoaded', function () {
     'use strict';
-    
+
     // dont do anything that modifies the element here
     function elementCreated(element) {
         // if "created" hasn't been suspended: run created code
@@ -33619,13 +33478,13 @@ document.addEventListener('DOMContentLoaded', function () {
             var observer,
                 headerElement = xtag.queryChildren(element, 'gs-header')[0],
                 footerElement = xtag.queryChildren(element, 'gs-footer')[0];
-            
+
             // create an observer instance
             observer = new MutationObserver(function(mutations) {
                 element.recalculatePadding();
                 //console.log('mutation observed');
             });
-            
+
             // pass in the element node, as well as the observer options
             if (headerElement) {
                 observer.observe(headerElement, {childList: true, subtree: true});
@@ -33635,7 +33494,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     }
-    
+
     //
     function elementInserted(element) {
         // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
@@ -33643,9 +33502,9 @@ document.addEventListener('DOMContentLoaded', function () {
             // if this is the first time inserted has been run: continue
             if (!element.inserted) {
                 element.inserted = true;
-                
+
                 element.recalculatePadding();
-                
+
                 window.addEventListener('load', function () {
                     element.recalculatePadding();
                 });
@@ -33656,27 +33515,27 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     }
-    
+
     xtag.register('gs-page', {
         lifecycle: {
             created: function () {
                 elementCreated(this);
             },
-            
+
             inserted: function () {
                 elementInserted(this);
             },
-            
+
             attributeChanged: function (strAttrName, oldValue, newValue) {
                 // if "suspend-created" has been removed: run created and inserted code
                 if (strAttrName === 'suspend-created' && newValue === null) {
                     elementCreated(this);
                     elementInserted(this);
-                    
+
                 // if "suspend-inserted" has been removed: run inserted code
                 } else if (strAttrName === 'suspend-inserted' && newValue === null) {
                     elementInserted(this);
-                    
+
                 } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
                     // attribute code
                 }
@@ -33688,7 +33547,7 @@ document.addEventListener('DOMContentLoaded', function () {
             recalculatePadding: function () {
                 var headerElement = xtag.queryChildren(this, 'gs-header')[0],
                     footerElement = xtag.queryChildren(this, 'gs-footer')[0];
-                
+
                 if (headerElement) {
                     //console.log('1***', headerElement.offsetHeight);
                     this.style.paddingTop = headerElement.offsetHeight + 'px';
@@ -33715,25 +33574,25 @@ window.addEventListener('design-register-element', function () {
                                                       '        \n' +
                                                       '    </gs-page>\n' +
                                                       '</gs-panel>');
-    
+
     designRegisterElement('gs-panel', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-panel.html');
-    
+
     window.designElementProperty_GSPANEL = function(selectedElement) {
         // no-shadow-dismiss attribute
         addProp('Dismissible By Clicking The Shadow', true, '<gs-checkbox class="target" value="' + (!selectedElement.hasAttribute('no-shadow-dismiss')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'no-shadow-dismiss', this.value === 'true', false);
         });
-        
+
         // dismissible attribute
         addProp('Dismissible On Desktop', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('dismissible') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'dismissible', this.value === 'true', true);
         });
-        
+
         // SUSPEND-CREATED attribute
         addProp('suspend-created', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-created') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-created', this.value === 'true', true);
         });
-        
+
         // SUSPEND-INSERTED attribute
         addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-inserted', this.value === 'true', true);
@@ -33743,39 +33602,39 @@ window.addEventListener('design-register-element', function () {
 
 document.addEventListener('DOMContentLoaded', function () {
     'use strict';
-    
+
     function pushReplacePopHandler(element) {
         var query = GS.getQueryString(), arrQueryKeys = GS.qryGetKeys(query),
             strID = element.getAttribute('id'), strAttributeName, i, len, strNewValue;
-        
+
         for (i = 0, len = arrQueryKeys.length; i < len; i += 1) {
             if (arrQueryKeys[i].indexOf(strID + '.') === 0 &&
                 element.panelIDs.indexOf(arrQueryKeys[i].split('.')[1]) > -1) {
-                
+
                 strAttributeName = arrQueryKeys[i].split('.')[1];
                 strNewValue = GS.qryGetVal(query, arrQueryKeys[i]);
-                
+
                 if (element.getAttribute(strAttributeName) !== strNewValue) {
                     element.setAttribute(strAttributeName, strNewValue);
                 }
             }
         }
-        
+
         for (i = 0, len = element.arrQueryStringAttributes.length; i < len; i += 1) {
             if (arrQueryKeys.indexOf(element.arrQueryStringAttributes[i]) === -1) {
                 element.removeAttribute(element.arrQueryStringAttributes[i].split('.')[1]);
             }
         }
     }
-    
+
     // dont do anything that modifies the element here
     function elementCreated(element) {
         // if "created" hasn't been suspended: run created code
         if (!element.hasAttribute('suspend-created')) {
-            
+
         }
     }
-    
+
     //
     function elementInserted(element) {
         // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
@@ -33783,22 +33642,22 @@ document.addEventListener('DOMContentLoaded', function () {
             // if this is the first time inserted has been run: continue
             if (!element.inserted) {
                 element.inserted = true;
-                
+
                 var arrElement, i, len, blockerElement, blockerClickHandler;
-                
+
                 element.arrQueryStringAttributes = [];
                 element.panelIDs = [];
-                
+
                 blockerClickHandler = function (event) {
                     var target = event.target;
-                    
+
                     if (target.classList.contains('gs-panel-page-blocker')) {
                         element.hide(target.getAttribute('blocking'));
                     }
                 };
-                
+
                 arrElement = xtag.queryChildren(element, '*');
-                
+
                 for (i = 0, len = arrElement.length; i < len; i += 1) {
                     if (arrElement[i].style.width === '') {
                         arrElement[i].setAttribute('flex', '');
@@ -33807,68 +33666,68 @@ document.addEventListener('DOMContentLoaded', function () {
                             console.warn('gs-panel Warning: No ID attribute on side-page element:',
                                          GS.cloneElement(arrElement[i]),
                                          ', please set ID the attribute');
-                            
+
                             arrElement[i].setAttribute('id', 'side-' + GS.GUID().substring(0, 8));
                         }
                         element.panelIDs.push(arrElement[i].getAttribute('id'));
-                        
+
                         blockerElement = document.createElement('div');
                         blockerElement.classList.add('gs-panel-page-blocker');
                         blockerElement.setAttribute('gs-dynamic', '');
                         blockerElement.setAttribute('blocking', arrElement[i].getAttribute('id'));
                         blockerElement.setAttribute('id', arrElement[i].getAttribute('id') + '-blocker');
-                        
+
                         element.insertBefore(blockerElement, arrElement[i]);
-                        
+
                         arrElement[i].setAttribute('panel-set-width', '');
-                        
+
                         if (arrElement[i].hasAttribute('hidden')) {
                             arrElement[i].removeAttribute('hidden');
                             element.hide(arrElement[i].getAttribute('id'));
-                            
+
                         } else {
                             if (element.getAttribute(arrElement[i].getAttribute('id')) === 'hide') {
                                 element.hide(arrElement[i].getAttribute('id'));
                             }
                         }
-                        
+
                         if (!element.hasAttribute('no-shadow-dismiss')) {
                             blockerElement.addEventListener('click', blockerClickHandler);
                         }
                     }
                 }
-                
+
                 window.addEventListener('pushstate',    function () { pushReplacePopHandler(element); });
                 window.addEventListener('replacestate', function () { pushReplacePopHandler(element); });
                 window.addEventListener('popstate',     function () { pushReplacePopHandler(element); });
-                
+
                 if (element.hasAttribute('id')) {
                     pushReplacePopHandler(element);
                 }
             }
         }
     }
-    
+
     xtag.register('gs-panel', {
         lifecycle: {
             created: function () {
                 elementCreated(this);
             },
-            
+
             inserted: function () {
                 elementInserted(this);
             },
-            
+
             attributeChanged: function (strAttrName, oldValue, newValue) {
                 // if "suspend-created" has been removed: run created and inserted code
                 if (strAttrName === 'suspend-created' && newValue === null) {
                     elementCreated(this);
                     elementInserted(this);
-                    
+
                 // if "suspend-inserted" has been removed: run inserted code
                 } else if (strAttrName === 'suspend-inserted' && newValue === null) {
                     elementInserted(this);
-                    
+
                 } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
                     if (document.getElementById(strAttrName) &&
                         document.getElementById(strAttrName).parentNode === this) {
@@ -33893,23 +33752,23 @@ document.addEventListener('DOMContentLoaded', function () {
                 //document.getElementById(strID).removeAttribute('hidden');
                 //document.getElementById(strID + '-blocker').setAttribute('shown', '');
                 //document.getElementById(strID + '-blocker').removeAttribute('hidden');
-                
+
                 //document.getElementById(strID).style.display = '';
                 //document.getElementById(strID + '-blocker').style.display = '';
-                
+
                 //if (window.innerWidth <= 768 || this.hasAttribute('dismissible')) {
-                
+
                 if ((strElementID && GS.qryGetKeys(strQueryString).indexOf(strElementID + '.' + strID) > -1) &&
                     GS.qryGetVal(strQueryString, strElementID + '.' + strID) === 'hide') {
                     GS.pushQueryString(strElementID + '.' + strID + '=show');
-                    
+
                 } else if (this.getAttribute(strID) === 'show') {
                     //document.getElementById(strID).style.left = '';
                     //document.getElementById(strID).style.position = '';
                     //document.getElementById(strID + '-blocker').style.left = ''; // <-- works on a phone
                     document.getElementById(strID).removeAttribute('panel-hide');
                     document.getElementById(strID + '-blocker').removeAttribute('panel-hide');
-                    
+
                     //this.hiddenIDs.splice(this.hiddenIDs.indexOf(strID), 1);
                     //
                     GS.triggerEvent(document.getElementById(strID), 'show');
@@ -33919,32 +33778,32 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 //}
             },
-            
+
             'hide': function (strID) {
                 var strQueryString = GS.getQueryString(), strElementID = this.getAttribute('id');
                 //document.getElementById(strID).setAttribute('hidden', '');
                 //document.getElementById(strID).removeAttribute('shown');
                 //document.getElementById(strID + '-blocker').setAttribute('hidden', '');
                 //document.getElementById(strID + '-blocker').removeAttribute('shown');
-                
+
                 //document.getElementById(strID).style.display = 'none';
                 //document.getElementById(strID + '-blocker').style.display = 'none';
-                
+
                 if ((strElementID && GS.qryGetKeys(strQueryString).indexOf(strElementID + '.' + strID) > -1) &&
                     GS.qryGetVal(strQueryString, strElementID + '.' + strID) === 'show') {
                     GS.pushQueryString(strElementID + '.' + strID + '=hide');
-                    
+
                 } else if (this.getAttribute(strID) === 'hide') {
                     document.getElementById(strID).setAttribute('panel-hide', '');
                     document.getElementById(strID + '-blocker').setAttribute('panel-hide', '');
-                    
+
                     //if (window.innerWidth <= 768 || this.hasAttribute('dismissible')) {
                     //    document.getElementById(strID).style.left = '-100%';
                     //    document.getElementById(strID).style.position = 'absolute';
                     //    document.getElementById(strID + '-blocker').style.left = '-100%'; // <-- works on a phone
-                    //    
+                    //
                     //    this.hiddenIDs.push(strID);
-                    //    
+                    //
                     GS.triggerEvent(document.getElementById(strID), 'hide');
                     GS.triggerEvent(window, 'resize'); //, {'triggered': true});
                     //}
@@ -33952,10 +33811,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     this.setAttribute(strID, 'hide');
                 }
             },
-            
+
             'toggle': function (strID) {
                 var element = document.getElementById(strID);
-                
+
                 if (element.hasAttribute('shown') || !element.hasAttribute('panel-hide')) {
                     this.hide(strID);
                 } else {
@@ -33972,12 +33831,12 @@ window.addEventListener('design-register-element', function () {
 
 GS.pushMessage = function (strHTML, intTime, callback) {
     var pushMessageElement, containerElement;
-    
+
     // if there is no html to put in the pushmessage: throw an error
     if (strHTML === undefined) {
         throw 'GS.pushMessage Error: no HTML to display.';
     }
-    
+
     // if there is no container: add it
     if (document.getElementsByTagName('gs-pushmessage-container').length === 0) {
         containerElement = document.createElement('gs-pushmessage-container');
@@ -33986,27 +33845,27 @@ GS.pushMessage = function (strHTML, intTime, callback) {
     } else {
         containerElement = document.getElementsByTagName('gs-pushmessage-container')[0];
     }
-    
+
     // create the pushmessage
     pushMessageElement = document.createElement('gs-pushmessage');
     pushMessageElement.setAttribute('gs-dynamic', '');
     pushMessageElement.innerHTML = strHTML;
-    
+
     // append the pushmessage to the container
     containerElement.appendChild(pushMessageElement);
-    
+
     // if there is a callback: run it
     if (typeof callback === 'function') {
         callback.apply(pushMessageElement);
     }
-    
+
     // if there is a time: set a timeout to close the message
     if (intTime) {
         setTimeout(function() {
             GS.closePushMessage(pushMessageElement);
         }, intTime);
     }
-    
+
     // return the pushmessage
     return pushMessageElement;
 };
@@ -34019,14 +33878,14 @@ window.addEventListener('design-register-element', function () {
 
 GS.closePushMessage = function (pushMessageElement) {
     var containerElement = document.getElementsByTagName('gs-pushmessage-container')[0];
-    
+
     // fade the pushmessage out
     GS.animateStyle(pushMessageElement, 'opacity', '1', '0', function () {
-        
+
         // if there is only one pushmessage element: remove the container
         if (document.getElementsByTagName('gs-pushmessage').length === 1) {
             document.body.removeChild(containerElement);
-            
+
         // else: just remove the element
         } else {
             containerElement.removeChild(pushMessageElement);
@@ -34042,7 +33901,7 @@ document.addEventListener('DOMContentLoaded', function () {
         accessors: {},
         methods: {}
     });
-    
+
     xtag.register('gs-pushmessage-container', {
         lifecycle: {},
         events: {},
@@ -34140,7 +33999,7 @@ window.addEventListener('design-register-element', function () {
         addProp('Disabled', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('disabled') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'disabled', this.value === 'true', true);
         });
-        
+
         addProp('Readonly', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('readonly') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'readonly', this.value === 'true', true);
         });
@@ -34375,7 +34234,7 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             change: function () {
                 var strQueryString = GS.getQueryString(), strColumn = (this.getAttribute('qs') || this.getAttribute('id'));
-                
+
                 if ((GS.qryGetVal(strQueryString, strColumn) || '') !== (this.control.value || '')) {
                     GS.pushQueryString(strColumn + '=' + encodeURIComponent(this.control.value));
                 }
@@ -34391,7 +34250,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         return this.innerHTML;
                     }
                 },
-                
+
                 // set the value of the input and set the value attribute
                 set: function (strNewValue) {
                     var element = this;
@@ -34412,7 +34271,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     this.control.focus();
                 }
             },
-            
+
             // adapt gs-input element to whatever control is in it and
             //      set the value of the control to the value attribute (if there is a value attribute) and
             //      resize the resize to text
@@ -34569,9 +34428,9 @@ document.addEventListener('DOMContentLoaded', function () {
     function changeFunction(event) {
         event.preventDefault();
         event.stopPropagation();
-        
+
         GS.triggerEvent(event.target.parentNode, 'change');
-        
+
         //return false;
     }
 
@@ -34726,7 +34585,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // check each mutation: if only option and optgroup tags were added: refersh option tags in select
                 mutations.forEach(function(mutation) {
                     var i, len;
-                    
+
                     for (i = 0, len = mutation.addedNodes.length; i < len; i += 1) {
                         if (mutation.addedNodes[i].nodeName !== 'OPTION' && mutation.addedNodes[i].nodeName !== 'OPTGROUP') {
                             bolRefreshOptionList = false;
@@ -35193,7 +35052,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         element.internal.bolQSFirstRun = true;
     }
-    
+
     // dont do anything that modifies the element here
     function elementCreated(element) {
         // if "created" hasn't been suspended: run created code
@@ -35235,27 +35094,27 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     }
-    
+
     xtag.register('gs-static', {
         lifecycle: {
             created: function () {
                 elementCreated(this);
             },
-            
+
             inserted: function () {
                 elementInserted(this);
             },
-            
+
             attributeChanged: function (strAttrName, oldValue, newValue) {
                 // if "suspend-created" has been removed: run created and inserted code
                 if (strAttrName === 'suspend-created' && newValue === null) {
                     elementCreated(this);
                     elementInserted(this);
-                    
+
                 // if "suspend-inserted" has been removed: run inserted code
                 } else if (strAttrName === 'suspend-inserted' && newValue === null) {
                     elementInserted(this);
-                    
+
                 } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
                     this.refresh();
                 }
@@ -35268,7 +35127,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 get: function () {
                     return this.getAttribute('value');
                 },
-                
+
                 // set the value of the input and set the value attribute
                 set: function (strNewValue) {
                     this.setAttribute('value', strNewValue);
@@ -35290,7 +35149,7 @@ window.addEventListener('design-register-element', function () {
                                                         '        ${0}\n' +
                                                         '    </gs-sticky-inner>\n' +
                                                         '</gs-sticky>');
-    
+
     designRegisterElement('gs-sticky', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-sticky.html');
 
     window.designElementProperty_GSSTICKY = function (selectedElement) {
@@ -35361,14 +35220,14 @@ window.addEventListener('design-register-element', function () {
             selectedElement.removeAttribute('show-on-desktop');
             selectedElement.removeAttribute('show-on-tablet');
             selectedElement.removeAttribute('show-on-phone');
-            
+
             if (this.value) {
                 selectedElement.setAttribute(this.value, '');
             }
-            
+
             return selectedElement;
         });
-        
+
         //addFlexContainerProps(selectedElement);
         addFlexProps(selectedElement);
     };
@@ -35381,17 +35240,17 @@ document.addEventListener('DOMContentLoaded', function () {
             intScrollPosition = document.body.scrollTop,
             jsnElementPositionData = GS.getElementPositionData(element),
             bolShouldBeStuck = (bolTop && jsnElementPositionData.intRoomAbove < 0) || (!bolTop && jsnElementPositionData.intRoomBelow < 0);
-        
+
         if (bolShouldBeStuck && !element.hasAttribute('stuck')) {
             element.style.height = element.offsetHeight + 'px';
             element.setAttribute('stuck', '');
-            
+
             //if (bolTop) {
             //    element.parentNode.style.paddingTop = element.offsetHeight + 'px';
             //} else {
             //    element.parentNode.style.paddingBottom = element.offsetHeight + 'px';
             //}
-            
+
         } else if (!bolShouldBeStuck && element.hasAttribute('stuck')) {
             element.style.height = '';
             element.removeAttribute('stuck');
@@ -35402,40 +35261,40 @@ document.addEventListener('DOMContentLoaded', function () {
             //    element.parentNode.style.paddingBottom = '';
             //}
         }
-        
+
         //console.log(bolTop, intScrollPosition, jsnElementPositionData);
     }
-    
+
     // dont do anything that modifies the element here
     function elementCreated(element) {
         // if "created" hasn't been suspended: run created code
         if (!element.hasAttribute('suspend-created')) {
-            
+
         }
     }
-    
+
     //
     function elementInserted(element) {
         var currentParent;
-        
+
         // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
         if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
             // if this is the first time inserted has been run: continue
             if (!element.inserted) {
                 element.inserted = true;
-                
+
                 if (element.children.length > 1) {
                     throw 'gs-sticky Error: Too many children. gs-sticky elements must have one child and it must be a <gs-sticky-inner> element.';
-                    
+
                 } else if (element.children.length === 0) {
                     throw 'gs-sticky Error: No children. gs-sticky elements must have one child and it must be a <gs-sticky-inner> element.';
-                    
+
                 } else if (element.children[0].nodeName !== 'GS-STICKY-INNER') {
                     throw 'gs-sticky Error: Invalid child. gs-sticky elements must have one child and it must be a <gs-sticky-inner> element.';
                 }
-                
+
                 element.parentNode.style.height = 'auto';
-                
+
                 if (element.hasAttribute('stuck')) {
                     //console.log(element.children[0].offsetHeight, element.getAttribute('direction'));
                     if (element.getAttribute('direction') !== 'down') {
@@ -35444,26 +35303,26 @@ document.addEventListener('DOMContentLoaded', function () {
                         element.parentNode.style.paddingBottom = element.children[0].offsetHeight + 'px';
                     }
                 }
-                
+
                 if (!element.hasAttribute('stuck') && (!evt.touchDevice || element.hasAttribute('touch-device-allowed'))) {
                     stickHandler(element);
                     currentParent = element.parentNode;
                     if (currentParent.nodeName !== 'BODY') {
                         console.warn('gs-sticky Warning: Element not immediate child of BODY. This element was designed for being an immediate child of the BODY, doing otherwise may give unexpected results.');
                     }
-                    
+
                     window.addEventListener('resize', function () {
                         if (element.parentNode === currentParent) {
                             stickHandler(element);
                         }
                     });
-                    
+
                     window.addEventListener('scroll', function () {
                         if (element.parentNode === currentParent) {
                             stickHandler(element);
                         }
                     });
-                    
+
                     window.addEventListener('orientationchange', function () {
                         if (element.parentNode === currentParent) {
                             stickHandler(element);
@@ -35473,30 +35332,30 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     }
-    
+
     xtag.register('gs-sticky-inner', {});
     xtag.register('gs-sticky', {
         lifecycle: {
             created: function () {
                 elementCreated(this);
             },
-            
+
             inserted: function () {
                 elementInserted(this);
             },
-            
+
             attributeChanged: function (strAttrName, oldValue, newValue) {
                 // if "suspend-created" has been removed: run created and inserted code
                 if (strAttrName === 'suspend-created' && newValue === null) {
                     elementCreated(this);
                     elementInserted(this);
-                    
+
                 // if "suspend-inserted" has been removed: run inserted code
                 } else if (strAttrName === 'suspend-inserted' && newValue === null) {
                     elementInserted(this);
-                    
+
                 } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
-                    
+
                 }
             }
         },
@@ -35530,7 +35389,7 @@ window.addEventListener('design-register-element', function () {
             this.removeAttribute('refresh-on-querystring-values');
             return setOrRemoveBooleanAttribute(selectedElement, 'refresh-on-querystring-change', this.value === 'true', true);
         });
-        
+
         addProp('Column In Querystring', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('qs') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'qs', this.value, false);
         });
@@ -35777,7 +35636,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     element.popValues[arrPopKeys[i]] = currentValue;
                     i += 1;
                 }
-                
+
             } else if (element.hasAttribute('refresh-on-querystring-change')) {
                 bolRefresh = true;
             } else if (element.hasAttribute('template') || element.hasAttribute('value')) {
@@ -35822,7 +35681,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     element.setAttribute('template', element.getAttribute('value'));
                     console.warn('gs-switch Warning: "value" attribute is deprecated. Please use the "template" attribute to replace the "value" attribute.', element);
                 }
-                
+
                 element.inserted = true;
                 element.internal = {};
                 saveDefaultAttributes(element);
@@ -35876,7 +35735,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         'arrAttrValues': arrAttrValues,
                         'templated': !(element.hasAttribute('static') || template.hasAttribute('static'))
                     };
-                    if (!(element.hasAttribute('static') || template.hasAttribute('static')) && 
+                    if (!(element.hasAttribute('static') || template.hasAttribute('static')) &&
                         (
                             element.templates[template.getAttribute('for') || template.getAttribute('id')].content.indexOf('&gt;') > -1 ||
                             element.templates[template.getAttribute('for') || template.getAttribute('id')].content.indexOf('&lt;') > -1
@@ -42022,7 +41881,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 'len': intTotalRecords
             });
 
-            console.log(strRecord);
+            //console.log(strRecord);
 
             // return record html
             return strRecord;
@@ -44809,7 +44668,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     ? '\t'
                     : ''
             );
-            strReturn += element.internalData.columnNames[col_i];
+            strReturn += element.internalData.columnNames[col_i].replace(/(\\)/g, '\\\\');
             col_i += 1;
         }
 
@@ -44878,7 +44737,7 @@ document.addEventListener('DOMContentLoaded', function () {
             col_i = 0;
             col_len = jsnInsert.data.columns.length;
             while (col_i < col_len) {
-                strColumn = jsnInsert.data.columns[col_i];
+                strColumn = jsnInsert.data.columns[col_i].replace(/(\\)/g, '\\\\');
 
                 strInsertColumns += (
                     strInsertColumns
@@ -44943,7 +44802,7 @@ document.addEventListener('DOMContentLoaded', function () {
             col_i = 0;
             col_len = jsnInsert.data.columns.length;
             while (col_i < col_len) {
-                strColumn = jsnInsert.data.columns[col_i];
+                strColumn = jsnInsert.data.columns[col_i].replace(/(\\)/g, '\\\\');
 
                 strInsertColumns += (
                     strInsertColumns
@@ -45044,7 +44903,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // gotta let the user know that an insert is in progress
             addLoader(element, 'data-insert', 'Inserting Data...');
-
+            console.log(strSchema,
+                strObject,
+                strReturn,
+                strPK,
+                strSeq,
+                strInsertData);
             // begin the websocket insert
             GS.requestInsertFromSocket(
                 getSocket(element),
@@ -45257,7 +45121,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     ? '\t'
                     : ''
             );
-            strReturn += element.internalData.columnNames[col_i];
+            strReturn += element.internalData.columnNames[col_i].replace(/(\\)/g, '\\\\');
             col_i += 1;
         }
 
@@ -45268,7 +45132,7 @@ document.addEventListener('DOMContentLoaded', function () {
         //      one record
         if (strMode === 'single-cell') {
             jsnCurrentData = {
-                "columnName": jsnUpdate.data.columnName,
+                "columnName": jsnUpdate.data.columnName.replace(/(\\)/g, '\\\\'),
                 "recordNumber": jsnUpdate.data.recordNumber,
                 "oldValue": ""
             };
@@ -45405,7 +45269,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 strHashString += (
                     strTemp === '\\N'
                         ? ''
-                        : strTemp
+                        : GS.encodeForTabDelimited(strTemp, '\\N')
                 );
                 i += 1;
             }
@@ -45446,7 +45310,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     ? '\t'
                     : ''
             );
-            strColumns += jsnUpdate.data.columnName;
+            strColumns += jsnUpdate.data.columnName.replace(/(\\)/g, '\\\\');
 
             // append new value
             strUpdateData += (
@@ -45554,7 +45418,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         ? '\t'
                         : ''
                 );
-                strColumns += jsnUpdate.data.columns[i];
+                strColumns += jsnUpdate.data.columns[i].replace(/(\\)/g, '\\\\');
                 i += 1;
             }
 
@@ -45641,7 +45505,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     strHashString += (
                         strTemp === '\\N'
                             ? ''
-                            : strTemp
+                            : GS.encodeForTabDelimited(strTemp, '\\N')
                     );
                     lock_i += 1;
                 }
@@ -46080,6 +45944,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         ? ""
                         : strTemp
                 );
+                console.log(strTemp, strRecordToHash);
 
                 col_i += 1;
             }
@@ -57154,7 +57019,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (element.classList.contains('table-fullscreen')) {
                     GS.triggerEvent(element, 'closeFullScreen');
                     element.classList.remove('table-fullscreen');
-    
+
                     if (target.getAttribute('icon') === 'close') {
                         target.setAttribute('icon', 'arrows-alt');
                     }
@@ -57656,7 +57521,7 @@ window.addEventListener('design-register-element', function () {
         addProp('Disabled', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('disabled') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'disabled', this.value === 'true', true);
         });
-        
+
         addProp('Readonly', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('readonly') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'readonly', this.value === 'true', true);
         });
@@ -57992,10 +57857,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     element.control.removeEventListener(evt.mouseout, mouseoutFunction);
                     element.control.addEventListener(evt.mouseout, mouseoutFunction);
-                    
+
                     element.control.removeEventListener(evt.mouseout, mouseoverFunction);
                     element.control.addEventListener(evt.mouseover, mouseoverFunction);
-                    
+
                     // copy passthrough attributes to control
                     i = 0;
                     len = arrPassThroughAttributes.length;
@@ -59225,41 +59090,41 @@ left: 49.75%;"><div class="clock-button clock-minute" data-value="25"><span clas
 
 window.addEventListener('design-register-element', function () {
     'use strict';
-    
+
     registerDesignSnippet('<gs-timestamp>', '<gs-timestamp>', 'gs-timestamp date-format="${0:isodate}" time-format=${1}></gs-timestamp>');
-    
+
     designRegisterElement('gs-timestamp', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-timestamp.html');
-    
-    window.designElementProperty_GSTIMESTAMP = function (selectedElement) {    
+
+    window.designElementProperty_GSTIMESTAMP = function (selectedElement) {
         addProp('Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'column', this.value);
         });
-        
+
         addProp('Value', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('value') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'value', this.value);
         });
-        
+
         addProp('Column In Querystring', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('qs') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'qs', this.value, false);
         });
-        
+
         addProp('Date Placeholder', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('date-placeholder') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'date-placeholder', this.value);
         });
-        
+
         addProp('Time Placeholder', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('time-placeholder') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'time-placeholder', this.value);
         });
-        
+
         addProp('Mini', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('mini')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'mini', (this.value === 'true'), true);
         });
-        
+
         addProp('Date Picker', true, '<gs-checkbox class="target" value="' + (!selectedElement.hasAttribute('no-date-picker')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'no-date-picker', (this.value === 'true'), false);
         });
-        
-        addProp('Date Format', true, '<gs-combo class="target" value="' + encodeHTML(selectedElement.getAttribute('date-format') || '') + '" mini>' + 
+
+        addProp('Date Format', true, '<gs-combo class="target" value="' + encodeHTML(selectedElement.getAttribute('date-format') || '') + '" mini>' +
                         ml(function () {/*<template>
                                             <table>
                                                 <tbody>
@@ -59317,36 +59182,36 @@ window.addEventListener('design-register-element', function () {
         addProp('Time Now Button', true, '<gs-checkbox class="target" value="' + (!selectedElement.hasAttribute('time-no-now-button')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'time-no-now-button', (this.value === 'true'), false);
         });
-        
+
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
-        
+
         addProp('Date Tabindex', true, '<gs-number class="target" value="' + encodeHTML(selectedElement.getAttribute('date-tabindex') || '') + '" mini></gs-number>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'date-tabindex', this.value);
         });
-        
+
         addProp('Time Tabindex', true, '<gs-number class="target" value="' + encodeHTML(selectedElement.getAttribute('time-tabindex') || '') + '" mini></gs-number>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'time-tabindex', this.value);
         });
-        
+
         addProp('Autocorrect', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocorrect') !== 'off') + '" mini></gs-checkbox>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'autocorrect', (this.value === 'false' ? 'off' : ''));
         });
-        
+
         addProp('Autocapitalize', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocapitalize') !== 'off') + '" mini></gs-checkbox>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'autocapitalize', (this.value === 'false' ? 'off' : ''));
         });
-        
+
         addProp('Autocomplete', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocomplete') !== 'off') + '" mini></gs-checkbox>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'autocomplete', (this.value === 'false' ? 'off' : ''));
         });
-        
+
         addProp('Spellcheck', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('spellcheck') !== 'false') + '" mini></gs-checkbox>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'spellcheck', (this.value === 'false' ? 'false' : ''));
         });
-        
+
         // visibility attributes
         var strVisibilityAttribute = '';
         if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
@@ -59356,7 +59221,7 @@ window.addEventListener('design-register-element', function () {
         if (selectedElement.hasAttribute('show-on-desktop'))   { strVisibilityAttribute = 'show-on-desktop'; }
         if (selectedElement.hasAttribute('show-on-tablet'))    { strVisibilityAttribute = 'show-on-tablet'; }
         if (selectedElement.hasAttribute('show-on-phone'))     { strVisibilityAttribute = 'show-on-phone'; }
-        
+
         addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                         '<option value="">Visible</option>' +
                                         '<option value="hidden">Invisible</option>' +
@@ -59374,14 +59239,14 @@ window.addEventListener('design-register-element', function () {
             selectedElement.removeAttribute('show-on-desktop');
             selectedElement.removeAttribute('show-on-tablet');
             selectedElement.removeAttribute('show-on-phone');
-            
+
             if (this.value) {
                 selectedElement.setAttribute(this.value, '');
             }
-            
+
             return selectedElement;
         });
-        
+
         // DISABLED attribute
         addProp('Disabled', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('disabled') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'disabled', this.value === 'true', true);
@@ -59391,10 +59256,10 @@ window.addEventListener('design-register-element', function () {
         addProp('Readonly', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('readonly') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'readonly', this.value === 'true', true);
         });
-        
+
         //addFlexContainerProps(selectedElement);
         addFlexProps(selectedElement);
-        
+
         // SUSPEND-INSERTED attribute
         addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-inserted', this.value === 'true', true);
@@ -59404,7 +59269,7 @@ window.addEventListener('design-register-element', function () {
 
 document.addEventListener('DOMContentLoaded', function () {
     'use strict';
-    
+
     function pushReplacePopHandler(element) {
         var i;
         var len;
@@ -59482,16 +59347,16 @@ document.addEventListener('DOMContentLoaded', function () {
         var strDateValue = element.dateControl.value + ' ' + (element.timeControl.value === 'NULL' ? '00:00' : element.timeControl.value);
         var dateValue = new Date(strDateValue);
         var newValue = dateValue.getFullYear() + '-' + (dateValue.getMonth() + 1) + '-' + dateValue.getDate() + ' ' + dateValue.getHours() + ':' + dateValue.getMinutes();
-        
+
         //console.log(element.dateControl.value);
         //console.log(element.timeControl.value === 'NULL' ? '00:00' : element.timeControl.value);
         //console.log(strDateValue);
         //console.log(dateValue);
         //console.log(newValue);
-        
+
         element.setAttribute('value', newValue);
     }
-    
+
     function saveDefaultAttributes(element) {
         var i;
         var len;
@@ -59537,7 +59402,7 @@ document.addEventListener('DOMContentLoaded', function () {
         GS.triggerEvent(event.target.parentNode, evt.mouseover);
         event.target.parentNode.classList.add('hover');
     }
-    
+
     // dont do anything that modifies the element here
     function elementCreated(element) {
         // if "created" hasn't been suspended: run created code
@@ -59553,11 +59418,11 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     }
-    
+
     function elementInserted(element) {
         var dateValue = '';
         var timeValue = '';
-        
+
         // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
         if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
             // if this is the first time inserted has been run: continue
@@ -59565,23 +59430,23 @@ document.addEventListener('DOMContentLoaded', function () {
                 element.inserted = true;
                 element.internal = {};
                 saveDefaultAttributes(element);
-                
+
                 if (element.hasAttribute('value')) {
                     var arrValue = element.getAttribute('value').split(' ');
                     dateValue = new Date(arrValue[0] + ' 00:00:00');    // adding an empty time causes the date to not be iso format
                                                                         // this makes the browser choose the local timezone instead of GMT
                     timeValue = arrValue[1];
                 }
-                
+
                 element.dateControl = document.createElement('gs-date');
                 element.timeControl = document.createElement('gs-time');
-                
+
                 var arrPassthrough = ['mini', 'autocorrect', 'autocapitalize', 'autocomplete', 'spellcheck', 'disabled', 'readonly'];
                 var arrDatePassthrough = ['date-placeholder', 'no-date-picker', 'date-format', 'date-tabindex'];
                 var arrTimePassthrough = ['time-placeholder', 'no-time-picker', 'time-format', 'time-non-empty', 'time-no-now-button', 'time-tabindex'];
                 var i;
                 var len;
-                
+
                 for (i = 0, len = arrPassthrough.length; i < len; i += 1) {
                     if (element.hasAttribute(arrPassthrough[i])) {
                         element.dateControl.setAttribute(arrPassthrough[i], '');
@@ -59598,16 +59463,16 @@ document.addEventListener('DOMContentLoaded', function () {
                         element.timeControl.setAttribute(arrTimePassthrough[i].replace(/time\-/g, ''), element.getAttribute(arrTimePassthrough[i]) || '');
                     }
                 }
-                
+
                 element.dateControl.value = dateValue;
                 element.timeControl.value = timeValue;
-                
+
                 element.dateControl.setAttribute('flex', '');
                 element.timeControl.setAttribute('flex', '');
-                
+
                 element.dateControl.setAttribute('gs-dynamic', '');
                 element.timeControl.setAttribute('gs-dynamic', '');
-                
+
                 element.dateControl.addEventListener('focus', focusFunction);
                 element.timeControl.addEventListener('focus', focusFunction);
 
@@ -59616,10 +59481,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 element.dateControl.addEventListener(evt.mouseout, mouseoutFunction);
                 element.timeControl.addEventListener(evt.mouseout, mouseoutFunction);
-                
+
                 element.dateControl.addEventListener(evt.mouseover, mouseoverFunction);
                 element.timeControl.addEventListener(evt.mouseover, mouseoverFunction);
-                
+
                 element.dateControl.addEventListener('change', function (event) {
                     syncView(element);
                     event.stopPropagation();
@@ -59630,15 +59495,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     event.stopPropagation();
                     GS.triggerEvent(element, 'change');
                 });
-                
+
                 //console.log(element.dateControl);
                 //console.log(element.timeControl);
-                
+
                 element.appendChild(element.dateControl);
                 element.appendChild(element.timeControl);
-                
+
                 //console.log(element.children);
-                
+
                 pushReplacePopHandler(element);
                 window.addEventListener('pushstate',    function () { pushReplacePopHandler(element); });
                 window.addEventListener('replacestate', function () { pushReplacePopHandler(element); });
@@ -59646,17 +59511,17 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     }
-    
+
     xtag.register('gs-timestamp', {
         lifecycle: {
             created: function () {
                 elementCreated(this);
             },
-            
+
             inserted: function () {
                 elementInserted(this);
             },
-            
+
             attributeChanged: function (strAttrName, oldValue, newValue) {
                 var dateValue = '';
                 var timeValue = '';
@@ -59664,18 +59529,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (strAttrName === 'suspend-created' && newValue === null) {
                     elementCreated(this);
                     elementInserted(this);
-                    
+
                 // if "suspend-inserted" has been removed: run inserted code
                 } else if (strAttrName === 'suspend-inserted' && newValue === null) {
                     elementInserted(this);
-                    
+
                 } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
                     if (strAttrName === 'value') {
                         if (newValue !== null) {
                             var arrValue = newValue.split(' ');
                             dateValue = new Date(arrValue[0]);
                             timeValue = arrValue[1];
-                            
+
                             this.dateControl.value = dateValue;
                             this.timeControl.value = timeValue;
                         } else {
@@ -59692,7 +59557,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 get: function () {
                     return this.getAttribute('value');
                 },
-                
+
                 set: function (newValue) {
                     this.setAttribute('value', newValue);
                 }
@@ -59703,11 +59568,11 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 window.addEventListener('design-register-element', function () {
-    
+
     registerDesignSnippet('<gs-toggle>', '<gs-toggle>', 'gs-toggle column="${1}">${2}</gs-toggle>');
-    
+
     designRegisterElement('gs-toggle', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-buttons-toggle.html');
-    
+
     window.designElementProperty_GSTOGGLE = function(selectedElement) {
         addProp('Icon', true, '<div flex-horizontal>' +
                               '     <gs-text id="prop-icon-input" class="target" value="' + (selectedElement.getAttribute('icon') || '') + '" mini flex></gs-text>' +
@@ -59716,20 +59581,20 @@ window.addEventListener('design-register-element', function () {
                               '</div>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'icon', this.value, false);
         });
-        
+
         document.getElementById('prop-icon-picker-button').addEventListener('click', function () {
             var i, len, html, arrIcons = GS.iconList(), strName, templateElement;
-            
+
             for (i = 0, len = arrIcons.length, html = ''; i < len; i += 1) {
                 strName = arrIcons[i].name;
                 html += '<gs-block>' +
                             '<gs-button iconleft icon="' + strName + '" dialogclose>' + strName + '</gs-button>' +
                         '</gs-block>';
             }
-            
+
             templateElement = document.createElement('template');
             templateElement.setAttribute('data-max-width', '1100px');
-            
+
             templateElement.innerHTML = ml(function () {/*
                 <gs-page>
                     <gs-header><center><h3>Choose An Icon</h3></center></gs-header>
@@ -59739,17 +59604,17 @@ window.addEventListener('design-register-element', function () {
                     <gs-footer><gs-button dialogclose>Cancel</gs-button></gs-footer>
                 </gs-page>
             */}).replace('{{HTML}}', html);
-            
+
             GS.openDialog(templateElement, '', function (event, strAnswer) {
                 var propInput = document.getElementById('prop-icon-input');
-                
+
                 if (strAnswer !== 'Cancel') {
                     propInput.value = strAnswer;
                     GS.triggerEvent(propInput, 'change');
                 }
             });
         });
-        
+
         if (selectedElement.getAttribute('icon') ||
             selectedElement.hasAttribute('iconleft') ||
             selectedElement.hasAttribute('iconright') ||
@@ -59770,7 +59635,7 @@ window.addEventListener('design-register-element', function () {
             } else if (selectedElement.hasAttribute('iconbottom')) { strIconPos = 'iconbottom';
             } else if (selectedElement.hasAttribute('icononly'))   { strIconPos = 'icononly';
             } else { strIconPos = ''; }
-            
+
             addProp('Icon Position', true, '<gs-select class="target" value="' + strIconPos + '" mini>' +
                                                 '   <option value="">Default</option>' +
                                                 '   <option value="iconleft">Left</option>' +
@@ -59784,19 +59649,19 @@ window.addEventListener('design-register-element', function () {
                 selectedElement.removeAttribute('icontop');
                 selectedElement.removeAttribute('iconbottom');
                 selectedElement.removeAttribute('icononly');
-                
+
                 if (this.value) {
                     selectedElement.setAttribute(this.value, '');
                 }
-                
+
                 return selectedElement;
             });
-            
+
             // None
             // 90 degrees  (iconrotateright)
             // 180 degrees (iconrotatedown)
             // 270 degrees (iconrotateleft)
-            
+
                    if (selectedElement.hasAttribute('iconrotateright')) { strIconRotation = 'iconrotateright';
             } else if (selectedElement.hasAttribute('iconrotatedown'))  { strIconRotation = 'iconrotatedown';
             } else if (selectedElement.hasAttribute('iconrotateleft'))  { strIconRotation = 'iconrotateleft';
@@ -59871,14 +59736,14 @@ window.addEventListener('design-register-element', function () {
             selectedElement.removeAttribute('show-on-desktop');
             selectedElement.removeAttribute('show-on-tablet');
             selectedElement.removeAttribute('show-on-phone');
-            
+
             if (this.value) {
                 selectedElement.setAttribute(this.value, '');
             }
-            
+
             return selectedElement;
         });
-        
+
         // DISABLED attribute
         addProp('Disabled', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('disabled') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'disabled', this.value === 'true', true);
@@ -60171,25 +60036,25 @@ document.addEventListener('DOMContentLoaded', function () {
                     element.addEventListener(evt.mousedown, function (event) {
                         element.classList.add('down');
                     });
-                    
+
                     element.addEventListener(evt.mouseout, function (event) {
                         element.classList.remove('down');
                         element.classList.remove('hover');
                     });
-                    
+
                     element.addEventListener(evt.mouseover, function (event) {
                         element.classList.remove('down');
                         element.classList.add('hover');
                     });
-                    
+
                     element.addEventListener('keydown', function (event) {
                         if (!element.hasAttribute('disabled') && !element.classList.contains('down') &&
                             (event.keyCode === 13 || event.keyCode === 32)) {
-                            
+
                             element.classList.add('down');
                         }
                     });
-                    
+
                     element.addEventListener('keyup', function (event) {
                         // if we are not disabled and we pressed return (13) or space (32): trigger click
                         if (!element.hasAttribute('disabled') && element.classList.contains('down') &&
@@ -60198,7 +60063,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     });
                 }
-                
+
 
                 // add a tabindex to allow focus
                 if (!element.hasAttribute('tabindex')) {
@@ -60225,7 +60090,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     }
-    
+
     xtag.register('gs-toggle', {
         lifecycle: {
             created: function () {
@@ -60237,24 +60102,24 @@ document.addEventListener('DOMContentLoaded', function () {
                     delete this.value;
                     //this.value = null;
                 }
-                
+
                 elementCreated(this);
             },
-            
+
             inserted: function () {
                 elementInserted(this);
             },
-            
+
             attributeChanged: function (strAttrName, oldValue, newValue) {
                 // if "suspend-created" has been removed: run created and inserted code
                 if (strAttrName === 'suspend-created' && newValue === null) {
                     elementCreated(this);
                     elementInserted(this);
-                    
+
                 // if "suspend-inserted" has been removed: run inserted code
                 } else if (strAttrName === 'suspend-inserted' && newValue === null) {
                     elementInserted(this);
-                    
+
                 } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
                     // attribute code
                 }
@@ -60264,26 +60129,26 @@ document.addEventListener('DOMContentLoaded', function () {
             'click': function (event) {
                 if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
                     this.classList.remove('down');
-                    
+
                     if (this.hasAttribute('selected')) {
                         this.removeAttribute('selected');
-                        
+
                         if (this.getAttribute('value') === 'true') {
                             this.setAttribute('value', 'false');
                         } else if (this.getAttribute('value') === '-1') {
                             this.setAttribute('value', '0');
                         }
-                        
+
                     } else {
                         this.setAttribute('selected', '');
-                        
+
                         if (this.getAttribute('value') === 'false') {
                             this.setAttribute('value', 'true');
                         } else if (this.getAttribute('value') === '0') {
                             this.setAttribute('value', '-1');
                         }
                     }
-                    
+
                     xtag.fireEvent(this, 'change', {
                         bubbles: true,
                         cancelable: true
@@ -60296,7 +60161,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 'get': function () {
                     return this.hasAttribute('selected'); //this.classList.contains('down');
                 },
-                
+
                 'set': function (newValue) {
                     if (newValue === true || newValue === 'true') {
                         this.setAttribute('selected', '');
@@ -60305,12 +60170,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
             },
-            
+
             'textValue': {
                 'get': function () {
                     return this.hasAttribute('selected') ? 'YES' : 'NO';
                 },
-                
+
                 'set': function (newValue) {
                     if (newValue === true || newValue === 'true' || newValue === 'YES') {
                         this.setAttribute('selected', '');
@@ -60321,17 +60186,17 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         },
         methods: {
-            
+
         }
     });
 });
 window.addEventListener('design-register-element', function () {
     'use strict';
-    
+
     //registerDesignSnippet('<gs-checkbox>', '<gs-checkbox>', 'gs-checkbox value="0" column="${1:ready_to_ship}">${2}</gs-checkbox>');
-    
+
     designRegisterElement('gs-tutorial', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-tutorial.html');
-    
+
     window.designElementProperty_GSTUTORIAL = function (selectedElement) {
         addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-inserted', this.value === 'true', true);
@@ -60341,24 +60206,24 @@ window.addEventListener('design-register-element', function () {
 
 document.addEventListener('DOMContentLoaded', function () {
     'use strict';
-    
+
     function closeCurrentPopup(element) {
         var popupElement = element.currentPopup;
-        
+
         // run before-close code if there is any
         if (popupElement.strBeforeClose) {
             new Function(popupElement.strBeforeClose).apply(element);
         }
-        
+
         // remove overlay if there is one
         if (popupElement.relatedOverlay) {
             document.body.removeChild(popupElement.relatedOverlay);
         }
-        
+
         // remove popup element
         document.body.removeChild(popupElement);
     }
-    
+
     function openPopup(element, templateElement, intTemplateNumber, intNumberOfTemplates) {
         var strTargetSelector = (templateElement.getAttribute('target') || '')
           , strDirectionRequest = (templateElement.getAttribute('direction') || 'down')
@@ -60367,20 +60232,20 @@ document.addEventListener('DOMContentLoaded', function () {
           , strBeforeClose = templateElement.getAttribute('before-close')
           , strHTML, arrElements, elementTarget, arrTests, popupElement, overlayElement, arrowElement
           , positionHandlingFunction, buttonElement, i, len;
-        
+
         // make the template a copy so that we can alter it safely
         templateElement = templateElement.cloneNode(true);
-        
+
         // run before-open code if there is any
         if (strBeforeOpen) {
             new Function(strBeforeOpen).apply(element);
         }
-        
+
         // get html from template
         strHTML = (templateElement.innerHTML || '');
-        
+
         // add next, previous and skip buttons
-        
+
         // if first and only
         if (intTemplateNumber === 1 && intNumberOfTemplates === 1) {
             strHTML += ml(function () {/*
@@ -60414,30 +60279,30 @@ document.addEventListener('DOMContentLoaded', function () {
                             </div>
                         */});
         }
-        
+
         // if a selector was provided: get the instruction target
         if (strTargetSelector) {
             try {
                 arrElements = xtag.toArray(document.querySelectorAll(strTargetSelector));
             } catch (e) {}
-            
+
             arrElements = arrElements || [];
-            
+
             if (arrElements.length > 1) {
                 console.warn('gs-tutorial Warning: More than one element matched with selector \'' + strTargetSelector + '\'.');
             }
-            
+
             if (arrElements.length === 0) {
                 console.warn('gs-tutorial Warning: No elements matched with selector \'' + strTargetSelector + '\'.');
-                
+
             } else {
                 elementTarget = arrElements[0];
             }
         }
-        
+
         // make strDirectionRequest lowercase
         strDirectionRequest.toLowerCase();
-        
+
         // if the direction does not match any valid direction: set direction to down and warn
         if (!strDirectionRequest.match(/^up$|^down$|^left$|^right$/)) {
             console.warn('gs-tutorial Warning: ' +
@@ -60445,29 +60310,29 @@ document.addEventListener('DOMContentLoaded', function () {
                                 'Please use \'up\', \'down\', \'left\', \'right\'. Defaulting to \'down\'.');
             strDirectionRequest = 'down';
         }
-        
+
         // order of tests depending direction request
         if (strDirectionRequest === 'up') { // up: up, down, left, right, full
             arrTests = ['up', 'down', 'left', 'right'];
-            
+
         } else if (strDirectionRequest === 'down') { // down: down, up, left, right, full
             arrTests = ['down', 'up', 'left', 'right'];
-            
+
         } else if (strDirectionRequest === 'left') { // left: left, right, down, up, full
             arrTests = ['left', 'right', 'down', 'up'];
-            
+
         } else if (strDirectionRequest === 'right') { // right: right, left, down, up, full
             arrTests = ['right', 'left', 'down', 'up'];
         }
-        
+
         // create popup, overlay and arrow
         popupElement = document.createElement('gs-tutorial-popup');
-        
+
         overlayElement = document.createElement('gs-tutorial-overlay');
-        
+
         arrowElement = document.createElement('div');
         arrowElement.classList.add('connection-arrow');
-        
+
         // append overlay then the popup so that they can have the same z-index and the popup will be over the overlay
         //      the reason why all of the overlays and all of the popups need the same z-index is because say for example
         //      the overlays had a z-index of '1' and the popups had a z-index of '2' if we had two popups open and the
@@ -60476,17 +60341,17 @@ document.addEventListener('DOMContentLoaded', function () {
         //      second popup.
         document.body.appendChild(overlayElement);
         document.body.appendChild(popupElement);
-        
+
         // link the popup to it's overlay so that when we close the popup we can also remove the popup overlay
         popupElement.relatedOverlay = overlayElement;
-        
+
         // link the popup to it's before-close so that before we close the popup we can run any code inside the before-close
         popupElement.strBeforeClose = strBeforeClose;
-        
+
         // fill popup
         popupElement.innerHTML = strHTML;
         popupElement.appendChild(arrowElement);
-        
+
         // bind next, previous and skip buttons
         buttonElement = xtag.query(popupElement, '.popup-control-bar > .button-left')[0];
         if (buttonElement) {
@@ -60494,53 +60359,53 @@ document.addEventListener('DOMContentLoaded', function () {
                 element.backward();
             });
         }
-        
+
         buttonElement = xtag.query(popupElement, '.popup-control-bar > .button-close')[0];
         if (buttonElement) {
             buttonElement.addEventListener('click', function () {
                 element.end();
             });
         }
-        
+
         buttonElement = xtag.query(popupElement, '.popup-control-bar > .button-right')[0];
         if (buttonElement) {
             buttonElement.addEventListener('click', function () {
                 element.forward();
             });
         }
-        
+
         // bind the overlay
         overlayElement.addEventListener('click', function () {
             element.forward();
         });
-        
+
         // create a positioning function: this is so that we can refresh the popup's position from several different events
         positionHandlingFunction = function () {
             var intTemp, intMaxWidth, intMaxHeight, intResolvedWidth, intResolvedHeight
               , jsnPositionData, strResolvedDirection, intPopupMidPoint, intElementMidPoint
               , intMargin = 10, intArrow = 5, intPopupTop, intPopupLeft, intArrowLeft, intArrowTop;
-            
+
             // if the dialog is not in the DOM: unbind and skip the contents of the function using return
             if (popupElement.parentNode !== document.body) {
                 window.removeEventListener('resize', positionHandlingFunction);
                 window.removeEventListener('orientationchange', positionHandlingFunction);
                 return;
             }
-            
+
             // save scroll numbers
             popupElement.oldScrollTop = popupElement.scrollTop;
             popupElement.oldScrollLeft = popupElement.scrollLeft;
-            
+
             // clear arrow direction
             popupElement.classList.remove('up');
             popupElement.classList.remove('down');
             popupElement.classList.remove('left');
             popupElement.classList.remove('right');
-            
+
             // clear popup and arrow css
             popupElement.setAttribute('style', '');
             arrowElement.setAttribute('style', '');
-            
+
             // find the closest balance of width and height (using the window width as a max width)
             if ((popupElement.offsetHeight + popupElement.offsetWidth) < 300) {
                 intTemp = 300;
@@ -60548,39 +60413,39 @@ document.addEventListener('DOMContentLoaded', function () {
                 intTemp = ((popupElement.offsetHeight + popupElement.offsetWidth) / 2);
             }
             intMaxWidth = (intTemp < window.innerWidth ? intTemp : window.innerWidth - (intMargin * 2));
-            
+
             if (intMaxWidth > intMaxWidthAttribute) {
                 intMaxWidth = intMaxWidthAttribute;
             }
-            
+
             // find the maximum height (must be less than half on touch devices and less than a third on everything else)
             if (evt.touchDevice) {
                 intMaxHeight = Math.floor(window.innerHeight / 2) - (intMargin * 2);
-                
+
             } else {
                 intMaxHeight = Math.floor(window.innerHeight / 3) - (intMargin * 2);
             }
-            
+
             // apply calculated max dimensions
             popupElement.style.maxWidth = intMaxWidth + 'px';
             popupElement.style.maxHeight = intMaxHeight + 'px';
-            
+
             // get resolved dimensions
             intResolvedWidth = popupElement.offsetWidth;
             intResolvedHeight = popupElement.offsetHeight;
-            
+
             // if there is a target: run through tests
             if (elementTarget) {
                 // get target position data
                 jsnPositionData = GS.getElementPositionData(elementTarget);
-                
+
                 //console.log(intResolvedHeight,
                 //            intResolvedWidth,
                 //            jsnPositionData.intRoomAbove,
                 //            jsnPositionData.intRoomBelow,
                 //            jsnPositionData.intRoomLeft,
                 //            jsnPositionData.intRoomRight);
-                
+
                 // up: compare room above to popup resolved height
                 //      pass: display
                 //      fail: next test
@@ -60593,132 +60458,132 @@ document.addEventListener('DOMContentLoaded', function () {
                         break;
                     }
                 }
-                
+
                 // if we could not resolve to a particular direction: position in the middle
                 strResolvedDirection = strResolvedDirection || 'middle';
-                
+
             // else: center on screen
             } else {
                 strResolvedDirection = 'middle';
             }
-            
+
             //console.log(strDirectionRequest, strResolvedDirection);
-            
+
             // if up or down: get as close to horizontally centered on the element as possible
             if (strResolvedDirection === 'up' || strResolvedDirection === 'down') {
                 intElementMidPoint = (jsnPositionData.intElementLeft + (jsnPositionData.intElementWidth / 2));
                 intPopupMidPoint = (intResolvedWidth / 2);
                 //console.log(intElementMidPoint, jsnPositionData.left, jsnPositionData.intElementWidth);
-                
+
                 // if centered goes past intMargin of the left edge of the screen: go to intMargin from the bottom
                 if (intElementMidPoint - intPopupMidPoint < intMargin) {
                     intPopupLeft = intMargin;
-                    
+
                     //console.log('1***', intMargin);
-                    
+
                 // else if centered goes past intMargin of the right edge of the screen: go to intMargin less than the width of the viewport
                 } else if (intElementMidPoint + intPopupMidPoint > window.innerWidth - intMargin) {
                     intPopupLeft = ((window.innerWidth - intResolvedWidth) - intMargin);
                     //console.log('2***', window.innerWidth, intResolvedWidth, intMargin);
-                    
+
                 // else centered does not go past intMargin of either edge of the screen: center
                 } else {
                     intPopupLeft = (intElementMidPoint - intPopupMidPoint);
                     //console.log('3***', intElementMidPoint, intPopupMidPoint, (intElementMidPoint - intPopupMidPoint) + 'px');
                 }
-                
+
                 // move the arrow to be pointing at the midopoint of the target
                 intArrowLeft = (intElementMidPoint - intPopupLeft);
-                
+
                 // if the midpoint of the target is really close the left of the screen: add extreme-left class to the popup
                 //console.log(intElementMidPoint, intMargin, intArrow);
                 if (intElementMidPoint <= (intMargin + Math.round(intArrow / 2) + 5)) {
                     popupElement.classList.add('extreme-left');
                 }
-                
+
                 // if the midpoint of the target is really close the right of the screen: add extreme-right class to the popup
                 //console.log(intElementMidPoint, window.innerWidth, intMargin, Math.round(intArrow / 2));
                 if (intElementMidPoint >= (((window.innerWidth - intMargin) - Math.round(intArrow / 2)) - 5)) {
                     popupElement.classList.add('extreme-right');
                 }
-                
+
             // else if left or right: get as close to vertically centered next to the element as possible
             } else if (strResolvedDirection === 'left' || strResolvedDirection === 'right') {
                 intElementMidPoint = (jsnPositionData.intElementTop + (jsnPositionData.intElementHeight / 2));
                 intPopupMidPoint = (intResolvedHeight / 2);
-                
+
                 //console.log('0***', intElementMidPoint, intPopupMidPoint, window.innerHeight, intMargin, intDialogResolvedHeight);
-                
+
                 // if centered goes past intMargin of the top edge of the screen: go to intMargin from the bottom
                 if (intElementMidPoint - intPopupMidPoint < intMargin) {
                     intPopupTop = intMargin;
                     //console.log('1***', intMargin);
-                    
+
                 // else if centered goes past intMargin of the bottom edge of the screen: go to intMargin less than the height of the viewport
                 } else if (intElementMidPoint + intPopupMidPoint > window.innerHeight - intMargin) {
                     intPopupTop = ((window.innerHeight - intResolvedHeight) - intMargin);
                     //console.log('2***', window.innerHeight, intResolvedHeight, intMargin);
-                    
+
                 // else centered does not go past intMargin of either edge of the screen: center
                 } else {
                     intPopupTop = (intElementMidPoint - intPopupMidPoint);
                     //console.log('3***', intElementMidPoint, intPopupMidPoint, (intElementMidPoint - intPopupMidPoint) + 'px');
                 }
-                
+
                 intArrowTop = (intElementMidPoint - intPopupTop);
-                
+
                 // if the midpoint of the target is really close the left of the screen: add extreme-left class to the popup
                 if (intElementMidPoint <= (intMargin + Math.round(intArrow / 2) + 5)) {
                     popupElement.classList.add('extreme-up');
                 }
-                
+
                 // if the midpoint of the target is really close the right of the screen: add extreme-right class to the popup
                 if (intElementMidPoint >= (((window.innerHeight - intMargin) - Math.round(intArrow / 2)) - 5)) {
                     popupElement.classList.add('extreme-down');
                 }
-                
+
             // else full: use dialog logic to get width and height and center both vertically and horizontally
             } else {
                 intPopupTop = (window.innerHeight / 2) - (intResolvedHeight / 2);
                 intPopupLeft = (window.innerWidth / 2) - (intResolvedWidth / 2);
             }
-            
+
             // if direction is up: connect the bottom of the dialog to the top of the element
             if (strResolvedDirection === 'up') {
                 intPopupTop = (jsnPositionData.intElementTop - intResolvedHeight) - intArrow;
-                
+
             // if direction is down: connect the top of the dialog to the bottom of the element
             } else if (strResolvedDirection === 'down') {
                 intPopupTop = (jsnPositionData.intElementTop + jsnPositionData.intElementHeight) + intArrow;
-                
+
             // if direction is left: connect the right of the dialog to the left of the element
             } else if (strResolvedDirection === 'left') {
                 intPopupLeft = (jsnPositionData.intElementLeft - intResolvedWidth) - intArrow;
-                
+
             // if direction is right: connect the left of the dialog to the right of the element
             } else if (strResolvedDirection === 'right') {
                 intPopupLeft = (jsnPositionData.intElementLeft + jsnPositionData.intElementWidth) + intArrow;
             }
-            
+
             // prevent the dialog from vertically going outside the viewport
             if (intPopupTop + intResolvedWidth > window.innerHeight) {
                 intPopupTop -= (intPopupTop + intResolvedWidth) - window.innerHeight;
             }
-            
+
             // prevent the dialog from horizontally going outside the viewport
             if (intPopupLeft + intResolvedWidth > window.innerWidth) {
                 intPopupLeft -= (intPopupLeft + intResolvedWidth) - window.innerWidth;
             }
-            
+
             // apply CSS to the popup
             //console.log(intPopupTop, intPopupLeft);
             popupElement.style.top  = intPopupTop + 'px';
             popupElement.style.left = intPopupLeft + 'px';
-            
+
             // handle arrow
             if (strResolvedDirection !== 'middle') {
                 popupElement.classList.add(strResolvedDirection);
-                
+
                 // apply CSS to the arrow
                 if (intArrowLeft) {
                     arrowElement.style.left = intArrowLeft + 'px';
@@ -60728,40 +60593,40 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         };
-        
+
         // run position handling function and bind to run it every window resize or re-orientation
         positionHandlingFunction();
         window.addEventListener('resize', positionHandlingFunction);
         window.addEventListener('orientationchange', positionHandlingFunction);
-        
+
         element.currentPopup = popupElement;
     }
-    
-    
+
+
     // this runs code on the first inserted lifecycle call
     function elementInserted(element) {
-        
+
         // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
         if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
             // if this is the first time inserted has been run: continue
             if (!element.inserted) {
                 element.inserted = true;
-                
+
             }
         }
     }
-    
+
     xtag.register('gs-tutorial', {
         lifecycle: {
             inserted: function () {
                 elementInserted(this);
             },
-            
+
             attributeChanged: function (strAttrName, oldValue, newValue) {
                 // if "suspend-inserted" or "suspend-created" has been removed: run inserted code
                 if ((strAttrName === 'suspend-created' || strAttrName === 'suspend-created') && newValue === null) {
                     elementInserted(this);
-                    
+
                 } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
                     // attribute code
                 }
@@ -60773,75 +60638,75 @@ document.addEventListener('DOMContentLoaded', function () {
             'start': function () {
                 var strBeforeStart = this.getAttribute('before-start'),
                     arrElement = xtag.queryChildren(this, 'template');
-                
+
                 // if there are no templates: warning
                 if (arrElement.length === 0) {
                     console.warn('gs-tutorial Warning: No popup templates provided.' +
                                     ' Please consult the documention if you need info on how to use the gs-tutorial element.');
-                    
+
                 // if there are non-template children: warning
                 } else if (this.children.length !== arrElement.length) {
                     console.warn('gs-tutorial Warning: Invalid element' + ((this.children.length - arrElement.length) === 1 ? '' : 's') + '.' +
                                     ' The gs-tutorial element only accepts template elements for it\'s children.');
                 }
-                
+
                 // read first template
                 this.currentIndex = 0;
                 if (arrElement[this.currentIndex]) {
                     if (strBeforeStart) {
                         new Function(strBeforeStart).apply(this);
                     }
-                    
+
                     openPopup(this, arrElement[this.currentIndex], (this.currentIndex + 1), arrElement.length);
                 }
             },
-            
+
             'end': function () {
                 var strBeforeEnd = this.getAttribute('before-end');
-                
+
                 if (strBeforeEnd) {
                     new Function(strBeforeEnd).apply(this);
                 }
-                
+
                 if (this.currentPopup) {
                     closeCurrentPopup(this);
                 }
             },
-            
+
             'forward': function () {
                 var arrElement = xtag.queryChildren(this, 'template');
-                
+
                 this.currentIndex += 1;
                 if (arrElement[this.currentIndex]) {
                     if (this.currentPopup) {
                         closeCurrentPopup(this);
                     }
-                    
+
                     openPopup(this, arrElement[this.currentIndex], (this.currentIndex + 1), arrElement.length);
                 } else {
                     this.end();
                 }
             },
-            
+
             'backward': function () {
                 var arrElement = xtag.queryChildren(this, 'template');
-                
+
                 if (this.currentPopup) {
                     closeCurrentPopup(this);
                 }
-                
+
                 this.currentIndex -= 1;
                 if (arrElement[this.currentIndex]) {
                     if (this.currentPopup) {
                         closeCurrentPopup(this);
                     }
-                    
+
                     openPopup(this, arrElement[this.currentIndex], (this.currentIndex + 1), arrElement.length);
                 }
             },
-            
+
             'reposition': function () {
-                
+
             }
         }
     });

@@ -1,4 +1,6 @@
+#define UTIL_DEBUG
 #include "ws_insert.h"
+
 
 void ws_insert_step1(struct sock_ev_client_request *client_request) {
 	struct sock_ev_client_insert *client_insert = (struct sock_ev_client_insert *)(client_request->client_request_data);
@@ -41,6 +43,8 @@ void ws_insert_step1(struct sock_ev_client_request *client_request) {
 		client_insert->str_real_table_name, client_insert->int_real_table_name_len,
 		&client_insert->int_return_columns_len
 	);
+	SDEBUG("client_insert->str_return_columns: %s", client_insert->str_return_columns);
+	SDEBUG("client_request->ptr_query: %s", client_request->ptr_query);
 	SFINISH_ERROR_CHECK(client_insert->str_return_columns != NULL, "Failed to get return columns from query");
 
 #ifndef POSTAGE_INTERFACE_LIBPQ
