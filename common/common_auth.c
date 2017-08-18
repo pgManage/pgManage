@@ -190,36 +190,36 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 #endif
 		}
 
-		str_cookie_decrypted = aes_decrypt(str_cookie_encrypted, &int_cookie_len);
-
-		// **** WARNING ****
-		// DO NOT UNCOMMENT THE NEXT LINE! THAT WILL PUT THE FULL COOKIE IN THE CLEAR
-		// IN THE LOG!!!!
-		// SDEBUG("str_cookie_decrypted: >%s<", str_cookie_decrypted);
-		// **** WARNING ****
-
-		SFINISH_CHECK(str_cookie_decrypted != NULL, "aes_decrypt failed");
-		SFINISH_CHECK(strncmp(str_cookie_decrypted, "valid=true&", 11) == 0, "Session expired");
-
-		////GET THINGS FOR CONNECTION STRING
-		str_username = getpar(str_cookie_decrypted, "username", int_cookie_len, &int_user_length);
-		SFINISH_CHECK(str_username != NULL, "getpar failed");
-		//str_username = bstr_tolower(str_username, int_user_length);
-
-		str_database = getpar(str_cookie_decrypted, "dbname", int_cookie_len, &client->int_database_len);
-		SFINISH_CHECK(str_database != NULL, "getpar failed");
-		//str_database = bstr_tolower(str_database, client->int_database_len);
-		SNOTICE("REQUEST USERNAME: %s", str_username);
-		if (str_database[0] == 0) {
-			SFREE(str_database);
-		}
-		if (str_database != NULL) {
-			SNOTICE("REQUEST DATABASE: %s", str_database);
-		}
-
 #ifdef ENVELOPE
 	} //this closing brace connects to a bol_public check, which only exists in envelope
 #endif
+
+	str_cookie_decrypted = aes_decrypt(str_cookie_encrypted, &int_cookie_len);
+
+	// **** WARNING ****
+	// DO NOT UNCOMMENT THE NEXT LINE! THAT WILL PUT THE FULL COOKIE IN THE CLEAR
+	// IN THE LOG!!!!
+	// SDEBUG("str_cookie_decrypted: >%s<", str_cookie_decrypted);
+	// **** WARNING ****
+
+	SFINISH_CHECK(str_cookie_decrypted != NULL, "aes_decrypt failed");
+	SFINISH_CHECK(strncmp(str_cookie_decrypted, "valid=true&", 11) == 0, "Session expired");
+
+	////GET THINGS FOR CONNECTION STRING
+	str_username = getpar(str_cookie_decrypted, "username", int_cookie_len, &int_user_length);
+	SFINISH_CHECK(str_username != NULL, "getpar failed");
+	//str_username = bstr_tolower(str_username, int_user_length);
+
+	str_database = getpar(str_cookie_decrypted, "dbname", int_cookie_len, &client->int_database_len);
+	SFINISH_CHECK(str_database != NULL, "getpar failed");
+	//str_database = bstr_tolower(str_database, client->int_database_len);
+	SNOTICE("REQUEST USERNAME: %s", str_username);
+	if (str_database[0] == 0) {
+		SFREE(str_database);
+	}
+	if (str_database != NULL) {
+		SNOTICE("REQUEST DATABASE: %s", str_database);
+	}
 
 #ifdef ENVELOPE
 	if (client->bol_public) {
@@ -428,7 +428,7 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 	SFREE_PWORD(str_password);
 	bol_error_state = false;
 finish:
-	if (str_response != NULL &&
+	if (str_response != NULL && !client->bol_handshake &&
 		(strstr(str_response, "\012Session expired") != NULL || strstr(str_response, "\012No Cookie") != NULL)) {
 		SFREE(str_response);
 		str_temp = str_uri_path(client->str_request, client->int_request_len, &int_uri_length);
@@ -480,6 +480,16 @@ finish:
 		}
 		SFINISH_SNFCAT(str_response, &int_response_len,
 			"You need to login.\012", (size_t)19);
+	} else if (str_response != NULL && client->bol_handshake) {
+		SFREE(str_response);
+		char *str_response_temp = "You need to login.";
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"\x03\xf3", (size_t)2, // close reason 1011
+			str_response_temp, strlen(str_response_temp)
+		);
+		WS_sendFrame(global_loop, client, true, 0x08, str_response, int_response_len);
+		client->bol_is_open = false;
+		SFREE(str_response);
 	}
 	SFREE_PWORD(str_cookie_encrypted);
 	SFREE_PWORD(str_cookie_decrypted);

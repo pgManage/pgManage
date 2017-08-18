@@ -39,7 +39,7 @@ void WS_readFrame_step2(EV_P, ev_io *w, int revents);
 This function prepares a client_message structure for the outgoing data, then
 waits for writable on the socket
 */
-bool WS_sendFrame(EV_P, struct sock_ev_client *client, bool bol_fin, int int_opcode, char *str_message, uint64_t int_length);
+bool WS_sendFrame(EV_P, struct sock_ev_client *client, bool bol_fin, int8_t int_opcode, char *str_message, uint64_t int_length);
 /*
 This function sends as much data as it can then returns, until there is no more
 data to write

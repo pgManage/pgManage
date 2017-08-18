@@ -86,7 +86,7 @@ struct sock_ev_client_notify_watcher {
 typedef struct WSFrame {
 	uint64_t int_length;
 	uint16_t int_orig_length;
-	int int_opcode;
+	int8_t int_opcode;
 	bool bol_fin;
 	bool bol_mask;
 	char *str_mask;
