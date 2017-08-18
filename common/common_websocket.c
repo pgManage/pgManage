@@ -321,7 +321,7 @@ error:
 	}
 }
 
-bool WS_sendFrame(EV_P, struct sock_ev_client *client, bool bol_fin, int int_opcode, char *str_message, uint64_t int_length) {
+bool WS_sendFrame(EV_P, struct sock_ev_client *client, bool bol_fin, int8_t int_opcode, char *str_message, uint64_t int_length) {
 	SDEBUG("WS_sendFrame");
 	char *str_response = NULL;
 

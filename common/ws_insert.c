@@ -1,6 +1,4 @@
-#define UTIL_DEBUG
 #include "ws_insert.h"
-
 
 void ws_insert_step1(struct sock_ev_client_request *client_request) {
 	struct sock_ev_client_insert *client_insert = (struct sock_ev_client_insert *)(client_request->client_request_data);
