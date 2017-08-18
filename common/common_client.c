@@ -1489,7 +1489,7 @@ void cnxn_cb(EV_P, void *cb_data, DB_conn *conn) {
 
 	SDEBUG("TESTING CNXN_CB");
 	if (conn->int_status != 1) {
-		SERROR_NORESPONSE("%s", conn->str_response);
+		SWARN_NORESPONSE("%s", conn->str_response);
 
 		int_temp_len = conn->int_response_len > 0 ? conn->int_response_len : strlen(conn->str_response);
 		//str_temp = bunescape_value(conn->str_response, &int_temp_len);
@@ -1502,18 +1502,17 @@ void cnxn_cb(EV_P, void *cb_data, DB_conn *conn) {
 			str_temp_escape, int_temp_len,
 			"\012", (size_t)1);
 		WS_sendFrame(EV_A, client, 0x01, true, str_response, strlen(str_response));
+	} else {
+#ifdef POSTAGE_INTERFACE_LIBPQ
+		PQsetNoticeProcessor(client->cnxn, notice_processor, client);
+		SERROR_SALLOC(client->notify_watcher, sizeof(struct sock_ev_client_notify_watcher));
+		ev_io_init(&client->notify_watcher->io, client_notify_cb, GET_CLIENT_PQ_SOCKET(client), EV_READ);
+		ev_io_start(EV_A, &client->notify_watcher->io);
+		client->notify_watcher->parent = client;
+#endif
 	}
 
 	client->bol_connected = true;
-
-#ifdef POSTAGE_INTERFACE_LIBPQ
-	//PQsetNoticeProcessor(client->cnxn, notice_processor, client);
-	PQsetNoticeProcessor(client->cnxn, notice_processor, client);
-	SERROR_SALLOC(client->notify_watcher, sizeof(struct sock_ev_client_notify_watcher));
-	ev_io_init(&client->notify_watcher->io, client_notify_cb, GET_CLIENT_PQ_SOCKET(client), EV_READ);
-	ev_io_start(EV_A, &client->notify_watcher->io);
-	client->notify_watcher->parent = client;
-#endif
 error:
 	SFREE_ALL();
 	SFREE(conn->str_response);
