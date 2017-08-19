@@ -2330,62 +2330,66 @@ function getCurrentQuery() {
         if (editorSelectionRange.start.row !== editorSelectionRange.end.row ||
             editorSelectionRange.start.column !== editorSelectionRange.end.column
         ) {
-            for (var intI = 0, intLen = editor.currentSelections.length; intI < intLen; intI++) {
-                intStartRow    = editor.currentSelections[intI].start.row;
-                intStartColumn = editor.currentSelections[intI].start.column;
-                intEndRow      = editor.currentSelections[intI].end.row;
-                intEndColumn   = editor.currentSelections[intI].end.column;
-                intStart = 0;
-                intEnd = 0;
+            if (editor.currentSelections.length > 1) {
+                for (var intI = 0, intLen = editor.currentSelections.length; intI < intLen; intI++) {
+                    intStartRow    = editor.currentSelections[intI].start.row;
+                    intStartColumn = editor.currentSelections[intI].start.column;
+                    intEndRow      = editor.currentSelections[intI].end.row;
+                    intEndColumn   = editor.currentSelections[intI].end.column;
+                    intStart = 0;
+                    intEnd = 0;
+        
+                    for (i = 0, len = arrLines.length; i < len; i += 1) {
+                        if (i < editor.currentSelections[intI].start.row) {
+                            intStart += arrLines[i].length + 1;
+                        }
+                        if (i < editor.currentSelections[intI].end.row) {
+                            intEnd += arrLines[i].length + 1;
+                        }
+        
+                        if (i === editor.currentSelections[intI].start.row) {
+                            intStart += editor.currentSelections[intI].start.column;
+                        }
+                        if (i === editor.currentSelections[intI].end.row) {
+                            intEnd += editor.currentSelections[intI].end.column;
+                        }
+                        if (i > editor.currentSelections[intI].end.row) {
+                            break;
+                        }
+                    }
+        
+                    strRunQuery += '\n\n' + strQuery.substring(intStart, intEnd);
+                }
+            } else if (
+                editorSelectionRange.start.row !== editorSelectionRange.end.row ||
+                editorSelectionRange.start.column !== editorSelectionRange.end.column
+            ){    
+                intStartRow    = editorSelectionRange.start.row;
+                intStartColumn = editorSelectionRange.start.column;
+                intEndRow      = editorSelectionRange.end.row;
+                intEndColumn   = editorSelectionRange.end.column;
     
                 for (i = 0, len = arrLines.length; i < len; i += 1) {
-                    if (i < editor.currentSelections[intI].start.row) {
+                    if (i < editorSelectionRange.start.row) {
                         intStart += arrLines[i].length + 1;
                     }
-                    if (i < editor.currentSelections[intI].end.row) {
+                    if (i < editorSelectionRange.end.row) {
                         intEnd += arrLines[i].length + 1;
                     }
     
-                    if (i === editor.currentSelections[intI].start.row) {
-                        intStart += editor.currentSelections[intI].start.column;
+                    if (i === editorSelectionRange.start.row) {
+                        intStart += editorSelectionRange.start.column;
                     }
-                    if (i === editor.currentSelections[intI].end.row) {
-                        intEnd += editor.currentSelections[intI].end.column;
+                    if (i === editorSelectionRange.end.row) {
+                        intEnd += editorSelectionRange.end.column;
                     }
-                    if (i > editor.currentSelections[intI].end.row) {
+                    if (i > editorSelectionRange.end.row) {
                         break;
                     }
                 }
     
-                strRunQuery += '\n\n' + strQuery.substring(intStart, intEnd);
+                strRunQuery = strQuery.substring(intStart, intEnd);
             }
-            // editorSelectionRange.start.column !== editorSelectionRange.end.column) {
-
-            // intStartRow    = editorSelectionRange.start.row;
-            // intStartColumn = editorSelectionRange.start.column;
-            // intEndRow      = editorSelectionRange.end.row;
-            // intEndColumn   = editorSelectionRange.end.column;
-
-            // for (i = 0, len = arrLines.length; i < len; i += 1) {
-            //     if (i < editorSelectionRange.start.row) {
-            //         intStart += arrLines[i].length + 1;
-            //     }
-            //     if (i < editorSelectionRange.end.row) {
-            //         intEnd += arrLines[i].length + 1;
-            //     }
-
-            //     if (i === editorSelectionRange.start.row) {
-            //         intStart += editorSelectionRange.start.column;
-            //     }
-            //     if (i === editorSelectionRange.end.row) {
-            //         intEnd += editorSelectionRange.end.column;
-            //     }
-            //     if (i > editorSelectionRange.end.row) {
-            //         break;
-            //     }
-            // }
-
-            // strRunQuery = strQuery.substring(intStart, intEnd);
         } else {
             intStartRow    = 0;
             intStartColumn = 0;

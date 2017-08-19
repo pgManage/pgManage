@@ -1436,7 +1436,8 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
         tabElement.relatedDocLinksContainer = document.getElementById('sql-doc-links-' + intTabNumber);
         tabElement.bolAutoOpenPropertyList = true;
         tabElement.relatedResultsArea.addEventListener('click', function () {
-			if (xtag.query(tabElement.relatedResultsArea, 'gs-table').length === 0) {
+			if (tabElement.relatedResultsArea.children.length === 0) {
+			    console.log(tabElement.relatedResultsArea);
 				document.getElementsByClassName('current-tab')[0].relatedEditor.focus()
 			}
 		});

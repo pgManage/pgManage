@@ -40352,6 +40352,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function renderSelection(element) {//<br />
+        console.trace('renderSelection');
         var bolHeaders;
         var bolSelectors;
         var bolInsert;
@@ -40424,6 +40425,7 @@ document.addEventListener('DOMContentLoaded', function () {
         arrSelectedStates = ['B', 'D', 'F', 'H', 'J', 'L'];
         //arrDeselectedStates = ['A', 'C', 'E', 'G', 'I', 'K'];
 
+        console.log(strCompareString === element.internalSelection.rangeCache);
         if (strCompareString === element.internalSelection.rangeCache) {
             arrSelection = element.internalSelection.resolvedSelection;
             arrSelectionRows = element.internalSelection.rows;
@@ -40484,7 +40486,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 arrSelection.push(strRecord);
             }
 
-            //console.log(arrSelection);
+            // console.log(arrSelection);
 
             // because of the vast array of column types, we'll (for simplicity
             //      and for brevity) use one of two matrices, a matrix that
@@ -40849,6 +40851,14 @@ document.addEventListener('DOMContentLoaded', function () {
             if (strRecord) {
                 if (arrSelectedStates.indexOf(strRecord[intCol]) > -1) {
                     cell.setAttribute('selected', '');
+                    console.log(
+                        strRecord,
+                        intCol,
+                        intRow,
+                        cell.getAttribute('data-col-number'),
+                        cell.getAttribute('data-row-number'),
+                        cell
+                    );
 
                 // sometimes, the user selects some cells without selecting the
                 //      record selectors and/or headers. in this case, we want
@@ -40875,6 +40885,17 @@ document.addEventListener('DOMContentLoaded', function () {
                     )
                 ) {
                     //console.log(strRow, intRow);
+                    console.log(
+                        arrSelectionRows,
+                        arrSelectionCols,
+                        arrRows,
+                        arrColumns,
+                        intCol,
+                        intRow,
+                        cell.getAttribute('data-col-number'),
+                        cell.getAttribute('data-row-number'),
+                        cell
+                    );
                     cell.setAttribute('auto-selected', '');
                 }
             }

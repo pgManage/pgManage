@@ -1289,7 +1289,7 @@ scriptQuery.objectTriggerFunction = scriptQuery.objectFunction = ml(function () 
     WHERE pg_proc.oid = {{INTOID}} AND proisagg = FALSE)
     
     -- OWNER
-    || (SELECT E'ALTER FUNCTION ' || COALESCE(quote_ident(nspname),'') || '.' || COALESCE(quote_ident(proname),'') || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ') OWNER TO ' || pg_roles.rolname || ';'
+    || (SELECT E'ALTER FUNCTION ' || COALESCE(quote_ident(nspname),'') || '.' || COALESCE(quote_ident(proname),'') || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ') OWNER TO ' || quote_ident(pg_roles.rolname) || ';'
     FROM pg_proc
     LEFT JOIN pg_roles ON pg_proc.proowner=pg_roles.oid
     JOIN pg_namespace ON pg_namespace.oid = pg_proc.pronamespace
@@ -1973,7 +1973,7 @@ scriptQuery.objectTable = ml(function () {/*
                                     ELSE ''
                             END) || E'\n);') ||
               E'\n\nALTER TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || 
-              ' OWNER TO ' || pg_roles.rolname || E';\n\n' ||
+              ' OWNER TO ' || quote_ident(pg_roles.rolname) || E';\n\n' ||
                 
                 -- get table and column comments
                 (
@@ -2396,7 +2396,7 @@ scriptQuery.objectTableNoComment = ml(function () {/*
                                     ELSE ''
                             END) || E'\n);') ||
               E'\n\nALTER TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || 
-              ' OWNER TO ' || pg_roles.rolname || E';\n\n' ||
+              ' OWNER TO ' || quote_ident(pg_roles.rolname) || E';\n\n' ||
                 
                 -- get table and column comments
                 (
@@ -2546,7 +2546,7 @@ scriptQuery.objectTableNoComment = ml(function () {/*
         		ORDER BY 1),','
         		)) ||
         	' ON ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || 
-        	' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE quote_ident((regexp_split_to_array(att.attacl::text,'[=/]'))[1]) END ||
+        	' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE quote_ident(substr((regexp_split_to_array(att.attacl::text,'[=/]'))[1], 2)) END ||
         	';' as perms
         FROM pg_class 
         LEFT JOIN pg_attribute att ON att.attrelid = pg_class.oid 
@@ -2610,6 +2610,266 @@ scriptQuery.objectTableNoComment = ml(function () {/*
      ORDER BY clidx.relname
         )ok),'')), ''); 
 */});
+
+
+scriptQuery.objectTableDump = ml(function () {/*
+           
+           
+    SELECT (SELECT '-- Table: ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || E';\n' ||
+    (SELECT '-- Estimated Rows ' || (COALESCE(reltuples, 0)::BIGINT) || E';\n' ||
+                    '-- Last Vacuum: ' || CASE WHEN last_vacuum is not null THEN to_char(last_vacuum, 'mm/dd/yyyy HH:MM AM') ELSE 'N/A' END
+                        || ', Last AutoVacuum: ' || CASE WHEN last_autovacuum is not null THEN to_char(last_autovacuum, 'mm/dd/yyyy HH:MM AM') ELSE 'N/A' END || E';\n' ||
+                    '-- Last Analyze: ' || CASE WHEN last_analyze is not null THEN to_char(last_analyze, 'mm/dd/yyyy HH:MM AM') ELSE 'N/A' END
+                        || ', Last AutoAnalyze: ' || CASE WHEN last_autoanalyze is not null THEN to_char(last_autoanalyze, 'mm/dd/yyyy HH:MM AM') ELSE 'N/A' END || E';\n'
+                    FROM pg_catalog.pg_class
+              LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+              LEFT JOIN pg_catalog.pg_stat_user_tables ON pg_stat_user_tables.relid = pg_class.oid
+                   WHERE pg_class.oid = {{INTOID}}) ||
+            E'\n-- DROP TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) ||
+            E';\n\nCREATE TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) ||
+            E' (\n' ||
+                    COALESCE(
+                        array_to_string(
+                            array_agg(
+                                '  ' ||
+                                COALESCE(em1.attname, '') || ' ' || COALESCE(format_type(em1.atttypid, em1.atttypmod), '') ||
+                                CASE WHEN
+                                    em1.attnotnull THEN ' NOT NULL'
+                                                    ELSE '' END ||
+                                CASE WHEN
+                                    em1.atthasdef  THEN ' DEFAULT ' || pg_catalog.pg_get_expr(em1.adbin, em1.adrelid)
+                                                    ELSE '' END ||
+                                CASE WHEN em1.collname IS NOT NULL AND em1.collname != 'default'
+                                    THEN ' COLLATE ' || quote_ident(em1.collname)
+                                    ELSE '' END
+                            ),
+                        E',\n'),
+                    '') ||
+                    COALESCE(em2.con_full, '') ||
+            E'\n)' || (E' WITH (\n  ' || 
+                            CASE WHEN pg_class.relhasoids THEN
+                                'OIDS=TRUE'
+                            ELSE
+                                'OIDS=FALSE'
+                            END ||
+                            (CASE WHEN array_upper(reloptions, 1) > 0
+                                    THEN E',\n  ' || array_to_string(reloptions, E',\n  ')
+                                    ELSE ''
+                            END) || E'\n);') ||
+              E'\n\nALTER TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || 
+              ' OWNER TO ' || quote_ident(pg_roles.rolname) || E';\n\n' ||
+                
+                -- get table and column comments
+                (
+                     SELECT  COALESCE(
+                                array_to_string(
+                                    array_agg(
+                                        COALESCE(
+                                            full_text,
+                                            ''
+                                        )
+                                    ),
+                                E'\n'),
+                            '') AS full_text
+                      FROM (
+                               SELECT COALESCE(
+                                            (
+                                                'COMMENT ON ' || (
+                                                        CASE WHEN objsubid = 0 THEN 'TABLE' ELSE 'COLUMN' END
+                                                ) || ' ' ||
+                                                quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) ||
+                                                (
+                                                    CASE WHEN objsubid = 0 THEN '' ELSE '.' || quote_ident(pg_attribute.attname) END
+                                                ) ||
+                                                ' IS ' ||
+                                                quote_literal(pg_description.description) || E';'
+                                            ),
+                                            ''
+                                        ) AS full_text
+                                 FROM pg_description
+                            LEFT JOIN pg_class ON pg_class.oid = pg_description.objoid 
+                            LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+                            LEFT JOIN pg_attribute ON attrelid = pg_description.objoid
+                                                  AND pg_attribute.attnum = pg_description.objsubid
+                                WHERE objoid = {{INTOID}}
+                             ORDER BY objsubid ASC
+                        ) descriptions
+                )
+        
+        FROM pg_class
+        --LEFT JOIN pg_description ON pg_class.oid = pg_description.objoid AND pg_description.objsubid IS NULL
+        
+        LEFT JOIN (SELECT attrelid, quote_ident(attname) AS attname, atttypid, atttypmod, typname, attnotnull, atthasdef, pg_attrdef.adbin, pg_attrdef.adrelid,
+                   CASE WHEN typname = 'varchar' AND atttypmod = 6 THEN 'chk_'
+                        WHEN typname ~ '^(text|varchar|bpchar|name|char)$' THEN 'str_'
+                        WHEN typname = 'int2' THEN 'shr_'
+                        WHEN typname = 'int4' THEN 'int_'
+                        WHEN typname = 'int8' THEN 'lng_'
+                        WHEN typname = 'numeric' THEN 'num_'
+                        WHEN typname = 'date' THEN 'dte_'
+                        WHEN typname ~ '^(abstime|time|timetz)$' THEN 'tme_'
+                        WHEN typname ~ '^(timestamp|timestamptz)$' THEN 'dtetme_'
+                        WHEN typname = 'oid' THEN 'oid_' END || attname AS att_var, pg_collation.collname
+          FROM pg_attribute
+          JOIN pg_type ON pg_type.oid = pg_attribute.atttypid
+        LEFT OUTER JOIN pg_attrdef ON pg_attrdef.adrelid = pg_attribute.attrelid AND pg_attrdef.adnum = pg_attribute.attnum
+        LEFT JOIN pg_collation ON pg_collation.oid = pg_attribute.attcollation
+          WHERE pg_attribute.attisdropped IS FALSE AND pg_attribute.attnum > 0
+          ORDER BY attnum ASC) em1 ON pg_class.oid = em1.attrelid
+                
+                
+          -- CONSTRAINTs
+        LEFT JOIN (SELECT conrelid AS oid, array_to_string(array_agg(
+                CASE WHEN pg_get_constraintdef(pg_constraint.oid, true) != 'TRIGGER' THEN E',\n  CONSTRAINT ' || pg_constraint.conname || ' ' || pg_get_constraintdef(pg_constraint.oid, true) ELSE '' END-- ||
+                                        --(CASE WHEN pg_constraint.confmatchtype = 'f' THEN ' MATCH FULL'
+                                        --      WHEN pg_constraint.confmatchtype = 'p' THEN ' MATCH PARTIAL'
+                                        --      WHEN pg_constraint.confmatchtype = 'u' THEN ' MATCH SIMPLE' ELSE '' END) ||
+                                        --(CASE WHEN pg_constraint.confdeltype = 'a' THEN ' ON DELETE NO ACTION'
+                                        --      WHEN pg_constraint.confdeltype = 'r' THEN ' ON DELETE RESTRICT'
+                                        --      WHEN pg_constraint.confdeltype = 'c' THEN ' ON DELETE CASCADE'
+                                        --      WHEN pg_constraint.confdeltype = 'n' THEN ' ON DELETE SET NULL'
+                                        --      WHEN pg_constraint.confdeltype = 'd' THEN ' ON DELETE SET DEFAULT' ELSE '' END) ||
+                                        --(CASE WHEN pg_constraint.confupdtype = 'a' THEN ' ON UPDATE NO ACTION'
+                                        --      WHEN pg_constraint.confupdtype = 'r' THEN ' ON UPDATE RESTRICT'
+                                        --      WHEN pg_constraint.confupdtype = 'c' THEN ' ON UPDATE CASCADE'
+                                        --      WHEN pg_constraint.confupdtype = 'n' THEN ' ON UPDATE SET NULL'
+                                        --      WHEN pg_constraint.confupdtype = 'd' THEN ' ON UPDATE SET DEFAULT' ELSE '' END)
+              ), E'') as con_full
+             FROM 
+                (SELECT oid, *
+                   FROM pg_constraint
+                  WHERE pg_constraint.oid IS NOT NULL
+               ORDER BY (CASE WHEN contype = 'p' THEN 1 WHEN contype = 'u' THEN 2
+                              WHEN contype = 'c' THEN 3 WHEN contype = 'f' THEN 4
+                              WHEN contype = 't' THEN 5 WHEN contype = 'x' THEN 6 END) ASC,
+                        pg_constraint.conname ASC) pg_constraint
+        GROUP BY conrelid) em2 ON pg_class.oid = em2.oid
+          
+          
+        
+        -- back to the unknown program
+         JOIN pg_roles ON pg_roles.oid = pg_class.relowner
+         JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+        LEFT JOIN pg_catalog.pg_stat_user_tables ON pg_stat_user_tables.relid = pg_class.oid
+        WHERE pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}'
+        GROUP BY pg_namespace.nspname, pg_class.relname, pg_class.relacl,
+                pg_class.relhasoids, pg_roles.rolname, em2.oid, em2.con_full, reloptions) --pg_description.description
+                
+        -- This section pulls the GRANT lines
+        || COALESCE((SELECT E'\n\n' || (SELECT array_to_string(array_agg( 'GRANT ' || 
+        	(SELECT array_to_string((SELECT array_agg(perms ORDER BY srt)
+        	FROM (	SELECT 1 as srt, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'r($|[^*])' THEN 'SELECT' END as perms
+        		UNION SELECT 2, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'w($|[^*])' THEN 'UPDATE' END
+        		UNION SELECT 3, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'a($|[^*])' THEN 'INSERT' END
+        		UNION SELECT 4, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'd($|[^*])' THEN 'DELETE' END
+        		UNION SELECT 5, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'D($|[^*])' THEN 'TRUNCATE' END
+        		UNION SELECT 6, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'x($|[^*])' THEN 'REFERENCES' END
+        		UNION SELECT 7, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 't($|[^*])' THEN 'TRIGGER' END ) em
+        		WHERE perms is not null),',')) ||
+        	' ON TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || ' TO ' ||
+        	CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE (regexp_split_to_array(unnest::text,'[=/]'))[1] END || 
+        	';' ), E'\n')
+        	FROM unnest(relacl) 
+        	WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|a|d|D|x|t)($|[^*])' 
+        	)
+        FROM pg_class 
+        JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+        WHERE pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}' ),'')
+        
+        -- This section pulls the GRANT lines 'WITH GRANT OPTION'
+        ||  COALESCE((SELECT E'\n\n' || (SELECT array_to_string(array_agg( 'GRANT ' || 
+        	(SELECT array_to_string((SELECT array_agg(perms ORDER BY srt)
+        	FROM (	SELECT 1 as srt, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'r\*' THEN 'SELECT' END as perms
+        		UNION SELECT 2, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'w\*' THEN 'UPDATE' END
+        		UNION SELECT 3, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'a\*' THEN 'INSERT' END
+        		UNION SELECT 4, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'd\*' THEN 'DELETE' END
+        		UNION SELECT 5, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'D\*' THEN 'TRUNCATE' END
+        		UNION SELECT 6, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'x\*' THEN 'REFERENCES' END
+        		UNION SELECT 7, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 't\*' THEN 'TRIGGER' END ) em
+        		WHERE perms is not null),',')) ||
+        	' ON TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || ' TO ' ||
+        	CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE ((regexp_split_to_array(unnest::text,'[=/]'))[1]) END || 
+        	' WITH GRANT OPTION;'), E'\n')
+        	FROM unnest(relacl) 
+        	WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|a|d|D|x|t)\*' )
+        FROM pg_class 
+        JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+        WHERE pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}' ), '')
+        
+        -- also does GRANT lines, perhaps for column permissions?
+        || COALESCE(
+        (SELECT E'\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (SELECT 'GRANT ' || (SELECT array_to_string((SELECT array_agg(perms)
+        	FROM (	SELECT 4, CASE WHEN (regexp_split_to_array((att.attacl)::text, '[=/]'))[2] ~ 'r[^*]' THEN 'SELECT(' || att.attname || ')' END as perms
+        		UNION SELECT 3, CASE WHEN (regexp_split_to_array((att.attacl)::text, '[=/]'))[2] ~ 'w[^*]' THEN 'UPDATE(' || att.attname || ')' END
+        		UNION SELECT 2, CASE WHEN (regexp_split_to_array((att.attacl)::text, '[=/]'))[2] ~ 'a[^*]' THEN 'INSERT(' || att.attname || ')' END
+        		UNION SELECT 1, CASE WHEN (regexp_split_to_array((att.attacl)::text, '[=/]'))[2] ~ 'x[^*]' THEN 'REFERENCES(' || att.attname || ')' END ) em
+        		WHERE perms is not null
+        		ORDER BY 1),','
+        		)) ||
+        	' ON ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || 
+        	' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE quote_ident(substr((regexp_split_to_array(att.attacl::text,'[=/]'))[1], 2)) END ||
+        	';' as perms
+        FROM pg_class 
+        LEFT JOIN pg_attribute att ON att.attrelid = pg_class.oid 
+        JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+        WHERE (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}') AND (regexp_split_to_array((att.attacl)::text, '[=/]'))[2] ~ 'r[^*]|w[^*]|a[^*]|x[^*]')ok),'')), '')
+        
+        -- also does GRANT lines, perhaps for column permissions? WITH GRANT OPTION
+        || COALESCE((SELECT E'\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (SELECT 'GRANT ' || (SELECT array_to_string((SELECT array_agg(perms)
+        	FROM (	SELECT 4, CASE WHEN (regexp_split_to_array((att.attacl)::text, '[=/]'))[2] ~ 'r\*' THEN 'SELECT(' || att.attname || ')' END as perms
+        		UNION SELECT 3, CASE WHEN (regexp_split_to_array((att.attacl)::text, '[=/]'))[2] ~ 'w\*' THEN 'UPDATE(' || att.attname || ')' END
+        		UNION SELECT 2, CASE WHEN (regexp_split_to_array((att.attacl)::text, '[=/]'))[2] ~ 'a\*' THEN 'INSERT(' || att.attname || ')' END
+        		UNION SELECT 1, CASE WHEN (regexp_split_to_array((att.attacl)::text, '[=/]'))[2] ~ 'x\*' THEN 'REFERENCES(' || att.attname || ')' END ) em
+        		WHERE perms is not null
+        		ORDER BY 1),','
+        		)) ||
+        	' ON ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || 
+        	' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE quote_ident((regexp_split_to_array(att.attacl::text,'[=/]'))[1]) END  ||
+        	' WITH GRANT OPTION;' as perms
+        FROM pg_class 
+        LEFT JOIN pg_attribute att ON att.attrelid = pg_class.oid 
+        JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+        WHERE (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}') AND (regexp_split_to_array((att.attacl)::text, '[=/]'))[2] ~ '(r|w|a|x)\*')ok),'')), '')
+        
+        -- Displays RULEs
+        || COALESCE((SELECT E'\n\n' || array_to_string((SELECT array_agg(perms) FROM (
+        
+        SELECT E'-- DROP RULE ' || quote_ident(pg_rewrite.rulename) ||
+        ' ON ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || E';\n' ||
+        E'\nCREATE OR REPLACE ' || substring(pg_get_ruledef(pg_rewrite.oid, true), 8) ||
+        E'\n\n' as perms
+        FROM pg_class
+        LEFT JOIN pg_rewrite ON pg_class.oid=pg_rewrite.ev_class
+        LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+        WHERE pg_rewrite.rulename <> '_RETURN' AND (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}') )ok),'')), '')
+        
+        -- Returns INDEXes
+        || COALESCE((SELECT E'\n\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (
+        SELECT E'-- Index: ' || quote_ident(nsp.nspname) || '.' || quote_ident(clidx.relname) || 
+        	E'\n-- DROP INDEX ' || quote_ident(nsp.nspname) || '.' || quote_ident(clidx.relname) || 
+        	E';\n' ||
+        	regexp_replace(pg_get_indexdef(clidx.oid), ' USING ', E'\n   USING ') || E';\n' as perms
+        FROM pg_class cl 
+        JOIN pg_index idx ON cl.oid = idx.indrelid 
+        JOIN pg_class clidx ON clidx.oid = idx.indexrelid 
+        LEFT JOIN pg_namespace nsp ON nsp.oid = cl.relnamespace 
+        WHERE (cl.oid = {{INTOID}} OR nsp.nspname || '.' || cl.relname = '{{STRSQLSAFENAME}}')
+          AND (SELECT count(*) FROM pg_constraint con WHERE con.conindid = clidx.oid) = 0
+     ORDER BY clidx.relname
+        )ok),'')), ''); 
+*/});
+
+scriptQuery.objectSchemaTriggers = ml(function () {/*
+    SELECT string_agg(E'\n\n' || '-- Trigger: ' || quote_ident(pg_trigger.tgname) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname) || E';\n' || 
+    	'-- DROP TRIGGER ' || quote_ident(pg_trigger.tgname) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname) || E';\n' ||
+    	regexp_replace(regexp_replace(regexp_replace(regexp_replace(pg_get_triggerdef(pg_trigger.oid, true),
+    	' BEFORE ', E'\n   BEFORE '), ' ON ', E'\n   ON '), ' FOR ', E'\n   FOR '), ' EXECUTE ', E'\n   EXECUTE ') || E';\n\n', E'\n')
+    FROM pg_class 
+    JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
+    JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+    WHERE (pg_namespace.nspname = '{{SCHEMA}}') AND pg_trigger.tgisinternal != TRUE;
+*/});
+
 
 scriptQuery.objectTableNoCreate = ml(function () {/*
     
@@ -3028,7 +3288,75 @@ scriptQuery.objectView = ml(function () {/*
                 E'\n      WHERE -CONDITIONS-;\n*' || '/'
         );
     */});
-
+scriptQuery.objectViewDump = ml(function () {/*
+        SELECT  (SELECT array_to_string(array_agg(full_sql), E'\n')
+        	FROM (SELECT '-- DROP VIEW ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || E';\n\n' ||
+        	       'CREATE OR REPLACE VIEW ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || 
+        	       COALESCE(' WITH (' || array_to_string(reloptions, ', ') || ')', '')
+        	       || E' AS\n' ||
+        	       pg_get_viewdef(c.oid, 100) || E'\n\n' ||
+        	       'ALTER TABLE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) ||
+        		 E' OWNER TO ' || quote_ident(pg_roles.rolname) || E';\n' ||
+        	       COALESCE('COMMENT ON VIEW ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) ||
+        		 E' IS ' || quote_literal(pg_description.description) || E';\n', '') AS full_sql--, c.relacl
+        	  FROM pg_class c
+        	LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
+        	LEFT JOIN pg_roles ON pg_roles.oid = c.relowner
+        	LEFT JOIN pg_description ON pg_description.objoid = c.oid
+        	 WHERE (c.relkind = 'v'::char OR c.relkind = 'm'::char) AND (c.oid = {{INTOID}} OR (n.nspname || '.' || c.relname) = '{{STRSQLSAFENAME}}')) em)
+         
+        || COALESCE((SELECT E'\n' || (SELECT array_to_string(array_agg( 'GRANT ' || 
+        	(SELECT array_to_string((SELECT array_agg(perms ORDER BY srt)
+        	FROM (	SELECT 1 as srt, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'r($|[^*])' THEN 'SELECT' END as perms
+        		UNION SELECT 2, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'w($|[^*])' THEN 'UPDATE' END
+        		UNION SELECT 3, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'a($|[^*])' THEN 'INSERT' END
+        		UNION SELECT 4, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'd($|[^*])' THEN 'DELETE' END
+        		UNION SELECT 5, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'D($|[^*])' THEN 'TRUNCATE' END
+        		UNION SELECT 6, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'x($|[^*])' THEN 'REFERENCES' END
+        		UNION SELECT 7, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 't($|[^*])' THEN 'TRIGGER' END ) em
+        		WHERE perms is not null),',')) ||
+        	' ON TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || ' TO ' ||
+        	CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE ((regexp_split_to_array(unnest::text,'[=/]'))[1]) END || 
+        	';' ), E'\n')
+        	FROM unnest(relacl) 
+        	WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|a|d|D|x|t)($|[^*])' 
+        	)
+        FROM pg_class 
+        JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+        WHERE pg_class.oid = {{INTOID}} OR (pg_namespace.nspname || '.' || pg_class.relname) = '{{STRSQLSAFENAME}}' ),'')
+        
+        || COALESCE((SELECT E'\n\n' || (SELECT array_to_string(array_agg( 'GRANT ' || 
+        	(SELECT array_to_string((SELECT array_agg(perms ORDER BY srt)
+        	FROM (	SELECT 1 as srt, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'r\*' THEN 'SELECT' END as perms
+        		UNION SELECT 2, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'w\*' THEN 'UPDATE' END
+        		UNION SELECT 3, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'a\*' THEN 'INSERT' END
+        		UNION SELECT 4, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'd\*' THEN 'DELETE' END
+        		UNION SELECT 5, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'D\*' THEN 'TRUNCATE' END
+        		UNION SELECT 6, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'x\*' THEN 'REFERENCES' END
+        		UNION SELECT 7, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 't\*' THEN 'TRIGGER' END ) em
+        		WHERE perms is not null),',')) ||
+        	' ON TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || ' TO ' ||
+        	CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE ((regexp_split_to_array(unnest::text,'[=/]'))[1]) END || 
+        	' WITH GRANT OPTION;'), E'\n')
+        	FROM unnest(relacl) 
+        	WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|a|d|D|x|t)\*' )
+        FROM pg_class 
+        JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+        WHERE pg_class.oid = {{INTOID}} OR (pg_namespace.nspname || '.' || pg_class.relname) = '{{STRSQLSAFENAME}}' ), '')
+        	
+        
+        || COALESCE((SELECT E'\n' || array_to_string(array_agg(drp),E'\n')
+        	FROM ( SELECT E'\n-- DROP RULE ' || quote_ident(pg_rewrite.rulename) ||
+        		  ' ON ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || E';\n' ||
+        		  E'\nCREATE OR REPLACE ' || substring(pg_get_ruledef(pg_rewrite.oid, true), 8) ||
+        		  '' as drp
+          FROM pg_class c
+        LEFT JOIN pg_rewrite ON c.oid=pg_rewrite.ev_class
+        LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
+         WHERE pg_rewrite.rulename <> '_RETURN' AND (c.oid = {{INTOID}} OR (n.nspname || '.' || c.relname) = '{{STRSQLSAFENAME}}')) em
+        	),'');
+    */});
+    
 scriptQuery.objectViewNoComment = ml(function () {/*
         SELECT  (SELECT array_to_string(array_agg(full_sql), E'\n')
         	FROM (SELECT '-- DROP VIEW ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || E';\n\n' ||
@@ -3344,7 +3672,7 @@ scriptQuery.objectOperatorClass = ml(function () {/*
         , E',\n\t' ORDER BY 'OPERATOR '::text || pg_amop.amopstrategy::text || '  ' || pg_operator_namespace.nspname || '.' || pg_operator.oprname ||
                             '(' || format_type(pg_operator.oprleft, NULL) || ', ' || format_type(pg_operator.oprright, NULL) || ')')
         , '') ||
-        COALESCE(E'\n\t' ||
+        COALESCE(E',\n\t' ||
         string_agg(DISTINCT
             'FUNCTION '::text || pg_amproc.amprocnum::text || '  ' || pg_proc_namespace.nspname || '.' || pg_proc.proname ||
                                                 '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '') || ')'
@@ -3396,12 +3724,12 @@ scriptQuery.objectType = ml(function () {/*
             ' (' ||
             E'\n\tINPUT = ' || pg_type.typinput::text ||
             E',\n\tOUTPUT = ' || pg_type.typoutput::text ||
-            COALESCE(E',\n\tRECEIVE = ' || pg_type.typreceive::text, '') ||
-            COALESCE(E',\n\tSEND = ' || pg_type.typsend::text, '') ||
-            COALESCE(E',\n\tTYPMOD_IN = ' || pg_type.typmodin::text, '') ||
-            COALESCE(E',\n\tTYPMOD_OUT = ' || pg_type.typmodout::text, '') ||
-            COALESCE(E',\n\tANALYZE = ' || pg_type.typanalyze::text, '') ||
-            COALESCE(E',\n\tINTERNALLENGTH = ' || pg_type.typlen::text, '') ||
+            CASE WHEN pg_type.typreceive::text != '-' THEN COALESCE(E',\n\tRECEIVE = ' || pg_type.typreceive::text, '') ELSE '' END ||
+            CASE WHEN pg_type.typsend::text != '-' THEN COALESCE(E',\n\tSEND = ' || pg_type.typsend::text, '') ELSE '' END ||
+            CASE WHEN pg_type.typmodin::text != '-' THEN COALESCE(E',\n\tTYPMOD_IN = ' || pg_type.typmodin::text, '') ELSE '' END ||
+            CASE WHEN pg_type.typmodout::text != '-' THEN COALESCE(E',\n\tTYPMOD_OUT = ' || pg_type.typmodout::text, '') ELSE '' END ||
+            CASE WHEN pg_type.typanalyze::text != '-' THEN COALESCE(E',\n\tANALYZE = ' || pg_type.typanalyze::text, '') ELSE '' END ||
+            CASE WHEN pg_type.typlen::text != '-' THEN COALESCE(E',\n\tINTERNALLENGTH = ' || pg_type.typlen::text, '') ELSE '' END ||
             COALESCE(CASE WHEN pg_type.typbyval THEN E',\n\tPASSEDBYVALUE' ELSE '' END, '') ||
             COALESCE(E',\n\tALIGNMENT = ' || CASE pg_type.typalign
                                           WHEN 'c' THEN 'char'
@@ -3415,12 +3743,12 @@ scriptQuery.objectType = ml(function () {/*
                                           WHEN 'm' THEN 'main'
                                           WHEN 'x' THEN 'extended'
                                           ELSE NULL END, '') ||
-            COALESCE(E',\n\tCATEGORY = ' || quote_literal(pg_type.typcategory::text), '') ||
-            COALESCE(E',\n\tPREFERRED = ' || pg_type.typispreferred::text, '') ||
-            COALESCE(E',\n\tDEFAULT = ' || quote_literal(pg_type.typdefault::text), '') ||--bytea not working
-            COALESCE(E',\n\tELEMENT = ' || pg_array_type.typname::text, '') ||
-            COALESCE(E',\n\tDELIMITER = ' || quote_literal(pg_type.typdelim::text), '') ||
-            COALESCE(E',\n\tCOLLATABLE = ' || pg_collation.collname::text, '') ||
+            CASE WHEN pg_type.typcategory::text != '-' THEN COALESCE(E',\n\tCATEGORY = ' || quote_literal(pg_type.typcategory::text), '') ELSE '' END ||
+            CASE WHEN pg_type.typispreferred::text != '-' THEN COALESCE(E',\n\tPREFERRED = ' || pg_type.typispreferred::text, '') ELSE '' END ||
+            CASE WHEN pg_type.typdefault::text != '-' THEN COALESCE(E',\n\tDEFAULT = ' || quote_literal(pg_type.typdefault::text), '') ELSE '' END ||--bytea not working
+            CASE WHEN pg_type.typname::text != '-' THEN COALESCE(E',\n\tELEMENT = ' || pg_array_type.typname::text, '') ELSE '' END ||
+            CASE WHEN pg_type.typdelim::text != '-' THEN COALESCE(E',\n\tDELIMITER = ' || quote_literal(pg_type.typdelim::text), '') ELSE '' END ||
+            CASE WHEN pg_collation.collname::text != '-' THEN COALESCE(E',\n\tCOLLATABLE = ' || pg_collation.collname::text, '') ELSE '' END ||
             ')' ||
             E';\n\n'
             ELSE ''
@@ -3580,7 +3908,7 @@ GROUP BY pg_namespace.nspname, pg_type.typname, pg_collation_namespace.nspname, 
     
        ELSE
     	-- public revoke
-    	(SELECT E'\nREVOKE ALL ON FUNCTION ' || name || ' FROM public;'
+    	(SELECT E'\nREVOKE ALL ON DOMAIN ' || name || ' FROM public;'
     	FROM (SELECT quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_type.typname) as name
     		FROM pg_type 
     		LEFT JOIN pg_namespace ON pg_type.typnamespace = pg_namespace.oid
