@@ -68,13 +68,17 @@ function getContext(strInput, intPosition) {
     // make sure that we have only whitespace after the cursor, otherwise we just end it here, however last line last character is allowed
     //console.log('intPosition', intPosition);
     //console.log('strInput.length', strInput.length);
-    //console.log('Check Whitespace', (! strInput.substr(intPosition, 1).match('^[\n\r\ \t]+')) && (intPosition !== strInput.length));
-    //console.log('Check Whitespace>' + strInput.substr(intPosition, 1) + '<');
-    //console.log('Check Whitespace - 1>' + strInput.substr(intPosition - 1, 1) + '<');
-    //console.log('Check Whitespace 1>' + strInput.substr(1, 1) + '<');
-    //console.log('Check Whitespace 0>' + strInput.substr(0, 1) + '<');
-    if ((! strInput.substr(intPosition, 1).match('^[\n\r\ \t]+')) && (intPosition !== strInput.length)) {
+    //console.log('Check Whitespace', (! strInput[intPosition].match('^[\n\r\ \t]+')) && (intPosition !== strInput.length));
+    //console.log('Check Whitespace>' + strInput[intPosition] + '<');
+    //console.log('Check Whitespace - 1>' + strInput[intPosition - 1] + '<');
+    //console.log('Check Whitespace 1>' + strInput[1] + '<');
+    //console.log('Check Whitespace 0>' + strInput[0] + '<');
+    if ((!strInput[intPosition].match('^[\n\r\ \t]+')) && (intPosition !== strInput.length)) {
         return;
+    }
+    
+    if (strInput.indexOf(/[\n\r\ \t]/) === strInput.lastIndexOf(/[\n\r\ \t]/)) {
+        autocompleteGlobals.bolSnippets = true;
     }
 
     var intContextPosition = 0;

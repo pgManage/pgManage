@@ -671,8 +671,8 @@ void client_cb(EV_P, ev_io *w, int revents) {
 					SDEBUG("client->str_request: %p", client->str_request);
 					// set_cnxn does its own error handling
 					if (set_cnxn(client, cnxn_cb) == NULL) {
-						SINFO("set_cnxn(client, cnxn_cb) == NULL");
 						//SERROR_CLIENT_CLOSE(client);
+
 					}
 					// set_cnxn has started a connection to the database, now we are done
 
@@ -680,7 +680,6 @@ void client_cb(EV_P, ev_io *w, int revents) {
 					// The reason for this, is because later functions depend on the
 					// values this function sets
 					if (set_cnxn(client, NULL) == NULL) {
-						SINFO("set_cnxn(client, cnxn_cb) == NULL");
 						//SERROR_CLIENT_CLOSE(client);
 					}
 				}
@@ -713,7 +712,7 @@ void client_cb(EV_P, ev_io *w, int revents) {
 		}
 
 		// handshake already done, let's get down to business
-	} else if (client->bol_handshake == true) {
+	} else if (client->bol_handshake == true && (client->bol_connected == true || client->bol_is_open == false)) {
 		SDEBUG("Reading a frame");
 		WS_readFrame(EV_A, client, client_frame_cb);
 	}
@@ -1492,6 +1491,8 @@ void cnxn_cb(EV_P, void *cb_data, DB_conn *conn) {
 	SDEFINE_VAR_ALL(str_temp, str_temp_escape);
 	size_t int_response_len = 0;
 	size_t int_temp_len = 0;
+
+	client->conn = conn;
 
 	SDEBUG("TESTING CNXN_CB");
 	if (conn->int_status != 1) {
