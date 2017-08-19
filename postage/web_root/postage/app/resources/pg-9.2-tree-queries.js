@@ -1865,7 +1865,97 @@ scriptQuery.objectSequence = ml(function () {/*
                                              AND s.sequence_name = c.relname
         WHERE c.relkind = 'S'::char AND (c.oid = {{INTOID}} OR n.nspname || '.' || c.relname = '{{STRSQLSAFENAME}}')),'');
     */});
+    
+scriptQuery.objectSequenceDump = ml(function () {/*
+        SELECT (SELECT '-- DROP SEQUENCE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || E';\n\n' ||
 
+               '-- Last value taken from this sequence: ' || (SELECT last_value FROM {{STRSQLSAFENAME}})::text || E'\n' ||
+              E'-- To set the value of the sequence:\n/' || E'*\n' ||
+              E'     -- restart sequence at desired value:\n' ||
+              E'     ALTER SEQUENCE {{STRSQLSAFENAME}} RESTART WITH ' || (SELECT last_value FROM {{STRSQLSAFENAME}})::text || E';\n' ||
+              E'     -- advance sequence to clear out it''s cache:\n' ||
+               '     SELECT nextval(''{{STRSQLSAFENAME}}'') FROM generate_series(1, ' || (SELECT cache_value FROM {{STRSQLSAFENAME}})::text || E');\n' ||
+               '*' || E'/\n\n' ||
+
+              'CREATE SEQUENCE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || E'\n' ||
+              '  INCREMENT ' || s.increment || E'\n' ||
+              '  MINVALUE '  || s.minimum_value || E'\n' ||
+              '  MAXVALUE '  || s.maximum_value || E'\n' ||
+              '  START '     || {{STRSQLSAFENAME}}.last_value || E'\n' ||
+              '  CACHE '     || (SELECT cache_value FROM {{STRSQLSAFENAME}})::text || E'\n' ||
+              '  ' || (CASE WHEN (SELECT is_cycled FROM {{STRSQLSAFENAME}}) THEN '' ELSE 'NO ' END) || E'CYCLE' ||
+              E';\n\nALTER SEQUENCE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || ' OWNER TO ' || pg_roles.rolname || E';\n\n' ||
+              '-- ALTER SEQUENCE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || E' RESTART;\n\n' ||
+              COALESCE('COMMENT ON SEQUENCE
+                            ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) ||
+                            ' IS ' || quote_literal(pg_description.description) || E';\n\n', '')
+
+        FROM {{STRSQLSAFENAME}}, pg_class c
+        LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
+        LEFT JOIN pg_roles ON pg_roles.oid = c.relowner
+        LEFT JOIN pg_description ON pg_description.objoid = c.oid
+        LEFT JOIN information_schema.sequences s ON s.sequence_schema = n.nspname
+                                             AND s.sequence_name = c.relname
+        WHERE c.relkind = 'S'::char AND (c.oid = {{INTOID}} OR n.nspname || '.' || c.relname = '{{STRSQLSAFENAME}}'))
+
+
+
+        || COALESCE((SELECT array_to_string(array_agg(
+        	(SELECT array_to_string((SELECT array_agg('GRANT ' || ok) FROM
+        	    (SELECT array_to_string((SELECT array_agg(perms ORDER BY srt)
+        		FROM (  SELECT 1 as srt, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'r($|[^*])' THEN 'SELECT' END as perms
+        			UNION SELECT 2, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'w($|[^*])' THEN 'UPDATE' END
+        			UNION SELECT 3, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'U($|[^*])' THEN 'USAGE' END) em
+        			WHERE perms is not null),',') ||
+        	' ON TABLE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || ' TO ' ||
+              	CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public'
+        		ELSE (regexp_split_to_array(unnest::text,'[=/]'))[1] END || E';\n' as ok
+
+        	FROM unnest(c.relacl)
+        	WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|U)($|[^*])') as em),'')
+        	)
+        	),'')
+        FROM pg_class c
+        LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
+        LEFT JOIN pg_roles ON pg_roles.oid = c.relowner
+        LEFT JOIN pg_description ON pg_description.objoid = c.oid
+        LEFT JOIN information_schema.sequences s ON s.sequence_schema = n.nspname
+                                             AND s.sequence_name = c.relname
+        WHERE c.relkind = 'S'::char AND (c.oid = {{INTOID}} OR n.nspname || '.' || c.relname = '{{STRSQLSAFENAME}}')),'')
+
+        || COALESCE((SELECT array_to_string(array_agg(
+        	(SELECT array_to_string((SELECT array_agg('GRANT ' || ok) FROM
+        	    (SELECT array_to_string((SELECT array_agg(perms ORDER BY srt)
+        		FROM (  SELECT 1 as srt, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'r\*' THEN 'SELECT' END as perms
+        			UNION SELECT 2, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'w\*' THEN 'UPDATE' END
+        			UNION SELECT 3, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'U\*' THEN 'USAGE' END) em
+        			WHERE perms is not null),',') ||
+        	' ON TABLE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || ' TO ' ||
+              	CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public'
+        		ELSE (regexp_split_to_array(unnest::text,'[=/]'))[1] END || E' WITH GRANT OPTION;\n' as ok
+
+        	FROM unnest(c.relacl)
+        	WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|U)\*') as em),'')
+        	)
+        	),'')
+        FROM pg_class c
+        LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
+        LEFT JOIN pg_roles ON pg_roles.oid = c.relowner
+        LEFT JOIN pg_description ON pg_description.objoid = c.oid
+        LEFT JOIN information_schema.sequences s ON s.sequence_schema = n.nspname
+                                             AND s.sequence_name = c.relname
+        WHERE c.relkind = 'S'::char AND (c.oid = {{INTOID}} OR n.nspname || '.' || c.relname = '{{STRSQLSAFENAME}}')),'');
+    */});
+    
+scriptQuery.objectSequencesOwned = ml(function () {/*
+    SELECT string_agg(E'ALTER SEQUENCE ' || objid::regclass || ' OWNED BY ' || pg_depend.refobjid::regclass || '.' || pg_attribute.attname || ';', E'\n\n')
+       FROM pg_depend
+       JOIN pg_class ON pg_class.oid = pg_depend.objid AND pg_class.relkind = 'S'
+       JOIN pg_attribute ON pg_attribute.attrelid = pg_depend.refobjid
+                        AND pg_attribute.attnum = pg_depend.refobjsubid
+      WHERE (E'' || pg_depend.objid::regclass) LIKE '{{SCHEMA}}.%'
+        AND pg_depend.refobjsubid > 0;
+*/});
 
 associatedButtons.objectRule = ['dependButton'];
 scriptQuery.objectRule = ml(function () {/*
@@ -1972,15 +2062,9 @@ scriptQuery.objectTable = ml(function () {/*
                                     THEN E',\n  ' || array_to_string(reloptions, E',\n  ')
                                     ELSE ''
                             END) || E'\n);') ||
-<<<<<<< HEAD
-              E'\n\nALTER TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || 
-              ' OWNER TO ' || quote_ident(pg_roles.rolname) || E';\n\n' ||
-                
-=======
               E'\n\nALTER TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) ||
               ' OWNER TO ' || quote_ident(pg_roles.rolname) || E';\n\n' ||
 
->>>>>>> 6de81ed46b4f66fc23215191ad558647e282bcc7
                 -- get table and column comments
                 (
                      SELECT  COALESCE(

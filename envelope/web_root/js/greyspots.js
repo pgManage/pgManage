@@ -40352,7 +40352,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function renderSelection(element) {//<br />
-        console.trace('renderSelection');
         var bolHeaders;
         var bolSelectors;
         var bolInsert;
@@ -40425,15 +40424,38 @@ document.addEventListener('DOMContentLoaded', function () {
         arrSelectedStates = ['B', 'D', 'F', 'H', 'J', 'L'];
         //arrDeselectedStates = ['A', 'C', 'E', 'G', 'I', 'K'];
 
-        console.log(strCompareString === element.internalSelection.rangeCache);
         if (strCompareString === element.internalSelection.rangeCache) {
             arrSelection = element.internalSelection.resolvedSelection;
-            arrSelectionRows = element.internalSelection.rows;
-            arrSelectionCols = element.internalSelection.columns;
             arrRanges = element.internalSelection.ranges;
             arrColumnWidths = element.internalDisplay.columnWidths;
-            arrRows = arrSelectionRows;
-            arrColumns = arrSelectionCols;
+            arrRows = element.internalSelection.rows;
+            arrColumns = element.internalSelection.columns;
+
+            arrSelectionRows = element.internalSelection.rows.slice(0);
+            rec_i = 0;
+            rec_len = arrSelectionRows.length;
+            while (rec_i < rec_len) {
+                if (arrSelectionRows[rec_i] === 'header') {
+                    arrSelectionRows[rec_i] = 0;
+                } else if (arrSelectionRows[rec_i] === 'insert') {
+                    arrSelectionRows[rec_i] = arrSelection.length - 1;
+                } else {
+                    arrSelectionRows[rec_i] += 1;
+                }
+                rec_i += 1;
+            }
+
+            arrSelectionCols = element.internalSelection.columns.slice(0);
+            col_i = 0;
+            col_len = arrSelectionCols.length;
+            while (col_i < col_len) {
+                if (arrSelectionCols[col_i] === 'selector') {
+                    arrSelectionCols[col_i] = 0;
+                } else {
+                    arrSelectionCols[col_i] += 1;
+                }
+                col_i += 1;
+            }
 
         } else {
             element.internalSelection.rangeCache = strCompareString;
@@ -40851,14 +40873,14 @@ document.addEventListener('DOMContentLoaded', function () {
             if (strRecord) {
                 if (arrSelectedStates.indexOf(strRecord[intCol]) > -1) {
                     cell.setAttribute('selected', '');
-                    console.log(
-                        strRecord,
-                        intCol,
-                        intRow,
-                        cell.getAttribute('data-col-number'),
-                        cell.getAttribute('data-row-number'),
-                        cell
-                    );
+                    //console.log(
+                    //    strRecord,
+                    //    intCol,
+                    //    intRow,
+                    //    cell.getAttribute('data-col-number'),
+                    //    cell.getAttribute('data-row-number'),
+                    //    cell
+                    //);
 
                 // sometimes, the user selects some cells without selecting the
                 //      record selectors and/or headers. in this case, we want
@@ -40885,17 +40907,17 @@ document.addEventListener('DOMContentLoaded', function () {
                     )
                 ) {
                     //console.log(strRow, intRow);
-                    console.log(
-                        arrSelectionRows,
-                        arrSelectionCols,
-                        arrRows,
-                        arrColumns,
-                        intCol,
-                        intRow,
-                        cell.getAttribute('data-col-number'),
-                        cell.getAttribute('data-row-number'),
-                        cell
-                    );
+                    //console.log(
+                    //    arrSelectionRows,
+                    //    arrSelectionCols,
+                    //    arrRows,
+                    //    arrColumns,
+                    //    intCol,
+                    //    intRow,
+                    //    cell.getAttribute('data-col-number'),
+                    //    cell.getAttribute('data-row-number'),
+                    //    cell
+                    //);
                     cell.setAttribute('auto-selected', '');
                 }
             }
@@ -50943,6 +50965,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         element.internalSelection
                             .ranges[intCurrentSelectionIndex]
                     );
+
+                    if (currentRange.start.column === 'selector') {
+                        jsnLocation.column = 'selector';
+                    }
 
                     // save old row and column so that we can later check if
                     //      a change was actually made (that way we only

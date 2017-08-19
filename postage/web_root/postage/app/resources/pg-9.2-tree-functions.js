@@ -2190,7 +2190,7 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
 
             // function to handle the query results
             handleListResults = function (arrResult) {
-                var strDumpQuery = '', strQuery, i, len, tempFunction, handleScriptResults, bolTriggers = false;
+                var strDumpQuery = '', strQuery, i, len, tempFunction, handleScriptResults, bolTriggers = false, bolSequenceOwned = false;
 
                 // drop statements (reverse order of schema then listed objects)
                 if (bolDropStatments) {
@@ -2249,6 +2249,15 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
                                 )
                                 .replace(/\{\{SCHEMA\}\}/gim, strSchemaName);
                         }
+                        if (bolSequenceOwned) {
+                            len1 += 1;
+                            strQuery += '\n\n' +
+                                (
+                                    scriptQuery['objectSequencesOwned']
+                                )
+                                .replace(/\{\{SCHEMA\}\}/gim, strSchemaName);
+                        }
+                        console.log(strQuery);
                         break;
                     }
                     if (arrResult[i][1].indexOf('"') === -1) {
@@ -2264,6 +2273,14 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
                         )
                         .replace(/\{\{INTOID\}\}/gim, arrResult[i][0])
                         .replace(/\{\{STRSQLSAFENAME\}\}/gim, quote_ident(strSchemaName) + '.' + resName);
+                    } else if (GS.strToTitle(arrResult[i][3]).toLowerCase() === 'sequence') {
+                        bolSequenceOwned = true;
+                        strQuery += '\n\n' +
+                            (
+                                scriptQuery['objectSequenceDump']
+                            )
+                            .replace(/\{\{INTOID\}\}/gim, arrResult[i][0])
+                            .replace(/\{\{STRSQLSAFENAME\}\}/gim, quote_ident(strSchemaName) + '.' + resName);
                     } else {
                         strQuery += '\n\n' +
                             (
