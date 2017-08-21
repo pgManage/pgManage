@@ -3203,5 +3203,9 @@ function SQLBeautify(strInput) {
         console.error('Beautify mangled the SQL: Before >>>' + strInput + '<<< After >>>' + strResult + '<<<');
     }
 
+    // for #380
+    // the reason it is after the test is because it modifies something other than whitespace
+    strResult = strResult.replace(/\'\n\'::text/gi, 'E\'\\n\'::text');
+
     return strResult;
 }

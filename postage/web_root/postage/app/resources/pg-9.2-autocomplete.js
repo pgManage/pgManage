@@ -28,7 +28,6 @@ var autocompleteGlobals = {
       , 'strSpecialFilter':  ""
       , 'bolTestSlowDown':   false
       , 'quoteLevel':      0
-      , 'bolSnippets':  false
       , 'intContextPosition': 0
       , 'arrStrContext': []
       , 'startRow': 0
@@ -77,7 +76,7 @@ function getContext(strInput, intPosition) {
         return;
     }
     
-    if (strInput.indexOf(/[\n\r\ \t]/) === strInput.lastIndexOf(/[\n\r\ \t]/)) {
+    if (strInput.match(/[\n\r\ \t]+/g).length < 2) {
         autocompleteGlobals.bolSnippets = true;
     }
 
@@ -776,7 +775,7 @@ function getContext(strInput, intPosition) {
             }
             //console.log(">intContextPosition|" + intContextPosition + "<");
 
-            console.log(">AND/OR/operators lookahead|" + intTabLevel + "<");
+            //console.log(">AND/OR/operators lookahead|" + intTabLevel + "<");
 
         // FOUND SELECT/UPDATE/DELETE ... PARENTHESIS
         } else if (int_qs === 0 && strNextOneChar === "(" && (bolSelect || bolUpdate || bolDelete || intCase > 0)) {
@@ -1538,7 +1537,7 @@ function getContext(strInput, intPosition) {
         return;
     }
 
-    console.log('arrShortQueries', arrShortQueries);
+    // console.log('arrShortQueries', arrShortQueries);
     if (arrShortQueries.indexOf('schemas') > -1) {
         arrQueries.push(autocompleteQuery.schemas);
     } if (arrShortQueries.indexOf('functions') > -1) {
@@ -1798,8 +1797,8 @@ function getContext(strInput, intPosition) {
         }
     } if (arrShortQueries.indexOf('contextTablesColumns') > -1) {
         //console.log('arrShortQueries', arrShortQueries);
-        console.log('before strContext', strContext);
-        console.log('before strCopyContext', strCopyContext);
+        //console.log('before strContext', strContext);
+        //console.log('before strCopyContext', strCopyContext);
 
         var strSchema = '';
         var strTable = '';
@@ -1814,9 +1813,9 @@ function getContext(strInput, intPosition) {
 
             autocompleteGlobals.bolAlpha = false;
 
-            console.log('strSchema', strSchema);
-            console.log('strTable', strTable);
-            console.log('after strContext', strContext);
+            //console.log('strSchema', strSchema);
+            //console.log('strTable', strTable);
+            //console.log('after strContext', strContext);
         } else if (strContext.match(/^.*\..*/)) {
             var arrMatches = strContext.match(/^(.*)\.([^.]*)/);
             strTable = arrMatches[1];
@@ -1824,21 +1823,21 @@ function getContext(strInput, intPosition) {
 
             autocompleteGlobals.bolAlpha = false;
 
-            console.log('strTable', strTable);
-            console.log('after strContext', strContext);
+            //console.log('strTable', strTable);
+            //console.log('after strContext', strContext);
         }
 
-        console.log('autocompleteGlobals.arrStrContext', autocompleteGlobals.arrStrContext);
+        //console.log('autocompleteGlobals.arrStrContext', autocompleteGlobals.arrStrContext);
         var i, len;
         for (i = 0, len = autocompleteGlobals.arrStrContext.length; i < len; i++) {
-            console.log(i + ' test1' + (autocompleteGlobals.arrStrContext[i][0] === strSchema && strSchema !== ''));
-            console.log(i + ' test2' + (autocompleteGlobals.arrStrContext[i][1] === strTable && strTable !== ''));
-            console.log(i + ' test3' + (autocompleteGlobals.arrStrContext[i][2] === strTable && autocompleteGlobals.arrStrContext[i][2] !== ''));
+            //console.log(i + ' test1' + (autocompleteGlobals.arrStrContext[i][0] === strSchema && strSchema !== ''));
+            //console.log(i + ' test2' + (autocompleteGlobals.arrStrContext[i][1] === strTable && strTable !== ''));
+            //console.log(i + ' test3' + (autocompleteGlobals.arrStrContext[i][2] === strTable && autocompleteGlobals.arrStrContext[i][2] !== ''));
             if ((autocompleteGlobals.arrStrContext[i][0] === strSchema && strSchema !== '')
                 || (autocompleteGlobals.arrStrContext[i][1] === strTable && strTable !== '')
                 || (autocompleteGlobals.arrStrContext[i][2] === strTable && autocompleteGlobals.arrStrContext[i][2] !== '')
                 || (strSchema === '' && strTable === '')) {
-                console.log('i ' + i + ' pass');
+                //console.log('i ' + i + ' pass');
                 arrQueries.push(
                     autocompleteQuery.columns
                         .replace(/\{\{ADDITIONALWHERE}\}/gi,

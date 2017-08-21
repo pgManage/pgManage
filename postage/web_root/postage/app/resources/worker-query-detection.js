@@ -623,7 +623,7 @@ function selectionFindRange(strScript, intCursorPos) {
     //              (same thing for ROLLBACK TO SAVEPOINT and SAVEPOINT)
     //              (same thing for (SELECT, INSERT, UPDATE, DELETE) and WITH)
     //              (same thing for (SELECT, INSERT, UPDATE, DELETE) and CREATE TRIGGER)
-    //              (same thing for (UPDATE, INSERT) and CREATE RULE)
+    //              (same thing for (INSERT, UPDATE, DELETE) and CREATE RULE)
     // ######################
 
     arrQueryStartKeywords = [
