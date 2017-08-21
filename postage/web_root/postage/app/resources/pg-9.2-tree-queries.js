@@ -807,6 +807,31 @@ listQuery.objectSequence = listQuery.sequences = ml(function () {/*
     ORDER BY pg_class.relname;
 */});
 
+listQuery.objectSequenceDump = ml(function () {/*
+    SELECT pg_class.oid, quote_ident(pg_class.relname) AS name, pg_namespace.nspname AS schema_name, 'Sequence' AS obj
+        FROM pg_class
+        LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+    WHERE relkind = 'S' AND pg_class.relnamespace = {{INTOID}} AND pg_class.relname NOT IN
+    (
+        SELECT pg_class.relname
+            FROM pg_depend
+            JOIN pg_class ON pg_class.oid = pg_depend.objid AND pg_class.relkind = 'S'
+            LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+            JOIN pg_attribute ON pg_attribute.attrelid = pg_depend.refobjid
+                AND pg_attribute.attnum = pg_depend.refobjsubid
+        WHERE pg_class.relnamespace = {{INTOID}}::oid
+    )
+    UNION
+    (SELECT pg_class.oid, quote_ident(pg_class.relname) AS name, pg_namespace.nspname AS schema_name, 'OwnedSequence' AS obj
+            FROM pg_depend
+            JOIN pg_class ON pg_class.oid = pg_depend.objid AND pg_class.relkind = 'S'
+            LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+            JOIN pg_attribute ON pg_attribute.attrelid = pg_depend.refobjid
+                AND pg_attribute.attnum = pg_depend.refobjsubid
+        WHERE pg_class.relnamespace = {{INTOID}}::oid)
+    ORDER BY name;
+*/});
+
 listQuery.objectCollation = listQuery.collations = ml(function () {/*
       SELECT pg_collation.oid, quote_ident(pg_collation.collname) AS name, pg_namespace.nspname AS schema_name, 'CL' AS bullet
         FROM pg_catalog.pg_collation
@@ -844,12 +869,39 @@ listQuery.objectOperatorClass = listQuery.operatorclasses = ml(function () {/*
     ORDER BY opcname;
 */});
 
+
+listQuery.objectOperatorClassDump = ml(function () {/*
+SELECT pg_opclass.oid
+	, (quote_ident(opcname) || ' USING ' || pg_am.amname) AS name
+	, pg_namespace.nspname AS schema_name
+	, 'OC' AS bullet
+FROM pg_opclass
+LEFT JOIN pg_namespace ON pg_namespace.oid = pg_opclass.opcnamespace
+LEFT JOIN pg_catalog.pg_am ON pg_opclass.opcmethod = pg_am.oid
+WHERE pg_opclass.opcnamespace = {{INTOID}}
+ORDER BY opcname;
+*/});
+
+
 listQuery.objectOperatorFamily = listQuery.operatorfamilies = ml(function () {/*
       SELECT pg_opfamily.oid, quote_ident(opfname) AS name, pg_namespace.nspname AS schema_name, 'OF' AS bullet
         FROM pg_opfamily
    LEFT JOIN pg_namespace ON pg_namespace.oid = pg_opfamily.opfnamespace
        WHERE pg_opfamily.opfnamespace = {{INTOID}}
     ORDER BY opfname;
+*/});
+
+
+listQuery.objectOperatorFamilyDump = ml(function () {/*
+SELECT pg_opfamily.oid
+	, (quote_ident(opfname) || ' USING ' || pg_am.amname) AS name
+	, pg_namespace.nspname AS schema_name
+	, 'OF' AS bullet
+FROM pg_opfamily
+LEFT JOIN pg_namespace ON pg_namespace.oid = pg_opfamily.opfnamespace
+LEFT JOIN pg_catalog.pg_am ON pg_opfamily.opfmethod = pg_am.oid
+WHERE pg_opfamily.opfnamespace = {{INTOID}}
+ORDER BY opfname;
 */});
 
 
@@ -1948,7 +2000,7 @@ scriptQuery.objectSequenceDump = ml(function () {/*
     */});
     
 scriptQuery.objectSequencesOwned = ml(function () {/*
-    SELECT string_agg(E'ALTER SEQUENCE ' || objid::regclass || ' OWNED BY ' || pg_depend.refobjid::regclass || '.' || pg_attribute.attname || ';', E'\n\n')
+    SELECT string_agg(E'ALTER SEQUENCE ' || objid::regclass || ' OWNED BY ' || pg_depend.refobjid::regclass || '.' || quote_ident(pg_attribute.attname) || ';', E'\n\n')
        FROM pg_depend
        JOIN pg_class ON pg_class.oid = pg_depend.objid AND pg_class.relkind = 'S'
        JOIN pg_attribute ON pg_attribute.attrelid = pg_depend.refobjid
@@ -2485,15 +2537,8 @@ scriptQuery.objectTableNoComment = ml(function () {/*
                                     THEN E',\n  ' || array_to_string(reloptions, E',\n  ')
                                     ELSE ''
                             END) || E'\n);') ||
-<<<<<<< HEAD
               E'\n\nALTER TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || 
               ' OWNER TO ' || quote_ident(pg_roles.rolname) || E';\n\n' ||
-                
-=======
-              E'\n\nALTER TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) ||
-              ' OWNER TO ' || quote_ident(pg_roles.rolname)|| E';\n\n' ||
-
->>>>>>> 6de81ed46b4f66fc23215191ad558647e282bcc7
                 -- get table and column comments
                 (
                      SELECT  COALESCE(
@@ -2641,13 +2686,8 @@ scriptQuery.objectTableNoComment = ml(function () {/*
         		WHERE perms is not null
         		ORDER BY 1),','
         		)) ||
-<<<<<<< HEAD
         	' ON ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || 
         	' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE quote_ident(substr((regexp_split_to_array(att.attacl::text,'[=/]'))[1], 2)) END ||
-=======
-        	' ON ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) ||
-        	' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE quote_ident((regexp_split_to_array(att.attacl::text,'[=/]'))[1]) END ||
->>>>>>> 6de81ed46b4f66fc23215191ad558647e282bcc7
         	';' as perms
         FROM pg_class
         LEFT JOIN pg_attribute att ON att.attrelid = pg_class.oid
@@ -3780,7 +3820,7 @@ scriptQuery.objectOperatorClass = ml(function () {/*
         , E',\n\t' ORDER BY 'FUNCTION '::text || pg_amproc.amprocnum::text || '  ' || pg_proc_namespace.nspname || '.' || pg_proc.proname ||
                                                 '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '') || ')')
         , '') ||
-        COALESCE(E'\n\tSTORAGE ' || pg_storage_type.typname, '') ||
+        COALESCE(E',\n\tSTORAGE ' || pg_storage_type.typname, '') ||
         E';\n\n' ||
         COALESCE('COMMENT ON OPERATOR CLASS ' ||
                 COALESCE(pg_namespace.nspname, '') || '.' || COALESCE(pg_opclass.opcname, '') ||

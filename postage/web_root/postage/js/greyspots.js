@@ -52549,7 +52549,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 intSelectionLength = (
                                     element.internalSelection.columns.length - 2
                                 );
-                            } else if (intStartColumn < intEndColumn) {
+                            } else if (intStartColumn > intEndColumn) {
                                 selectedBroken = true;
                                 intSelectionLength = (
                                     (intStartColumn + 1) - intEndColumn
@@ -52582,7 +52582,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
 
                 }
-                colsToResize.push(element.internalResize.resizeColumnIndex);
+                // nunzio commented this out on 2017-08-21
+                //      because it was causing the datasheet
+                //      to resize the selected columns even
+                //      though the resized column was not selected
+                // colsToResize.push(element.internalResize.resizeColumnIndex);
+
                 //console.log(colsToResize);
 
                 // if scrolling is running, stop it because we are done with
@@ -52831,7 +52836,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                                 .columns
                                                 .length - 2
                                         );
-                                    } else if (intStartColumn < intEndColumn) {
+                                    } else if (intStartColumn > intEndColumn) {
                                         selectedBroken = true;
                                         intSelectionLength = (
                                             (intStartColumn + 1) - intEndColumn
@@ -52863,12 +52868,22 @@ document.addEventListener('DOMContentLoaded', function () {
                                 }
                             }
                         }
-                        colsToResize.push(
-                            element.internalResize.resizeColumnIndex
-                        );
+                        // commented by nunzio on 2017-08-21
+                        //      Same reason as in cellResizeDragEnd
+                        //colsToResize.push(
+                        //    element.internalResize.resizeColumnIndex
+                        //);
 
                         //console.log(colsToResize);
-                        resizeColumnsToContent(element, colsToResize);
+                        if (colsToResize.indexOf(
+                            element.internalResize.resizeColumnIndex
+                        ) > 0) {
+                            resizeColumnsToContent(element, colsToResize);
+                        } else {
+                            resizeColumnsToContent(element, [
+                                element.internalResize.resizeColumnIndex
+                            ]);
+                        }
 
 
 

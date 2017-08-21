@@ -1,0 +1,1322 @@
+gs-table {
+    display: block;
+    border: 1px solid #006E00;
+    position: relative;
+    z-index: 4; /* this prevents internally z-indexed items from going
+                    over elements that the parent itself can't go over. */
+
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+}
+/*gs-cell {
+    white-space: pre;
+    display: inline-block;
+}*/
+
+/*
+gs-cell input {
+    overflow: hidden !important;
+}
+*/
+
+gs-table[mini] {
+    border: 0 none;
+}
+
+gs-table.table-fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    z-index: 95; /* below dialogs */
+}
+
+gs-table.notHidden {
+    z-index: 95; /* below dialogs */
+}
+
+gs-current-record[inline] {
+    display: inline-block;
+}
+
+.relative {
+    position: relative;
+}
+
+.absolute {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+}
+
+/* #######################################################################
+################################# THEMES #################################
+####################################################################### */
+
+
+/* ##################################################
+###################### DEFAULT ######################
+################################################## */
+gs-table:not([theme]) {
+    border-color: #006E00;
+}
+gs-table:not([theme]) >
+        .table-root.show-top-hud >
+        .table-hud-container.hud-top {
+    background-color: #FFF;
+    border-bottom-color: #006E00;
+}
+
+gs-table:not([theme]) >
+        .table-root.show-bottom-hud >
+        .table-hud-container.hud-bottom {
+    background-color: #FFF;
+    border-top-color: #006E00;
+}
+
+gs-table:not([theme]) >
+        .table-root.show-top-hud >
+        .table-hud-container.hud-top {
+    background-color: #f1f1f1;
+}
+
+gs-table:not([theme]) >
+        .table-root.show-bottom-hud >
+        .table-hud-container.hud-bottom {
+    background-color: #f1f1f1;
+}
+
+gs-table:not([theme]) >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport {
+    background-color: #f1f1f1;
+    border-right-color: #006E00;
+    border-bottom-color: #006E00;
+}
+
+
+
+
+gs-table.focus-in:not([theme]) > .table-root >
+        .table-table-container > .table-data-container >
+        .table-data-viewport > gs-cell[origin-record]:not([selected]):not([auto-selected]) {
+    background-color: #F0F0F0 !important;
+    background: #F0F0F0 !important;
+}
+
+gs-table.focus-in:not([theme]) > .table-root >
+        .table-table-container > .table-data-container >
+        .table-data-viewport > gs-cell[origin-record][selected] {
+    background-color: #f3f3b8 !important;
+    background: #f3f3b8 !important;
+}
+
+gs-table.focus-in:not([theme]) > .table-root >
+        .table-table-container > .table-data-container >
+        .table-data-viewport > gs-cell[selected] {
+    background-color: #f3f3b8 !important;
+    background: #f3f3b8 !important;
+}
+
+gs-table.focus-in:not([theme]) > .table-root >
+        .table-table-container > .table-data-container >
+        .table-data-viewport > gs-cell[origin-record][auto-selected] {
+    background-color: #c2f7c3 !important;
+    background: #c2f7c3 !important;
+}
+
+gs-table.focus-in:not([theme]) >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell[auto-selected]:not([origin-record]):not(.table-header):not(.table-all-selector) {
+    background-color: #d6f7d7 !important;
+    background: #d6f7d7 !important;
+}
+
+gs-table.focus-in:not([theme]) > .table-root >
+        .table-table-container > .table-data-container >
+        .table-data-viewport > gs-cell.table-all-selector[auto-selected],
+gs-table.focus-in:not([theme]) > .table-root >
+        .table-table-container > .table-data-container >
+        .table-data-viewport > gs-cell.table-header[auto-selected] {
+    background: #dff3e7;
+    background: -moz-linear-gradient(top, #dff3e7 0%, #beded1 100%);
+    background: -webkit-linear-gradient(top, #dff3e7 0%,#beded1 100%);
+    background: linear-gradient(to bottom, #dff3e7 0%,#beded1 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#dff3e7', endColorstr='#beded1',GradientType=0 );
+}
+
+gs-table.focus-in:not([theme]) > .table-root >
+        .table-table-container > .table-data-container >
+        .table-data-viewport > gs-cell.table-all-selector[selected],
+gs-table.focus-in:not([theme]) > .table-root >
+        .table-table-container > .table-data-container >
+        .table-data-viewport > gs-cell.table-header[selected] {
+    background: #fcfae8;
+    background: -moz-linear-gradient(top, #fcfae8 0%, #f1f6d0 100%);
+    background: -webkit-linear-gradient(top, #fcfae8 0%,#f1f6d0 100%);
+    background: linear-gradient(to bottom, #fcfae8 0%,#f1f6d0 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcfae8', endColorstr='#f1f6d0',GradientType=0 );
+}
+
+
+gs-table.focus-out:not([theme]) > .table-root >
+        .table-table-container > .table-data-container >
+        .table-data-viewport > gs-cell[selected],
+gs-table.focus-out:not([theme]) > .table-root >
+        .table-table-container > .table-data-container >
+        .table-data-viewport > gs-cell[auto-selected] {
+    background-color: #F0F0F0 !important;
+    background: #F0F0F0 !important;
+}
+
+
+
+
+
+gs-table:not([theme]) >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell.table-cell {
+    background-color: #FFF;
+    border-right-color: #adadad;
+    border-bottom-color: #adadad;
+}
+
+gs-table:not([theme]) >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell.table-header {
+    border-right-color: #006E00;
+    border-bottom-color: #006E00;
+    
+    background: #f8fcf9;
+    background: -moz-linear-gradient(top, #f8fcf9 0%, #d3e9dc 100%);
+    background: -webkit-linear-gradient(top, #f8fcf9 0%,#d3e9dc 100%);
+    background: linear-gradient(to bottom, #f8fcf9 0%,#d3e9dc 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f8fcf9', endColorstr='#d3e9dc',GradientType=0 );
+}
+
+gs-table:not([theme]) >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell.table-all-selector {
+    color: #529c66;
+    border-bottom-color: #006E00;
+    border-right-color: #006E00;
+    
+    background: #f8fcf9;
+    background: -moz-linear-gradient(top, #f8fcf9 0%, #d3e9dc 100%);
+    background: -webkit-linear-gradient(top, #f8fcf9 0%,#d3e9dc 100%);
+    background: linear-gradient(to bottom, #f8fcf9 0%,#d3e9dc 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f8fcf9', endColorstr='#d3e9dc',GradientType=0 );
+}
+
+gs-table:not([theme]) >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell.table-insert {
+    background-color: #FFF;
+    border-right-color: #adadad;
+    border-bottom-color: #adadad;
+}
+
+gs-table:not([theme]) >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell.table-record-selector {
+    background-color: #e4f7ec;
+    color: #CCC;
+    border-bottom-color: #006E00;
+    border-right-color: #006E00;
+}
+
+gs-table:not([theme]) >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell.table-insert-selector {
+    background-color: #e4f7ec;
+    color: #CCC;
+    border-right-color: #006E00;
+    border-bottom-color: #006E00;
+}
+
+gs-table:not([theme]) >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        .no-data-label {
+    color: #efefef;
+}
+
+gs-table:not([theme]) >
+        .table-root >
+        .table-table-container >
+        .table-v-scroll-bar-container >
+        .table-v-scroll-bar {
+    border-bottom-color: #A1A1A1; /* 006E00 */
+}
+
+gs-table:not([theme]) >
+        .table-root >
+        .table-table-container >
+        .table-h-scroll-bar-container >
+        .table-h-scroll-bar {
+    border-right-color: #A1A1A1; /* 006E00 */
+}
+
+/*
+gs-table:not([theme]) >
+        .table-root >
+        .table-table-container >
+        .table-h-scroll-bar-container >
+        .table-h-scroll-bar::-webkit-scrollbar {
+    height: 16px;
+}
+
+gs-table:not([theme]) >
+        .table-root >
+        .table-table-container >
+        .table-h-scroll-bar-container >
+        .table-h-scroll-bar::-webkit-scrollbar-track {
+    background-color: #FFFFFF;
+}
+
+gs-table:not([theme]) >
+        .table-root >
+        .table-table-container >
+        .table-h-scroll-bar-container >
+        .table-h-scroll-bar::-webkit-scrollbar-thumb {
+    background-color: #006E00;
+    border-radius: 15px;
+}
+-- themed scrollbars in the future?
+*/
+
+gs-table:not([theme]) >
+        .table-root >
+        .table-loader-container >
+        .table-loader {
+    border-color: #006E00;
+    background-color: #FFF;
+    box-shadow: 0 0 0.5em 0.001em #636363;
+}
+
+gs-table:not([theme]) > 
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        .resize-column-handle.active,
+gs-table:not([theme]) > 
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        .resize-record-handle.active,
+gs-table:not([theme]) > 
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        .reorder-column-handle {
+    background-color: #006E00;
+}
+
+
+.gs-table-contextmenu .gs-table-text-grey {
+    display: block;
+    padding: 0.25em;
+    color: #9c9c9c;
+}
+
+
+/* ##################################################
+####################### SUPER #######################
+################################################## */
+/*
+border-color: #6b34bf;
+background-color: #000000;
+box-shadow: 0 0 0.5em 0.001em #636363;
+*/
+
+/* ################################################### 
+###################### HOMEBREW ######################
+################################################### */
+/*
+border-color: #f5a200;
+background-color: #000000;
+box-shadow: 0 0 0.5em 0.001em #636363;
+*/
+
+/* ###################################################
+######################## DARK ########################
+################################################### */
+
+/* ##################################################
+####################### MOCHA #######################
+################################################## */
+
+
+
+
+
+
+
+/* #######################################################################
+############################### TABLE ROOT ###############################
+####################################################################### */
+gs-table > .table-root {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+
+/* #######################################################################
+########################## HIDDEN FOCUS CONTROL ##########################
+####################################################################### */
+gs-table > .table-root > .hidden-focus-control {
+    width: 1px;
+    height: 1px;
+    border: 0 none;
+    margin: 0;
+    padding: 0;
+    
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    z-index: -5000;
+    opacity: 0.00000001;
+    
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+
+/* #######################################################################
+######################## DIMENSION TEST CONTAINER ########################
+####################################################################### */
+gs-table > .table-root > .table-cell-test-container {
+    position: absolute;
+    top: -100%; /* negative prevents this from affecting scrolling */
+    left: -100%; /* negative prevents this from affecting scrolling */
+    z-index: -5000;
+    opacity: 0.00000001;
+}
+
+
+/* #######################################################################
+################################## HUD  ##################################
+####################################################################### */
+gs-table >
+        .table-root >
+        .table-hud-container {
+    display: none;
+}
+gs-table >
+        .table-root.show-top-hud >
+        .table-hud-container.hud-top,
+gs-table >
+        .table-root.show-bottom-hud >
+        .table-hud-container.hud-bottom {
+    display: block;
+    position: absolute;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    line-height: 1em;
+    padding: 3px;
+    font-size: 0.8em;
+    box-shadow: 0 0 0.25em 0 #b9b9b9 inset;
+    
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+
+
+
+gs-table >
+        .table-root.show-top-hud >
+        .table-hud-container.hud-top {
+    top: 0;
+    /*height: 2em;*/
+    border-bottom: 1px solid #006E00;
+}
+
+gs-table >
+        .table-root.show-bottom-hud >
+        .table-hud-container.hud-bottom {
+    bottom: 0;
+    /*height: 2em;*/
+    border-top: 1px solid #006E00;
+}
+
+gs-table >
+        .table-root >
+        .table-hud-container >
+        gs-button {
+    line-height: 1.5em;
+}
+
+gs-table >
+        .table-root >
+        .table-hud-container >
+        .text-selection-status {
+    display: inline-block;
+    width: 8em;
+    /*height: 100%;
+    border-top: 0 none;
+    border-bottom: 0 none;
+    margin: 0;*/
+}
+
+
+
+/* #######################################################################
+################## SCROLLBARs AND DATA CONTAINER PARENT ##################
+####################################################################### */
+gs-table >
+        .table-root >
+        .table-table-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+
+/* #######################################################################
+########################### VIEWPORT CONTAINER ###########################
+####################################################################### */
+gs-table >
+        .table-root >
+        .table-table-container >
+        .table-data-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+
+/* #######################################################################
+################################ VIEWPORT ################################
+####################################################################### */
+gs-table >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    
+    border-right: 1px solid #006E00;
+    border-bottom: 1px solid #006E00;
+
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+
+/* #######################################################################
+################################ GS-CELLs ################################
+####################################################################### */
+gs-table >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell,
+gs-table >
+        .table-root >
+        .table-cell-test-container >
+        gs-cell {
+    position: absolute;
+    overflow: hidden;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+}
+gs-table >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell.table-cell,
+gs-table >
+        .table-root >
+        .table-cell-test-container >
+        gs-cell.table-cell {
+    z-index: 40;
+    border-right: 1px solid #006E00;
+    border-bottom: 1px solid #006E00;
+    width: 75px;
+    height: 27px;
+}
+gs-table >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell.table-header,
+gs-table >
+        .table-root >
+        .table-cell-test-container >
+        gs-cell.table-header {
+    z-index: 50;
+    background-color: #FFF;
+    text-align: center;
+    font-weight: 900;
+    border-right: 1px solid #006E00;
+    border-bottom: 1px solid #006E00;
+    /*height: 27px;*/
+    line-height: 27px;
+    cursor: s-resize;
+    top: 0;
+    
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+gs-table >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell.table-insert,
+gs-table >
+        .table-root >
+        .table-cell-test-container >
+        gs-cell.table-insert {
+    z-index: 60;
+    background-color: #FFF;
+    border-right: 1px solid #006E00;
+    border-bottom: 1px solid #006E00;
+    height: 27px;
+    bottom: 0;
+}
+gs-table >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell.table-record-selector,
+gs-table >
+        .table-root >
+        .table-cell-test-container >
+        gs-cell.table-record-selector {
+    z-index: 70;
+    background-color: #FFF;
+    text-align: right;
+    font-size: 0.6em;
+    color: #CCC;
+    cursor: e-resize;
+    left: 0;
+    
+    border-bottom: 1px solid #006E00;
+    border-right: 1px solid #006E00;
+    
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+gs-table >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell.table-insert-selector,
+gs-table >
+        .table-root >
+        .table-cell-test-container >
+        gs-cell.table-insert-selector {
+    z-index: 75;
+    background-color: #FFF;
+    text-align: center;
+    color: #CCC;
+    cursor: e-resize;
+    bottom: 0;
+    right: 0;
+    
+    border-right: 1px solid #006E00;
+    border-bottom: 1px solid #006E00;
+    
+    /* asterisk specific */
+    line-height: 1.4em;
+    font-size: 2em;
+    vertical-align:sub;
+    
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+gs-table >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell.table-all-selector,
+gs-table >
+        .table-root >
+        .table-cell-test-container >
+        gs-cell.table-all-selector {
+    cursor: se-resize;
+    z-index: 80;
+    background-color: #FFF;
+    text-align: center;
+    color: #CCC;
+    top: 0;
+    right: 0;
+    
+    border-bottom: 1px solid #006E00;
+    border-right: 1px solid #006E00;
+    
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+
+
+/* #######################################################################
+########################## MULTI UPDATE BUTTONS ##########################
+####################################################################### */
+
+gs-table >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell.multi-update {
+    text-align: center;
+    font-size: 1em;
+}
+
+gs-table >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell >
+        .table-multi-update-button {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    color: #000;
+}
+
+gs-table >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell >
+        .table-multi-update-button:hover {
+    color: #565856;
+}
+
+gs-table >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell >
+        .table-multi-update-button:after {
+    display: block;
+    content: '\f040'; /* icon: pencil */
+    font-family: FontAwesome;
+    width: 100%;
+    height: 100%;
+    padding: 1px;
+    
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+
+
+/* #######################################################################
+############################# COLUMN BUTTONS #############################
+####################################################################### */
+gs-table >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell.table-header.right-button {
+    padding-right: 1.25em;
+}
+gs-table >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell.table-header >
+        .header-button {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 1.25em;
+    cursor: pointer;
+}
+gs-table >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell.table-header >
+        .header-button:after {
+    content: '\f0d7';/*caret-down*/
+    font-family: FontAwesome;
+    text-align: center;
+}
+gs-table >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell.table-header >
+        .header-button.filtered:after {
+    content: '\f0b0'; /*filter*/
+}
+gs-table >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell.table-header >
+        .header-button.sort-asc:before {
+    position: absolute;
+    left: 0.1em;
+    bottom: 0.25em;
+    font-size: 0.75em;
+    height: 1em;
+    line-height: 1em;
+
+    font-family: FontAwesome;
+    content: '\f175'; /*long-arrow-down*/
+}
+gs-table >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell.table-header >
+        .header-button.sort-desc:before {
+    position: absolute;
+    left: 0.1em;
+    bottom: 0.25em;
+    font-size: 0.75em;
+    height: 1em;
+    line-height: 1em;
+
+    font-family: FontAwesome;
+    content: '\f176'; /*long-arrow-up*/
+}
+
+.gs-table-unique-value-list {
+    /*padding: 0.25em 0.25em 0 0.25em;*/
+    height: 15em;
+    /*overflow: auto;*/
+    /*border-left: 1px solid #BBB;
+    border-top: 1px solid #BBB;
+    border-right: 1px solid #BBB;*/
+}
+
+.gs-table-unique-value-list-toolbar {
+    text-align: right;
+    /*padding: 0.25em;*/
+    /*padding: 1px 0.25em 0.25em 0.25em;
+    border-left: 1px solid #BBB;
+    border-bottom: 1px solid #BBB;
+    border-right: 1px solid #BBB;*/
+    margin-bottom: 0.25em;
+}
+.gs-table-unique-value-list-toolbar gs-button {
+    border-top: 0 none;
+}
+.gs-table-unique-value-list-toolbar gs-button:first-child {
+    border-right: 0 none;
+}
+
+
+/* #######################################################################
+############################# COLUMN REORDER #############################
+####################################################################### */
+gs-table >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell.table-header[selected] {
+    /*cursor: ew-resize;*/
+    /*cursor: -moz-grab;
+    cursor: -webkit-grab;
+    cursor: grab;*/
+    cursor: move;
+}
+
+gs-table > 
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        .reorder-column-handle {
+    position: absolute;
+    top: 0;
+    width: 5px;
+    height: 100%;
+    margin-left: -3px;
+
+    z-index: 500;
+    background-color: #006E00;
+}
+
+
+/* #######################################################################
+################################## MISC ##################################
+####################################################################### */
+gs-table >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        .no-data-label {
+    position: absolute;
+    top: 50px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 4em;
+    color: #efefef;
+    font-style: italic;
+    font-weight: 100;
+}
+
+gs-table >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell[selected] * {
+    background-color: transparent;
+}
+
+gs-table > .table-root .pixel-element {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    background-color: transparent;
+}
+
+gs-table > .table-root > .table-font-size-detector {
+    width: 1em;
+    height: 1em;
+    position: absolute;
+    left: -500px;
+    top: -500px;
+}
+
+
+
+
+/* #######################################################################
+############################### SCROLLBAR  ###############################
+####################################################################### */
+gs-table >
+        .table-root >
+        .table-table-container >
+        .table-v-scroll-bar-container {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+}
+gs-table >
+        .table-root >
+        .table-table-container >
+        .table-v-scroll-bar-container >
+        .table-v-scroll-bar {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    border-bottom: 1px solid #006E00;
+}
+gs-table >
+        .table-root >
+        .table-table-container >
+        .table-h-scroll-bar-container {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+}
+gs-table >
+        .table-root >
+        .table-table-container >
+        .table-h-scroll-bar-container >
+        .table-h-scroll-bar {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    border-right: 1px solid #006E00;
+}
+gs-table >
+        .table-root >
+        .table-table-container >
+        .table-h-scroll-bar-container >
+        .table-h-scroll-bar >
+        .table-scroll-causer,
+gs-table >
+        .table-root >
+        .table-table-container >
+        .table-v-scroll-bar-container >
+        .table-v-scroll-bar >
+        .table-scroll-causer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1px;
+    height: 1px;
+}
+
+
+/* #######################################################################
+################################# LOADER #################################
+####################################################################### */
+gs-table >
+        .table-root >
+        .table-loader-container {
+    position: absolute;
+    left: 100%;
+    top: 2%;
+    width: 100%;
+    height: 98%;
+    overflow: visible;
+    z-index: 98;
+}
+gs-table >
+        .table-root >
+        .table-loader-container >
+        .table-loader-wrapper >
+        .table-loader {
+    display: inline-block;
+    position: relative;
+    
+    border: 1px solid #006E00;
+    padding: 0.25em;
+    background-color: #FFF;
+    margin-bottom: 0.25em;
+    
+    text-align: center;
+    box-shadow: 0 0 0.5em 0.001em #636363;
+    
+    -webkit-border-radius: 0.5em;
+    -moz-border-radius: 0.5em;
+    -ms-border-radius: 0.5em;
+    -o-border-radius: 0.5em;
+    border-radius: 0.5em;
+}
+gs-table >
+        .table-root >
+        .table-loader-container >
+        .table-loader-wrapper.table-fade-out {
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s 1s, opacity 1s linear;
+}
+
+/* old version, required text width detection, which is slow
+gs-table >
+        .table-root >
+        .table-loader-container {
+    position: absolute;
+    right: 1em;
+    top: 1em;
+    width: 1px;
+    height: 1px;
+    overflow: visible;
+    z-index: 98;
+}
+gs-table >
+        .table-root >
+        .table-loader-container >
+        .table-loader {
+    border: 1px solid #006E00;
+    padding: 0.25em;
+    background-color: #FFF;
+    margin-bottom: 0.25em;
+    
+    text-align: center;
+    box-shadow: 0 0 0.5em 0.001em #636363;
+    
+    -webkit-border-radius: 0.5em;
+    -moz-border-radius: 0.5em;
+    -ms-border-radius: 0.5em;
+    -o-border-radius: 0.5em;
+    border-radius: 0.5em;
+}
+*/
+
+/* #######################################################################
+################################ CURSORS  ################################
+####################################################################### */
+gs-table > .table-root .table-cursor-col-resize {
+    cursor: ew-resize;
+}
+gs-table > .table-root .table-cursor-row-resize {
+    cursor: ns-resize;
+}
+gs-table > .table-root .table-cursor-all-resize {
+    cursor: move;
+}
+
+/* #######################################################################
+############################## CELL  RESIZE ##############################
+####################################################################### */
+gs-table > 
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        .resize-column-handle {
+    position: absolute;
+    top: 0;
+    width: 11px;
+    height: 100%;
+    margin-left: -5px;
+    
+    z-index: 500;
+    background-color: transparent;
+}
+gs-table > 
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        .resize-record-handle {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 11px;
+    margin-top: -5px;
+    
+    z-index: 500;
+    background-color: transparent;
+}
+
+gs-table > 
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        .resize-column-handle.active {
+    width: 1px;
+    margin-left: 0;
+    background-color: #006E00;
+}
+gs-table > 
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        .resize-record-handle.active {
+    height: 1px;
+    margin-top: 0;
+    background-color: #006E00;
+}
+
+
+
+
+/* #######################################################################
+############################## CONTEXT MENU ##############################
+####################################################################### */
+
+.gs-table-contextmenu,
+.gs-table-contextmenu gs-page,
+.gs-table-contextmenu gs-body {
+    border-radius: 0.25em;
+    -webkit-border-radius: 0.25em;
+    -moz-border-radius: 0.25em;
+    -ms-border-radius: 0.25em;
+    -o-border-radius: 0.25em;
+    border-radius: 0.25em;
+}
+.gs-table-contextmenu gs-body {
+    padding: 0.4em;
+}
+
+.gs-table-contextmenu gs-button[icon] {
+    padding-left: 2.2em;
+    text-align: left;
+}
+.gs-table-contextmenu gs-button[icon]:after {
+    color: #006E00;
+    width: 1.6em;
+}
+
+.gs-table-contextmenu gs-checkbox {
+    text-align: left;
+}
+.gs-table-contextmenu gs-checkbox[mini] {
+    padding: 0.2em 0.4em;
+}
+.gs-table-contextmenu table {
+    border-left: 1px solid #DDD;
+    font-size: 0.9em;
+}
+.gs-table-contextmenu table td {
+    padding: 0;
+}
+
+.gs-table-contextmenu [remove-bottom],
+.gs-table-contextmenu [remove-all] {
+    border-bottom: 0 none;
+}
+
+.gs-table-contextmenu .context-menu-header {
+    font-size: 0.75em;
+    color: #777;
+}
+.gs-table-contextmenu .context-menu-indent {
+    padding-left: 0.25em;
+}
+
+
+
+/* #######################################################################
+############################ SETTINGS  DIALOG ############################
+####################################################################### */
+
+
+.gs-table-pref-dialog .pref-limit-from-label,
+.gs-table-pref-dialog .pref-limit-to-label {
+    /*display: inline-block;
+    width: 30%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;*/
+}
+.gs-table-pref-dialog .pref-limit-from,
+.gs-table-pref-dialog .pref-limit-to {
+    /*display: inline-block;
+    width: 70%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;*/
+}
+
+
+
+
+
+
+
+
+
+
+

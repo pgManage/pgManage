@@ -4,7 +4,7 @@ var bolGetFunctionsLoaded = true;
 function getListData(strQuery, loaderTarget, callback, socket) {
     'use strict';
     var arrRecords = [], bolSkipNext = false;
-
+    //console.log(strQuery);
     // add loader to target or with class
     GS.addLoader(loaderTarget, 'Getting list...');
 
