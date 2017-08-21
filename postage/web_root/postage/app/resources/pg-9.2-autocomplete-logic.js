@@ -413,8 +413,6 @@ function autocompleteBindEditor(tabElement, editor) {
     });
     
     editor.addEventListener('change', function (event) {
-        //console.log(event);
-        
         if (event.action === 'insert') {
             //we we typed a key (four spaces is a tab from the indent action (tab key))
             if (event.lines[0] === '    ') {
@@ -444,7 +442,15 @@ function autocompleteBindEditor(tabElement, editor) {
             autocompleteKeyEvent = 'other_cursor';
         }
         
-        autocompleteLogic(editor, autocompleteKeyEvent, event);
+        if (editor.rangeUpdateHandler) {
+            editor.container.removeEventListener('range-update', editor.rangeUpdateHandler);
+        }
+        editor.rangeUpdateHandler = function () {
+            autocompleteLogic(editor, autocompleteKeyEvent, event);
+            editor.container.removeEventListener('range-update', editor.rangeUpdateHandler);
+            editor.rangeUpdateHandler = null;
+        };
+        editor.container.addEventListener('range-update', editor.rangeUpdateHandler);
     });
 }
 
@@ -487,8 +493,8 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
     };
     */
     
-    if (! editor.currentQueryRange) {
-       // console.log()('There was no context detected by Michael\'s code, so ignore.');
+    if (!editor.currentQueryRange) {
+        //console.log('There was no context detected by Michael\'s code, so ignore.');
         return;
     }
     
@@ -549,6 +555,10 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
         autocompleteMakeList(objContext.arrQueries, objContext.strContext, editor);
         
 
+    } else if (autocompleteGlobals.bolSnippets) {
+        console.log(editor.currentQueryRange.text, editor);
+        autocompleteMakeList([], editor.currentQueryRange.text.trim(), editor);
+        
     } else {
         //console.log('told to close');
         closePopup();

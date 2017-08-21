@@ -623,7 +623,7 @@ function selectionFindRange(strScript, intCursorPos) {
     //              (same thing for ROLLBACK TO SAVEPOINT and SAVEPOINT)
     //              (same thing for (SELECT, INSERT, UPDATE, DELETE) and WITH)
     //              (same thing for (SELECT, INSERT, UPDATE, DELETE) and CREATE TRIGGER)
-    //              (same thing for (SET) and UPDATE)
+    //              (same thing for (INSERT, UPDATE, DELETE) and CREATE RULE)
     // ######################
 
     arrQueryStartKeywords = [
@@ -632,7 +632,9 @@ function selectionFindRange(strScript, intCursorPos) {
         'EXECUTE', 'EXPLAIN', 'FETCH', 'GRANT', 'IMPORT', 'INSERT', 'LISTEN',
         'LOAD', 'LOCK', 'MOVE', 'NOTIFY', 'PREPARE', 'REASSIGN', 'REFRESH', 'REINDEX',
         'RELEASE', 'RESET', 'REVOKE', 'ROLLBACK', 'SAVEPOINT', 'SECURITY', 'SELECT',
-        'SET', 'SHOW', 'START', 'TRUNCATE', 'UNLISTEN', 'UPDATE', 'VACUUM', 'VALUES'
+        'SET', 'SHOW', 'START', 'TRUNCATE', 'UNLISTEN', 'UPDATE', 'VACUUM', 'VALUES',
+        // For snippets
+        'RESTART', 'UPSERT'
         //'BEGIN', 'DECLARE', 'END'
     ];
     arrDangerousQueryStartKeywords = [
