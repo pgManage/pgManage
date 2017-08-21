@@ -2762,7 +2762,11 @@ function SQLBeautify(strInput) {
                 strResult = strResult.substring(0, strResult.length - 1);
             }
             if (bolDeclare) {
-                strResult = strResult + '\n' + '\t'.repeat(intTabLevel - 1);
+                if (intTabLevel > 0) {
+                    strResult = strResult + '\n' + '\t'.repeat(intTabLevel - 1);
+                } else {
+                    strResult = strResult + '\n' + '\t'.repeat(0);
+                }
             }
             i = i + 4 + (strInput.substr(i + 5, 1) === ' ' ? 1 : 0);
             if (bolDeclare) {
