@@ -55,11 +55,11 @@ if test $(uname -s) = "Linux"; then
 		node_modules/.bin/build --linux=rpm
 		sudo yum -y install ./dist/*.rpm
 	}
-	
+
 	mkdir ~/.postage
 	cp ../postage/config/postage.conf ~/.postage
 	cp ../postage/config/postage-connections-test.conf ~/.postage/postage-connections.conf
-	
+
 	/opt/Postage/postage --postage-test & export POSTAGEPID="$!"
 	printf "HTTP/1.1 200 OK\r\n\r\n\r\n" | ncat -l -p 45654
 	kill $POSTAGEPID
@@ -67,10 +67,12 @@ if test $(uname -s) = "Linux"; then
 	command -v apt-get >/dev/null 2>&1 && {
 		sudo apt-get -y remove postage
 		cp -f ./dist/*.deb /mnt/Groups/wfprod_group/postage/packages/
+		md5sum ./dist/*.deb >> /mnt/Groups/wfprod_group/postage/packages/md5s.txt
 	}
 	command -v yum >/dev/null 2>&1 && {
 		sudo yum -y remove Postage
 		cp -f ./dist/*.rpm /mnt/Groups/wfprod_group/postage/packages/
+		md5sum ./dist/*.rpm >> /mnt/Groups/wfprod_group/postage/packages/md5s.txt
 	}
 
 #elif test $(uname -s) = "FreeBSD"; then
