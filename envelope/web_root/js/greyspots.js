@@ -6094,7 +6094,7 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
     }
 
     function errorJSONToHTML(errorJSON) {
-        console.log(errorJSON);
+        //console.log(errorJSON);
         return '<pre style="word-break: break-all; white-space: pre-wrap;">' +
                     (errorJSON.error_title ?
                         'There was ' +
@@ -7077,7 +7077,7 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
         var strKey = (strSchema + strObject + strColumns + strWhere + strOrd + strLimit + strOffset)
           , intQueryIndex, i, len, currentEntry;
 
-        console.log(strKey, bolClearCache, cacheLedger[strKey]);
+        //console.log(strKey, bolClearCache, cacheLedger[strKey]);
 
         if (bolClearCache) {
             cacheLedger[strKey] = null;
@@ -7139,14 +7139,14 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
             cacheCallbacks[intQueryIndex].push({'callback': callback, 'ready': true});
 
         } else {
-            console.log(strKey);
-            console.log(cacheQueries.length);
+            //console.log(strKey);
+            //console.log(cacheQueries.length);
             cacheQueries.push(strKey);
             cacheCallbacks.push([{'callback': callback, 'ready': true}]);
             cacheResults.push([]);
-            console.log(cacheQueries.length);
+            //console.log(cacheQueries.length);
             intQueryIndex = (cacheQueries.length - 1);
-            console.log(intQueryIndex);
+            //console.log(intQueryIndex);
 
             GS.requestSelectFromSocket(socket, strSchema, strObject, strColumns
                                      , strWhere, strOrd, strLimit, strOffset
@@ -7191,7 +7191,7 @@ GS.encodeForTabDelimited = function (strValue, nullValue) {
 GS.decodeFromTabDelimited = function (strValue, nullValue) {
     'use strict';
     var i, len, strRet = '';
-
+    //console.log(strValue, nullValue);
     if (nullValue === undefined) {
         nullValue = '\\N';
     }
@@ -24644,147 +24644,6 @@ window.addEventListener('design-register-element', function () {
         window.open(location.protocol + '//' + location.host + getRealPath(element) + '' + lineElement.getAttribute('data-name'));
     }
     
-    function fileUpload(element, target) {
-        var templateElement = document.createElement('template');
-        var strHTML;
-        
-        strHTML = ml(function () {/*
-            <gs-page>
-                <gs-header><center><h3>Upload a File</h3></center></gs-header>
-                <gs-body padded>
-                    <form class="upload-form" action="/env/upload" method="POST" target="upload_response_gs_folder"
-                                enctype="multipart/form-data">
-                        <label>File:</label>
-                        <gs-text class="upload-file" name="file_content" type="file"></gs-text>
-                    */});
-        
-        if (element.hasAttribute('upload-choose-file-name')) {
-            strHTML += ml(function () {/*
-                        <br />
-                        <label>File Name:</label>
-                        <gs-text class="upload-name" disabled autocorrect="off" autocapitalize="off" autocomplete="off" spellcheck="false"></gs-text>
-            */});
-        } else {
-            strHTML += ml(function () {/*
-                        <gs-text class="upload-name" hidden></gs-text>
-            */});
-        }
-        
-        strHTML +=  ml(function () {/*
-                        <input class="upload-path" name="file_name" hidden />
-                    </form>
-                    <iframe class="upload-frame" name="upload_response_gs_folder" hidden></iframe>
-                </gs-body>
-                <gs-footer>
-                    <gs-grid>
-                        <gs-block><gs-button dialogclose>Cancel</gs-button></gs-block>
-                        <gs-block><gs-button class="upload-button">Upload File</gs-button></gs-block>
-                    </gs-grid>
-                </gs-footer>
-            </gs-page>
-        */});
-
-        templateElement.innerHTML = strHTML;
-
-        GS.openDialog(templateElement, function () {
-            var dialog = this,
-                formElement = xtag.query(dialog, '.upload-form')[0],
-                fileControl = xtag.query(dialog, '.upload-file')[0],
-                nameControl = xtag.query(dialog, '.upload-name')[0],
-                pathControl = xtag.query(dialog, '.upload-path')[0],
-                uploadButton = xtag.query(dialog, '.upload-button')[0],
-                responseFrame = xtag.query(dialog, '.upload-frame')[0],
-                strFileExtension;
-            
-            // upload existing file
-            uploadButton.addEventListener('click', function(event) {
-                var strFile = fileControl.value
-                  , strName = nameControl.value;
-                
-                //console.log(element.innerPath + nameControl.value);
-                pathControl.setAttribute('value', getPath(element) + nameControl.value + '.' + strFileExtension);
-                
-                if (strName === '' && strFile === '') { // no values (no file and no file name)
-                    GS.msgbox('Error', 'No values in form. Please fill in the form.', 'okonly');
-                    
-                } else if (strFile === '') { // one value missing (no file)
-                    GS.msgbox('Error', 'No file selected. Please select a file using the file input.', 'okonly');
-                    
-                } else if (strName === '') { // one value missing (no file name)
-                    GS.msgbox('Error', 'No value in file path textbox. Please fill in file name textbox.', 'okonly');
-                    
-                } else { // values are filled in submit the form
-                    responseFrame.loadListen = true;
-                    formElement.submit();
-                    GS.addLoader('file-upload', 'Uploading file...');
-                }
-            });
-            
-            fileControl.addEventListener('change', function(event) {
-                var strValue = this.value;
-                
-                strFileExtension = strValue.substring(strValue.lastIndexOf('.') + 1);
-                
-                nameControl.removeAttribute('disabled');
-                nameControl.value = strValue.substring(strValue.lastIndexOf('\\') + 1, strValue.lastIndexOf('.')) || 'filename';
-                nameControl.focus();
-            });
-            
-            nameControl.addEventListener('keydown', function(event) {
-                if (event.keyCode === 13) {
-                    GS.triggerEvent('click', uploadButton);
-                }
-            });
-            
-            // response frame binding
-            responseFrame.addEventListener('load', function (event) {
-                var strResponseText = responseFrame.contentWindow.document.body.textContent,
-                    jsnResponse, strResponse, bolError, strError;
-                
-                if (responseFrame.loadListen === true) {
-                    // get error text
-                    try {
-                        jsnResponse = JSON.parse(strResponseText);
-                        
-                    } catch (err) {
-                        strResponse = strResponseText;
-                    }
-                    
-                    if (strResponse.trim() === 'Upload Succeeded') {
-                        GS.closeDialog(dialog, 'cancel');
-                    } else {
-                        if (jsnResponse) {
-                            if (jsnResponse.stat === true) {
-                                bolError = false;
-                            } else {
-                                bolError = true;
-                                if (jsnResponse.dat && jsnResponse.dat.error) {
-                                    strError = jsnResponse.dat.error;
-                                } else {
-                                    strError = jsnResponse.dat;
-                                }
-                            }
-                        } else {
-                            bolError = true;
-                            strError = strResponse;
-                        }
-                        
-                        // if no error destroy new file popup
-                        if (!bolError) {
-                            GS.closeDialog(dialog, 'cancel');
-                            
-                        // if error open error popup
-                        } else {
-                            GS.msgbox('Error', strError, 'okonly');
-                        }
-                    }
-                    
-                    getData(element);
-                    GS.removeLoader('file-upload');
-                }
-            });
-        });
-    }
     
     // ################################################################################################
     // ############################################# XTAG #############################################
@@ -40567,12 +40426,36 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (strCompareString === element.internalSelection.rangeCache) {
             arrSelection = element.internalSelection.resolvedSelection;
-            arrSelectionRows = element.internalSelection.rows;
-            arrSelectionCols = element.internalSelection.columns;
             arrRanges = element.internalSelection.ranges;
             arrColumnWidths = element.internalDisplay.columnWidths;
-            arrRows = arrSelectionRows;
-            arrColumns = arrSelectionCols;
+            arrRows = element.internalSelection.rows;
+            arrColumns = element.internalSelection.columns;
+
+            arrSelectionRows = element.internalSelection.rows.slice(0);
+            rec_i = 0;
+            rec_len = arrSelectionRows.length;
+            while (rec_i < rec_len) {
+                if (arrSelectionRows[rec_i] === 'header') {
+                    arrSelectionRows[rec_i] = 0;
+                } else if (arrSelectionRows[rec_i] === 'insert') {
+                    arrSelectionRows[rec_i] = arrSelection.length - 1;
+                } else {
+                    arrSelectionRows[rec_i] += 1;
+                }
+                rec_i += 1;
+            }
+
+            arrSelectionCols = element.internalSelection.columns.slice(0);
+            col_i = 0;
+            col_len = arrSelectionCols.length;
+            while (col_i < col_len) {
+                if (arrSelectionCols[col_i] === 'selector') {
+                    arrSelectionCols[col_i] = 0;
+                } else {
+                    arrSelectionCols[col_i] += 1;
+                }
+                col_i += 1;
+            }
 
         } else {
             element.internalSelection.rangeCache = strCompareString;
@@ -40625,7 +40508,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 arrSelection.push(strRecord);
             }
 
-            //console.log(arrSelection);
+            // console.log(arrSelection);
 
             // because of the vast array of column types, we'll (for simplicity
             //      and for brevity) use one of two matrices, a matrix that
@@ -40990,6 +40873,14 @@ document.addEventListener('DOMContentLoaded', function () {
             if (strRecord) {
                 if (arrSelectedStates.indexOf(strRecord[intCol]) > -1) {
                     cell.setAttribute('selected', '');
+                    //console.log(
+                    //    strRecord,
+                    //    intCol,
+                    //    intRow,
+                    //    cell.getAttribute('data-col-number'),
+                    //    cell.getAttribute('data-row-number'),
+                    //    cell
+                    //);
 
                 // sometimes, the user selects some cells without selecting the
                 //      record selectors and/or headers. in this case, we want
@@ -41016,6 +40907,17 @@ document.addEventListener('DOMContentLoaded', function () {
                     )
                 ) {
                     //console.log(strRow, intRow);
+                    //console.log(
+                    //    arrSelectionRows,
+                    //    arrSelectionCols,
+                    //    arrRows,
+                    //    arrColumns,
+                    //    intCol,
+                    //    intRow,
+                    //    cell.getAttribute('data-col-number'),
+                    //    cell.getAttribute('data-row-number'),
+                    //    cell
+                    //);
                     cell.setAttribute('auto-selected', '');
                 }
             }
@@ -42022,7 +41924,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 'len': intTotalRecords
             });
 
-            console.log(strRecord);
+            //console.log(strRecord);
 
             // return record html
             return strRecord;
@@ -44809,7 +44711,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     ? '\t'
                     : ''
             );
-            strReturn += element.internalData.columnNames[col_i];
+            strReturn += element.internalData.columnNames[col_i].replace(/(\\)/g, '\\\\');
             col_i += 1;
         }
 
@@ -44878,7 +44780,7 @@ document.addEventListener('DOMContentLoaded', function () {
             col_i = 0;
             col_len = jsnInsert.data.columns.length;
             while (col_i < col_len) {
-                strColumn = jsnInsert.data.columns[col_i];
+                strColumn = jsnInsert.data.columns[col_i].replace(/(\\)/g, '\\\\');
 
                 strInsertColumns += (
                     strInsertColumns
@@ -44943,7 +44845,7 @@ document.addEventListener('DOMContentLoaded', function () {
             col_i = 0;
             col_len = jsnInsert.data.columns.length;
             while (col_i < col_len) {
-                strColumn = jsnInsert.data.columns[col_i];
+                strColumn = jsnInsert.data.columns[col_i].replace(/(\\)/g, '\\\\');
 
                 strInsertColumns += (
                     strInsertColumns
@@ -45044,7 +44946,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // gotta let the user know that an insert is in progress
             addLoader(element, 'data-insert', 'Inserting Data...');
-
+            console.log(strSchema,
+                strObject,
+                strReturn,
+                strPK,
+                strSeq,
+                strInsertData);
             // begin the websocket insert
             GS.requestInsertFromSocket(
                 getSocket(element),
@@ -45197,6 +45104,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
     function databaseWSUPDATE(element, strMode, jsnUpdate) {
+        console.trace('databaseWSUPDATE');
         var i;
         var len;
         var pk_i;
@@ -45257,7 +45165,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     ? '\t'
                     : ''
             );
-            strReturn += element.internalData.columnNames[col_i];
+            strReturn += element.internalData.columnNames[col_i].replace(/(\\)/g, '\\\\');
             col_i += 1;
         }
 
@@ -45268,7 +45176,7 @@ document.addEventListener('DOMContentLoaded', function () {
         //      one record
         if (strMode === 'single-cell') {
             jsnCurrentData = {
-                "columnName": jsnUpdate.data.columnName,
+                "columnName": jsnUpdate.data.columnName.replace(/(\\)/g, '\\\\'),
                 "recordNumber": jsnUpdate.data.recordNumber,
                 "oldValue": ""
             };
@@ -45405,7 +45313,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 strHashString += (
                     strTemp === '\\N'
                         ? ''
-                        : strTemp
+                        : GS.encodeForTabDelimited(strTemp, '\\N')
                 );
                 i += 1;
             }
@@ -45446,7 +45354,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     ? '\t'
                     : ''
             );
-            strColumns += jsnUpdate.data.columnName;
+            strColumns += jsnUpdate.data.columnName.replace(/(\\)/g, '\\\\');
 
             // append new value
             strUpdateData += (
@@ -45554,7 +45462,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         ? '\t'
                         : ''
                 );
-                strColumns += jsnUpdate.data.columns[i];
+                strColumns += jsnUpdate.data.columns[i].replace(/(\\)/g, '\\\\');
                 i += 1;
             }
 
@@ -45641,7 +45549,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     strHashString += (
                         strTemp === '\\N'
                             ? ''
-                            : strTemp
+                            : GS.encodeForTabDelimited(strTemp, '\\N')
                     );
                     lock_i += 1;
                 }
@@ -46080,6 +45988,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         ? ""
                         : strTemp
                 );
+                console.log(strTemp, strRecordToHash);
 
                 col_i += 1;
             }
@@ -51057,6 +50966,10 @@ document.addEventListener('DOMContentLoaded', function () {
                             .ranges[intCurrentSelectionIndex]
                     );
 
+                    if (currentRange.start.column === 'selector') {
+                        jsnLocation.column = 'selector';
+                    }
+
                     // save old row and column so that we can later check if
                     //      a change was actually made (that way we only
                     //      re-render if the selection has changed)
@@ -52636,7 +52549,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 intSelectionLength = (
                                     element.internalSelection.columns.length - 2
                                 );
-                            } else if (intStartColumn < intEndColumn) {
+                            } else if (intStartColumn > intEndColumn) {
                                 selectedBroken = true;
                                 intSelectionLength = (
                                     (intStartColumn + 1) - intEndColumn
@@ -52669,7 +52582,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
 
                 }
-                colsToResize.push(element.internalResize.resizeColumnIndex);
+                // nunzio commented this out on 2017-08-21
+                //      because it was causing the datasheet
+                //      to resize the selected columns even
+                //      though the resized column was not selected
+                // colsToResize.push(element.internalResize.resizeColumnIndex);
+
                 //console.log(colsToResize);
 
                 // if scrolling is running, stop it because we are done with
@@ -52918,7 +52836,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                                 .columns
                                                 .length - 2
                                         );
-                                    } else if (intStartColumn < intEndColumn) {
+                                    } else if (intStartColumn > intEndColumn) {
                                         selectedBroken = true;
                                         intSelectionLength = (
                                             (intStartColumn + 1) - intEndColumn
@@ -52950,12 +52868,22 @@ document.addEventListener('DOMContentLoaded', function () {
                                 }
                             }
                         }
-                        colsToResize.push(
-                            element.internalResize.resizeColumnIndex
-                        );
+                        // commented by nunzio on 2017-08-21
+                        //      Same reason as in cellResizeDragEnd
+                        //colsToResize.push(
+                        //    element.internalResize.resizeColumnIndex
+                        //);
 
                         //console.log(colsToResize);
-                        resizeColumnsToContent(element, colsToResize);
+                        if (colsToResize.indexOf(
+                            element.internalResize.resizeColumnIndex
+                        ) > 0) {
+                            resizeColumnsToContent(element, colsToResize);
+                        } else {
+                            resizeColumnsToContent(element, [
+                                element.internalResize.resizeColumnIndex
+                            ]);
+                        }
 
 
 

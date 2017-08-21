@@ -2122,12 +2122,12 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
             }
             if (bolOperatorClass) {
                 arrQuery.push('\n\n SELECT oid, name, schema_name, \'OperatorClass\' AS objType FROM (' +
-                    listQuery.objectOperatorClass.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+                    listQuery.objectOperatorClassDump.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
                 ') em ');
             }
             if (bolOperatorFamily) {
                 arrQuery.push('\n\n SELECT oid, name, schema_name, \'OperatorFamily\' AS objType FROM (' +
-                    listQuery.objectOperatorFamily.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+                    listQuery.objectOperatorFamilyDump.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
                 ') em ');
             }
             if (bolOperator) {
@@ -2136,8 +2136,8 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
                 ') em ');
             }
             if (bolSequence) {
-                arrQuery.push('\n\n SELECT oid, name, schema_name, \'Sequence\' AS objType FROM (' +
-                    listQuery.objectSequence.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+                arrQuery.push('\n\n SELECT oid, name, schema_name, obj AS objType FROM (' +
+                    listQuery.objectSequenceDump.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
                 ') em ');
             }
             if (bolTable) {
@@ -2187,22 +2187,48 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
                 || bolTextSearchParser || bolTextSearchTemplate || bolType || bolView) {
                 strQuery = arrQuery.join(' UNION ALL ') + '\n\nORDER BY 1';
             }
-
             // function to handle the query results
             handleListResults = function (arrResult) {
-                var strDumpQuery = '', strQuery, i, len, tempFunction, handleScriptResults;
+                var strDumpQuery = '', strDropIndexes = '', strDropTGFunctions = '', strQuery, i, len, tempFunction, handleScriptResults, bolTriggers = false, bolSequenceOwned = false;
 
                 // drop statements (reverse order of schema then listed objects)
                 if (bolDropStatments) {
                     GS.addLoader('loader-drop', 'Creating DROP Statements');
                     for (i = arrResult.length - 1; i >= 0; i -= 1) {
                         //strDumpQuery += 'DROP ' + arrResult[i][3].toUpperCase() + ' ' + quote_ident(strSchemaName) + '.' + quote_ident(arrResult[i][1]) + ';\n';
-                        //console.log(arrResult[i][3].toUpperCase() === 'FUNCTION');
+                        //console.log(arrResult[i][3].toUpperCase());
 
-                        if (arrResult[i][3].toUpperCase() === 'FUNCTION' || arrResult[i][1].indexOf('"') !== -1) {
+                        if (arrResult[i][3].toUpperCase() === 'OPERATORFAMILY') {
+                            strDumpQuery += 'DROP OPERATOR FAMILY ' + quote_ident(strSchemaName) + '.' + arrResult[i][1] + ';\n';
+                        } else  if (arrResult[i][3].toUpperCase() === 'OPERATORCLASS') {
+                            strDumpQuery += 'DROP OPERATOR CLASS ' + quote_ident(strSchemaName) + '.' + arrResult[i][1] + ';\n';
+                        } else  if (arrResult[i][3].toUpperCase() === 'OPERATORFAMILY') {
+                            strDumpQuery += 'DROP OPERATOR FAMILY ' + quote_ident(strSchemaName) + '.' + arrResult[i][1] + ';\n';
+                        } else  if (arrResult[i][3].toUpperCase() === 'TEXTSEARCHTEMPLATE') {
+                            strDumpQuery += 'DROP TEXT SEARCH TEMPLATE ' + quote_ident(strSchemaName) + '.' + arrResult[i][1] + ';\n';
+                        } else  if (arrResult[i][3].toUpperCase() === 'TEXTSEARCHPARSER') {
+                            strDumpQuery += 'DROP TEXT SEARCH PARSER ' + quote_ident(strSchemaName) + '.' + arrResult[i][1] + ';\n';
+                        } else  if (arrResult[i][3].toUpperCase() === 'TEXTSEARCHDICTIONARY') {
+                            strDumpQuery += 'DROP TEXT SEARCH DICTIONARY ' + quote_ident(strSchemaName) + '.' + arrResult[i][1] + ';\n';
+                        } else  if (arrResult[i][3].toUpperCase() === 'TEXTSEARCHCONFIGURATION') {
+                            strDumpQuery += 'DROP TEXT SEARCH CONFIGURATION ' + quote_ident(strSchemaName) + '.' + arrResult[i][1] + ';\n';
+                        } else if (arrResult[i][3].toUpperCase() === 'OWNEDSEQUENCE') {
+                            strDumpQuery += '-- DROP SEQUENCE ' + quote_ident(strSchemaName) + '.' + arrResult[i][1] + ';\n';
+                        } else if (arrResult[i][3].toUpperCase() === 'FOREIGNTABLE') {
+                            strDumpQuery += 'DROP FOREIGN TABLE ' + quote_ident(strSchemaName) + '.' + arrResult[i][1] + ';\n';
+                        } else if (arrResult[i][3].toUpperCase() === 'FUNCTION' || arrResult[i][1].indexOf('"') !== -1) {
                             strDumpQuery += 'DROP ' + arrResult[i][3].toUpperCase().replace('TRIGGERFUNCTION', 'FUNCTION') + ' ' + quote_ident(strSchemaName) + '.' + arrResult[i][1] + ';\n';
+                        } else if (arrResult[i][3].toUpperCase() === 'INDEX') {
+                            strDropIndexes += '-- DROP ' + arrResult[i][3].toUpperCase() + ' ' + quote_ident(strSchemaName) + '.' + arrResult[i][1] + ';\n';
+                        } else if (arrResult[i][3].toUpperCase() === 'TRIGGERFUNCTION') {
+                            strDropTGFunctions += 'DROP ' + arrResult[i][3].toUpperCase().replace('TRIGGERFUNCTION', 'FUNCTION') + ' ' + quote_ident(strSchemaName) + '.' + arrResult[i][1] + ';\n';
                         } else {
-                            strDumpQuery += 'DROP ' + arrResult[i][3].toUpperCase().replace('TRIGGERFUNCTION', 'FUNCTION') + ' ' + quote_ident(strSchemaName) + '.' + quote_ident(arrResult[i][1]) + ';\n';
+                            //console.log(arrResult[i][3].toUpperCase());
+                            strDumpQuery += 'DROP ' + arrResult[i][3].toUpperCase() + ' ' + quote_ident(strSchemaName) + '.' + arrResult[i][1] + ';\n';
+                        }
+                        if (i === 0) {
+                            strDumpQuery += strDropIndexes;
+                            strDumpQuery += strDropTGFunctions;
                         }
                     }
 
@@ -2223,19 +2249,57 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
                 var j = 0, len1 = arrResult.length + (bolSchema ? 2 : 1);
                 var resName;
 
-                for (i = 0, len = arrResult.length; i < len; i += 1) {
+                for (i = 0, len = arrResult.length; i <= len; i += 1) {
+                    if (i === len) {
+                        if (bolTriggers) {
+                            len1 += 1;
+                            strQuery += '\n\n' +
+                                (
+                                    scriptQuery['objectSchemaTriggers']
+                                )
+                                .replace(/\{\{SCHEMA\}\}/gim, strSchemaName);
+                        }
+                        if (bolSequenceOwned) {
+                            len1 += 1;
+                            strQuery += '\n\n' +
+                                (
+                                    scriptQuery['objectSequencesOwned']
+                                )
+                                .replace(/\{\{SCHEMA\}\}/gim, strSchemaName);
+                        }
+                        break;
+                    }
                     if (arrResult[i][1].indexOf('"') === -1) {
                         resName = quote_ident(arrResult[i][1]);
                     } else {
                         resName = arrResult[i][1];
                     }
                     if (GS.strToTitle(arrResult[i][3]).toLowerCase() === 'view' || GS.strToTitle(arrResult[i][3]).toLowerCase() === 'table') {
+                    bolTriggers = true
                     strQuery += '\n\n' +
                         (
-                            scriptQuery['object' + GS.strToTitle(arrResult[i][3]) + 'NoComment']
+                            scriptQuery['object' + GS.strToTitle(arrResult[i][3]) + 'Dump']
                         )
                         .replace(/\{\{INTOID\}\}/gim, arrResult[i][0])
                         .replace(/\{\{STRSQLSAFENAME\}\}/gim, quote_ident(strSchemaName) + '.' + resName);
+                    } else if (GS.strToTitle(arrResult[i][3]).toLowerCase() === 'sequence') {
+                        //bolSequenceOwned = true;
+                        strQuery += '\n\n' +
+                            (
+                                scriptQuery['objectSequenceDump']
+                            )
+                            .replace(/\{\{INTOID\}\}/gim, arrResult[i][0])
+                            .replace(/\{\{STRSQLSAFENAME\}\}/gim, quote_ident(strSchemaName) + '.' + resName);
+                    } else if (GS.strToTitle(arrResult[i][3]).toLowerCase() === 'ownedsequence') {
+                        bolSequenceOwned = true;
+                        strQuery += '\n\n' +
+                            (
+                                scriptQuery['objectSequenceDump']
+                            )
+                            .replace(/\{\{INTOID\}\}/gim, arrResult[i][0])
+                            .replace(/\{\{STRSQLSAFENAME\}\}/gim, quote_ident(strSchemaName) + '.' + resName);
+                    } else if (GS.strToTitle(arrResult[i][3]).toLowerCase() === 'index') {
+                        len1 -= 1;
                     } else {
                         strQuery += '\n\n' +
                             (
@@ -2245,15 +2309,13 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
                             .replace(/\{\{STRSQLSAFENAME\}\}/gim, quote_ident(strSchemaName) + '.' + resName);
                     }
                 }
-
                 handleScriptResults = function (arrResult) {
                     var i, len;
 
-
+                    //console.log(arrResult);
                     arrResult.splice(0, 1);
 
                     for (i = 0, len = arrResult.length; i < len; i += 1) {
-                        //console.log(GS.decodeFromTabDelimited(arrResult[i][0]).substring(0, 35));
                         strDumpQuery += GS.decodeFromTabDelimited(arrResult[i][0]) + '\n\n';
                     }
                     j += len;

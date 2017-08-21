@@ -43,6 +43,30 @@
 				ipcRenderer.send('postage', 'restart');
 			}
 
+			function addWarnings(editor) {
+				var arrAnnotation = [];
+				var arrLine = editor.getSession().getLines(0, editor.getSession().getLength() + 1);
+				var i = 0;
+				var len = arrLine.length;
+
+				while (i < len) {
+					console.log(arrLine[i], i, len);
+					var hostaddrIndex = arrLine[i].indexOf('hostaddr=');
+					if (hostaddrIndex > -1) {
+						arrAnnotation.push({
+							row: i,
+							column: hostaddrIndex,
+							text: '`hostaddr` cannot be used with a .pgpass (https://www.postgresql.org/docs/current/static/libpq-connect.html#LIBPQ-PARAMKEYWORDS)',
+							type: 'warning'
+						});
+					}
+
+					i += 1;
+				}
+
+				editor.getSession().setAnnotations(arrAnnotation);
+			}
+
 			document.addEventListener('DOMContentLoaded', function () {
 			    "use strict";
 				var indicator = document.getElementById('conf-indicator')
@@ -95,6 +119,8 @@
 				        editor.session.selection.setRange(new Range(0, 0, 0, 0));
 				        editor.resize(true);
 
+						addWarnings(editor);
+
 				        // reset undo stack so that we can't undo to empty
 				        //      (last time I tried to do this without the timer and didn't find a solution)
 				        setTimeout(function () {
@@ -128,6 +154,8 @@
 									indicator.textContent = '';
 								}
 							});
+							
+							addWarnings(editor);
 						});
 					}
 				});

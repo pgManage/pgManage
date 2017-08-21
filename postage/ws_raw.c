@@ -38,21 +38,21 @@ void ws_raw_step1(struct sock_ev_client_request *client_request) {
 	client_request->arr_response = DArray_create(sizeof(char *), 1);
 	client_raw->bol_autocommit = true;
 	client_raw->bol_begin_transaction = PQtransactionStatus(client_request->parent->conn->conn) == PQTRANS_IDLE;
-	SINFO("client_raw->bol_begin_transaction: %s", client_raw->bol_begin_transaction == true ? "true" : "false");
+	SDEBUG("client_raw->bol_begin_transaction: %s", client_raw->bol_begin_transaction == true ? "true" : "false");
 
 	ptr_query = client_request->ptr_query + 3;
 	SFINISH_CHECK(*ptr_query != 0, "Invalid RAW request");
 	if (strncmp(ptr_query, "\tDISABLE AUTOCOMMIT\n", 20) == 0) {
 		ptr_query += 20;
 		client_raw->bol_autocommit = false;
-		SINFO("DISABLE AUTOCOMMIT");
+		SDEBUG("DISABLE AUTOCOMMIT");
 	} else {
 		ptr_query++;
 		SFINISH_CHECK(*ptr_query != 0, "Invalid RAW request");
 	}
 
 	client_raw->bol_commit_transaction = client_raw->bol_autocommit && client_raw->bol_begin_transaction;
-	SINFO("client_raw->bol_commit_transaction: %s", client_raw->bol_commit_transaction == true ? "true" : "false");
+	SDEBUG("client_raw->bol_commit_transaction: %s", client_raw->bol_commit_transaction == true ? "true" : "false");
 
 	client_request->arr_query = DArray_sql_split(ptr_query);
 	memset(str_temp, 0, 101);
@@ -128,7 +128,7 @@ void ws_raw_step1(struct sock_ev_client_request *client_request) {
 		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 		str_response = NULL;
-		SINFO(PQtransactionStatus(client_request->parent->conn->conn) == PQTRANS_IDLE ? "TRANSACTION COMPLETED" : "TRANSACTION OPEN");
+		SDEBUG(PQtransactionStatus(client_request->parent->conn->conn) == PQTRANS_IDLE ? "TRANSACTION COMPLETED" : "TRANSACTION OPEN");
 		goto finish;
 	}
 	client_request->int_i = (client_raw->bol_begin_transaction ? -1 : 0);
@@ -219,7 +219,7 @@ void ws_raw_step1(struct sock_ev_client_request *client_request) {
 
 		int_status = PQsendQuery(client_request->parent->cnxn, str_sql);
 	} else {
-		SINFO("client_request->parent: %p", client_request->parent);
+		SDEBUG("client_request->parent: %p", client_request->parent);
 		int_status = PQsendQuery(client_request->parent->cnxn, "BEGIN");
 	}
 	if (int_status != 1) {
@@ -470,7 +470,7 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 				client_raw->bol_commit_transaction = true;
 
 			}
-			SINFO("client_raw->bol_commit_transaction: %s", client_raw->bol_commit_transaction == true ? "true" : "false");
+			SDEBUG("client_raw->bol_commit_transaction: %s", client_raw->bol_commit_transaction == true ? "true" : "false");
 		}
 	} else {
 		client_request->int_response_id -= 1;
@@ -493,7 +493,7 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 		memset(str_temp, 0, 101);
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 
-		SINFO("client_raw->bol_commit_transaction: %s", client_raw->bol_commit_transaction == true ? "true" : "false");
+		SDEBUG("client_raw->bol_commit_transaction: %s", client_raw->bol_commit_transaction == true ? "true" : "false");
 
 		// If there is another query to run...
 		if (client_request->int_i < client_request->int_len) {
@@ -578,7 +578,6 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 			}
 			query_callback(EV_A, client_request, ws_raw_step2);
 		} else if (client_request->int_i == client_request->int_len && client_raw->bol_commit_transaction) {
-			SINFO("test");
 			client_request->int_response_id -= 1;
 			int_status = PQsendQuery(client_request->parent->cnxn, "COMMIT");
 			if (int_status != 1) {
@@ -609,7 +608,7 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 			WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 			DArray_push(client_request->arr_response, str_response);
 			str_response = NULL;
-			SINFO(PQtransactionStatus(client_request->parent->conn->conn) == PQTRANS_IDLE ? "TRANSACTION COMPLETED" : "TRANSACTION OPEN");
+			SDEBUG(PQtransactionStatus(client_request->parent->conn->conn) == PQTRANS_IDLE ? "TRANSACTION COMPLETED" : "TRANSACTION OPEN");
 			// client_request_free(client_request);
 		}
 	} else {
@@ -701,8 +700,8 @@ bool ws_raw_step3(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 		PQclear(res);
 	}
 	if (client_request->str_current_response != NULL) {
-		SINFO("       client_request->str_current_response : %s", client_request->str_current_response);
-		SINFO("strlen(client_request->str_current_response): %d", strlen(client_request->str_current_response));
+		SDEBUG("       client_request->str_current_response : %s", client_request->str_current_response);
+		SDEBUG("strlen(client_request->str_current_response): %d", strlen(client_request->str_current_response));
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, client_request->str_current_response, strlen(client_request->str_current_response));
 		DArray_push(client_request->arr_response, client_request->str_current_response);
 		client_request->str_current_response = NULL;
@@ -798,7 +797,7 @@ bool _raw_tuples_callback(EV_P, PGresult *res, ExecStatusType result, struct soc
 
 	// This will make sure that the event loop does not sleep
 	increment_idle(EV_A);
-	SINFO("client_raw->copy_check: %p", client_raw->copy_check);
+	SDEBUG("client_raw->copy_check: %p", client_raw->copy_check);
 
 	// This will run every iteration
 	ev_check_init(&client_copy_check->check, _raw_tuples_check_callback);
@@ -1030,7 +1029,7 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 				WS_sendFrame(EV_A, client, true, 0x01, str_response, int_response_len);
 				DArray_push(client_request->arr_response, str_response);
 				str_response = NULL;
-				SINFO(PQtransactionStatus(client_request->parent->conn->conn) == PQTRANS_IDLE ? "TRANSACTION COMPLETED" : "TRANSACTION OPEN");
+				SDEBUG(PQtransactionStatus(client_request->parent->conn->conn) == PQTRANS_IDLE ? "TRANSACTION COMPLETED" : "TRANSACTION OPEN");
 			}
 
 			client_raw->copy_check = NULL;
@@ -1086,7 +1085,7 @@ finish:
 
 void ws_raw_free(struct sock_ev_client_request_data *client_request_data) {
 	struct sock_ev_client_raw *client_raw = (struct sock_ev_client_raw *)client_request_data;
-	SINFO("client_raw->copy_check: %p", client_raw->copy_check);
+	SDEBUG("client_raw->copy_check: %p", client_raw->copy_check);
 	if (client_raw->copy_check != NULL) {
 		decrement_idle(global_loop);
 		ev_check_stop(global_loop, &client_raw->copy_check->check);

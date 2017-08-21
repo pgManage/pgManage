@@ -245,25 +245,32 @@ void sunlogf_root(
 	snprintf(str_new_format, 512, "%s%s%s%s\012", str_pid, log_level, str_error, str_format);
 
 	if (
-		str_global_log_level != NULL &&
-		strncmp(str_global_log_level, "none", 5) != 0 &&
 		(
+			str_global_log_level != NULL &&
+			strncmp(str_global_log_level, "none", 5) != 0 &&
 			(
-				str_global_log_level != NULL &&
-				strncmp(str_global_log_level, "info", 5) == 0 &&
-				int_error_level <= 6
-			) ||
-			(
-				str_global_log_level != NULL &&
-				strncmp(str_global_log_level, "notice", 7) == 0 &&
-				int_error_level <= 5
-			) ||
-			(
-				str_global_log_level != NULL &&
-				strncmp(str_global_log_level, "warn", 5) == 0 &&
-				int_error_level <= 4
-			) ||
-			int_error_level <= 3
+				(
+					str_global_log_level != NULL &&
+					strncmp(str_global_log_level, "info", 5) == 0 &&
+					int_error_level <= 6
+				) ||
+				(
+					str_global_log_level != NULL &&
+					strncmp(str_global_log_level, "notice", 7) == 0 &&
+					int_error_level <= 5
+				) ||
+				(
+					str_global_log_level != NULL &&
+					strncmp(str_global_log_level, "warn", 5) == 0 &&
+					int_error_level <= 4
+				) ||
+				int_error_level <= 3
+			)
+		) ||
+		(
+			str_global_log_level != NULL &&
+			strncmp(str_global_log_level, "none", 5) == 0 &&
+			int_error_level == 3 // debug
 		)
 	) {
 #ifdef _WIN32

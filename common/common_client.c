@@ -671,7 +671,8 @@ void client_cb(EV_P, ev_io *w, int revents) {
 					SDEBUG("client->str_request: %p", client->str_request);
 					// set_cnxn does its own error handling
 					if (set_cnxn(client, cnxn_cb) == NULL) {
-						SERROR_CLIENT_CLOSE(client);
+						//SERROR_CLIENT_CLOSE(client);
+
 					}
 					// set_cnxn has started a connection to the database, now we are done
 
@@ -679,7 +680,7 @@ void client_cb(EV_P, ev_io *w, int revents) {
 					// The reason for this, is because later functions depend on the
 					// values this function sets
 					if (set_cnxn(client, NULL) == NULL) {
-						SERROR_CLIENT_CLOSE(client);
+						//SERROR_CLIENT_CLOSE(client);
 					}
 				}
 
@@ -711,7 +712,7 @@ void client_cb(EV_P, ev_io *w, int revents) {
 		}
 
 		// handshake already done, let's get down to business
-	} else if (client->bol_handshake == true && client->bol_connected == true) {
+	} else if (client->bol_handshake == true && (client->bol_connected == true || client->bol_is_open == false)) {
 		SDEBUG("Reading a frame");
 		WS_readFrame(EV_A, client, client_frame_cb);
 	}
@@ -841,10 +842,14 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 			WS_freeFrame(frame_temp);
 		}
 
-		SERROR_CHECK(WS_sendFrame(EV_A, client, true, 0x08, frame->str_message, frame->int_length), "Failed to send message");
-		SINFO("Sent close frame", client);
+		if (client->bol_is_open) {
+			SERROR_CHECK(WS_sendFrame(EV_A, client, true, 0x08, frame->str_message, frame->int_length), "Failed to send message");
+			SINFO("Sent close frame", client);
 
-		client->bol_is_open = false;
+			client->bol_is_open = false;
+		} else {
+			goto error;
+		}
 
 		WS_freeFrame(frame);
 
@@ -929,7 +934,7 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 			SERROR_CHECK(client_request != NULL, "create_request failed!");
 
 		} else if (strcmp(str_first_word, "ROLLBACK") == 0) {
-			client_request = create_request(client, frame, str_message_id, str_transaction_id,ptr_query,
+			client_request = create_request(client, frame, str_message_id, str_transaction_id, ptr_query,
 				0, POSTAGE_REQ_ROLLBACK, NULL);
 
 			SERROR_CHECK(client_request != NULL, "create_request failed!");
@@ -1487,33 +1492,34 @@ void cnxn_cb(EV_P, void *cb_data, DB_conn *conn) {
 	size_t int_response_len = 0;
 	size_t int_temp_len = 0;
 
+	client->conn = conn;
+
 	SDEBUG("TESTING CNXN_CB");
 	if (conn->int_status != 1) {
-		SERROR_NORESPONSE("%s", conn->str_response);
+		SWARN_NORESPONSE("%s", conn->str_response);
 
 		int_temp_len = conn->int_response_len > 0 ? conn->int_response_len : strlen(conn->str_response);
 		//str_temp = bunescape_value(conn->str_response, &int_temp_len);
 		//SDEBUG("%s\t%s", conn->str_response, str_temp);
-		str_temp_escape = bescape_value(conn->str_response, &int_temp_len);
-		SDEBUG(">%s|%s<", conn->str_response, str_temp_escape);
+		SDEBUG(">%s<", conn->str_response);
 
 		SERROR_SNCAT(str_response, &int_response_len,
-			"messageid = NULL\012ERROR\t", (size_t)23,
-			str_temp_escape, int_temp_len,
-			"\012", (size_t)1);
-		WS_sendFrame(EV_A, client, 0x01, true, str_response, strlen(str_response));
-	}
-
-	client->bol_connected = true;
+			"\x03\xf3", (size_t)2, // close reason 1011
+			conn->str_response, int_temp_len
+		);
+		WS_sendFrame(EV_A, client, 0x08, true, str_response, strlen(str_response));
+		client->bol_is_open = false;
+	} else {
+		client->bol_connected = true;
 
 #ifdef POSTAGE_INTERFACE_LIBPQ
-	//PQsetNoticeProcessor(client->cnxn, notice_processor, client);
-	PQsetNoticeProcessor(client->cnxn, notice_processor, client);
-	SERROR_SALLOC(client->notify_watcher, sizeof(struct sock_ev_client_notify_watcher));
-	ev_io_init(&client->notify_watcher->io, client_notify_cb, GET_CLIENT_PQ_SOCKET(client), EV_READ);
-	ev_io_start(EV_A, &client->notify_watcher->io);
-	client->notify_watcher->parent = client;
+		PQsetNoticeProcessor(client->cnxn, notice_processor, client);
+		SERROR_SALLOC(client->notify_watcher, sizeof(struct sock_ev_client_notify_watcher));
+		ev_io_init(&client->notify_watcher->io, client_notify_cb, GET_CLIENT_PQ_SOCKET(client), EV_READ);
+		ev_io_start(EV_A, &client->notify_watcher->io);
+		client->notify_watcher->parent = client;
 #endif
+	}
 error:
 	SFREE_ALL();
 	SFREE(conn->str_response);
@@ -1683,7 +1689,7 @@ finish:
 		"\012responsenumber = ", (size_t)18,
 		str_temp, strlen(str_temp),
 		"\012transactionid = ", (size_t)17,
-		client_request->str_message_id, client_request->int_message_id_len,
+		client_request->str_transaction_id, client_request->int_transaction_id_len,
 		"\012", (size_t)1,
 		_str_response, _int_response_len);
 	SFREE(_str_response);
@@ -1813,7 +1819,7 @@ bool client_close(struct sock_ev_client *client) {
 			WS_client_message_free(client_message);
 			WS_freeFrame(frame);
 		}
-		WS_sendFrame(global_loop, client, true, 0x08, "asdf", 4);
+		WS_sendFrame(global_loop, client, true, 0x08, "\01\00", 2);
 	}
 	ev_io_stop(global_loop, &client->io);
 

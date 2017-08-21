@@ -28,7 +28,6 @@ var autocompleteGlobals = {
       , 'strSpecialFilter':  ""
       , 'bolTestSlowDown':   false
       , 'quoteLevel':      0
-      , 'bolSnippets':  false
       , 'intContextPosition': 0
       , 'arrStrContext': []
       , 'startRow': 0
@@ -68,13 +67,17 @@ function getContext(strInput, intPosition) {
     // make sure that we have only whitespace after the cursor, otherwise we just end it here, however last line last character is allowed
     //console.log('intPosition', intPosition);
     //console.log('strInput.length', strInput.length);
-    //console.log('Check Whitespace', (! strInput.substr(intPosition, 1).match('^[\n\r\ \t]+')) && (intPosition !== strInput.length));
-    //console.log('Check Whitespace>' + strInput.substr(intPosition, 1) + '<');
-    //console.log('Check Whitespace - 1>' + strInput.substr(intPosition - 1, 1) + '<');
-    //console.log('Check Whitespace 1>' + strInput.substr(1, 1) + '<');
-    //console.log('Check Whitespace 0>' + strInput.substr(0, 1) + '<');
-    if ((! strInput.substr(intPosition, 1).match('^[\n\r\ \t]+')) && (intPosition !== strInput.length)) {
+    //console.log('Check Whitespace', (! strInput[intPosition].match('^[\n\r\ \t]+')) && (intPosition !== strInput.length));
+    //console.log('Check Whitespace>' + strInput[intPosition] + '<');
+    //console.log('Check Whitespace - 1>' + strInput[intPosition - 1] + '<');
+    //console.log('Check Whitespace 1>' + strInput[1] + '<');
+    //console.log('Check Whitespace 0>' + strInput[0] + '<');
+    if ((!strInput[intPosition].match('^[\n\r\ \t]+')) && (intPosition !== strInput.length)) {
         return;
+    }
+    
+    if (strInput.match(/[\n\r\ \t]+/g).length < 2) {
+        autocompleteGlobals.bolSnippets = true;
     }
 
     var intContextPosition = 0;
@@ -668,7 +671,7 @@ function getContext(strInput, intPosition) {
             arrShortQueries = ['schemasTables'];
 
             doubleIdentifier(strInput.substr(i + 1));
-            //console.log(">UPDATE|" + intTabLevel + "<");
+            console.log(">UPDATE|" + intTabLevel + "<");
 
         // FOUND UPDATE ... SET
         } else if (int_qs === 0 && strInput.substr(i).match(/^SET[\n\r\ \t]+/i) && bolWordBreak && bolUpdate) {
@@ -676,34 +679,34 @@ function getContext(strInput, intPosition) {
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['contextColumns'];
-            //console.log(">INSERT ... INTO|" + intTabLevel + "<");
+            console.log(">UPDATE ... SET|" + intTabLevel + "<");
 
         // FOUND UPDATE ... SET ... ,
-        } else if (int_qs === 0 && strNextOneChar === "," && bolWordBreak && bolUpdate) {
+        } else if (int_qs === 0 && strNextOneChar === "," && bolUpdate) {
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['contextColumns'];
-            //console.log(">INSERT ... INTO|" + intTabLevel + "<");
+            console.log(">UPDATE ... SET ... ,|" + intTabLevel + "<");
 
         // FOUND UPDATE ... SET ... =
         } else if (int_qs === 0 && strNextOneChar === "=" && bolWordBreak && bolUpdate) {
             strFirst = ' ';
             intContextPosition = i + 1;
-            arrShortQueries = ['variables', 'contextTablesColumns', 'functions', 'builtins'];
+            arrShortQueries = ['variables', 'contextTablesColumns', 'schemasFunctions', 'functions', 'builtins'];
 
             bolFinal = true;
             intFinalI = i;
             intFinalContextPosition = intContextPosition;
             arrFinalShortQueries = arrShortQueries;
             strFinalFirst = strFirst;
-            //console.log(">UPDATE ... SET ... = lookahead|" + intTabLevel + "<");
+            console.log(">UPDATE ... SET ... = lookahead|" + intTabLevel + "<");
 
         // FOUND DELETE
         } else if (int_qs === 0 && strInput.substr(i).match(/^DELETE[\n\r\ \t]+/i) && bolWordBreak) {
             i += (strInput.substr(i).match(/^DELETE/i)[0].length - 1);
             bolDelete = true;
 
-            //console.log(">UPDATE|" + intTabLevel + "<");
+            //console.log(">DELETE|" + intTabLevel + "<");
 
         // FOUND SELECT
         } else if (int_qs === 0 && strInput.substr(i).match(/^SELECT[\n\r\ \t]+/i) && bolWordBreak && !bolGrant && !bolRevoke) {
@@ -712,7 +715,7 @@ function getContext(strInput, intPosition) {
 
             strFirst = ' ';
             intContextPosition = i + 1;
-            arrShortQueries = ['variables', 'contextTablesColumns', 'functions', 'builtins'];
+            arrShortQueries = ['variables', 'contextTablesColumns', 'schemasFunctions', 'functions', 'builtins'];
 
             //set final if we are NOT already on a final and we are NOT past the cursor
             //console.log('bolFinal = ' + bolFinal);
@@ -734,7 +737,7 @@ function getContext(strInput, intPosition) {
             i += (strInput.substr(i).match(/^(GROUP|PARTITION|ORDER)[\n\r\ \t]+BY/i)[0].length - 1);
             strFirst = ' ';
             intContextPosition = i + 1;
-            arrShortQueries = ['variables', 'contextTablesColumns', 'functions', 'builtins'];
+            arrShortQueries = ['variables', 'contextTablesColumns', 'schemasFunctions', 'functions', 'builtins'];
             //console.log(">INSERT ... INTO|" + intTabLevel + "<");
 
         // FOUND WHERE
@@ -745,7 +748,7 @@ function getContext(strInput, intPosition) {
 
             strFirst = ' ';
             intContextPosition = i + 1;
-            arrShortQueries = ['variables', 'contextTablesColumns', 'functions', 'builtins'];
+            arrShortQueries = ['variables', 'contextTablesColumns', 'schemasFunctions', 'functions', 'builtins'];
 
             //console.log(">WHERE|" + intTabLevel + "<");
 
@@ -756,7 +759,7 @@ function getContext(strInput, intPosition) {
 
             strFirst = ' ';
             intContextPosition = i;
-            arrShortQueries = ['variables', 'contextTablesColumns', 'functions', 'builtins'];
+            arrShortQueries = ['variables', 'contextTablesColumns', 'schemasFunctions', 'functions', 'builtins'];
 
             //set final if we are NOT already on a final and we are NOT past the cursor
             //console.log('bolFinal = ' + bolFinal);
@@ -778,7 +781,7 @@ function getContext(strInput, intPosition) {
         } else if (int_qs === 0 && strNextOneChar === "(" && (bolSelect || bolUpdate || bolDelete || intCase > 0)) {
             strFirst = '';
             intContextPosition = i + 1;
-            arrShortQueries = ['variables', 'contextTablesColumns', 'functions', 'builtins'];
+            arrShortQueries = ['variables', 'contextTablesColumns', 'schemasFunctions', 'functions', 'builtins'];
 
             int_ps = int_ps + 1;
             intTabLevel += 1;
@@ -807,7 +810,7 @@ function getContext(strInput, intPosition) {
 
             strFirst = ' ';
             intContextPosition = i + 1;
-            arrShortQueries = ['variables', 'functions', 'builtins'];
+            arrShortQueries = ['variables', 'schemasFunctions', 'functions', 'builtins'];
 
             //console.log(">IF|" + intTabLevel + "<");
 
@@ -818,7 +821,7 @@ function getContext(strInput, intPosition) {
 
             strFirst = ' ';
             intContextPosition = i + 1;
-            arrShortQueries = ['variables', 'functions', 'builtins'];
+            arrShortQueries = ['variables', 'schemasFunctions', 'functions', 'builtins'];
 
             //console.log(">AND/OR/operators/:=|" + intTabLevel + "<");
 
@@ -863,7 +866,7 @@ function getContext(strInput, intPosition) {
 
             strFirst = ' ';
             intContextPosition = i + 1;
-            arrShortQueries = ['variables', 'contextTablesColumns', 'functions', 'builtins'];
+            arrShortQueries = ['variables', 'contextTablesColumns', 'schemasFunctions', 'functions', 'builtins'];
             //console.log(">USING/FROM/JOIN/ONLY|" + intTabLevel + "<");
 
         // FOUND PROCEDURE
@@ -940,7 +943,7 @@ function getContext(strInput, intPosition) {
         } else if (int_qs === 0 && strNextOneChar === "(" && bolInsert && bolInsertValues) {
             strFirst = '';
             intContextPosition = i + 1;
-            arrShortQueries = ['variables', 'functions', 'builtins'];
+            arrShortQueries = ['variables', 'schemasFunctions', 'functions', 'builtins'];
 
             int_ps = int_ps + 1;
             intTabLevel += 1;
@@ -950,7 +953,7 @@ function getContext(strInput, intPosition) {
         } else if (int_qs === 0 && int_ps >= 1 && strNextOneChar === "," && bolInsert && bolInsertValues) {
             strFirst = ' ';
             intContextPosition = i + 1;
-            arrShortQueries = ['variables', 'functions', 'builtins'];
+            arrShortQueries = ['variables', 'schemasFunctions', 'functions', 'builtins'];
 
             //console.log(">(|" + intTabLevel + "<");
 
@@ -1089,7 +1092,7 @@ function getContext(strInput, intPosition) {
 
             strFirst = ' ';
             intContextPosition = i;
-            arrShortQueries = ['variables', 'contextTablesColumns', 'functions', 'builtins'];
+            arrShortQueries = ['variables', 'contextTablesColumns', 'schemasFunctions', 'functions', 'builtins'];
 
             //set final if we are NOT already on a final and we are NOT past the cursor
             //console.log('bolFinal = ' + bolFinal);
@@ -1105,7 +1108,7 @@ function getContext(strInput, intPosition) {
             }
             //console.log(">intContextPosition|" + intContextPosition + "<");
 
-            //console.log(">, lookahead|" + intTabLevel + "<");
+            console.log(">, lookahead|" + intTabLevel + "<");
 
         // FOUND AN ON SCHEMA INSIDE A GRANT/REVOKE STATEMENT:
         } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+SCHEMA[\n\r\ \t]+/i) && bolWordBreak && (bolGrant || bolRevoke)) {
@@ -1270,7 +1273,7 @@ function getContext(strInput, intPosition) {
 
             strFirst = ' ';
             intContextPosition = i + 1;
-            arrShortQueries = ['variables', 'contextTablesColumns', 'functions', 'builtins'];
+            arrShortQueries = ['variables', 'contextTablesColumns', 'schemasFunctions', 'functions', 'builtins'];
 
             intTabLevel += 1;
             intCase += 1; //INCREASE CASE LEVEL, WHILE intCase > 0 THEN "THEN" AND "END" IS TREATED DIFFERENTLY
@@ -1282,7 +1285,7 @@ function getContext(strInput, intPosition) {
 
             strFirst = ' ';
             intContextPosition = i + 1;
-            arrShortQueries = ['variables', 'contextTablesColumns', 'functions', 'builtins'];
+            arrShortQueries = ['variables', 'contextTablesColumns', 'schemasFunctions', 'functions', 'builtins'];
 
             intTabLevel += 1;
             intCase += 1; //INCREASE CASE LEVEL, WHILE intCase > 0 THEN "THEN" AND "END" IS TREATED DIFFERENTLY
@@ -1294,7 +1297,7 @@ function getContext(strInput, intPosition) {
 
             strFirst = ' ';
             intContextPosition = i + 1;
-            arrShortQueries = ['variables', 'contextTablesColumns', 'functions', 'builtins'];
+            arrShortQueries = ['variables', 'contextTablesColumns', 'schemasFunctions', 'functions', 'builtins'];
 
 
         // FOUND CASE... THEN
@@ -1303,7 +1306,7 @@ function getContext(strInput, intPosition) {
 
             strFirst = ' ';
             intContextPosition = i + 1;
-            arrShortQueries = ['variables', 'contextTablesColumns', 'functions', 'builtins'];
+            arrShortQueries = ['variables', 'contextTablesColumns', 'schemasFunctions', 'functions', 'builtins'];
 
             //console.log(">C THEN|" + intTabLevel + "<");
 
@@ -1313,7 +1316,7 @@ function getContext(strInput, intPosition) {
 
             strFirst = ' ';
             intContextPosition = i + 1;
-            arrShortQueries = ['variables', 'contextTablesColumns', 'functions', 'builtins'];
+            arrShortQueries = ['variables', 'contextTablesColumns', 'schemasFunctions', 'functions', 'builtins'];
 
             //console.log(">WHEN|" + intTabLevel + "<");
 
@@ -1323,7 +1326,7 @@ function getContext(strInput, intPosition) {
 
             strFirst = ' ';
             intContextPosition = i + 1;
-            arrShortQueries = ['variables', 'contextTablesColumns', 'functions', 'builtins'];
+            arrShortQueries = ['variables', 'contextTablesColumns', 'schemasFunctions', 'functions', 'builtins'];
 
             //console.log(">C ELSE|" + intTabLevel + "<");
 
@@ -1534,6 +1537,7 @@ function getContext(strInput, intPosition) {
         return;
     }
 
+    // console.log('arrShortQueries', arrShortQueries);
     if (arrShortQueries.indexOf('schemas') > -1) {
         arrQueries.push(autocompleteQuery.schemas);
     } if (arrShortQueries.indexOf('functions') > -1) {
