@@ -1437,7 +1437,7 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
         tabElement.bolAutoOpenPropertyList = true;
         tabElement.relatedResultsArea.addEventListener('click', function () {
 			if (tabElement.relatedResultsArea.children.length === 0) {
-			    console.log(tabElement.relatedResultsArea);
+			    //console.log(tabElement.relatedResultsArea);
 				document.getElementsByClassName('current-tab')[0].relatedEditor.focus()
 			}
 		});
@@ -2537,21 +2537,25 @@ function SQLBeautify(strInput) {
         } else if (int_qs === 6 || int_qs === 5) {
             strResult += strInput[i];
 
-        // FOUND SLASH:  we don't skip slashed chars within dollar tags, double or single quotes and comments.
-        } else if (strInput.substr(i, 1) === "\\" && int_qs !== 4 && int_qs !== 2 && int_qs !== 5 && int_qs !== 6) {
+        // FOUND SLASH:  we don't skip slashed chars within dollar tags, double or single quotes and comments. <-- ONLY IF IT'S AN E STRING
+        } else if (strInput.substr(i, 1) === "\\" && int_qs === 1) {
             strResult += strInput[i];
             // skip next character
             i += 1;
             strResult += strInput[i];
-
-            //console.log("found slash int_loop: %s", int_loop);
-
+        // FOUND E SINGLE QUOTE:
+        } else if (int_qs === 0 && strInput.substr(i, 2) === "E'") {
+            strResult += strInput.substr(i, 2);
+            int_qs = 1;
+            int_E_quote = (i - 1) === 'E';
+            //console.log("found E single quote, ", strResult);
+            i += 1
         // FOUND SINGLE QUOTE:
         } else if (int_qs === 0 && strInput.substr(i, 1) === "'") {
             strResult += strInput[i];
             int_qs = 3;
             int_E_quote = (i - 1) === 'E';
-            //console.log("found single quote");
+            //console.log("found single quote", strResult);
 
         // FOUND TWO SINGLE QUOTES INSIDE STRING:
         } else if (int_qs === 3 && strInput.substr(i, 2) === "''") {
@@ -2563,12 +2567,12 @@ function SQLBeautify(strInput) {
             //console.log("found two single quote");
 
         // ENDING SINGLE QUOTE
-        } else if (int_qs === 3 && strInput.substr(i, 1) === "'") {
+        } else if ((int_qs === 3 || int_qs === 1) && strInput.substr(i, 1) === "'") {
             strResult += strInput[i] + " ";
             bolNoExtraWhitespace = true;
             int_qs = 0;
             int_E_quote = 0;
-            //console.log("found end of single quote");
+            //console.log("found end of single quote", strResult);
 
         // FOUND DOUBLE QUOTE:
         } else if (int_qs === 0 && strInput.substr(i, 1) === "\"") {
@@ -2581,7 +2585,7 @@ function SQLBeautify(strInput) {
             strResult += strInput[i] + " ";
             bolNoExtraWhitespace = true;
             int_qs = 0;
-            //console.log("found end of double quote");
+            //console.log(strInput);
         // FOUND CREATE OR REPLACE TABLE... (
         } else if (int_qs === 0 && int_ps === 0 && bolTable && strInput.substr(i, 1) === "(") {
             strResult += strInput[i] + '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel) + 1);
@@ -2738,6 +2742,9 @@ function SQLBeautify(strInput) {
             }
             bolRule = false;
             bolTable = false;
+            if (bolTrigger) {
+                intTabLevel -= 1;
+            }
             bolTrigger = false;
             bolGrant = false;
             bolLastComment = false;
@@ -2944,6 +2951,13 @@ function SQLBeautify(strInput) {
             bolNoExtraWhitespace = true;
             //console.log(">ELSIF;|" + intTabLevel + "<");
 
+        // END =
+        } else if (int_qs === 0 && intCase === 0 && strInput.substr(i).match(/^END[\ \t\n]+=[\ \t\n]+/i)) {
+            strResult += 'END = ';
+            i += (strInput.substr(i).match(/^END[\ \t\n]+=[\ \t\n]+/i)[0].length - 1);
+            bolNoExtraWhitespace = true;
+            //console.log(">END = <");
+
         // Not an END IF, at this point it has to be a BEGIN END
         } else if (int_qs === 0 && intCase === 0 && strInput.substr(i).match(/^END\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
             // Remove previous tab if previous character is whitespace
@@ -3027,7 +3041,7 @@ function SQLBeautify(strInput) {
 
         // FOUND AS
         } else if (int_qs === 0 && (!bolFunction) && strInput.substr(i).match(/^AS[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
-            strResult += 'AS ';
+            strResult += strInput.substr(i).match(/^AS[\n\r\ \t]+/i)[0];
             i += 1;
             bolNoExtraWhitespace = true;
             //console.log(">KEYWORD|" + intTabLevel + "<");
@@ -3098,13 +3112,13 @@ function SQLBeautify(strInput) {
             if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {
                 strResult = strResult.substr(0, strResult.length - 1);
             }
-            console.log('here, here', strResult);
+            //console.log('here, here', strResult);
             strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i).match(/^CREATE[\ \t]+OR[\ \t]+REPLACE/i)[0] + ' ';
             i += (strInput.substr(i).match(/^CREATE[\ \t]+OR[\ \t]+REPLACE/i)[0].length - 1);
             bolNoExtraWhitespace = true;
             //console.log(">KEYWORD|" + intTabLevel + "<");
 
-        // FOUND CREATE OR REPLACE     <--- Dupe?
+        // FOUND CREATE (OR REPLACE)
         } else if (int_qs === 0 && strInput.substr(i).match(/^CREATE[\ \t]+(OR[\ \t]+REPLACE)?/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
             // Remove previous tab if previous character is whitespace
             if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {
@@ -3193,6 +3207,10 @@ function SQLBeautify(strInput) {
         } else {
             strResult += strInput[i];
         }
+        if (intTabLevel < 0) {
+            console.log(strInput.substring(i, i - 10), strInput.substring(i, i + 10));
+            break;
+        }
     }
 
     // Strip all the whitespace between the input and output, then check to see if they match, if they don't then console.error
@@ -3205,6 +3223,7 @@ function SQLBeautify(strInput) {
 
     if (strResultStripped !== strInputStripped) {
         console.error('Beautify mangled the SQL: Before >>>' + strInput + '<<< After >>>' + strResult + '<<<');
+        return strInput;
     }
 
     // for #380

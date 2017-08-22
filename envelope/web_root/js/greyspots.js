@@ -36066,6 +36066,7 @@ events:
     after_selection (contains TSV of selection ranges under "selection" key)
 
     insert_dialog_open (event.relatedTarget = insert dialog)
+    before_copy (preventDefault will prevent copy)
     copy
     paste
 
@@ -39374,8 +39375,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 insertDialogTemplate.innerHTML.trim()
             );
 
-            // remove the template element now that it's been siphoned
-            element.removeChild(insertDialogTemplate);
+            //// remove the template element now that it's been siphoned
+            //element.removeChild(insertDialogTemplate);
         }
 
         // if present, siphon "update-dialog" template
@@ -39469,6 +39470,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var recordDelimiter;
         var cellDelimiter;
         var nullString;
+        var copyTypes;
 
         // we need the user to be able to override the copy parameters so that
         //      they can format the copy in the way they need
@@ -39516,6 +39518,11 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             nullString = '';
         }
+        if (element.getAttribute('copy-types')) {
+            copyTypes = element.getAttribute('copy-types') || 'text,html';
+        } else {
+            copyTypes = 'text,html';
+        }
 
         // we need to return multiple variables but return only allows one
         //      return value, so we'll return in JSON
@@ -39527,7 +39534,8 @@ document.addEventListener('DOMContentLoaded', function () {
             "quoteMode": quoteMode,
             "recordDelimiter": recordDelimiter,
             "cellDelimiter": cellDelimiter,
-            "nullString": nullString
+            "nullString": nullString,
+            "copyTypes": copyTypes
         };
     }
 
@@ -44830,7 +44838,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 );
 
                 rec_i = 0;
-                rec_len = jsnInsert.data.columns.length;
+                rec_len = jsnInsert.data.values.length;
                 while (rec_i < rec_len) {
                     jsnInsert.data.values[rec_i] += '\t';
                     jsnInsert.data.values[rec_i] += GS.encodeForTabDelimited(
@@ -44839,6 +44847,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     rec_i += 1;
                 }
             }
+            console.log(jsnInsert.data.columns, jsnInsert.data.addin);
 
             // build up insert column list
             strInsertColumns = '';
@@ -49543,6 +49552,16 @@ document.addEventListener('DOMContentLoaded', function () {
         </gs-select>
     </td>
 </tr>
+<tr>
+    <td>Copy types:</td>
+    <td>
+        <gs-select class="pref-copy-types" mini>
+            <option value="text">Text</option>
+            <option value="html">HTML</option>
+            <option value="text,html">Both</option>
+        </gs-select>
+    </td>
+</tr>
             </tbody>
         </table>
         <hr />
@@ -49551,7 +49570,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <gs-button dialogclose>Cancel</gs-button>
             </gs-block>
             <gs-block>
-                <gs-button dialogclose bg-primary>Apply</gs-button>
+                <gs-button class="recopy-button" bg-primary>Recopy</gs-button>
             </gs-block>
         </gs-grid>
     </gs-body>
@@ -49572,6 +49591,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var copyCellDelimiterControl;
         var copyRecordDelimiterControl;
         var copyNullControl;
+        var copyTypesControl;
 
         GS.openDialogToElement(
             buttonElement,
@@ -49620,6 +49640,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     dialog,
                     '.pref-null-value'
                 )[0];
+                copyTypesControl = xtag.query(
+                    dialog,
+                    '.pref-copy-types'
+                )[0];
 
                 copyHeadersControl.value = jsnCopy.headerMode;
                 copySelectorsControl.value = jsnCopy.selectorMode;
@@ -49629,19 +49653,24 @@ document.addEventListener('DOMContentLoaded', function () {
                 copyCellDelimiterControl.value = jsnCopy.cellDelimiter;
                 copyRecordDelimiterControl.value = jsnCopy.recordDelimiter;
                 copyNullControl.value = jsnCopy.nullString;
-            },
-            // event parameter is ignored
-            function (ignore, strAnswer) {
-                var strCopyHeaders;
-                var strCopySelectors;
-                var strQuoteChar;
-                var strEscapeChar;
-                var strQuoteMode;
-                var strCellDelimiter;
-                var strRecordDelimiter;
-                var strNullValue;
+                copyTypesControl.value = jsnCopy.copyTypes;
 
-                if (strAnswer === 'Apply') {
+                xtag.query(
+                    dialog,
+                    '.recopy-button'
+                )[0].addEventListener('click', function () {
+                    GS.closeDialog(dialog);
+
+                    var strCopyHeaders;
+                    var strCopySelectors;
+                    var strQuoteChar;
+                    var strEscapeChar;
+                    var strQuoteMode;
+                    var strCellDelimiter;
+                    var strRecordDelimiter;
+                    var strNullValue;
+                    var strCopyTypes;
+
                     // gather the control values
                     strCopyHeaders = copyHeadersControl.value;
                     strCopySelectors = copySelectorsControl.value;
@@ -49651,6 +49680,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     strCellDelimiter = copyCellDelimiterControl.value;
                     strRecordDelimiter = copyRecordDelimiterControl.value;
                     strNullValue = copyNullControl.value;
+                    strCopyTypes = copyTypesControl.value;
 
                     // save the copy settings
                     element.setAttribute('copy-header', strCopyHeaders);
@@ -49667,7 +49697,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         strRecordDelimiter
                     );
                     element.setAttribute('copy-null-cell', strNullValue);
-                }
+                    element.setAttribute('copy-types', strCopyTypes);
+
+                    element.internalEvents.forceCopy = true;
+                    element.elems.hiddenFocusControl.focus();
+                    document.execCommand('copy');
+                });
             }
         );
     }
@@ -55196,50 +55231,74 @@ document.addEventListener('DOMContentLoaded', function () {
         element.internalEvents.copySelection = function (event) {
             var jsnCopyString;
             var focusedElement;
+            var arrCopyType = (element.getAttribute('copy-types') || 'text,html').split(',');
+            var i;
+            var len;
+            var beforeCopyEvent = GS.triggerEvent(element, 'before_copy', {
+                forceCopy: element.internalEvents.forceCopy
+            });
+            element.internalEvents.forceCopy = false;
 
-            // saving the currently focused element for easy/quick access
-            focusedElement = document.activeElement;
+            i = 0;
+            len = arrCopyType.length;
+            while (i < len) {
+                arrCopyType[i] = arrCopyType[i].toLowerCase();
+                i += 1;
+            }
 
-            // if the focus is on the hidden focus control of if the text
-            //      selection of the currently focused element is not
-            //      selecting multiple characters
-            if (
-                focusedElement.classList.contains('hidden-focus-control') ||
-                focusedElement.selectionStart === focusedElement.selectionEnd
-            ) {
-                console.time('copy');
+            if (beforeCopyEvent.defaultPrevented) {
+                event.preventDefault(event);
 
-                // because copying a large amount of data takes time, add a
-                //      loader to let the user know we're copying, just in case
-                addLoader(element, 'copy-loader', 'Copying Data...');
+            } else {
+                // saving the currently focused element for easy/quick access
+                focusedElement = document.activeElement;
 
-                // focus the hidden focus control and select all of it's text so
-                //      that Firefox will allow us to override the clipboard
-                focusedElement = element.elems.hiddenFocusControl;
-                focusedElement.focus();
+                // if the focus is on the hidden focus control of if the text
+                //      selection of the currently focused element is not
+                //      selecting multiple characters
+                if (
+                    focusedElement.classList.contains('hidden-focus-control') ||
+                    focusedElement.selectionStart ===
+                    focusedElement.selectionEnd
+                ) {
+                    console.time('copy');
 
-                GS.setInputSelection(
-                    focusedElement,
-                    0,
-                    focusedElement.value.length
-                );
+                    // because copying a large amount of data takes time, add a
+                    //      loader to let the user know we're copying,
+                    //      just in case
+                    addLoader(element, 'copy-loader', 'Copying Data...');
 
-                // we want to override the text and HTML mime type clipboards,
-                //      so we get the copy text for both types
-                jsnCopyString = getCopyStrings(element);
-                // override clipboard (prevent event default if we are
-                //      successful)
-                if (handleClipboardData(event, jsnCopyString.text, 'text')) {
-                    event.preventDefault(event);
+                    // focus the hidden focus control and select all of it's
+                    //      text so that Firefox will allow us to override
+                    //      the clipboard
+                    focusedElement = element.elems.hiddenFocusControl;
+                    focusedElement.focus();
+
+                    GS.setInputSelection(
+                        focusedElement,
+                        0,
+                        focusedElement.value.length
+                    );
+
+                    // we want to override the text and HTML mime type
+                    //      clipboards, so we get the copy text for both types
+                    jsnCopyString = getCopyStrings(element);
+                    // override clipboard (prevent event default if we are
+                    //      successful)
+                    if (arrCopyType.indexOf('text') > -1 &&
+                        handleClipboardData(event, jsnCopyString.text, 'text')) {
+                        event.preventDefault(event);
+                    }
+                    if (arrCopyType.indexOf('html') > -1 &&
+                        handleClipboardData(event, jsnCopyString.html, 'html')) {
+                        event.preventDefault(event);
+                    }
+
+                    // remove copying loader
+                    removeLoader(element, 'copy-loader', 'Data Copied');
+
+                    console.timeEnd('copy');
                 }
-                if (handleClipboardData(event, jsnCopyString.html, 'html')) {
-                    event.preventDefault(event);
-                }
-
-                // remove copying loader
-                removeLoader(element, 'copy-loader', 'Data Copied');
-
-                console.timeEnd('copy');
             }
         };
 
@@ -56927,7 +56986,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     // this is the fastest way to destroy all of the data
                     element.internalData = {};
                     element.internalScrollOffsets = {};
-                    element.internalEvents = {};
+                    element.internalEvents = { forceCopy: false };
                     element.internalEventCancelled = {};
                     element.internalScroll = {};
                     element.internalTimerIDs = {};

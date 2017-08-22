@@ -1487,14 +1487,14 @@ scriptQuery.objectRole = ml(function () {/*
                     ), '') ||
                 COALESCE(
                     (
-                        SELECT array_to_string(array_agg(E'\nGRANT ' || quote_ident(em.unnest) || ' TO ' || quote_ident(r.rolname) || ';'), '')
+                        SELECT array_to_string(array_agg(E'\nGRANT ' || quote_ident(em.unnest) || ' TO ' || quote_ident(r.rolname) || ';' ORDER BY em.unnest), '')
                           FROM (
                                 SELECT DISTINCT unnest(array_agg(g.rolname))
                             ) em
                     ), '') ||
                 COALESCE(E'\n\n/*' ||
                     NULLIF((
-                        SELECT array_to_string(array_agg(E'\nGRANT ' || quote_ident(r.rolname) || ' TO ' || quote_ident(em.unnest) || ';'), '')
+                        SELECT array_to_string(array_agg(E'\nGRANT ' || quote_ident(r.rolname) || ' TO ' || quote_ident(em.unnest) || ';' ORDER BY em.unnest), '')
                           FROM (
                                 SELECT DISTINCT unnest(array_agg(og.rolname))
                             ) em

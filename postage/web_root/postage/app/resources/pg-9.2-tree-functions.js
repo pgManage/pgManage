@@ -2316,7 +2316,9 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
                     arrResult.splice(0, 1);
 
                     for (i = 0, len = arrResult.length; i < len; i += 1) {
-                        strDumpQuery += GS.decodeFromTabDelimited(arrResult[i][0]) + '\n\n';
+                        //console.log(arrResult[i][0]);
+                        //console.log(GS.decodeFromTabDelimited(arrResult[i][0]));
+                        strDumpQuery += GS.decodeFromTabDelimited(arrResult[i][0].replace(/(\\)/g, '\\\\')) + '\n\n';
                     }
                     j += len;
 
