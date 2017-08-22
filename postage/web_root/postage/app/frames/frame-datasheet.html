@@ -14,6 +14,7 @@
         <link href="datagrid.css" type="text/css" rel="stylesheet" />
         <script src="../../js/page-zoom.js" type="text/javascript"></script>
 
+        <script src="../resources/pg-9.2-other.js" type="text/javascript"></script>
 
         <script>
             //global GS, window, ml
@@ -167,6 +168,18 @@
                             tableElement.setAttribute('style', 'width: 100%; height: 100%;');
                             tableElement.setAttribute('focus-on-load', '');
                             tableElement.setAttribute('src', (qs.schema + '.' + qs.object) || '');
+
+                            tableElement.setAttribute('copy-quote-when', getClipSetting('quoteType'));
+                            tableElement.setAttribute('copy-quote-char', getClipSetting('quoteChar'));
+                            tableElement.setAttribute('copy-escape-char', getClipSetting('escapeChar'));
+                            tableElement.setAttribute('copy-delimiter-cell', getClipSetting('fieldDelimiter'));
+                            tableElement.setAttribute('copy-delimiter-record', getClipSetting('recordDelimiter'));
+                            tableElement.setAttribute('copy-null-cell', getClipSetting('nullValues'));
+                            tableElement.setAttribute('copy-header', getClipSetting('columnNames'));
+                            tableElement.setAttribute('copy-selectors', getClipSetting('rowNumbers'));
+                            tableElement.setAttribute('copy-types', getClipSetting('copyTypes'));
+
+                            tableElement.addEventListener('before_copy', beforeTableCopyFunction);
 
                             var updateContent = ''
                             var headerContent = '';

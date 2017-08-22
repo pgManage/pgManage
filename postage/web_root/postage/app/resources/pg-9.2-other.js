@@ -292,8 +292,9 @@ function menuOptions(target) {
             }
         }
     }, function () {
-		if (document.getElementsByClassName('current-tab')[0]) {
-			document.getElementsByClassName('current-tab')[0].relatedEditor.focus();
+        var currentTab = document.getElementsByClassName('current-tab')[0];
+		if (currentTab && currentTab.relatedEditor) {
+			currentTab.relatedEditor.focus();
 		}
 	});
 }
@@ -845,70 +846,114 @@ function dialogOptions() {
                     </gs-optionbox>
                 </div>
 
-
                 <h3>Clip Options</h3>
-                <div>
-                    <gs-grid widths="1,1" gutter>
-                        <gs-block>
-                            <gs-optionbox id="clip-options-quote-which" style="padding: 0 0.25em 0.25em 0.25em;">
-                                    <label>Escape Values When:</label>
-                                    <gs-option value="none">Nothing</gs-option>
-                                    <gs-option value="strings">Strings</gs-option>
-                                    <gs-option value="all">All Fields</gs-option>
-                            </gs-optionbox>
-                        </gs-block>
-                        <gs-block>
-                            <gs-optionbox id="clip-options-column-names" style="padding: 0 0.25em 0.25em 0.25em;">
-                                    <label>Include Column Names:</label>
-                                    <gs-option value="true">Always</gs-option>
-                                    <gs-option value="false">Only When Selected</gs-option>
-                            </gs-optionbox>
-                        </gs-block>
-                    </gs-grid>
-                </div>
-                <div>
-                    <div flex-horizontal>
-                        <label for="clip-options-quote-char" style="min-width: 7.25em;">Escape Values with Char:</label>
-                        <gs-combo id="clip-options-quote-char" flex>
-                            <template>
-                                <table>
-                                    <tbody>
-                                        <tr value="&#34;"><td>(Double Quote)</td></tr>
-                                        <tr value="&#39;"><td>(Single Quote)</td></tr>
-                                    </tbody>
-                                </table>
-                            </template>
-                        </gs-combo>
-                    </div>
-                    <div flex-horizontal>
-                        <label for="clip-options-field-delimiter" style="min-width: 7.25em;">Field Delimiter:</label>
-                        <gs-combo id="clip-options-field-delimiter" flex>
-                            <template>
-                                <table>
-                                    <tbody>
-                                        <tr value="&#9;"><td>(Tab)</td></tr>
-                                        <tr value="&#44;"><td>(Comma)</td></tr>
-                                        <tr value="&#124;"><td>(Vertical Bar)</td></tr>
-                                    </tbody>
-                                </table>
-                            </template>
-                        </gs-combo>
-                    </div>
-                    <div flex-horizontal>
-                        <label for="clip-options-null-values" style="min-width: 7.25em;">Null Values:</label>
-                        <gs-combo id="clip-options-null-values" flex>
-                            <template>
-                                <table>
-                                    <tbody>
-                                        <tr value="&lt;NULL&gt;"><td>&lt;NULL&gt;</td></tr>
-                                        <tr value="NULL"><td>NULL</td></tr>
-                                        <tr value=""><td>(Nothing)</td></tr>
-                                    </tbody>
-                                </table>
-                            </template>
-                        </gs-combo>
-                    </div>
-                </div>
+                <gs-checkbox flex-horizontal value="true" class="pref-ask">
+                    <label flex>Always ask for clip options</label>
+                </gs-checkbox>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>Headers?</td>
+                            <td>
+                                <gs-select class="pref-copy-headers" mini>
+                                    <option value="never">No</option>
+                                    <option value="always">Yes</option>
+                                    <option value="selected">Only when selected</option>
+                                </gs-select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Row Numbers?</td>
+                            <td>
+                                <gs-select class="pref-copy-selectors" mini>
+                                    <option value="never">No</option>
+                                    <option value="always">Yes</option>
+                                    <option value="selected">Only when selected</option>
+                                </gs-select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Quote Character:</td>
+                            <td>
+                                <gs-select class="pref-quote-char" mini>
+                                    <option value="\">Backslash (\)</option>
+                                    <option value="/">Forward Slash (/)</option>
+                                    <option value="|">Pipe (|)</option>
+                                    <option value="&quot;">Double Quote (&quot;)</option>
+                                    <option value="'">Single Quote (')</option>
+                                </gs-select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Escape Character:</td>
+                            <td>
+                                <gs-select class="pref-escape-char" mini>
+                                    <option value="\">Backslash (\)</option>
+                                    <option value="/">Forward Slash (/)</option>
+                                    <option value="|">Pipe (|)</option>
+                                    <option value="&quot;">Double Quote (&quot;)</option>
+                                    <option value="'">Single Quote (')</option>
+                                </gs-select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Quote?</td>
+                            <td>
+                                <gs-select class="pref-copy-quote" mini>
+                                    <option value="always">Always</option>
+                                    <option value="never">Never</option>
+                                    <option value="strings">Only on strings</option>
+                                    <option value="delimiter-in-content">Cell contains separator</option>
+                                </gs-select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Record Separator:</td>
+                            <td>
+                                <gs-select class="pref-delimiter-record" mini>
+                                    <option value="{{RETURN}}">Newline</option>
+                                    <option value="|">Vertical Bar (|)</option>
+                                    <option value=",">Comma (,)</option>
+                                    <option value="{{TAB}}">Tab</option>
+                                </gs-select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Cell Separator:</td>
+                            <td>
+                                <gs-select class="pref-delimiter-cell" mini>
+                                    <option value="{{RETURN}}">Newline</option>
+                                    <option value="|">Vertical Bar (|)</option>
+                                    <option value=",">Comma (,)</option>
+                                    <option value="{{TAB}}">Tab</option>
+                                </gs-select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Empty values:</td>
+                            <td>
+                                <gs-select class="pref-null-value" mini>
+                                    <option value="">(nothing)</option>
+                                    <option value="NULL">"NULL"</option>
+                                    <option value="null">"null"</option>
+                                    <option value="EMPTY">"EMPTY"</option>
+                                    <option value="empty">"empty"</option>
+                                    <option value="Nothing">"Nothing"</option>
+                                </gs-select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Copy types:</td>
+                            <td>
+                                <gs-select class="pref-copy-types" mini>
+                                    <option value="text">Text</option>
+                                    <option value="html">HTML</option>
+                                    <option value="text,html">Both</option>
+                                </gs-select>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
 
                 <h3>Page Zoom Levels</h3>
                 <div style="width: 35em">
@@ -1056,9 +1101,93 @@ function dialogOptions() {
             </gs-body>
             <gs-footer><gs-button dialogclose id="settingsClose">Done</gs-button></gs-footer>
         </gs-page>
-    */}).replace('{{ZOOM}}', strZoom);
+    */})
+        .replace('{{ZOOM}}', strZoom)
+        .replace(/\{\{RETURN\}\}/gi, '\n')
+        .replace(/\{\{TAB\}\}/gi, '\t');
 
     GS.openDialog(templateElement, function () {
+        var dialog = this;
+        var copyHeadersControl;
+        var copySelectorsControl;
+        var copyQuoteCharControl;
+        var copyEscapeCharControl;
+        var copyQuoteWhenControl;
+        var copyCellDelimiterControl;
+        var copyRecordDelimiterControl;
+        var copyNullControl;
+        var copyTypesControl;
+        var askControl;
+
+        copyHeadersControl = xtag.query(dialog, '.pref-copy-headers')[0];
+        copySelectorsControl = xtag.query(dialog, '.pref-copy-selectors')[0];
+        copyQuoteCharControl = xtag.query(dialog, '.pref-quote-char')[0];
+        copyEscapeCharControl = xtag.query(dialog, '.pref-escape-char')[0];
+        copyQuoteWhenControl = xtag.query(dialog, '.pref-copy-quote')[0];
+        copyCellDelimiterControl = xtag.query(dialog, '.pref-delimiter-cell')[0];
+        copyRecordDelimiterControl = xtag.query(dialog, '.pref-delimiter-record')[0];
+        copyNullControl = xtag.query(dialog, '.pref-null-value')[0];
+        copyTypesControl = xtag.query(dialog, '.pref-copy-types')[0];
+        askControl = xtag.query(dialog, '.pref-ask')[0];
+        
+        askControl.value = localStorage.askCopySettings;
+        askControl.addEventListener('change', function () {
+            localStorage.askCopySettings = askControl.value;
+        });
+        
+        copyQuoteWhenControl.value = getClipSetting('quoteType');
+        copyQuoteCharControl.value = getClipSetting('quoteChar');
+        copyEscapeCharControl.value = getClipSetting('escapeChar');
+        copyCellDelimiterControl.value = getClipSetting('fieldDelimiter');
+        copyRecordDelimiterControl.value = getClipSetting('recordDelimiter');
+        copyNullControl.value = getClipSetting('nullValues');
+        copyHeadersControl.value = getClipSetting('columnNames');
+        copySelectorsControl.value = getClipSetting('rowNumbers');
+        copyTypesControl.value = getClipSetting('copyTypes');
+
+        function setAllClipSettings() {
+            var arrElements, i, len;
+
+            // save clip settings
+            setClipSetting('quoteType', copyQuoteWhenControl.value);
+            setClipSetting('quoteChar', copyQuoteCharControl.value);
+            setClipSetting('escapeChar', copyEscapeCharControl.value);
+            setClipSetting('fieldDelimiter', copyCellDelimiterControl.value);
+            setClipSetting('recordDelimiter', copyRecordDelimiterControl.value);
+            setClipSetting('nullValues', copyNullControl.value);
+            setClipSetting('columnNames', copyHeadersControl.value);
+            setClipSetting('rowNumbers', copySelectorsControl.value);
+            setClipSetting('copyTypes', copyTypesControl.value);
+
+            // set all the table elements clip setting attributes
+            arrElements = xtag.query(document, 'gs-table.results-table');
+            xtag.query(document, '.tab-frame iframe').forEach(function (cur) {
+                arrElements.push.apply(arrElements, xtag.query(cur.contentWindow.document, 'gs-table'));
+            });
+
+            for (i = 0, len = arrElements.length; i < len; i += 1) {
+                arrElements[i].setAttribute('copy-quote-when', getClipSetting('quoteType'));
+                arrElements[i].setAttribute('copy-quote-char', getClipSetting('quoteChar'));
+                arrElements[i].setAttribute('copy-escape-char', getClipSetting('escapeChar'));
+                arrElements[i].setAttribute('copy-delimiter-cell', getClipSetting('fieldDelimiter'));
+                arrElements[i].setAttribute('copy-delimiter-record', getClipSetting('recordDelimiter'));
+                arrElements[i].setAttribute('copy-null-cell', getClipSetting('nullValues'));
+                arrElements[i].setAttribute('copy-header', getClipSetting('columnNames'));
+                arrElements[i].setAttribute('copy-selectors', getClipSetting('rowNumbers'));
+                arrElements[i].setAttribute('copy-types', getClipSetting('copyTypes'));
+            }
+        }
+
+        copyQuoteWhenControl.addEventListener('change', setAllClipSettings);
+        copyQuoteCharControl.addEventListener('change', setAllClipSettings);
+        copyEscapeCharControl.addEventListener('change', setAllClipSettings);
+        copyCellDelimiterControl.addEventListener('change', setAllClipSettings);
+        copyRecordDelimiterControl.addEventListener('change', setAllClipSettings);
+        copyNullControl.addEventListener('change', setAllClipSettings);
+        copyHeadersControl.addEventListener('change', setAllClipSettings);
+        copySelectorsControl.addEventListener('change', setAllClipSettings);
+        copyTypesControl.addEventListener('change', setAllClipSettings);
+
         document.getElementById('postage-options-beautify').value = localStorage.bolBeautify;
         document.getElementById('postage-options-beautify').addEventListener('change', function () {
             localStorage.bolBeautify = document.getElementById('postage-options-beautify').value;
@@ -1112,16 +1241,9 @@ function dialogOptions() {
 
 
         // set control values
-        document.getElementById('clip-options-quote-which').value = getClipSetting("quoteType");
         document.getElementById('button-options').value = localStorage.labeledButtons;
         document.getElementById('graph-options').value = localStorage.horizontalGraph;
-        document.getElementById('clip-options-quote-char').value = getClipSetting("quoteChar");
-        document.getElementById('clip-options-field-delimiter').value = getClipSetting("fieldDelimiter");
-        document.getElementById('clip-options-null-values').value = getClipSetting("nullValues");
-        document.getElementById('clip-options-column-names').value = getClipSetting("columnNames");
 
-
-        document.getElementById('clip-options-quote-which').addEventListener('change', setAllClipSettings);
         document.getElementById('button-options').addEventListener('change', function () {
             refreshButtons(document.getElementById('button-options').value);
             //console.log(document.getElementById('button-options').value);
@@ -1226,33 +1348,6 @@ function dialogOptions() {
             document.getElementById('ShortcutKeyHome').value = event.key;
         });
 
-        document.getElementById('clip-options-quote-char').addEventListener('change', setAllClipSettings);
-        document.getElementById('clip-options-field-delimiter').addEventListener('change', setAllClipSettings);
-        document.getElementById('clip-options-null-values').addEventListener('change', setAllClipSettings);
-        document.getElementById('clip-options-column-names').addEventListener('change', setAllClipSettings);
-
-        function setAllClipSettings() {
-            var arrElements, i, len;
-
-            // save clip settings
-            setClipSetting("quoteType", document.getElementById('clip-options-quote-which').value);
-            setClipSetting("quoteChar", document.getElementById('clip-options-quote-char').value);
-            setClipSetting("fieldDelimiter", document.getElementById('clip-options-field-delimiter').value);
-            setClipSetting("nullValues", document.getElementById('clip-options-null-values').value);
-            setClipSetting("columnNames", document.getElementById('clip-options-column-names').value);
-
-            // set all the table elements clip setting attributes
-            arrElements = xtag.query(document.getElementsByClassName('current-tab')[0].relatedResultsArea, 'table.results-table');
-
-            for (i = 0, len = arrElements.length; i < len; i += 1) {
-                arrElements[i].setAttribute('quote-type', getClipSetting("quoteType"));
-                arrElements[i].setAttribute('quote-char', getClipSetting("quoteChar"));
-                arrElements[i].setAttribute('field-delimiter', getClipSetting("fieldDelimiter"));
-                arrElements[i].setAttribute('null-values', getClipSetting("nullValues"));
-                arrElements[i].setAttribute('column-names', getClipSetting("columnNames"));
-            }
-        }
-
 
         var i, len;
         for (i=0,len=localStorage.length;i < len;i++) {
@@ -1313,7 +1408,10 @@ function dialogOptions() {
 
         refreshCustomCSS(customCSSText);
         refreshShortcutKeys(ShortcutKeysText);
-		document.getElementsByClassName('current-tab')[0].relatedEditor.focus()
+        var currentTab = document.getElementsByClassName('current-tab')[0];
+		if (currentTab) {
+            currentTab.relatedEditor.focus();
+        }
     });
 }
 
@@ -2399,9 +2497,13 @@ function getClipSetting(propertyName) {
     savedSettings = {
         "quoteType":      (savedSettings.quoteType || "strings"),
         "quoteChar":      (savedSettings.quoteChar || "'"),
+        "escapeChar":      (savedSettings.escapeChar || "\\"),
         "fieldDelimiter": (savedSettings.fieldDelimiter || "\t"),
+        "recordDelimiter":    (savedSettings.rowNumbers || "\n"),
         "nullValues":     (savedSettings.nullValues || "NULL"),
-        "columnNames":    (savedSettings.columnNames || "true")
+        "columnNames":    (savedSettings.columnNames || "never"),
+        "rowNumbers":    (savedSettings.rowNumbers || "never"),
+        "copyTypes":    (savedSettings.copyTypes || "text")
     };
 
     return savedSettings[propertyName];
@@ -2413,6 +2515,304 @@ function setClipSetting(propertyName, newValue) {
     savedSettings[propertyName] = newValue;
 
     localStorage.clip_settings = JSON.stringify(savedSettings);
+}
+
+function beforeTableCopyFunction(event) {
+    // This is for when a user uses the "Recopy" button in the datasheet copy options dialog
+    if (event.forceCopy) {
+        return;
+    }
+
+    var getCopyParameters = function (element) {
+        var headerMode;
+        var selectorMode;
+        var quoteChar;
+        var escapeChar;
+        var quoteMode;
+        var recordDelimiter;
+        var cellDelimiter;
+        var nullString;
+        var copyTypes;
+
+        // we need the user to be able to override the copy parameters so that
+        //      they can format the copy in the way they need
+        // if the attribute is present for a parameter, fill the variable with
+        //      the attribute (and default to empty string) else default to
+        //      parameter default
+        quoteMode = element.getAttribute('copy-quote-when') || getClipSetting('quoteType');
+        quoteChar = element.getAttribute('copy-quote-char') || getClipSetting('quoteChar');
+        escapeChar = element.getAttribute('copy-escape-char') || getClipSetting('escapeChar');
+        cellDelimiter = element.getAttribute('copy-delimiter-cell') || getClipSetting('fieldDelimiter');
+        recordDelimiter = element.getAttribute('copy-delimiter-record') || getClipSetting('recordDelimiter');
+        nullString = element.getAttribute('copy-null-cell') || getClipSetting('nullValues');
+        headerMode = element.getAttribute('copy-header') || getClipSetting('columnNames');
+        selectorMode = element.getAttribute('copy-selectors') || getClipSetting('rowNumbers');
+        copyTypes = element.getAttribute('copy-types') || getClipSetting('copyTypes');
+
+        // we need to return multiple variables but return only allows one
+        //      return value, so we'll return in JSON
+        return {
+            "headerMode": headerMode,
+            "selectorMode": selectorMode,
+            "quoteChar": quoteChar,
+            "escapeChar": escapeChar,
+            "quoteMode": quoteMode,
+            "recordDelimiter": recordDelimiter,
+            "cellDelimiter": cellDelimiter,
+            "nullString": nullString,
+            "copyTypes": copyTypes
+        };
+    };
+    var tableElement = this;
+    var template;
+
+    if (!tableElement.forceCopy && localStorage.askCopySettings !== 'false') {
+        event.preventDefault();
+
+        template = document.createElement('template');
+        template.innerHTML = ml(function () {/*
+            <gs-page class="gs-table-contextmenu">
+                <gs-body class="gs-table-contextmenu" padded>
+                    <div class="context-menu-header">Paste Format:</div>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>Headers?</td>
+                                <td>
+                                    <gs-select class="pref-copy-headers" mini>
+                                        <option value="never">No</option>
+                                        <option value="always">Yes</option>
+                                    </gs-select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Row Numbers?</td>
+                                <td>
+                                    <gs-select class="pref-copy-selectors" mini>
+                                        <option value="never">No</option>
+                                        <option value="always">Yes</option>
+                                    </gs-select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Quote Character:</td>
+                                <td>
+                                    <gs-select class="pref-quote-char" mini>
+                                        <option value="\">Backslash (\)</option>
+                                        <option value="/">Forward Slash (/)</option>
+                                        <option value="|">Pipe (|)</option>
+                                        <option value="&quot;">Double Quote (&quot;)</option>
+                                        <option value="'">Single Quote (')</option>
+                                    </gs-select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Escape Character:</td>
+                                <td>
+                                    <gs-select class="pref-escape-char" mini>
+                                        <option value="\">Backslash (\)</option>
+                                        <option value="/">Forward Slash (/)</option>
+                                        <option value="|">Pipe (|)</option>
+                                        <option value="&quot;">Double Quote (&quot;)</option>
+                                        <option value="'">Single Quote (')</option>
+                                    </gs-select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Quote?</td>
+                                <td>
+                                    <gs-select class="pref-copy-quote" mini>
+                                        <option value="always">Always</option>
+                                        <option value="never">Never</option>
+                                        <option value="strings">Only on strings</option>
+                                        <option value="delimiter-in-content">
+                                            Cell contains separator
+                                        </option>
+                                    </gs-select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Record Separator:</td>
+                                <td>
+                                    <gs-select class="pref-delimiter-record" mini>
+                                        <option value="{{RETURN}}">Newline</option>
+                                        <option value="|">Vertical Bar (|)</option>
+                                        <option value=",">Comma (,)</option>
+                                        <option value="{{TAB}}">Tab</option>
+                                    </gs-select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Cell Separator:</td>
+                                <td>
+                                    <gs-select class="pref-delimiter-cell" mini>
+                                        <option value="{{RETURN}}">Newline</option>
+                                        <option value="|">Vertical Bar (|)</option>
+                                        <option value=",">Comma (,)</option>
+                                        <option value="{{TAB}}">Tab</option>
+                                    </gs-select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Empty values:</td>
+                                <td>
+                                    <gs-select class="pref-null-value" mini>
+                                        <option value="">(nothing)</option>
+                                        <option value="NULL">"NULL"</option>
+                                        <option value="null">"null"</option>
+                                        <option value="EMPTY">"EMPTY"</option>
+                                        <option value="empty">"empty"</option>
+                                        <option value="Nothing">"Nothing"</option>
+                                    </gs-select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Copy types:</td>
+                                <td>
+                                    <gs-select class="pref-copy-types" mini>
+                                        <option value="text">Text</option>
+                                        <option value="html">HTML</option>
+                                        <option value="text,html">Both</option>
+                                    </gs-select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <hr />
+                    <gs-checkbox flex-horizontal value="true" class="pref-save">
+                        <label flex>Remember settings</label>
+                    </gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" class="pref-ask">
+                        <label flex>Always ask me</label>
+                    </gs-checkbox>
+                    <hr />
+                    <gs-grid gutter>
+                        <gs-block>
+                            <gs-button dialogclose>Cancel</gs-button>
+                        </gs-block>
+                        <gs-block>
+                            <gs-button bg-primary class="copy-button">Copy</gs-button>
+                        </gs-block>
+                    </gs-grid>
+                </gs-body>
+            </gs-page>
+        */})
+            .replace(/\{\{RETURN\}\}/gi, '\n')
+            .replace(/\{\{TAB\}\}/gi, '\t');
+        var copyHeadersControl;
+        var copySelectorsControl;
+        var copyQuoteCharControl;
+        var copyEscapeCharControl;
+        var copyQuoteWhenControl;
+        var copyCellDelimiterControl;
+        var copyRecordDelimiterControl;
+        var copyNullControl;
+        var copyTypesControl;
+        var saveControl;
+        var askControl;
+
+        GS.openDialog(template, function () {
+            var dialog = this;
+            var jsnCopy;
+
+            // we want the top gs-page to have corner rounding
+            dialog.classList.add('gs-table-contextmenu');
+
+            // we need the current copy parameters
+            jsnCopy = getCopyParameters(tableElement);
+
+            // find all of the control elements
+            copyHeadersControl = xtag.query(dialog, '.pref-copy-headers')[0];
+            copySelectorsControl = xtag.query(dialog, '.pref-copy-selectors')[0];
+            copyQuoteCharControl = xtag.query(dialog, '.pref-quote-char')[0];
+            copyEscapeCharControl = xtag.query(dialog, '.pref-escape-char')[0];
+            copyQuoteWhenControl = xtag.query(dialog, '.pref-copy-quote')[0];
+            copyCellDelimiterControl = xtag.query(dialog, '.pref-delimiter-cell')[0];
+            copyRecordDelimiterControl = xtag.query(dialog, '.pref-delimiter-record')[0];
+            copyNullControl = xtag.query(dialog, '.pref-null-value')[0];
+            copyTypesControl = xtag.query(dialog, '.pref-copy-types')[0];
+            saveControl = xtag.query(dialog, '.pref-save')[0];
+            askControl = xtag.query(dialog, '.pref-ask')[0];
+
+            copyHeadersControl.value = jsnCopy.headerMode;
+            copySelectorsControl.value = jsnCopy.selectorMode;
+            copyQuoteCharControl.value = jsnCopy.quoteChar;
+            copyEscapeCharControl.value = jsnCopy.escapeChar;
+            copyQuoteWhenControl.value = jsnCopy.quoteMode;
+            copyCellDelimiterControl.value = jsnCopy.cellDelimiter;
+            copyRecordDelimiterControl.value = jsnCopy.recordDelimiter;
+            copyNullControl.value = jsnCopy.nullString;
+            copyTypesControl.value = jsnCopy.copyTypes;
+
+            xtag.query(dialog, '.copy-button')[0].addEventListener('click', function () {
+                GS.closeDialog(dialog);
+
+                var strCopyHeaders;
+                var strCopySelectors;
+                var strQuoteChar;
+                var strEscapeChar;
+                var strQuoteMode;
+                var strCellDelimiter;
+                var strRecordDelimiter;
+                var strNullValue;
+                var strCopyTypes;
+    
+                // gather the control values
+                strCopyHeaders = copyHeadersControl.value;
+                strCopySelectors = copySelectorsControl.value;
+                strQuoteChar = copyQuoteCharControl.value;
+                strEscapeChar = copyEscapeCharControl.value;
+                strQuoteMode = copyQuoteWhenControl.value;
+                strCellDelimiter = copyCellDelimiterControl.value;
+                strRecordDelimiter = copyRecordDelimiterControl.value;
+                strNullValue = copyNullControl.value;
+                strCopyTypes = copyTypesControl.value;
+
+                // save the copy settings
+                tableElement.setAttribute('copy-header', strCopyHeaders);
+                tableElement.setAttribute('copy-selectors', strCopySelectors);
+                tableElement.setAttribute('copy-quote-char', strQuoteChar);
+                tableElement.setAttribute('copy-escape-char', strEscapeChar);
+                tableElement.setAttribute('copy-quote-when', strQuoteMode);
+                tableElement.setAttribute('copy-delimiter-cell', strCellDelimiter);
+                tableElement.setAttribute('copy-delimiter-record', strRecordDelimiter);
+                tableElement.setAttribute('copy-null-cell', strNullValue);
+                tableElement.setAttribute('copy-types', strCopyTypes);
+                
+                tableElement.forceCopy = true;
+                tableElement.elems.hiddenFocusControl.focus();
+                document.execCommand('copy');
+
+                if (saveControl.value === 'false') {
+                    tableElement.setAttribute('copy-header', jsnCopy.headerMode);
+                    tableElement.setAttribute('copy-selectors', jsnCopy.selectorMode);
+                    tableElement.setAttribute('copy-quote-char', jsnCopy.quoteChar);
+                    tableElement.setAttribute('copy-escape-char', jsnCopy.escapeChar);
+                    tableElement.setAttribute('copy-quote-when', jsnCopy.quoteMode);
+                    tableElement.setAttribute('copy-delimiter-cell', jsnCopy.cellDelimiter);
+                    tableElement.setAttribute('copy-delimiter-record', jsnCopy.recordDelimiter);
+                    tableElement.setAttribute('copy-null-cell', jsnCopy.nullString);
+                    tableElement.setAttribute('copy-types', jsnCopy.copyTypes);
+                } else {
+                    setClipSetting('quoteType', copyQuoteWhenControl.value);
+                    setClipSetting('quoteChar', copyQuoteCharControl.value);
+                    setClipSetting('escapeChar', copyEscapeCharControl.value);
+                    setClipSetting('fieldDelimiter', copyCellDelimiterControl.value);
+                    setClipSetting('recordDelimiter', copyRecordDelimiterControl.value);
+                    setClipSetting('nullValues', copyNullControl.value);
+                    setClipSetting('columnNames', copyHeadersControl.value);
+                    setClipSetting('rowNumbers', copySelectorsControl.value);
+                    setClipSetting('copyTypes', copyTypesControl.value);
+                }
+
+                localStorage.askCopySettings = askControl.value;
+            });
+        }, null, null);
+
+        
+    } else {
+        tableElement.forceCopy = undefined;
+    }
 }
 
 function highlightCurrentCursorQuery(tabElement, jsnQueryStart, jsnQueryEnd) {
@@ -3140,16 +3540,28 @@ function executeScript(bolCursorQuery) {
                                 tableElement.classList.add('results-table');
                                 scrollElement.appendChild(tableElement);
 
+                                tableElement.setAttribute('copy-quote-when', getClipSetting('quoteType'));
+                                tableElement.setAttribute('copy-quote-char', getClipSetting('quoteChar'));
+                                tableElement.setAttribute('copy-escape-char', getClipSetting('escapeChar'));
+                                tableElement.setAttribute('copy-delimiter-cell', getClipSetting('fieldDelimiter'));
+                                tableElement.setAttribute('copy-delimiter-record', getClipSetting('recordDelimiter'));
+                                tableElement.setAttribute('copy-null-cell', getClipSetting('nullValues'));
+                                tableElement.setAttribute('copy-header', getClipSetting('columnNames'));
+                                tableElement.setAttribute('copy-selectors', getClipSetting('rowNumbers'));
+                                tableElement.setAttribute('copy-types', getClipSetting('copyTypes'));
+
                                 tableElement.addEventListener('openFullContainer', function () {
                                     currentTab.resultsScroll = document.getElementById('sql-results-area-' + tabNumber + '').scrollTop;
                                     document.getElementById('sql-results-area-' + tabNumber + '').scrollTop = 0;
                                     document.getElementById('sql-results-area-' + tabNumber + '').style.overflow = 'hidden';
                                 });
-
+                                
                                 tableElement.addEventListener('closeFullContainer', function () {
                                     document.getElementById('sql-results-area-' + tabNumber + '').scrollTop = currentTab.resultsScroll;
                                     document.getElementById('sql-results-area-' + tabNumber + '').style.overflow = 'auto';
                                 });
+                                
+                                tableElement.addEventListener('before_copy', beforeTableCopyFunction);
 
                                 // reset array so that we don't override the data for the previous table
                                 arrData = Array(data.intRows);
