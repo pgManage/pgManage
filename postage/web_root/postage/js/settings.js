@@ -11,7 +11,7 @@ localStorage.horizontalGraph = localStorage.horizontalGraph ? localStorage.horiz
     // This is for a re-done clip-options value set
     // - Nunzio on 2017-08-22 (while implementing issue #390)
 
-    var clipSettings = JSON.parse(localStorage.clip_settings);
+    var clipSettings = JSON.parse(localStorage.clip_settings || '{}');
 
     if (clipSettings.columnNames === 'false' || clipSettings.columnNames === 'true') {
         clipSettings.columnNames = (clipSettings.columnNames === 'false' ? 'never' : 'always');
