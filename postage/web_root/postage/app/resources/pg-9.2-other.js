@@ -2336,7 +2336,7 @@ function getCurrentQuery() {
                 editor.currentSelections[editor.currentSelections.length - 1].end.column
             ));
             editorSelectionRange = editor.getSelectionRange();
-            console.log(editorSelectionRange);
+            //console.log(editorSelectionRange);
         }
         if (
             editorSelectionRange.start.row !== editorSelectionRange.end.row ||
