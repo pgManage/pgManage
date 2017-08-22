@@ -6,7 +6,25 @@ localStorage.bolBeautify = localStorage.bolBeautify ? localStorage.bolBeautify =
 localStorage.bolComma = localStorage.bolComma ? localStorage.bolComma === 'true' : true;
 localStorage.horizontalGraph = localStorage.horizontalGraph ? localStorage.horizontalGraph === 'true' : true;
 
-function refreshButtons (bolBtnType) {
+(function () {
+    // NEVER DELETE THIS BLOCK
+    // This is for a re-done clip-options value set
+    // - Nunzio on 2017-08-22 (while implementing issue #390)
+
+    var clipSettings = JSON.parse(localStorage.clip_settings);
+
+    if (clipSettings.columnNames === 'false' || clipSettings.columnNames === 'true') {
+        clipSettings.columnNames = (clipSettings.columnNames === 'false' ? 'never' : 'always');
+    }
+
+    if (clipSettings.quoteType === 'none' || clipSettings.quoteType === 'all') {
+        clipSettings.quoteType = (clipSettings.quoteType === 'none' ? 'never' : (clipSettings.quoteType === 'all' ? 'always' : 'never'));
+    }
+
+    localStorage.clip_settings = JSON.stringify(clipSettings);
+}());
+
+function refreshButtons(bolBtnType) {
     'use strict';
     var curr_toolbar, curr_tab_num, tabElement, bolBtnLabeled;
     if (bolBtnType === '' ||

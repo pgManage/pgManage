@@ -1342,7 +1342,7 @@ void client_request_queue_cb(EV_P, ev_check *w, int revents) {
 		// SDEBUG("Queue_count(%p->que_request): %d", client, int_len);
 		// SDEBUG("%p->bol_request_in_progress: %s", client, client->bol_request_in_progress ? "true" : "false");
 	}
-	if (client->bol_request_in_progress == false && int_len > 0) {
+	if (client->bol_connected && client->bol_request_in_progress == false && int_len > 0) {
 		struct sock_ev_client_request *client_request = (struct sock_ev_client_request *)Queue_recv(client->que_request);
 		client->cur_request = client_request;
 		SDEBUG("client->cur_request: %p", client->cur_request);
