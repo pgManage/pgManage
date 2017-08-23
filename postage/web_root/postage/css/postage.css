@@ -69,6 +69,36 @@ div#header-text-container {
     text-overflow: ellipsis;
 }
 
+.clip-options .option-row {
+    color: #111111;
+    margin: 0;
+    box-shadow: none !important;
+    border: 1px solid #eee;
+    line-height: normal;
+    padding: 0.5em;
+    position: relative;
+    background-color: white;
+    border-radius: 0;
+    min-height: 1em;
+    font-size: 1em;
+}
+.clip-options .option-row div {
+    text-align: right;
+
+    padding: 0.25em;
+    margin: 0;
+
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.clip-options .option-row gs-select {
+    padding: 0;
+    margin: 0;
+}
+
 /* ###################################################### */
 /* ################### HEADER BUTTONS ################### */
 /* ###################################################### */

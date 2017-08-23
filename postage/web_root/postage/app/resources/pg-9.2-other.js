@@ -821,279 +821,278 @@ function dialogOptions() {
         <gs-page>
             <gs-header><center><h3>Postage Options</h3></center></gs-header>
             <gs-body padded>
-                <h3>General</h3>
+                <gs-grid min-width="all {reflow}; 1200px {1,1};" gutter>
+                    <gs-block>
+                        <h3>General</h3>
+                        <div>
+                            <label for="postage-options-left-panel" style="min-width: 7.25em;">Panel Width:</label>
+                            <gs-text id="postage-options-left-panel"></gs-text>
 
-                <div>
-                    <label for="postage-options-left-panel" style="min-width: 7.25em;">Panel Width:</label>
-                    <gs-text id="postage-options-left-panel"></gs-text>
+                            <label for="postage-options-beautify" style="min-width: 7.25em;">Automatic Beautify:</label>
+                            <gs-checkbox id="postage-options-beautify"></gs-checkbox>
 
-                    <label for="postage-options-beautify" style="min-width: 7.25em;">Automatic Beautify:</label>
-                    <gs-checkbox id="postage-options-beautify"></gs-checkbox>
+                            <label for="postage-options-Comma" style="min-width: 7.25em;">Comma First Formatting:</label>
+                            <gs-checkbox id="postage-options-Comma"></gs-checkbox>
 
-                    <label for="postage-options-Comma" style="min-width: 7.25em;">Comma First Formatting:</label>
-                    <gs-checkbox id="postage-options-Comma"></gs-checkbox>
+                            <label>SQL Toolbar Button Style:</label>
+                            <gs-optionbox id="button-options" style="padding: 0 0.25em 0.25em 0.25em;">
+                                <gs-option value="true">Labeled</gs-option>
+                                <gs-option value="false">Unlabeled</gs-option>
+                            </gs-optionbox>
 
-                    <label>SQL Toolbar Button Style:</label>
-                    <gs-optionbox id="button-options" style="padding: 0 0.25em 0.25em 0.25em;">
-                        <gs-option value="true">Labeled</gs-option>
-                        <gs-option value="false">Unlabeled</gs-option>
-                    </gs-optionbox>
+                            <label>SQL Explain Graph Style:</label>
+                            <gs-optionbox id="graph-options" style="padding: 0 0.25em 0.25em 0.25em;">
+                                <gs-option value="true">Horizontal</gs-option>
+                                <gs-option value="false">Vertical</gs-option>
+                            </gs-optionbox>
+                        </div>
+                    </gs-block>
 
-                    <label>SQL Explain Graph Style:</label>
-                    <gs-optionbox id="graph-options" style="padding: 0 0.25em 0.25em 0.25em;">
-                        <gs-option value="true">Horizontal</gs-option>
-                        <gs-option value="false">Vertical</gs-option>
-                    </gs-optionbox>
-                </div>
-
-                <h3>Clip Options</h3>
-                <gs-checkbox flex-horizontal value="true" class="pref-ask">
-                    <label flex>Always ask for clip options</label>
-                </gs-checkbox>
-                <table>
-                    <tbody>
-                        <tr>
-                            <td>Headers?</td>
-                            <td>
-                                <gs-select class="pref-copy-headers" mini>
-                                    <option value="never">No</option>
-                                    <option value="always">Yes</option>
-                                    <option value="selected">Only when selected</option>
-                                </gs-select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Row Numbers?</td>
-                            <td>
-                                <gs-select class="pref-copy-selectors" mini>
-                                    <option value="never">No</option>
-                                    <option value="always">Yes</option>
-                                    <option value="selected">Only when selected</option>
-                                </gs-select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Quote Character:</td>
-                            <td>
-                                <gs-select class="pref-quote-char" mini>
-                                    <option value="\">Backslash (\)</option>
-                                    <option value="/">Forward Slash (/)</option>
-                                    <option value="|">Pipe (|)</option>
-                                    <option value="&quot;">Double Quote (&quot;)</option>
-                                    <option value="'">Single Quote (')</option>
-                                </gs-select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Escape Character:</td>
-                            <td>
-                                <gs-select class="pref-escape-char" mini>
-                                    <option value="\">Backslash (\)</option>
-                                    <option value="/">Forward Slash (/)</option>
-                                    <option value="|">Pipe (|)</option>
-                                    <option value="&quot;">Double Quote (&quot;)</option>
-                                    <option value="'">Single Quote (')</option>
-                                </gs-select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Quote?</td>
-                            <td>
-                                <gs-select class="pref-copy-quote" mini>
-                                    <option value="always">Always</option>
-                                    <option value="never">Never</option>
-                                    <option value="strings">Only on strings</option>
-                                    <option value="delimiter-in-content">Cell contains separator</option>
-                                </gs-select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Record Separator:</td>
-                            <td>
-                                <gs-select class="pref-delimiter-record" mini>
-                                    <option value="{{RETURN}}">Newline</option>
-                                    <option value="|">Vertical Bar (|)</option>
-                                    <option value=",">Comma (,)</option>
-                                    <option value="{{TAB}}">Tab</option>
-                                </gs-select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Cell Separator:</td>
-                            <td>
-                                <gs-select class="pref-delimiter-cell" mini>
-                                    <option value="{{RETURN}}">Newline</option>
-                                    <option value="|">Vertical Bar (|)</option>
-                                    <option value=",">Comma (,)</option>
-                                    <option value="{{TAB}}">Tab</option>
-                                </gs-select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Empty values:</td>
-                            <td>
-                                <gs-select class="pref-null-value" mini>
-                                    <option value="">(nothing)</option>
-                                    <option value="NULL">"NULL"</option>
-                                    <option value="null">"null"</option>
-                                    <option value="EMPTY">"EMPTY"</option>
-                                    <option value="empty">"empty"</option>
-                                    <option value="Nothing">"Nothing"</option>
-                                </gs-select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Copy types:</td>
-                            <td>
-                                <gs-select class="pref-copy-types" mini>
-                                    <option value="text">Text</option>
-                                    <option value="html">HTML</option>
-                                    <option value="text,html">Both</option>
-                                </gs-select>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <h3>Page Zoom Levels</h3>
-                <div style="width: 35em">
-                    <!--<div id="options-container" style="position: relative; min-height: 10em;">-->
-                    <div id="options-container">
-                        <table class="simple-table">
-                            <thead>
-                                <tr>
-                                    <th>Page</th>
-                                    <th style="width: 10em;">Setting Value</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {{ZOOM}}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <h3 style="float: left;" id="KeyboardShortCuts">Keyboard Shortcuts</h3>
-                <div id="shortcuts-options-container">
-                    <table class="simple-table">
-                        <thead>
-                            <tr>
-                                <th style="padding: 0.75em;">Meta Key&nbsp;&nbsp;<gs-button id="metaKeyReset" inline>Reset</gs-button></th>
-                                <th style="padding: 0.75em;">Key&nbsp;&nbsp;<gs-button id="keyReset" inline>Reset</gs-button></th>
-                                <th style="padding: 0.75em;">Function</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-
-                                <td>
-                                    <gs-select id="shortcutMetaKeyNewTab" mini>
-                                        <option value="Command">Command/Windows Key</option>
-                                        <option value="Control">Control</option>
-                                        <option value="Option">Option/Alt</option>
-                                        <option value="Shift">Shift</option>
-                                        <option value="None">None</option>
+                    <gs-block>
+                        <h3>Clip Options</h3>
+                        <div class="clip-options">
+                            <gs-checkbox flex-horizontal value="true" class="pref-copy-headers">
+                                <label flex style="text-align: right;">Copy Headers</label>
+                            </gs-checkbox>
+                            <gs-checkbox flex-horizontal value="true" class="pref-copy-selectors">
+                                <label flex style="text-align: right;">Copy Row Numbers</label>
+                            </gs-checkbox>
+                            <div flex-horizontal flex-fill class="option-row">
+                                <div flex>
+                                    <gs-select class="pref-quote-char" mini>
+                                        <option value="\">Backslash (\)</option>
+                                        <option value="/">Forward Slash (/)</option>
+                                        <option value="|">Pipe (|)</option>
+                                        <option value="&quot;">Double Quote (&quot;)</option>
+                                        <option value="'">Single Quote (')</option>
                                     </gs-select>
-                                </td>
-                                <td><gs-text id="ShortcutKeyNewTab" mini></gs-text></td>
-                                <td><gs-static value="New Tab"></gs-static></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <gs-select id="shortcutMetaKeySaveTab" mini>
-                                        <option value="Command">Command/Windows Key</option>
-                                        <option value="Control">Control</option>
-                                        <option value="Option">Option/Alt</option>
-                                        <option value="Shift">Shift</option>
-                                        <option value="None">None</option>
+                                </div>
+                                <div style="width: 55em;">Quote Character</div>
+                            </div>
+                            <div flex-horizontal flex-fill class="option-row">
+                                <div flex>
+                                    <gs-select class="pref-escape-char" mini>
+                                        <option value="\">Backslash (\)</option>
+                                        <option value="/">Forward Slash (/)</option>
+                                        <option value="|">Pipe (|)</option>
+                                        <option value="&quot;">Double Quote (&quot;)</option>
+                                        <option value="'">Single Quote (')</option>
                                     </gs-select>
-                                </td>
-                                <td><gs-text id="ShortcutKeySaveTab" mini></gs-text></td>
-                                <td><gs-static value="Save Tab"></gs-static></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <gs-select id="shortcutMetaKeyRunQuery" mini>
-                                        <option value="Command">Command/Windows Key</option>
-                                        <option value="Control">Control</option>
-                                        <option value="Option">Option/Alt</option>
-                                        <option value="Shift">Shift</option>
-                                        <option value="None">None</option>
+                                </div>
+                                <div style="width: 55em;">Escape Character</div>
+                            </div>
+                            <div flex-horizontal flex-fill class="option-row">
+                                <div flex>
+                                    <gs-select class="pref-copy-quote" mini>
+                                        <option value="always">Always</option>
+                                        <option value="never">Never</option>
+                                        <option value="strings">Only on strings</option>
+                                        <option value="delimiter-in-content">
+                                            Cell contains separator
+                                        </option>
                                     </gs-select>
-                                </td>
-                                <td><gs-text id="ShortcutKeyRunQuery" mini></gs-text></td>
-                                <td><gs-static value="Run Query"></gs-static></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <gs-select id="shortcutMetaKeyRunCursorQuery" mini>
-                                        <option value="Command">Command/Windows Key</option>
-                                        <option value="Control">Control</option>
-                                        <option value="Option">Option/Alt</option>
-                                        <option value="Shift">Shift</option>
-                                        <option value="None">None</option>
+                                </div>
+                                <div style="width: 55em;">Quote</div>
+                            </div>
+                            <div flex-horizontal flex-fill class="option-row">
+                                <div flex>
+                                    <gs-select class="pref-delimiter-record" mini>
+                                        <option value="{{DOS_RETURN}}">DOS (\r\n)</option>
+                                        <option value="{{MAC_RETURN}}">Mac (\r)</option>
+                                        <option value="{{UNIX_RETURN}}">UNIX (\n)</option>
+                                        <option value="|">Vertical Bar (|)</option>
+                                        <option value=",">Comma (,)</option>
+                                        <option value="{{TAB}}">Tab</option>
                                     </gs-select>
-                                </td>
-                                <td><gs-text id="ShortcutKeyRunCursorQuery" mini></gs-text></td>
-                                <td><gs-static value="Run Query Under Cursor"></gs-static></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <gs-select id="shortcutMetaKeyFindDocumentation" mini>
-                                        <option value="Command">Command/Windows Key</option>
-                                        <option value="Control">Control</option>
-                                        <option value="Option">Option/Alt</option>
-                                        <option value="Shift">Shift</option>
-                                        <option value="None">None</option>
+                                </div>
+                                <div style="width: 55em;">Record Separator</div>
+                            </div>
+                            <div flex-horizontal flex-fill class="option-row">
+                                <div flex>
+                                    <gs-select class="pref-delimiter-cell" mini>
+                                        <option value="{{DOS_RETURN}}">DOS (\r\n)</option>
+                                        <option value="{{MAC_RETURN}}">Mac (\r)</option>
+                                        <option value="{{UNIX_RETURN}}">UNIX (\n)</option>
+                                        <option value="|">Vertical Bar (|)</option>
+                                        <option value=",">Comma (,)</option>
+                                        <option value="{{TAB}}">Tab</option>
                                     </gs-select>
-                                </td>
-                                <td><gs-text id="ShortcutKeyFindDocumentation" mini></gs-text></td>
-                                <td><gs-static value="Find Documentation"></gs-static></td>
-                            </tr>
-                            <tr>
+                                </div>
+                                <div style="width: 55em;">Cell Separator</div>
+                            </div>
+                            <div flex-horizontal flex-fill class="option-row">
+                                <div flex>
+                                    <gs-select class="pref-null-value" mini>
+                                        <option value="">(nothing)</option>
+                                        <option value="NULL">"NULL"</option>
+                                        <option value="null">"null"</option>
+                                        <option value="EMPTY">"EMPTY"</option>
+                                        <option value="empty">"empty"</option>
+                                        <option value="Nothing">"Nothing"</option>
+                                    </gs-select>
+                                </div>
+                                <div style="width: 55em;">Empty values</div>
+                            </div>
+                            <div flex-horizontal flex-fill class="option-row">
+                                <div flex>
+                                    <gs-select class="pref-copy-types" mini>
+                                        <option value="text">Text</option>
+                                        <option value="html">HTML</option>
+                                        <option value="text,html">Both</option>
+                                    </gs-select>
+                                </div>
+                                <div style="width: 55em;">Copy types</div>
+                            </div>
+                            <gs-checkbox flex-horizontal value="true" class="pref-ask">
+                                <label flex style="text-align: right;">Always ask me</label>
+                            </gs-checkbox>
+                        </div>
+                    </gs-block>
 
-                                <td>
-                                    <gs-select id="shortcutMetaKeyExplain" mini>
-                                        <option value="Command">Command/Windows Key</option>
-                                        <option value="Control">Control</option>
-                                        <option value="Option">Option/Alt</option>
-                                        <option value="Shift">Shift</option>
-                                        <option value="None">None</option>
-                                    </gs-select>
-                                </td>
-                                <td><gs-text id="ShortcutKeyExplain" mini></gs-text></td>
-                                <td><gs-static value="Explain"></gs-static></td>
-                            </tr>
-                            <tr>
+                    <gs-block>
+                        <h3>Page Zoom Levels</h3>
+                        <div style="width: 35em">
+                            <!--<div id="options-container" style="position: relative; min-height: 10em;">-->
+                            <div id="options-container">
+                                <table class="simple-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Page</th>
+                                            <th style="width: 10em;">Setting Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {{ZOOM}}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </gs-block>
 
-                                <td>
-                                    <gs-select id="shortcutMetaKeyExplainAnalyze" mini>
-                                        <option value="Command">Command/Windows Key</option>
-                                        <option value="Control">Control</option>
-                                        <option value="Option">Option/Alt</option>
-                                        <option value="Shift">Shift</option>
-                                        <option value="None">None</option>
-                                    </gs-select>
-                                </td>
-                                <td><gs-text id="ShortcutKeyExplainAnalyze" mini></gs-text></td>
-                                <td><gs-static value="Explain Analyze"></gs-static></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <gs-select id="shortcutMetaKeyHome" mini>
-                                        <option value="Command">Command/Windows Key</option>
-                                        <option value="Control">Control</option>
-                                        <option value="Option">Option/Alt</option>
-                                        <option value="Shift">Shift</option>
-                                        <option value="None">None</option>
-                                    </gs-select>
-                                </td>
-                                <td><gs-text id="ShortcutKeyHome" mini></gs-text></td>
-                                <td><gs-static value="Home"></gs-static></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                    <gs-block>
+                        <h3 style="float: left;" id="KeyboardShortCuts">Keyboard Shortcuts</h3>
+                        <div id="shortcuts-options-container">
+                            <table class="simple-table">
+                                <thead>
+                                    <tr>
+                                        <th style="padding: 0.75em;">Meta Key&nbsp;&nbsp;<gs-button id="metaKeyReset" inline>Reset</gs-button></th>
+                                        <th style="padding: 0.75em;">Key&nbsp;&nbsp;<gs-button id="keyReset" inline>Reset</gs-button></th>
+                                        <th style="padding: 0.75em;">Function</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+
+                                        <td>
+                                            <gs-select id="shortcutMetaKeyNewTab" mini>
+                                                <option value="Command">Command/Windows Key</option>
+                                                <option value="Control">Control</option>
+                                                <option value="Option">Option/Alt</option>
+                                                <option value="Shift">Shift</option>
+                                                <option value="None">None</option>
+                                            </gs-select>
+                                        </td>
+                                        <td><gs-text id="ShortcutKeyNewTab" mini></gs-text></td>
+                                        <td><gs-static value="New Tab"></gs-static></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <gs-select id="shortcutMetaKeySaveTab" mini>
+                                                <option value="Command">Command/Windows Key</option>
+                                                <option value="Control">Control</option>
+                                                <option value="Option">Option/Alt</option>
+                                                <option value="Shift">Shift</option>
+                                                <option value="None">None</option>
+                                            </gs-select>
+                                        </td>
+                                        <td><gs-text id="ShortcutKeySaveTab" mini></gs-text></td>
+                                        <td><gs-static value="Save Tab"></gs-static></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <gs-select id="shortcutMetaKeyRunQuery" mini>
+                                                <option value="Command">Command/Windows Key</option>
+                                                <option value="Control">Control</option>
+                                                <option value="Option">Option/Alt</option>
+                                                <option value="Shift">Shift</option>
+                                                <option value="None">None</option>
+                                            </gs-select>
+                                        </td>
+                                        <td><gs-text id="ShortcutKeyRunQuery" mini></gs-text></td>
+                                        <td><gs-static value="Run Query"></gs-static></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <gs-select id="shortcutMetaKeyRunCursorQuery" mini>
+                                                <option value="Command">Command/Windows Key</option>
+                                                <option value="Control">Control</option>
+                                                <option value="Option">Option/Alt</option>
+                                                <option value="Shift">Shift</option>
+                                                <option value="None">None</option>
+                                            </gs-select>
+                                        </td>
+                                        <td><gs-text id="ShortcutKeyRunCursorQuery" mini></gs-text></td>
+                                        <td><gs-static value="Run Query Under Cursor"></gs-static></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <gs-select id="shortcutMetaKeyFindDocumentation" mini>
+                                                <option value="Command">Command/Windows Key</option>
+                                                <option value="Control">Control</option>
+                                                <option value="Option">Option/Alt</option>
+                                                <option value="Shift">Shift</option>
+                                                <option value="None">None</option>
+                                            </gs-select>
+                                        </td>
+                                        <td><gs-text id="ShortcutKeyFindDocumentation" mini></gs-text></td>
+                                        <td><gs-static value="Find Documentation"></gs-static></td>
+                                    </tr>
+                                    <tr>
+
+                                        <td>
+                                            <gs-select id="shortcutMetaKeyExplain" mini>
+                                                <option value="Command">Command/Windows Key</option>
+                                                <option value="Control">Control</option>
+                                                <option value="Option">Option/Alt</option>
+                                                <option value="Shift">Shift</option>
+                                                <option value="None">None</option>
+                                            </gs-select>
+                                        </td>
+                                        <td><gs-text id="ShortcutKeyExplain" mini></gs-text></td>
+                                        <td><gs-static value="Explain"></gs-static></td>
+                                    </tr>
+                                    <tr>
+
+                                        <td>
+                                            <gs-select id="shortcutMetaKeyExplainAnalyze" mini>
+                                                <option value="Command">Command/Windows Key</option>
+                                                <option value="Control">Control</option>
+                                                <option value="Option">Option/Alt</option>
+                                                <option value="Shift">Shift</option>
+                                                <option value="None">None</option>
+                                            </gs-select>
+                                        </td>
+                                        <td><gs-text id="ShortcutKeyExplainAnalyze" mini></gs-text></td>
+                                        <td><gs-static value="Explain Analyze"></gs-static></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <gs-select id="shortcutMetaKeyHome" mini>
+                                                <option value="Command">Command/Windows Key</option>
+                                                <option value="Control">Control</option>
+                                                <option value="Option">Option/Alt</option>
+                                                <option value="Shift">Shift</option>
+                                                <option value="None">None</option>
+                                            </gs-select>
+                                        </td>
+                                        <td><gs-text id="ShortcutKeyHome" mini></gs-text></td>
+                                        <td><gs-static value="Home"></gs-static></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </gs-block>
+                </gs-grid>
 
                 <h3>Custom CSS Stylesheet</h3>
                 <div id="customCSSAce"></div>
@@ -1103,7 +1102,7 @@ function dialogOptions() {
         </gs-page>
     */})
         .replace('{{ZOOM}}', strZoom)
-        .replace(/\{\{RETURN\}\}/gi, '\n')
+        .replace(/\{\{UNIX_RETURN\}\}/gi, '\n')
         .replace(/\{\{TAB\}\}/gi, '\t');
 
     GS.openDialog(templateElement, function () {
@@ -1409,7 +1408,7 @@ function dialogOptions() {
         refreshCustomCSS(customCSSText);
         refreshShortcutKeys(ShortcutKeysText);
         var currentTab = document.getElementsByClassName('current-tab')[0];
-		if (currentTab) {
+		if (currentTab.relatedEditor) {
             currentTab.relatedEditor.focus();
         }
     });
@@ -2499,7 +2498,7 @@ function getClipSetting(propertyName) {
         "quoteChar":      (savedSettings.quoteChar || "'"),
         "escapeChar":      (savedSettings.escapeChar || "\\"),
         "fieldDelimiter": (savedSettings.fieldDelimiter || "\t"),
-        "recordDelimiter":    (savedSettings.rowNumbers || "\n"),
+        "recordDelimiter":    (savedSettings.recordDelimiter || "\n"),
         "nullValues":     (savedSettings.nullValues || "NULL"),
         "columnNames":    (savedSettings.columnNames || "never"),
         "rowNumbers":    (savedSettings.rowNumbers || "never"),
@@ -2570,120 +2569,110 @@ function beforeTableCopyFunction(event) {
         event.preventDefault();
 
         template = document.createElement('template');
+        template.setAttribute('data-max-width', '24em');
         template.innerHTML = ml(function () {/*
-            <gs-page class="gs-table-contextmenu">
-                <gs-body class="gs-table-contextmenu" padded>
-                    <div class="context-menu-header">Paste Format:</div>
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td>Headers?</td>
-                                <td>
-                                    <gs-select class="pref-copy-headers" mini>
-                                        <option value="never">No</option>
-                                        <option value="always">Yes</option>
-                                    </gs-select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Row Numbers?</td>
-                                <td>
-                                    <gs-select class="pref-copy-selectors" mini>
-                                        <option value="never">No</option>
-                                        <option value="always">Yes</option>
-                                    </gs-select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Quote Character:</td>
-                                <td>
-                                    <gs-select class="pref-quote-char" mini>
-                                        <option value="\">Backslash (\)</option>
-                                        <option value="/">Forward Slash (/)</option>
-                                        <option value="|">Pipe (|)</option>
-                                        <option value="&quot;">Double Quote (&quot;)</option>
-                                        <option value="'">Single Quote (')</option>
-                                    </gs-select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Escape Character:</td>
-                                <td>
-                                    <gs-select class="pref-escape-char" mini>
-                                        <option value="\">Backslash (\)</option>
-                                        <option value="/">Forward Slash (/)</option>
-                                        <option value="|">Pipe (|)</option>
-                                        <option value="&quot;">Double Quote (&quot;)</option>
-                                        <option value="'">Single Quote (')</option>
-                                    </gs-select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Quote?</td>
-                                <td>
-                                    <gs-select class="pref-copy-quote" mini>
-                                        <option value="always">Always</option>
-                                        <option value="never">Never</option>
-                                        <option value="strings">Only on strings</option>
-                                        <option value="delimiter-in-content">
-                                            Cell contains separator
-                                        </option>
-                                    </gs-select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Record Separator:</td>
-                                <td>
-                                    <gs-select class="pref-delimiter-record" mini>
-                                        <option value="{{RETURN}}">Newline</option>
-                                        <option value="|">Vertical Bar (|)</option>
-                                        <option value=",">Comma (,)</option>
-                                        <option value="{{TAB}}">Tab</option>
-                                    </gs-select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Cell Separator:</td>
-                                <td>
-                                    <gs-select class="pref-delimiter-cell" mini>
-                                        <option value="{{RETURN}}">Newline</option>
-                                        <option value="|">Vertical Bar (|)</option>
-                                        <option value=",">Comma (,)</option>
-                                        <option value="{{TAB}}">Tab</option>
-                                    </gs-select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Empty values:</td>
-                                <td>
-                                    <gs-select class="pref-null-value" mini>
-                                        <option value="">(nothing)</option>
-                                        <option value="NULL">"NULL"</option>
-                                        <option value="null">"null"</option>
-                                        <option value="EMPTY">"EMPTY"</option>
-                                        <option value="empty">"empty"</option>
-                                        <option value="Nothing">"Nothing"</option>
-                                    </gs-select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Copy types:</td>
-                                <td>
-                                    <gs-select class="pref-copy-types" mini>
-                                        <option value="text">Text</option>
-                                        <option value="html">HTML</option>
-                                        <option value="text,html">Both</option>
-                                    </gs-select>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <hr />
+            <gs-page class="clip-options">
+                <gs-header>
+                    <center><h3>Paste Format</div></center>
+                </gs-header>
+                <gs-body padded>
+                    <gs-checkbox flex-horizontal value="true" class="pref-copy-headers">
+                        <label flex style="text-align: right;">Copy Headers</label>
+                    </gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" class="pref-copy-selectors">
+                        <label flex style="text-align: right;">Copy Row Numbers</label>
+                    </gs-checkbox>
+                    <div flex-horizontal flex-fill class="option-row">
+                        <div flex>
+                            <gs-select class="pref-quote-char" mini>
+                                <option value="\">Backslash (\)</option>
+                                <option value="/">Forward Slash (/)</option>
+                                <option value="|">Pipe (|)</option>
+                                <option value="&quot;">Double Quote (&quot;)</option>
+                                <option value="'">Single Quote (')</option>
+                            </gs-select>
+                        </div>
+                        <div style="width: 16em;">Quote Character</div>
+                    </div>
+                    <div flex-horizontal flex-fill class="option-row">
+                        <div flex>
+                            <gs-select class="pref-escape-char" mini>
+                                <option value="\">Backslash (\)</option>
+                                <option value="/">Forward Slash (/)</option>
+                                <option value="|">Pipe (|)</option>
+                                <option value="&quot;">Double Quote (&quot;)</option>
+                                <option value="'">Single Quote (')</option>
+                            </gs-select>
+                        </div>
+                        <div style="width: 16em;">Escape Character</div>
+                    </div>
+                    <div flex-horizontal flex-fill class="option-row">
+                        <div flex>
+                            <gs-select class="pref-copy-quote" mini>
+                                <option value="always">Always</option>
+                                <option value="never">Never</option>
+                                <option value="strings">Only on strings</option>
+                                <option value="delimiter-in-content">
+                                    Cell contains separator
+                                </option>
+                            </gs-select>
+                        </div>
+                        <div style="width: 16em;">Quote</div>
+                    </div>
+                    <div flex-horizontal flex-fill class="option-row">
+                        <div flex>
+                            <gs-select class="pref-delimiter-record" mini>
+                                <option value="{{DOS_RETURN}}">DOS (\r\n)</option>
+                                <option value="{{MAC_RETURN}}">Mac (\r)</option>
+                                <option value="{{UNIX_RETURN}}">UNIX (\n)</option>
+                                <option value="|">Vertical Bar (|)</option>
+                                <option value=",">Comma (,)</option>
+                                <option value="{{TAB}}">Tab</option>
+                            </gs-select>
+                        </div>
+                        <div style="width: 16em;">Record Separator</div>
+                    </div>
+                    <div flex-horizontal flex-fill class="option-row">
+                        <div flex>
+                            <gs-select class="pref-delimiter-cell" mini>
+                                <option value="{{DOS_RETURN}}">DOS (\r\n)</option>
+                                <option value="{{MAC_RETURN}}">Mac (\r)</option>
+                                <option value="{{UNIX_RETURN}}">UNIX (\n)</option>
+                                <option value="|">Vertical Bar (|)</option>
+                                <option value=",">Comma (,)</option>
+                                <option value="{{TAB}}">Tab</option>
+                            </gs-select>
+                        </div>
+                        <div style="width: 16em;">Cell Separator</div>
+                    </div>
+                    <div flex-horizontal flex-fill class="option-row">
+                        <div flex>
+                            <gs-select class="pref-null-value" mini>
+                                <option value="">(nothing)</option>
+                                <option value="NULL">"NULL"</option>
+                                <option value="null">"null"</option>
+                                <option value="EMPTY">"EMPTY"</option>
+                                <option value="empty">"empty"</option>
+                                <option value="Nothing">"Nothing"</option>
+                            </gs-select>
+                        </div>
+                        <div style="width: 16em;">Empty values</div>
+                    </div>
+                    <div flex-horizontal flex-fill class="option-row">
+                        <div flex>
+                            <gs-select class="pref-copy-types" mini>
+                                <option value="text">Text</option>
+                                <option value="html">HTML</option>
+                                <option value="text,html">Both</option>
+                            </gs-select>
+                        </div>
+                        <div style="width: 16em;">Copy types</div>
+                    </div>
                     <gs-checkbox flex-horizontal value="true" class="pref-save">
-                        <label flex>Remember settings</label>
+                        <label flex style="text-align: right;">Remember settings</label>
                     </gs-checkbox>
                     <gs-checkbox flex-horizontal value="true" class="pref-ask">
-                        <label flex>Always ask me</label>
+                        <label flex style="text-align: right;">Always ask me</label>
                     </gs-checkbox>
                     <hr />
                     <gs-grid gutter>
@@ -2697,7 +2686,7 @@ function beforeTableCopyFunction(event) {
                 </gs-body>
             </gs-page>
         */})
-            .replace(/\{\{RETURN\}\}/gi, '\n')
+            .replace(/\{\{UNIX_RETURN\}\}/gi, '\n')
             .replace(/\{\{TAB\}\}/gi, '\t');
         var copyHeadersControl;
         var copySelectorsControl;
@@ -2734,8 +2723,8 @@ function beforeTableCopyFunction(event) {
             saveControl = xtag.query(dialog, '.pref-save')[0];
             askControl = xtag.query(dialog, '.pref-ask')[0];
 
-            copyHeadersControl.value = jsnCopy.headerMode;
-            copySelectorsControl.value = jsnCopy.selectorMode;
+            copyHeadersControl.value = jsnCopy.headerMode !== 'never';
+            copySelectorsControl.value = jsnCopy.selectorMode !== 'never';
             copyQuoteCharControl.value = jsnCopy.quoteChar;
             copyEscapeCharControl.value = jsnCopy.escapeChar;
             copyQuoteWhenControl.value = jsnCopy.quoteMode;
@@ -2800,8 +2789,8 @@ function beforeTableCopyFunction(event) {
                     setClipSetting('fieldDelimiter', copyCellDelimiterControl.value);
                     setClipSetting('recordDelimiter', copyRecordDelimiterControl.value);
                     setClipSetting('nullValues', copyNullControl.value);
-                    setClipSetting('columnNames', copyHeadersControl.value);
-                    setClipSetting('rowNumbers', copySelectorsControl.value);
+                    setClipSetting('columnNames', copyHeadersControl.value === 'true' ? 'always' : 'never');
+                    setClipSetting('rowNumbers', copySelectorsControl.value === 'true' ? 'always' : 'never');
                     setClipSetting('copyTypes', copyTypesControl.value);
                 }
 

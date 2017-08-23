@@ -39480,48 +39480,54 @@ if (typeof HTMLTemplateElement === 'undefined') {
           //      the attribute (and default to empty string) else default to
           //      parameter default
           if (element.getAttribute('copy-header')) {
-              headerMode = element.getAttribute('copy-header') || '';
+              headerMode = element.getAttribute('copy-header');
           } else {
-              headerMode = 'selected';
+              headerMode = 'never';
           }
           if (element.getAttribute('copy-selectors')) {
-              selectorMode = element.getAttribute('copy-selectors') || '';
+              selectorMode = element.getAttribute('copy-selectors');
           } else {
-              selectorMode = 'selected';
+              selectorMode = 'never';
           }
           if (element.getAttribute('copy-quote-char')) {
-              quoteChar = element.getAttribute('copy-quote-char') || '';
+              quoteChar = element.getAttribute('copy-quote-char');
           } else {
               quoteChar = '"';
           }
           if (element.getAttribute('copy-escape-char')) {
-              escapeChar = element.getAttribute('copy-escape-char') || '';
+              escapeChar = element.getAttribute('copy-escape-char');
           } else {
               escapeChar = quoteChar;
           }
           if (element.getAttribute('copy-quote-when')) {
-              quoteMode = element.getAttribute('copy-quote-when') || '';
+              quoteMode = element.getAttribute('copy-quote-when');
           } else {
               quoteMode = 'delimiter-in-content';
           }
           if (element.getAttribute('copy-delimiter-record')) {
               recordDelimiter =
-                      element.getAttribute('copy-delimiter-record') || '';
+                      element.getAttribute('copy-delimiter-record')
+                  .replace(/\{\{DOS_RETURN\}\}/gi, '\r\n')
+                  .replace(/\{\{MAC_RETURN\}\}/gi, '\r')
+                  .replace(/\{\{UNIX_RETURN\}\}/gi, '\n');
           } else {
               recordDelimiter = '\n';
           }
           if (element.getAttribute('copy-delimiter-cell')) {
-              cellDelimiter = element.getAttribute('copy-delimiter-cell') || '';
+              cellDelimiter = element.getAttribute('copy-delimiter-cell')
+                  .replace(/\{\{DOS_RETURN\}\}/gi, '\r\n')
+                  .replace(/\{\{MAC_RETURN\}\}/gi, '\r')
+                  .replace(/\{\{UNIX_RETURN\}\}/gi, '\n');
           } else {
               cellDelimiter = '\t';
           }
           if (element.getAttribute('copy-null-cell')) {
-              nullString = element.getAttribute('copy-null-cell') || '';
+              nullString = element.getAttribute('copy-null-cell');
           } else {
               nullString = '';
           }
           if (element.getAttribute('copy-types')) {
-              copyTypes = element.getAttribute('copy-types') || 'text,html';
+              copyTypes = element.getAttribute('copy-types');
           } else {
               copyTypes = 'text,html';
           }
@@ -49351,9 +49357,7 @@ if (typeof HTMLTemplateElement === 'undefined') {
       </gs-body>
   </gs-page>
               */
-          })
-              .replace(/\{\{RETURN\}\}/gi, '\n')
-              .replace(/\{\{TAB\}\}/gi, '\t');
+          });
   
           // the control elements are found in the "after open" callback.
           //      the reason these variables are defined here is so that
@@ -49523,7 +49527,9 @@ if (typeof HTMLTemplateElement === 'undefined') {
       <td>Record Separator:</td>
       <td>
           <gs-select class="pref-delimiter-record" mini>
-              <option value="{{RETURN}}">Newline</option>
+              <option value="{{DOS_RETURN}}">DOS (\r\n)</option>
+              <option value="{{MAC_RETURN}}">Mac (\r)</option>
+              <option value="{{UNIX_RETURN}}">UNIX (\n)</option>
               <option value="|">Vertical Bar (|)</option>
               <option value=",">Comma (,)</option>
               <option value="{{TAB}}">Tab</option>
@@ -49534,7 +49540,9 @@ if (typeof HTMLTemplateElement === 'undefined') {
       <td>Cell Separator:</td>
       <td>
           <gs-select class="pref-delimiter-cell" mini>
-              <option value="{{RETURN}}">Newline</option>
+              <option value="{{DOS_RETURN}}">DOS (\r\n)</option>
+              <option value="{{MAC_RETURN}}">Mac (\r)</option>
+              <option value="{{UNIX_RETURN}}">UNIX (\n)</option>
               <option value="|">Vertical Bar (|)</option>
               <option value=",">Comma (,)</option>
               <option value="{{TAB}}">Tab</option>
@@ -49579,7 +49587,6 @@ if (typeof HTMLTemplateElement === 'undefined') {
   </gs-page>
               */
           })
-              .replace(/\{\{RETURN\}\}/gi, '\n')
               .replace(/\{\{TAB\}\}/gi, '\t');
   
           // the control elements are found in the "after open" callback.
