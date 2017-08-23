@@ -3572,12 +3572,16 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         if (element.getAttribute('copy-delimiter-record')) {
             recordDelimiter =
-                    element.getAttribute('copy-delimiter-record');
+                    element.getAttribute('copy-delimiter-record')
+                .replace(/\{\{DOS_RETURN\}\}/gi, '\r\n')
+                .replace(/\{\{MAC_RETURN\}\}/gi, '\r');
         } else {
             recordDelimiter = '\n';
         }
         if (element.getAttribute('copy-delimiter-cell')) {
-            cellDelimiter = element.getAttribute('copy-delimiter-cell');
+            cellDelimiter = element.getAttribute('copy-delimiter-cell')
+                .replace(/\{\{DOS_RETURN\}\}/gi, '\r\n')
+                .replace(/\{\{MAC_RETURN\}\}/gi, '\r');
         } else {
             cellDelimiter = '\t';
         }
@@ -13417,9 +13421,7 @@ document.addEventListener('DOMContentLoaded', function () {
     </gs-body>
 </gs-page>
             */
-        })
-            .replace(/\{\{RETURN\}\}/gi, '\n')
-            .replace(/\{\{TAB\}\}/gi, '\t');
+        });
 
         // the control elements are found in the "after open" callback.
         //      the reason these variables are defined here is so that
@@ -13589,7 +13591,9 @@ document.addEventListener('DOMContentLoaded', function () {
     <td>Record Separator:</td>
     <td>
         <gs-select class="pref-delimiter-record" mini>
-            <option value="{{RETURN}}">Newline</option>
+            <option value="{{DOS_RETURN}}">DOS (\r\n)</option>
+            <option value="{{MAC_RETURN}}">Mac (\r)</option>
+            <option value="{{UNIX_RETURN}}">UNIX (\n)</option>
             <option value="|">Vertical Bar (|)</option>
             <option value=",">Comma (,)</option>
             <option value="{{TAB}}">Tab</option>
@@ -13600,7 +13604,9 @@ document.addEventListener('DOMContentLoaded', function () {
     <td>Cell Separator:</td>
     <td>
         <gs-select class="pref-delimiter-cell" mini>
-            <option value="{{RETURN}}">Newline</option>
+            <option value="{{DOS_RETURN}}">DOS (\r\n)</option>
+            <option value="{{MAC_RETURN}}">Mac (\r)</option>
+            <option value="{{UNIX_RETURN}}">UNIX (\n)</option>
             <option value="|">Vertical Bar (|)</option>
             <option value=",">Comma (,)</option>
             <option value="{{TAB}}">Tab</option>
@@ -13645,7 +13651,7 @@ document.addEventListener('DOMContentLoaded', function () {
 </gs-page>
             */
         })
-            .replace(/\{\{RETURN\}\}/gi, '\n')
+            .replace(/\{\{UNIX_RETURN\}\}/gi, '\n')
             .replace(/\{\{TAB\}\}/gi, '\t');
 
         // the control elements are found in the "after open" callback.
