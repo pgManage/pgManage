@@ -2688,7 +2688,7 @@ function SQLBeautify(strInput) {
         } else if (int_qs === 0 && strInput.substr(i, 7).match(/^GRANT\b|REVOKE\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
             bolGrant = true;
             if (int_ps > 0) {
-                strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i, 7).match(/^GRANT|REVOKE\b/i) + ' ';
+                strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i, 7).match(/^GRANT\b|REVOKE\b/i) + ' ';
             } else {
                 strResult += /*'\n' + */strInput.substr(i, 7).match(/^GRANT\b|REVOKE\b/i) + ' ';
             }
@@ -2706,6 +2706,7 @@ function SQLBeautify(strInput) {
                 bolNoExtraWhitespace = true;
             } else {
                 strResult += ',' + '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel) + 1);
+                bolNoExtraWhitespace = true;
             }
             //console.log(">,|" + intTabLevel + "<");
 
@@ -2988,6 +2989,7 @@ function SQLBeautify(strInput) {
                 bolNoExtraWhitespace = true;
             } else {
                 strResult += ',' + '\n' + '\t'.repeat((intTabLevel < 0) ? 0 : intTabLevel);
+                bolNoExtraWhitespace = true;
             }
             //console.log(">,|" + intTabLevel + "<");
 
@@ -3005,14 +3007,14 @@ function SQLBeautify(strInput) {
             // Remove whitespace
             strResult = strResult.trim();
 
-            strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i,3).match(/^TO[\n\r\ \t]+|DO[\n\r\ \t]+|ON[\n\r\ \t]+/i) + ' ';
+            strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i,3).match(/^TO|DO|ON/i) + ' ';
             i += (strInput.substr(i,3).match(/^TO[\n\r\ \t]+|DO[\n\r\ \t]+|ON[\n\r\ \t]+/i)[0].length - 1);
             bolNoExtraWhitespace = true;
             //console.log(">TO/DO/ON|" + intTabLevel + "<");
 
         // FOUND CREATE OR REPLACE RULE... INSTEAD
         } else if (int_qs === 0 && bolRule && strInput.substr(i,8).match(/^INSTEAD[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
-            strResult += strInput.substr(i,8).match(/^INSTEAD[\n\r\ \t]+/i) + '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel));
+            strResult += strInput.substr(i,8).match(/^INSTEAD/i) + '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel));
             i += (strInput.substr(i,8).match(/^INSTEAD[\n\r\ \t]+/i)[0].length - 1);
             bolNoExtraWhitespace = true;
             //console.log(">INSTEAD|" + intTabLevel + "<");
@@ -3065,7 +3067,7 @@ function SQLBeautify(strInput) {
                 strResult = strResult.substr(0, strResult.length - 1);
             }
 
-            strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i).match(/^ON[\n\r\ \t]+/i)[0] + ' ';
+            strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i).match(/^ON/i)[0] + ' ';
             i += (strInput.substr(i).match(/^ON[\n\r\ \t]+/i)[0].length - 1);
             bolNoExtraWhitespace = true;
 
@@ -3077,7 +3079,7 @@ function SQLBeautify(strInput) {
                 strResult = strResult.substr(0, strResult.length - 1);
             }
 
-            strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i).match(/^INSTEAD[\n\r\ \t]+/i)[0] + ' ';
+            strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i).match(/^INSTEAD/i)[0] + ' ';
             i += (strInput.substr(i).match(/^INSTEAD[\n\r\ \t]+/i)[0].length - 1);
             bolNoExtraWhitespace = true;
 
@@ -3089,7 +3091,7 @@ function SQLBeautify(strInput) {
                 strResult = strResult.substr(0, strResult.length - 1);
             }
 
-            strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i).match(/^EXECUTE[\n\r\ \t]+/i)[0] + ' ';
+            strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i).match(/^EXECUTE/i)[0] + ' ';
             i += (strInput.substr(i).match(/^EXECUTE[\n\r\ \t]+/i)[0].length - 1);
             bolNoExtraWhitespace = true;
 
@@ -3101,7 +3103,7 @@ function SQLBeautify(strInput) {
                 strResult = strResult.substr(0, strResult.length - 1);
             }
 
-            strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i).match(/^FOR[\n\r\ \t]+/i)[0] + ' ';
+            strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i).match(/^FOR/i)[0] + ' ';
             i += (strInput.substr(i).match(/^FOR[\n\r\ \t]+/i)[0].length - 1);
             bolNoExtraWhitespace = true;
 

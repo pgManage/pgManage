@@ -3110,8 +3110,51 @@ function executeScript(bolCursorQuery) {
                         executeHelperStartLoading();
                     }
 
-                    //console.log(data.strQuery);
-                    if (data.strQuery.toLowerCase().indexOf('drop ') !== -1) {
+
+                    if (data.strQuery.toLowerCase().indexOf('alter table') !== -1 && data.strQuery.toLowerCase().indexOf('rename to') !== -1) {
+                        var strObjName, trimmedQuery, oidQuery, schemaOID, strSchemaName, strNewName;
+                        trimmedQuery = data.strQuery.substring(parseInt(data.strQuery.toLowerCase().indexOf('alter table '), 10) + 12, data.strQuery.length);
+                        strNewName = trimmedQuery.substring(parseInt(trimmedQuery.toLowerCase().indexOf('rename to '), 10) + 10, trimmedQuery.length - 1);
+                        trimmedQuery = trimmedQuery.substring(0, parseInt(trimmedQuery.toLowerCase().indexOf('rename to '), 10)).trim();
+                        //console.log(data.strQuery);
+                        //console.log(trimmedQuery);
+                        //console.log(strNewName);
+                        if (trimmedQuery.indexOf(' ') !== -1) {
+                            trimmedQuery = trimmedQuery.substring(0, trimmedQuery.toLowerCase().indexOf(' '));
+                        }
+
+                        if (trimmedQuery.indexOf(';') !== -1) {
+                            trimmedQuery = trimmedQuery.substring(0, trimmedQuery.toLowerCase().indexOf(';'));
+                        }
+                        strObjName = trimmedQuery;
+
+                        strSchemaName = strObjName.substring(0, strObjName.indexOf('.'));
+                        var schemaoidQuery = ml(function () {/*
+                        SELECT oid
+                            FROM pg_namespace
+                            WHERE nspname = '{{NAMETOKEN}}'
+                            ORDER BY nspname;
+                        */}).replace(/\{\{NAMETOKEN\}\}/g, strSchemaName);
+                        getSingleCellData(schemaoidQuery, function (newSchemaOID) {
+                            schemaOID = newSchemaOID;
+                            strObjName = strObjName.substring(parseInt(strObjName.indexOf('.'), 10) + 1, strObjName.length)
+                            oidQuery = ml(function () {/*
+                            SELECT oid
+                                FROM pg_class
+                                WHERE relnamespace = '{{SCHEMAOID}}' AND relname = '{{NAMETOKEN}}'
+                            */}).replace(/\{\{NAMETOKEN\}\}/g, strObjName).replace(/\{\{SCHEMAOID\}\}/g, schemaOID);
+
+                            //console.log(oidQuery);
+                            getSingleCellData(oidQuery, function (newOID) {
+                                for (i = 0, len = treeGlobals.data.length; i < len; i++) {
+                                    if (treeGlobals.data[i].name.toLowerCase() === strObjName.toLowerCase() && treeGlobals.data[i].schemaName === strSchemaName) {
+                                        treeGlobals.data[i].oid = newOID;
+                                    }
+                                }
+                            });
+
+                        });
+                    } else if (data.strQuery.toLowerCase().indexOf('drop ') !== -1) {
                         var strObjName, trimmedQuery, oidQuery, schemaOID, strSchemaName;
                         trimmedQuery = data.strQuery.substring(parseInt(data.strQuery.toLowerCase().indexOf('drop '), 10) + 5, data.strQuery.length);
                         trimmedQuery = trimmedQuery.substring(parseInt(trimmedQuery.toLowerCase().indexOf(' '), 10) + 1, trimmedQuery.length);
