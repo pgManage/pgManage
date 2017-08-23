@@ -26,26 +26,26 @@
             var bolCurl = false;
             var strTableName, strSchemaName, strHasOids, strConstraints, arrConstraint, strGrantsEtc, arrColumn = [], strRelOptions, dependency_script, strOwner, arrConstraint = [];
             var strDumpQuery = ''
-            scriptQuery.ruleSql = ml(function () {/*
-                   SELECT   E'-- DROP RULE ' || quote_ident(pg_rewrite.rulename) || ' ON ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || E';\n' ||
-                            E'\nCREATE OR REPLACE ' || substring(pg_get_ruledef(pg_rewrite.oid, true), 8) ||
-                            E'\n\n'
-                     FROM pg_class
-                LEFT JOIN pg_rewrite ON pg_class.oid = pg_rewrite.ev_class
-                LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
-                    WHERE pg_rewrite.oid = {{INTOID}};
-                * /});
+            // scriptQuery.ruleSql = ml(function () {/*
+            //       SELECT   E'-- DROP RULE ' || quote_ident(pg_rewrite.rulename) || ' ON ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || E';\n' ||
+            //                 E'\nCREATE OR REPLACE ' || substring(pg_get_ruledef(pg_rewrite.oid, true), 8) ||
+            //                 E'\n\n'
+            //          FROM pg_class
+            //     LEFT JOIN pg_rewrite ON pg_class.oid = pg_rewrite.ev_class
+            //     LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+            //         WHERE pg_rewrite.oid = {{INTOID}};
+            //     * /});
 
-            scriptQuery.triggerSql = ml(function () {/*
-                   SELECT   '-- Trigger: ' || quote_ident(pg_trigger.tgname) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname) || E';\n\n' ||
-                            '-- DROP TRIGGER ' || quote_ident(pg_trigger.tgname) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname) || E';\n\n' ||
-                            regexp_replace(regexp_replace(regexp_replace(regexp_replace(pg_get_triggerdef(pg_trigger.oid, true),
-                            ' BEFORE ', E'\n   BEFORE '), ' ON ', E'\n   ON '), ' FOR ', E'\n   FOR '), ' EXECUTE ', E'\n   EXECUTE ') || E';\n\n'
-                    FROM pg_class
-                    JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
-                    JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
-                   WHERE pg_trigger.oid = {{INTOID}};
-                */});
+            // scriptQuery.triggerSql = ml(function () {/*
+            //       SELECT   '-- Trigger: ' || quote_ident(pg_trigger.tgname) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname) || E';\n\n' ||
+            //                 '-- DROP TRIGGER ' || quote_ident(pg_trigger.tgname) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname) || E';\n\n' ||
+            //                 regexp_replace(regexp_replace(regexp_replace(regexp_replace(pg_get_triggerdef(pg_trigger.oid, true),
+            //                 ' BEFORE ', E'\n   BEFORE '), ' ON ', E'\n   ON '), ' FOR ', E'\n   FOR '), ' EXECUTE ', E'\n   EXECUTE ') || E';\n\n'
+            //         FROM pg_class
+            //         JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
+            //         JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+            //       WHERE pg_trigger.oid = {{INTOID}};
+            //     */});
 
             listQuery.tableData = ml(function(){/*
                      -- non-CHECK CONSTRAINTs
@@ -60,7 +60,13 @@
                        JOIN pg_class pg_class ON pg_class.oid = conrelid
                        JOIN pg_namespace nl ON nl.oid = relnamespace
             LEFT OUTER JOIN pg_description des ON des.objoid = pg_constraint.oid
-                      WHERE contype = 'c' AND pg_class.oid = {{INTOID}};
+                      WHERE contype = 'c' AND pg_class.oid = {{INTOID}} AND conname NOT IN
+                        (
+                            SELECT pg_constraint.conname
+                                FROM pg_class
+                                LEFT JOIN pg_constraint ON pg_constraint.conrelid = pg_class.oid
+                            WHERE pg_constraint.oid IS NOT NULL AND pg_class.oid = {{INTOID}}
+                        );;
 
                     SELECT COALESCE((SELECT E'\n\n' || (SELECT array_to_string(array_agg( 'GRANT ' ||
                         (SELECT array_to_string((SELECT array_agg(perms ORDER BY srt)
@@ -864,7 +870,7 @@
                 var strTableColumns = '', i = 0;
                 strConstraints = '';
                 strTableName = '';
-
+                //console.log(listQuery.tableData.replace(/\{\{INTOID\}\}/g, strOID));
                 GS.requestRawFromSocket(GS.envSocket, listQuery.tableData.replace(/\{\{INTOID\}\}/g, strOID), function (data) {
                     //console.log('1', i, data);
 
@@ -918,7 +924,7 @@
                                     //console.log(strSchemaName, strTableName, strHasOids, strRelOptions);
                                     var strColumns = '';
                                     GS.requestRawFromSocket(GS.envSocket, ml(function () {/*
-                                         SELECT attname, format_type(atttypid, atttypmod),
+                                         SELECT quote_ident(attname) AS attname, format_type(atttypid, atttypmod),
                                                 (CASE WHEN attnotnull THEN '-1' ELSE '0' END) AS col_not_null,
                                                 (CASE WHEN atthasdef THEN pg_catalog.pg_get_expr(adbin, adrelid) ELSE '' END) AS col_default,
                                                 (CASE WHEN attcollation <> 0 THEN pg_collation.collname ELSE '0' END) AS col_collation
@@ -928,7 +934,7 @@
                                           WHERE pg_attribute.attisdropped IS FALSE AND pg_attribute.attnum > 0 AND attrelid = {{INTOID}}
                                        ORDER BY attnum ASC*/}).replace(/\{\{INTOID\}\}/g, strOID), function (data) {
 
-                                        //console.log(data);
+
 
                                         if (data.intQueryNumber === 0 && data.strMessage !== '\\.') {
                                             //console.log(data);
@@ -942,6 +948,7 @@
                                                     WHERE pg_class.oid = {{INTOID}}
                                             */}).replace(/\{\{INTOID\}\}/g, strOID), function (owner) {
                                                 strOwner = owner;
+                                                //console.log(data.arrColumnName, strColumns);
                                                 initTableDesign(data.arrColumnNames, strColumns);
                                             });
                                         }
