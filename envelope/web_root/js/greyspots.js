@@ -39,8 +39,8 @@
     
     
     ######## BEFORE UPDATING X-TAGS: ######## ~michael and nunzio
-    nunzio: the below warning now seems to be outdated
     nunzio: you have to delete '"function"==typeof define&&define.amd?define(X):"undefined"!=typeof module&&module.exports?module.exports=X:' from xtags for electron
+    nunzio: the below warning now seems to be outdated
     make sure you include the polyfills and make sure that there isn't still a duplicated block of code in the source, if there is remove it, here is how to find out:
     
     do a find in textedit for: "scope.upgradeDocumentTree = nop;" (excluding the quotes of course)
@@ -38412,7 +38412,9 @@ document.addEventListener('DOMContentLoaded', function () {
         // we need a place to store event functions because, to unbind a
         //      specific event javascript requires that you have the
         //      original function that was bound to that event
-        element.internalEvents = {};
+        element.internalEvents = {
+            "forceCopy": false
+        };
 
         // some events are triggered by something that the gs-table does,
         //      so event code needs to have a place to look to see if
@@ -39478,48 +39480,48 @@ document.addEventListener('DOMContentLoaded', function () {
         //      the attribute (and default to empty string) else default to
         //      parameter default
         if (element.getAttribute('copy-header')) {
-            headerMode = element.getAttribute('copy-header') || '';
+            headerMode = element.getAttribute('copy-header');
         } else {
-            headerMode = 'selected';
+            headerMode = 'never';
         }
         if (element.getAttribute('copy-selectors')) {
-            selectorMode = element.getAttribute('copy-selectors') || '';
+            selectorMode = element.getAttribute('copy-selectors');
         } else {
-            selectorMode = 'selected';
+            selectorMode = 'never';
         }
         if (element.getAttribute('copy-quote-char')) {
-            quoteChar = element.getAttribute('copy-quote-char') || '';
+            quoteChar = element.getAttribute('copy-quote-char');
         } else {
             quoteChar = '"';
         }
         if (element.getAttribute('copy-escape-char')) {
-            escapeChar = element.getAttribute('copy-escape-char') || '';
+            escapeChar = element.getAttribute('copy-escape-char');
         } else {
             escapeChar = quoteChar;
         }
         if (element.getAttribute('copy-quote-when')) {
-            quoteMode = element.getAttribute('copy-quote-when') || '';
+            quoteMode = element.getAttribute('copy-quote-when');
         } else {
             quoteMode = 'delimiter-in-content';
         }
         if (element.getAttribute('copy-delimiter-record')) {
             recordDelimiter =
-                    element.getAttribute('copy-delimiter-record') || '';
+                    element.getAttribute('copy-delimiter-record');
         } else {
             recordDelimiter = '\n';
         }
         if (element.getAttribute('copy-delimiter-cell')) {
-            cellDelimiter = element.getAttribute('copy-delimiter-cell') || '';
+            cellDelimiter = element.getAttribute('copy-delimiter-cell');
         } else {
             cellDelimiter = '\t';
         }
         if (element.getAttribute('copy-null-cell')) {
-            nullString = element.getAttribute('copy-null-cell') || '';
+            nullString = element.getAttribute('copy-null-cell');
         } else {
             nullString = '';
         }
         if (element.getAttribute('copy-types')) {
-            copyTypes = element.getAttribute('copy-types') || 'text,html';
+            copyTypes = element.getAttribute('copy-types');
         } else {
             copyTypes = 'text,html';
         }
@@ -56986,7 +56988,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     // this is the fastest way to destroy all of the data
                     element.internalData = {};
                     element.internalScrollOffsets = {};
-                    element.internalEvents = { forceCopy: false };
+                    element.internalEvents = {};
                     element.internalEventCancelled = {};
                     element.internalScroll = {};
                     element.internalTimerIDs = {};
