@@ -259,8 +259,13 @@ window.addEventListener('load', function () {
     }
 
     // when the connection optionbox is changed: try to get a username from the cookie
-    document.getElementById('option-connection').addEventListener('change', function (event) {
+    /*document.getElementById('option-connection').addEventListener('change', function (event) {
         if (event.target.getAttribute('id') === 'option-connection') {
+            getUserName();
+        }
+    });*/
+    document.getElementById('option-connection').addEventListener('click', function (event) {
+        if (event.target.tagName.toLowerCase() === 'gs-option') {
             getUserName();
         }
     });

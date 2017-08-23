@@ -39,8 +39,8 @@
     
     
     ######## BEFORE UPDATING X-TAGS: ######## ~michael and nunzio
-    nunzio: the below warning now seems to be outdated
     nunzio: you have to delete '"function"==typeof define&&define.amd?define(X):"undefined"!=typeof module&&module.exports?module.exports=X:' from xtags for electron
+    nunzio: the below warning now seems to be outdated
     make sure you include the polyfills and make sure that there isn't still a duplicated block of code in the source, if there is remove it, here is how to find out:
     
     do a find in textedit for: "scope.upgradeDocumentTree = nop;" (excluding the quotes of course)
@@ -38412,7 +38412,9 @@ if (typeof HTMLTemplateElement === 'undefined') {
           // we need a place to store event functions because, to unbind a
           //      specific event javascript requires that you have the
           //      original function that was bound to that event
-          element.internalEvents = {};
+          element.internalEvents = {
+              "forceCopy": false
+          };
   
           // some events are triggered by something that the gs-table does,
           //      so event code needs to have a place to look to see if
@@ -56986,7 +56988,7 @@ if (typeof HTMLTemplateElement === 'undefined') {
                       // this is the fastest way to destroy all of the data
                       element.internalData = {};
                       element.internalScrollOffsets = {};
-                      element.internalEvents = { forceCopy: false };
+                      element.internalEvents = {};
                       element.internalEventCancelled = {};
                       element.internalScroll = {};
                       element.internalTimerIDs = {};
