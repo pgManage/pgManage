@@ -304,6 +304,9 @@ var $ = {
 					data = data.replace(/\\test/g, '/test');
 	                data = data.replace(/\/\//g, '\\\\');
 	                data = data.replace('CreateFile failed: 0x50 (The file exists.\r\n)', 'File already exists.');
+                    data = data.replace(/\.\.\/envelope\/app/gi, '/home/super/Repos/postage/envelope/app');
+                    data = data.replace(/\.\.\/envelope\/role/gi, '/home/super/Repos/postage/envelope/role');
+                    data = data.replace(/\.\.\/envelope\/web_root/gi, '/home/super/Repos/postage/envelope/web_root');
 				}
                 arrStrActualOutput.push(data.replace(/transactionid = .*\n/gim, ''));
                 i += 1;

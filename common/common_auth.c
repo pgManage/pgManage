@@ -1,3 +1,4 @@
+#define UTIL_DEBUG
 #include "common_auth.h"
 
 #ifdef ENVELOPE
@@ -195,6 +196,11 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 #endif
 
 	str_cookie_decrypted = aes_decrypt(str_cookie_encrypted, &int_cookie_len);
+	SFINISH_CHECK(str_cookie_decrypted != NULL, "aes_decrypt failed");
+
+#ifdef ENVELOPE
+	if (client->bol_public == false && int_cookie_len > 0) {
+#endif
 
 	// **** WARNING ****
 	// DO NOT UNCOMMENT THE NEXT LINE! THAT WILL PUT THE FULL COOKIE IN THE CLEAR
@@ -202,8 +208,10 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 	// SDEBUG("str_cookie_decrypted: >%s<", str_cookie_decrypted);
 	// **** WARNING ****
 
-	SFINISH_CHECK(str_cookie_decrypted != NULL, "aes_decrypt failed");
 	SFINISH_CHECK(strncmp(str_cookie_decrypted, "valid=true&", 11) == 0, "Session expired");
+#ifdef ENVELOPE
+	} //this closing brace connects to a bol_public check, which only exists in envelope
+#endif
 
 	////GET THINGS FOR CONNECTION STRING
 	str_username = getpar(str_cookie_decrypted, "username", int_cookie_len, &int_user_length);
