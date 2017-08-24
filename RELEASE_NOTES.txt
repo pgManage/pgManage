@@ -1,4 +1,4 @@
-Changes since 3.2.18:
+Changes since 3.2.17:
 Postage:
 - Fix `super_only` error to be more specific
 - Fix tab folder icon (closes workflowproducts/postage#351)
