@@ -28,6 +28,7 @@ sleep 5
 xdg-open "http://127.0.0.1:8080/postage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true" &
 printf "HTTP/1.1 200 OK\r\n\r\n\r\n" | ncat -l -p 45654
 kill $POSTAGEPID
+sleep 2
 
 rm -rf ~/.mozilla ~/.postage
 
@@ -38,6 +39,7 @@ sleep 5
 xdg-open "http://127.0.0.1:8080/postage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true" &
 printf "HTTP/1.1 200 OK\r\n\r\n\r\n" | ncat -l -p 45654
 kill $POSTAGEPID
+sleep 2
 
 sudo $MAKE uninstall
 
