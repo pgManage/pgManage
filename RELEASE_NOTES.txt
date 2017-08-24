@@ -1,38 +1,86 @@
-Changes since 3.2.16:
+Changes since 3.2.18:
 Postage:
-Make headers visible rather than seeing "####" (PR workflowproducts/postage#328)
-Fix running postage from a different disk drive (for workflowproducts/postage#339)
-Fix configure to accept --prefix, fix Makefile to create mandir (closes workflowproducts/postage#343)
-Disable context data in Postage (closes workflowproducts/postage#336)
-Fix line indicator when Postgres doesn't supply a line number with an error (closes workflowproducts/postage#329)
-Add autofit button (closes workflowproducts/postage#345)
-Fix file save/save as in postage (closes workflowproducts/postage#330)
-Fix raw not returning NULL properly (closes workflowproducts/postage#332)
-Changed transaction block errors to include a solution (closes workflowproducts/postage#349)
+- Fix `super_only` error to be more specific
+- Fix tab folder icon (closes workflowproducts/postage#351)
+- Don't require superuser by default (for workflowproducts/postage#353)
+- Disable timeout by default (for workflowproducts/postage#353)
+- Fixed page curls in postage frames (closes workflowproducts/postage#362)
+- Relabel ACE button to Help (closes workflowproducts/postage#359)
+- Fix table designer issues (closes workflowproducts/postage#364)
+- Add shortcuts to toolbar (closes workflowproducts/postage#358)
+- Fix CTRL-W closing application in electron (closes workflowproducts/postage#356)
+- Fix UNLOGGED, REAL and TEMP (closes workflowproducts/postage#370)
+- Add automatically resizing when you run one record returning query (closes workflowproducts/postage#369)
+- Prevent editor from losing focus (closes workflowproducts/postage#361)
+- Make NULL a placeholder text (closes workflowproducts/postage#368)
+- Fix justification of integers and number columns (closes workflowproducts/postage#31)
+- Add zoom-to-fit to explain graph (for workflowproducts/postage#363)
+- Add horizontal explain graph (for workflowproducts/postage#363)
+- Add EXPLAIN and EXPLAIN ANALYZE to history (closes workflowproducts/postage#360)
+- Add `hostaddr` warning to config editor (closes workflowproducts/postage#367)
+- Fix carriage returns (closes workflowproducts/postage#373)
+- Fix query detection in update rules (working on workflowproducts/postage#372)
+- Autocomplete 'SELECT schema.' now shows functions in that schema (closes workflowproducts/postage#374)
+- Fix multiple cursor query execute (closes workflowproducts/postage#375)
+- Usernames are now qouted (closes workflowproducts/postage#376)
+- Fix schema dump dropping sequences owned by a table (closes workflowproducts/postage#385)
+- Fix schema dump sequences owned by clause (closes workflowproducts/postage#382)
+- Fix schema dump OPERATOR drop statements (closes workflowproducts/postage#381)
+- Fix schema dump dropping indexes (closes workflowproducts/postage#379)
+- Fix schema dump triggers to come after the functions they call (closes workflowproducts/postage#378)
+- Make snippets popup when you complete the first word (closes workflowproducts/postage#377)
+- Fix E'\n's being converted to actual newlines (for workflowproducts/postage#380)
+- Add generation of md5sums for packages (closes workflowproducts/postage#383)
+- Fix beautify with multiple cursors (closes workflowproducts/postage#386)
+- Fixed beautify mangling query (closes workflowproducts/postage#388)
+- Make postage ask for copy options when you copy (closes workflowproducts/postage#390)
+- Fixed beautify extra space (closes workflowproducts/postage#392)
+- Fix clicking on current connection de-focusing password input (closes workflowproducts/postage#387)
+
+Envelope:
+- Fix auth check for `/env` to instead check for `/env/`
+- Make envelope behave when the nocookie user credentials don't work (closes workflowproducts/envelope#83)
 
 Both:
-Fix openssl on mac linking to static library (closes workflowproducts/postage#343)
-Fix UPDATE/DELETE hashes (closes workflowproducts/postage#347)
+- Fix gs-table copy/paste with \r\n
+- Add websocket close with reason when session expired and you try to connect
+- Fix insert and update for columns with backslashes
+
+Changes since 3.2.16:
+Postage:
+- Make headers visible rather than seeing "####" (PR workflowproducts/postage#328)
+- Fix running postage from a different disk drive (for workflowproducts/postage#339)
+- Fix configure to accept --prefix, fix Makefile to create mandir (closes workflowproducts/postage#343)
+- Disable context data in Postage (closes workflowproducts/postage#336)
+- Fix line indicator when Postgres doesn't supply a line number with an error (closes workflowproducts/postage#329)
+- Add autofit button (closes workflowproducts/postage#345)
+- Fix file save/save as in postage (closes workflowproducts/postage#330)
+- Fix raw not returning NULL properly (closes workflowproducts/postage#332)
+- Changed transaction block errors to include a solution (closes workflowproducts/postage#349)
+
+Both:
+- Fix openssl on mac linking to static library (closes workflowproducts/postage#343)
+- Fix UPDATE/DELETE hashes (closes workflowproducts/postage#347)
 
 
 Changes since 3.2.15:
 Postage:
-Rewrite generate script for table designer (closed workflowproducts/postage#307)
-Fix beautify not working on tables (closed workflowproducts/postage#318)
-Fix dollar tag syntax highlighting (closed workflowproducts/postage#274)
-Fix function utility comment script on table functions (closed workflowproducts/postage#319)
-Fix object browser losing track of replaced view (closed workflowproducts/postage#220)
-Fix object browser losing track of replaced schema (closed workflowproducts/postage#251)
-Fix column permissions in table script (closed workflowproducts/postage#316)
+- Rewrite generate script for table designer (closed workflowproducts/postage#307)
+- Fix beautify not working on tables (closed workflowproducts/postage#318)
+- Fix dollar tag syntax highlighting (closed workflowproducts/postage#274)
+- Fix function utility comment script on table functions (closed workflowproducts/postage#319)
+- Fix object browser losing track of replaced view (closed workflowproducts/postage#220)
+- Fix object browser losing track of replaced schema (closed workflowproducts/postage#251)
+- Fix column permissions in table script (closed workflowproducts/postage#316)
 
 Envelope:
-Fix GS-Time showing PM at wrong time (closed workflowproducts/envelope#68)
+- Fix GS-Time showing PM at wrong time (closed workflowproducts/envelope#68)
 
 Both:
-Fix datasheet inserting a record scrolls to the top (closed workflowproducts/postage#309)
-Fix datasheet column resizing behaviors (closed workflowproducts/envelope#70, workflowproducts/postage#315)
-Fix datasheet allows cursor while multiple columns are selected (closed workflowproducts/postage#308)
-Fix datasheet updating selection after changing a cell (closed workflowproducts/postage#311)
+- Fix datasheet inserting a record scrolls to the top (closed workflowproducts/postage#309)
+- Fix datasheet column resizing behaviors (closed workflowproducts/envelope#70, workflowproducts/postage#315)
+- Fix datasheet allows cursor while multiple columns are selected (closed workflowproducts/postage#308)
+- Fix datasheet updating selection after changing a cell (closed workflowproducts/postage#311)
 
 
 Changes since 3.2.14:
