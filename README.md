@@ -1,6 +1,6 @@
 Postage is no longer being maintained.
 
-#Postage - A fast PostgreSQL admin tool 
+# Postage - A fast PostgreSQL admin tool 
 
 A fast replacement for PGAdmin!
 
