@@ -1418,8 +1418,9 @@ function dialogAddSchema(target) {
 
             //localStorage.shownObjects = querystringShownObj;
         }
-		if (document.getElementsByClassName('current-tab')[0]) {
-			document.getElementsByClassName('current-tab')[0].relatedEditor.focus();
+        var currentTab = document.getElementsByClassName('current-tab')[0];
+		if (currentTab && currentTab.relatedEditor) {
+			currentTab.relatedEditor.focus();
 		}
     };
 

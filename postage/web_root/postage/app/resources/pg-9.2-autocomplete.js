@@ -72,7 +72,7 @@ function getContext(strInput, intPosition) {
     //console.log('Check Whitespace - 1>' + strInput[intPosition - 1] + '<');
     //console.log('Check Whitespace 1>' + strInput[1] + '<');
     //console.log('Check Whitespace 0>' + strInput[0] + '<');
-    if ((!strInput[intPosition].match('^[\n\r\ \t]+')) && (intPosition !== strInput.length)) {
+    if (strInput[intPosition] && (!strInput[intPosition].match('^[\n\r\ \t]+')) && (intPosition !== strInput.length)) {
         return;
     }
     

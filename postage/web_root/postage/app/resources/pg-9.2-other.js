@@ -201,8 +201,9 @@ function menuUser(target) {
     */});
 
     GS.openDialogToElement(target, templateElement, 'down', function () {}, function () {
-		if (document.getElementsByClassName('current-tab')[0]) {
-			document.getElementsByClassName('current-tab')[0].relatedEditor.focus();
+        var currentTab = document.getElementsByClassName('current-tab')[0];
+		if (currentTab && currentTab.relatedEditor) {
+			currentTab.relatedEditor.focus();
 		}
 	});
 }
@@ -250,8 +251,9 @@ function menuTools(target) {
     // dialogAbout()
 
     GS.openDialogToElement(target, templateElement, 'down', function () {}, function () {
-		if (document.getElementsByClassName('current-tab')[0]) {
-			document.getElementsByClassName('current-tab')[0].relatedEditor.focus();
+        var currentTab = document.getElementsByClassName('current-tab')[0];
+		if (currentTab && currentTab.relatedEditor) {
+			currentTab.relatedEditor.focus();
 		}
 	});
 }
@@ -367,8 +369,9 @@ function menuTab(target) {
     }
 
     GS.openDialogToElement(target, templateElement, 'down', function () {}, function () {
-		if (document.getElementsByClassName('current-tab')[0]) {
-			document.getElementsByClassName('current-tab')[0].relatedEditor.focus();
+        var currentTab = document.getElementsByClassName('current-tab')[0];
+		if (currentTab && currentTab.relatedEditor) {
+			currentTab.relatedEditor.focus();
 		}
 	});
 }
@@ -519,8 +522,9 @@ function dialogSwitchDatabase(target) {
                 }
             });
         }
-		if (document.getElementsByClassName('current-tab')[0]) {
-			document.getElementsByClassName('current-tab')[0].relatedEditor.focus();
+        var currentTab = document.getElementsByClassName('current-tab')[0];
+		if (currentTab && currentTab.relatedEditor) {
+			currentTab.relatedEditor.focus();
 		}
     });
 }

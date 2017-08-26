@@ -1,4 +1,3 @@
-#define UTIL_DEBUG
 #include "common_auth.h"
 
 #ifdef ENVELOPE
