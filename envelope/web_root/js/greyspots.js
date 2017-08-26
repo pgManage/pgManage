@@ -35935,6 +35935,53 @@ document.addEventListener('DOMContentLoaded', function () {
 });//global GS, xtag, document, window, ml, evt, doT, Worker
 //jslint browser:true, maxlen:80, white:false, this:true
 
+// # CODE INDEX:
+//          (use "find" (CTRL-f or CMD-f) to skip to a section)
+//          ("PRE-RENDER" refers to a section of functions that do not depend
+//                  on the viewport being rendered AND dont use any render
+//                  functions)
+//          ("POST-RENDER" refers to a section of functions that either depend
+//                  on the viewport being rendered OR use render functions)
+//      # TOP  (this just brings you back this index)
+//      # ELEMENT CONFIG
+//      # GLOBAL <STYLE></STYLE> ELEMENT SETUP
+//      # SCROLLBAR WIDTH
+//      # CELL DIMENSION DETECTOR
+//      # EXTERIOR LIBRARIES
+//          # GETPLAINTEXT
+//      # PRE-RENDER UTILITY FUNCTIONS
+//      # ELEMENT FUNCTIONS
+//      # RENDER FUNCTIONS
+//      # POST-RENDER UTILITY FUNCTIONS
+//      # LOADER FUNCTIONS
+//      # DATA FUNCTIONS
+//      # COPY FUNCTIONS
+//      # PASTE FUNCTIONS
+//      # BUTTON FUNCTIONS
+//      # EVENT FUNCTIONS
+//          # FOCUS EVENTS
+//          # SCROLL EVENTS
+//          # SELECTION EVENTS
+//          # COLUMN/ROW RESIZE EVENTS
+//          # COLUMN REORDER EVENTS
+//          # UPDATE EVENTS
+//          # INSERT EVENTS
+//          # HUD EVENTS
+//          # KEY EVENTS
+//          # COPY EVENTS
+//          # PASTE EVENTS
+//          # CUT EVENTS
+//          # CONTEXTMENU EVENTS
+//          # COLUMN DROPDOWN EVENTS
+//          # DEVELOPER EVENTS
+//          # HIGH LEVEL BINDING
+//      # XTAG DEFINITION
+//      # ELEMENT LIFECYCLE
+//      # ELEMENT ACCESSORS
+//      # ELEMENT METHODS
+
+// for sections of code that need to be completed:
+//      # NEED CODING
 
 /*
 new datasheet
@@ -36222,54 +36269,6 @@ select behavior:
 
 
 
-
-// # CODE INDEX:
-//          (use "find" (CTRL-f or CMD-f) to skip to a section)
-//          ("PRE-RENDER" refers to a section of functions that do not depend
-//                  on the viewport being rendered AND dont use any render
-//                  functions)
-//          ("POST-RENDER" refers to a section of functions that either depend
-//                  on the viewport being rendered OR use render functions)
-//      # TOP  (this just brings you back this index)
-//      # ELEMENT CONFIG
-//      # GLOBAL <STYLE></STYLE> ELEMENT SETUP
-//      # SCROLLBAR WIDTH
-//      # CELL DIMENSION DETECTOR
-//      # EXTERIOR LIBRARIES
-//          # GETPLAINTEXT
-//      # PRE-RENDER UTILITY FUNCTIONS
-//      # ELEMENT FUNCTIONS
-//      # RENDER FUNCTIONS
-//      # POST-RENDER UTILITY FUNCTIONS
-//      # LOADER FUNCTIONS
-//      # DATA FUNCTIONS
-//      # COPY FUNCTIONS
-//      # PASTE FUNCTIONS
-//      # BUTTON FUNCTIONS
-//      # EVENT FUNCTIONS
-//          # FOCUS EVENTS
-//          # SCROLL EVENTS
-//          # SELECTION EVENTS
-//          # COLUMN/ROW RESIZE EVENTS
-//          # COLUMN REORDER EVENTS
-//          # UPDATE EVENTS
-//          # INSERT EVENTS
-//          # HUD EVENTS
-//          # KEY EVENTS
-//          # COPY EVENTS
-//          # PASTE EVENTS
-//          # CUT EVENTS
-//          # CONTEXTMENU EVENTS
-//          # COLUMN DROPDOWN EVENTS
-//          # DEVELOPER EVENTS
-//          # HIGH LEVEL BINDING
-//      # XTAG DEFINITION
-//      # ELEMENT LIFECYCLE
-//      # ELEMENT ACCESSORS
-//      # ELEMENT METHODS
-
-// for sections of code that need to be completed:
-//      # NEED CODING
 
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -39508,16 +39507,14 @@ document.addEventListener('DOMContentLoaded', function () {
             recordDelimiter =
                     element.getAttribute('copy-delimiter-record')
                 .replace(/\{\{DOS_RETURN\}\}/gi, '\r\n')
-                .replace(/\{\{MAC_RETURN\}\}/gi, '\r')
-                .replace(/\{\{UNIX_RETURN\}\}/gi, '\n');
+                .replace(/\{\{MAC_RETURN\}\}/gi, '\r');
         } else {
             recordDelimiter = '\n';
         }
         if (element.getAttribute('copy-delimiter-cell')) {
             cellDelimiter = element.getAttribute('copy-delimiter-cell')
                 .replace(/\{\{DOS_RETURN\}\}/gi, '\r\n')
-                .replace(/\{\{MAC_RETURN\}\}/gi, '\r')
-                .replace(/\{\{UNIX_RETURN\}\}/gi, '\n');
+                .replace(/\{\{MAC_RETURN\}\}/gi, '\r');
         } else {
             cellDelimiter = '\t';
         }
@@ -40473,6 +40470,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 col_i += 1;
             }
 
+            if (arrSelection[0][0] !== 'G') {
+                console.trace(arrSelection);
+            }
+            //console.log(arrSelectionRows);
+            //console.log(arrSelectionCols);
+
         } else {
             element.internalSelection.rangeCache = strCompareString;
 
@@ -40891,10 +40894,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     cell.setAttribute('selected', '');
                     //console.log(
                     //    strRecord,
+                    //    bolHeaders,
+                    //    bolSelectors,
                     //    intCol,
                     //    intRow,
-                    //    cell.getAttribute('data-col-number'),
-                    //    cell.getAttribute('data-row-number'),
                     //    cell
                     //);
 
@@ -45121,7 +45124,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
     function databaseWSUPDATE(element, strMode, jsnUpdate) {
-        console.trace('databaseWSUPDATE');
         var i;
         var len;
         var pk_i;
@@ -48503,7 +48505,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // save selection cache so that we can check if a particular cell is
         //      selected
-        arrSelection = element.internalSelection.resolvedSelection;
+        // take a copy of the resolved selction
+        //      (fixes workflowproducts/postage#395)
+        arrSelection = element.internalSelection.resolvedSelection.slice(0);
 
         // you can't paste into the header
         if (element.internalDisplay.headerVisible) {
@@ -49587,6 +49591,7 @@ document.addEventListener('DOMContentLoaded', function () {
 </gs-page>
             */
         })
+            .replace(/\{\{UNIX_RETURN\}\}/gi, '\n')
             .replace(/\{\{TAB\}\}/gi, '\t');
 
         // the control elements are found in the "after open" callback.

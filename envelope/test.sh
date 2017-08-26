@@ -73,6 +73,7 @@ else
 	kill $ELECTRONPID
 fi
 kill $ENVELOPEPID
+sleep 2
 
 rm -rf ~/.mozilla ~/.envelope
 
@@ -91,6 +92,7 @@ else
 	kill $ELECTRONPID
 fi
 kill $ENVELOPEPID
+sleep 2
 
 sudo $MAKE uninstall
 
