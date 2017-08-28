@@ -1,5 +1,5 @@
 #!/bin/sh
 
-( cd postage && ./configure $@ )
+( cd src && ./configure $@ )
 
 cp Makefile.in Makefile

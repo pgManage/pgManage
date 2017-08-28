@@ -16,15 +16,9 @@ static void db_query_cb(EV_P, ev_io *w, int revents);
 static void db_copy_out_check_cb(EV_P, ev_check *w, int revents);
 static void db_cnxn_cb(EV_P, ev_io *w, int revents);
 
-#ifdef ENVELOPE
-#define SUN_PROGRAM_LOWER_NAME "envelope"
-#define SUN_PROGRAM_WORD_NAME "Envelope"
-#define SUN_PROGRAM_UPPER_NAME "ENVELOPE"
-#else
 #define SUN_PROGRAM_LOWER_NAME "postage"
 #define SUN_PROGRAM_WORD_NAME "Postage"
 #define SUN_PROGRAM_UPPER_NAME "POSTAGE"
-#endif
 
 void db_conn_error_cb(EV_P, ev_check *w, int revents) {
 	if (revents != 0) {
@@ -54,7 +48,6 @@ DB_conn *DB_connect(EV_P, void *cb_data, char *str_connstring, char *str_user,
 	conn->int_sock = -1;
 #endif
 	conn->EV_A = EV_A;
-	conn->driver = DB_DRIVER_POSTGRES;
 
 	// Envelope uses pg_authid to authenticate
 	if (str_user != NULL && str_password != NULL) {

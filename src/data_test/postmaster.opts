@@ -1,0 +1,1 @@
+/usr/bin/postgres "-D" "data_test" "-i" "-p" "5431"

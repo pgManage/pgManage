@@ -5,10 +5,10 @@
 #include <winsock2.h>
 #endif
 
-#include "../util/util_darray.h"
-#include "../util/util_idle.h"
-#include "../util/util_salloc.h"
-#include "../util/util_string.h"
+#include "util_darray.h"
+#include "util_idle.h"
+#include "util_salloc.h"
+#include "util_string.h"
 #include <ev.h>
 #include <libpq-fe.h>
 #include <stdbool.h>
@@ -23,9 +23,6 @@ typedef struct DB_result_poll *DB_result_pollp;
 typedef struct DB_copy_check *DB_copy_checkp;
 
 typedef void (*connect_cb_t)(EV_P, void *cb_data, DB_connp conn);
-
-typedef enum { DB_DRIVER_POSTGRES = 1, DB_DRIVER_SQL_SERVER = 2, DB_DRIVER_MSACCESS = 3 } DB_driver;
-#define DB_connection_driver(conn) conn->driver
 
 typedef struct DB_conn {
 	ev_check check;
@@ -72,8 +69,6 @@ typedef struct DB_conn {
 
 	//variable lengths
 	size_t int_response_len;
-
-	DB_driver driver;
 } DB_conn;
 
 typedef struct DB_poll {
