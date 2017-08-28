@@ -23,7 +23,7 @@ cd postage-master/
 ./configure && $MAKE -j32
 $MAKE test-common
 
-./postage/postage -c ./postage/config/postage.conf -d ./postage/config/postage-connections-test.conf -n true -t 300 -r ./postage/web_root -l info & export POSTAGEPID="$!"
+./src/postage -c ./src/config/postage.conf -d ./src/config/postage-connections-test.conf -n true -t 300 -r ./src/web_root -l info & export POSTAGEPID="$!"
 sleep 5
 xdg-open "http://127.0.0.1:8080/postage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true" &
 printf "HTTP/1.1 200 OK\r\n\r\n\r\n" | ncat -l -p 45654
@@ -34,7 +34,7 @@ rm -rf ~/.mozilla ~/.postage
 
 sudo $MAKE install
 
-/usr/local/sbin/postage -d ./postage/config/postage-connections-test.conf & export POSTAGEPID="$!"
+/usr/local/sbin/postage -d ./src/config/postage-connections-test.conf & export POSTAGEPID="$!"
 sleep 5
 xdg-open "http://127.0.0.1:8080/postage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true" &
 printf "HTTP/1.1 200 OK\r\n\r\n\r\n" | ncat -l -p 45654
@@ -59,8 +59,8 @@ if test $(uname -s) = "Linux"; then
 	}
 
 	mkdir ~/.postage
-	cp ../postage/config/postage.conf ~/.postage
-	cp ../postage/config/postage-connections-test.conf ~/.postage/postage-connections.conf
+	cp ../src/config/postage.conf ~/.postage
+	cp ../src/config/postage-connections-test.conf ~/.postage/postage-connections.conf
 
 	/opt/Postage/postage --postage-test & export POSTAGEPID="$!"
 	printf "HTTP/1.1 200 OK\r\n\r\n\r\n" | ncat -l -p 45654

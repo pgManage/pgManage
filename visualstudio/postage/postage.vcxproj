@@ -19,96 +19,94 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\common\common_auth.c" />
-    <ClCompile Include="..\..\common\common_client.c" />
-    <ClCompile Include="..\..\common\common_config.c" />
-    <ClCompile Include="..\..\common\common_main.c" />
-    <ClCompile Include="..\..\common\common_server.c" />
-    <ClCompile Include="..\..\common\common_ssl.c" />
-    <ClCompile Include="..\..\common\common_util_sql.c" />
-    <ClCompile Include="..\..\common\common_websocket.c" />
-    <ClCompile Include="..\..\common\http_auth.c" />
-    <ClCompile Include="..\..\common\http_ev.c" />
-    <ClCompile Include="..\..\common\http_export.c" />
-    <ClCompile Include="..\..\common\http_file.c" />
-    <ClCompile Include="..\..\common\http_main.c" />
-    <ClCompile Include="..\..\common\http_upload.c" />
-    <ClCompile Include="..\..\common\ws_delete.c" />
-    <ClCompile Include="..\..\common\ws_insert.c" />
-    <ClCompile Include="..\..\common\ws_select.c" />
-    <ClCompile Include="..\..\common\ws_update.c" />
     <ClCompile Include="..\..\db_framework_pq\db_framework.c" />
-    <ClCompile Include="..\..\postage\postage_callback.c" />
-    <ClCompile Include="..\..\postage\ws_raw.c" />
-    <ClCompile Include="..\..\postage\ws_tab.c" />
-    <ClCompile Include="..\..\util\util_aes.c" />
-    <ClCompile Include="..\..\util\util_base64.c" />
-    <ClCompile Include="..\..\util\util_canonical.c" />
-    <ClCompile Include="..\..\util\util_cookie.c" />
-    <ClCompile Include="..\..\util\util_darray.c" />
-    <ClCompile Include="..\..\util\util_error.c" />
-    <ClCompile Include="..\..\util\util_exec.c" />
-    <ClCompile Include="..\..\util\util_file.c" />
-    <ClCompile Include="..\..\util\util_getopt.c" />
-    <ClCompile Include="..\..\util\util_idle.c" />
-    <ClCompile Include="..\..\util\util_ini.c" />
-    <ClCompile Include="..\..\util\util_list.c" />
-    <ClCompile Include="..\..\util\util_request.c" />
-    <ClCompile Include="..\..\util\util_salloc.c" />
-    <ClCompile Include="..\..\util\util_sql_split.c" />
-    <ClCompile Include="..\..\util\util_string.c" />
-    <ClCompile Include="..\..\util\util_strptime.c" />
+    <ClCompile Include="..\..\src\common_auth.c" />
+    <ClCompile Include="..\..\src\common_client.c" />
+    <ClCompile Include="..\..\src\common_config.c" />
+    <ClCompile Include="..\..\src\common_main.c" />
+    <ClCompile Include="..\..\src\common_server.c" />
+    <ClCompile Include="..\..\src\common_ssl.c" />
+    <ClCompile Include="..\..\src\common_util_sql.c" />
+    <ClCompile Include="..\..\src\common_websocket.c" />
+    <ClCompile Include="..\..\src\http_auth.c" />
+    <ClCompile Include="..\..\src\http_ev.c" />
+    <ClCompile Include="..\..\src\http_export.c" />
+    <ClCompile Include="..\..\src\http_file.c" />
+    <ClCompile Include="..\..\src\http_main.c" />
+    <ClCompile Include="..\..\src\http_upload.c" />
+    <ClCompile Include="..\..\src\postage_callback.c" />
+    <ClCompile Include="..\..\src\util_aes.c" />
+    <ClCompile Include="..\..\src\util_base64.c" />
+    <ClCompile Include="..\..\src\util_canonical.c" />
+    <ClCompile Include="..\..\src\util_cookie.c" />
+    <ClCompile Include="..\..\src\util_darray.c" />
+    <ClCompile Include="..\..\src\util_error.c" />
+    <ClCompile Include="..\..\src\util_file.c" />
+    <ClCompile Include="..\..\src\util_getopt.c" />
+    <ClCompile Include="..\..\src\util_idle.c" />
+    <ClCompile Include="..\..\src\util_ini.c" />
+    <ClCompile Include="..\..\src\util_list.c" />
+    <ClCompile Include="..\..\src\util_request.c" />
+    <ClCompile Include="..\..\src\util_salloc.c" />
+    <ClCompile Include="..\..\src\util_sql_split.c" />
+    <ClCompile Include="..\..\src\util_string.c" />
+    <ClCompile Include="..\..\src\util_strptime.c" />
+    <ClCompile Include="..\..\src\ws_delete.c" />
+    <ClCompile Include="..\..\src\ws_insert.c" />
+    <ClCompile Include="..\..\src\ws_raw.c" />
+    <ClCompile Include="..\..\src\ws_select.c" />
+    <ClCompile Include="..\..\src\ws_tab.c" />
+    <ClCompile Include="..\..\src\ws_update.c" />
     <ClCompile Include="..\compat\bsd-asprintf.c" />
     <ClCompile Include="..\compat\posix_win.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\common\common_auth.h" />
-    <ClInclude Include="..\..\common\common_client.h" />
-    <ClInclude Include="..\..\common\common_client_struct.h" />
-    <ClInclude Include="..\..\common\common_config.h" />
-    <ClInclude Include="..\..\common\common_server.h" />
-    <ClInclude Include="..\..\common\common_ssl.h" />
-    <ClInclude Include="..\..\common\common_util_sql.h" />
-    <ClInclude Include="..\..\common\common_websocket.h" />
-    <ClInclude Include="..\..\common\http_auth.h" />
-    <ClInclude Include="..\..\common\http_ev.h" />
-    <ClInclude Include="..\..\common\http_export.h" />
-    <ClInclude Include="..\..\common\http_file.h" />
-    <ClInclude Include="..\..\common\http_main.h" />
-    <ClInclude Include="..\..\common\http_upload.h" />
-    <ClInclude Include="..\..\common\ws_delete.h" />
-    <ClInclude Include="..\..\common\ws_insert.h" />
-    <ClInclude Include="..\..\common\ws_select.h" />
-    <ClInclude Include="..\..\common\ws_update.h" />
     <ClInclude Include="..\..\db_framework_pq\db_framework.h" />
-    <ClInclude Include="..\..\postage\postage_callback.h" />
-    <ClInclude Include="..\..\postage\ws_raw.h" />
-    <ClInclude Include="..\..\postage\ws_tab.h" />
-    <ClInclude Include="..\..\util\util_aes.h" />
-    <ClInclude Include="..\..\util\util_base64.h" />
-    <ClInclude Include="..\..\util\util_canonical.h" />
-    <ClInclude Include="..\..\util\util_cookie.h" />
-    <ClInclude Include="..\..\util\util_darray.h" />
-    <ClInclude Include="..\..\util\util_error.h" />
-    <ClInclude Include="..\..\util\util_exec.h" />
-    <ClInclude Include="..\..\util\util_file.h" />
-    <ClInclude Include="..\..\util\util_getopt.h" />
-    <ClInclude Include="..\..\util\util_idle.h" />
-    <ClInclude Include="..\..\util\util_ini.h" />
-    <ClInclude Include="..\..\util\util_list.h" />
-    <ClInclude Include="..\..\util\util_list_queue.h" />
-    <ClInclude Include="..\..\util\util_request.h" />
-    <ClInclude Include="..\..\util\util_salloc.h" />
-    <ClInclude Include="..\..\util\util_sql_split.h" />
-    <ClInclude Include="..\..\util\util_string.h" />
-    <ClInclude Include="..\..\util\util_strptime.h" />
+    <ClInclude Include="..\..\src\common_auth.h" />
+    <ClInclude Include="..\..\src\common_client.h" />
+    <ClInclude Include="..\..\src\common_client_struct.h" />
+    <ClInclude Include="..\..\src\common_config.h" />
+    <ClInclude Include="..\..\src\common_server.h" />
+    <ClInclude Include="..\..\src\common_ssl.h" />
+    <ClInclude Include="..\..\src\common_util_sql.h" />
+    <ClInclude Include="..\..\src\common_websocket.h" />
+    <ClInclude Include="..\..\src\http_auth.h" />
+    <ClInclude Include="..\..\src\http_ev.h" />
+    <ClInclude Include="..\..\src\http_export.h" />
+    <ClInclude Include="..\..\src\http_file.h" />
+    <ClInclude Include="..\..\src\http_main.h" />
+    <ClInclude Include="..\..\src\http_upload.h" />
+    <ClInclude Include="..\..\src\postage_callback.h" />
+    <ClInclude Include="..\..\src\util_aes.h" />
+    <ClInclude Include="..\..\src\util_base64.h" />
+    <ClInclude Include="..\..\src\util_canonical.h" />
+    <ClInclude Include="..\..\src\util_cookie.h" />
+    <ClInclude Include="..\..\src\util_darray.h" />
+    <ClInclude Include="..\..\src\util_error.h" />
+    <ClInclude Include="..\..\src\util_file.h" />
+    <ClInclude Include="..\..\src\util_getopt.h" />
+    <ClInclude Include="..\..\src\util_idle.h" />
+    <ClInclude Include="..\..\src\util_ini.h" />
+    <ClInclude Include="..\..\src\util_list.h" />
+    <ClInclude Include="..\..\src\util_list_queue.h" />
+    <ClInclude Include="..\..\src\util_request.h" />
+    <ClInclude Include="..\..\src\util_salloc.h" />
+    <ClInclude Include="..\..\src\util_sql_split.h" />
+    <ClInclude Include="..\..\src\util_string.h" />
+    <ClInclude Include="..\..\src\util_strptime.h" />
+    <ClInclude Include="..\..\src\ws_delete.h" />
+    <ClInclude Include="..\..\src\ws_insert.h" />
+    <ClInclude Include="..\..\src\ws_raw.h" />
+    <ClInclude Include="..\..\src\ws_select.h" />
+    <ClInclude Include="..\..\src\ws_tab.h" />
+    <ClInclude Include="..\..\src\ws_update.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\postage\web_root\postage\test\test-lib.js" />
-    <None Include="..\..\postage\web_root\postage\test\test-lists.js" />
-    <None Include="..\..\postage\web_root\postage\test\test.css" />
-    <None Include="..\..\postage\web_root\postage\test\index.html" />
-    <None Include="..\..\postage\web_root\postage\test\test.js" />
+    <None Include="..\..\src\web_root\postage\test\index.html" />
+    <None Include="..\..\src\web_root\postage\test\test-lib.js" />
+    <None Include="..\..\src\web_root\postage\test\test-lists.js" />
+    <None Include="..\..\src\web_root\postage\test\test.css" />
+    <None Include="..\..\src\web_root\postage\test\test.js" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{610DEA50-50E1-48A6-BF11-78F555E5EF51}</ProjectGuid>
@@ -163,7 +161,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>..\..\dependencies\libev;..\include\compat;..\include;..\..\db_framework_pq;..\..\common;..\..;$(IncludePath)</IncludePath>
+    <IncludePath>..\..\dependencies\libev;..\include\compat;..\include;..\..\db_framework_pq;..\..\src;..\..;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -171,7 +169,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>..\..\dependencies\libev;..\include\compat;..\include;..\..\db_framework_pq;..\..\common;..\..;$(IncludePath)</IncludePath>
+    <IncludePath>..\..\dependencies\libev;..\include\compat;..\include;..\..\db_framework_pq;..\..\src;..\..;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -185,7 +183,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalOptions>/D ssize_t=SSIZE_T  /D _CRT_SECURE_NO_WARNINGS /D _CRT_NONSTDC_NO_WARNINGS /D HAVE_INET_PTON /D WIN32_LEAN_AND_MEAN /D FD_SETSIZE=4096 /D POSTAGE_INTERFACE_LIBPQ /D HAVE_STRNLEN /D HAVE_STRCASECMP /FS /D HAVE_INET_NTOP</AdditionalOptions>
+      <AdditionalOptions>/D ssize_t=SSIZE_T  /D _CRT_SECURE_NO_WARNINGS /D _CRT_NONSTDC_NO_WARNINGS /D HAVE_INET_PTON /D WIN32_LEAN_AND_MEAN /D FD_SETSIZE=4096 /D HAVE_STRNLEN /D HAVE_STRCASECMP /FS /D HAVE_INET_NTOP</AdditionalOptions>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -219,7 +217,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalOptions>/D ssize_t=SSIZE_T  /D _CRT_SECURE_NO_WARNINGS /D _CRT_NONSTDC_NO_WARNINGS /D HAVE_INET_PTON /D WIN32_LEAN_AND_MEAN /D FD_SETSIZE=4096 /D POSTAGE_INTERFACE_LIBPQ /D HAVE_STRNLEN /D HAVE_STRCASECMP /FS /D HAVE_INET_NTOP</AdditionalOptions>
+      <AdditionalOptions>/D ssize_t=SSIZE_T  /D _CRT_SECURE_NO_WARNINGS /D _CRT_NONSTDC_NO_WARNINGS /D HAVE_INET_PTON /D WIN32_LEAN_AND_MEAN /D FD_SETSIZE=4096 /D HAVE_STRNLEN /D HAVE_STRCASECMP /FS /D HAVE_INET_NTOP</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
     </ClCompile>

@@ -163,7 +163,8 @@ var $ = {
                     data = data.replace(/c\:\\users\\nunzio\\repos\\postage\\/gi, '../');
                     data = data.replace(/\.\.\\\.\.\\/gi, '../');
                     data = data.replace(/\\(?![rnt])/gi, '/');
-					data = data.replace(' (0x0000274D/10061)', '');
+                    data = data.replace(' (0x0000274D/10061)', '');
+                    data = data.replace(/\.\.\/src\//g, '');
                 }
 
                 if (strExpectedOutput === data && intStatusCode === ajax.status) {
@@ -302,8 +303,9 @@ var $ = {
 					data = data.replace(/\/Users\/nunzio\//g, '/home/super/');
 					data = data.replace(/\/usr\/home\/super\//g, '/home/super/');
 					data = data.replace(/\\test/g, '/test');
-	                data = data.replace(/\/\//g, '\\\\');
-	                data = data.replace(/Bob\/\\r\/\\n\/\\t\\\\\\\\by/g, 'Bob\\\\r\\\\n\\\\t\\\\\\\\by');
+                    data = data.replace(/\/\//g, '\\\\');
+                    data = data.replace(/Bob\/\\r\/\\n\/\\t\\\\\\\\by/g, 'Bob\\\\r\\\\n\\\\t\\\\\\\\by');
+                    data = data.replace(/\.\.\/src\//g, '');
 				}
                 arrStrActualOutput.push(data.replace(/transactionid = .*\n/gim, ''));
                 i += 1;

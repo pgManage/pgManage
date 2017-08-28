@@ -1,0 +1,73 @@
+DONT FORGET DEBIAN (rename to distinguish)
+CHECK THE PG PATCHES!!!!!!!!!!  https://www.postgresql.org/support/versioning/
+CHECK THE LOGS!!!!!!!!!!!!!
+TURN ON THE ERROR LOGS!!!!!
+
+
+Mac package:
+cd Repos/postage/
+./package-nix.sh
+This outputs postage_electron/dist/Postage-VERSION.dmg
+
+
+Mac test:
+Install Postage from DMG
+Open Terminal
+/Applications/Postage.app/Contents/MacOS/Postage
+Go to Postage
+Cmd+Q
+Go back to Terminal
+nano ~/.postage/postage-connections.conf
+delete and paste:
+
+test: host=<ipaddress> port=5431 dbname=postgres sslmode=disable
+test2: host=<ipaddress> port=5431 dbname='WFP\'s "Testing" Database' sslmode=disable
+localhost@5432: hostaddr=127.0.0.1 port=5432 dbname=postgres
+ip example: hostaddr=127.0.0.1 port=5442 dbname=postgres
+host example: host=domain_name.com port=5432 dbname=postgres sslmode=require
+
+replace <ipaddress> with the ip address of a server running a compatable testing database on 5431
+
+
+Win package:
+Use VS2017 x86 Native Tools Prompt
+cd \Users\nunzio\Repos\postage
+package-windows
+make sure to delete old version and rename wfprod_group/postage/packages/Postage Windows VERSION/
+This outputs postage_electron/dist/Postage Setup VERSION.exe
+
+
+Win test:
+Install Postage from EXE
+edit connections
+delete and paste:
+
+test: host=<ipaddress> port=5431 dbname=postgres sslmode=disable
+test2: host=<ipaddress> port=5431 dbname='WFP\'s "Testing" Database' sslmode=disable
+localhost@5432: hostaddr=127.0.0.1 port=5432 dbname=postgres
+ip example: hostaddr=127.0.0.1 port=5442 dbname=postgres
+host example: host=domain_name.com port=5432 dbname=postgres sslmode=require
+
+replace <ipaddress> with the ip address of a server running a compatable testing database on 5431
+
+close postage
+go to desktop
+right click on shortcut
+show in folder
+deselect
+shift right-click in empty space
+open command prompt
+postage --postage-test
+
+
+Linux (good to put in a script):
+rm -f test.sh
+
+curl https://raw.githubusercontent.com/<repourl>/master/src/test.sh > ./test.sh
+chmod 770 test.sh
+./test.sh
+
+rm -f test.sh
+
+replace <repourl> with wherever it is
+install node, libicns-utils, GraphicsMagick, rpm-build and dpkg-deb
