@@ -91,6 +91,84 @@ function handleQueryVersionDifferences (versionNum) {
         */});
     }
 
+    if (parseFloat(versionNum, 10) >= 10) {
+        propQuery.prop_sequence = propQuery.objectSequence = ml(function () {/*
+            SELECT 1 AS sort,
+                   'Name',
+                   'OID',
+                   'Owner',
+                   'ACL',
+                   'Current Value',
+                   'Minimum Value',
+                   'Maximum Value',
+                   'Increment Value',
+                   'Cache',
+                   'Cycled?',
+                   'Called?',
+                   'Comment'
+         UNION ALL
+            SELECT 2 AS sort,
+                   pg_class.relname::text,
+                   pg_class.oid::text,
+                   pg_roles.rolname::text,
+                   pg_class.relacl::text,
+                   sequences.start_value::text,
+                   sequences.minimum_value::text,
+                   sequences.maximum_value::text,
+                   sequences.increment::text,
+                   (SELECT seqcache AS cache_value FROM pg_sequence WHERE pg_sequence.oid = '{{INTOID}}')::text,
+                   (SELECT (CASE WHEN seqcycle THEN 'Yes' ELSE 'No' END) FROM pg_sequence WHERE pg_sequence.oid = '{{INTOID}}')::text,
+                   (SELECT (CASE WHEN is_called THEN 'Yes' ELSE 'No' END) FROM {{STRSQLSAFENAME}})::text,
+                   description::text
+              FROM pg_class
+         LEFT JOIN pg_roles ON pg_roles.oid = pg_class.relowner
+         LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+         LEFT JOIN information_schema.sequences ON sequences.sequence_schema = pg_namespace.nspname
+                                AND sequences.sequence_name = pg_class.relname
+         LEFT JOIN pg_description ON pg_description.objoid = pg_class.oid AND pg_description.objsubid = 0
+             WHERE pg_class.relkind = 'S' AND pg_class.oid = '{{INTOID}}'
+          ORDER BY sort;
+         */});
+    } else {
+        propQuery.prop_sequence = propQuery.objectSequence = ml(function () {/*
+            SELECT 1 AS sort,
+                   'Name',
+                   'OID',
+                   'Owner',
+                   'ACL',
+                   'Current Value',
+                   'Minimum Value',
+                   'Maximum Value',
+                   'Increment Value',
+                   'Cache',
+                   'Cycled?',
+                   'Called?',
+                   'Comment'
+         UNION ALL
+            SELECT 2 AS sort,
+                   pg_class.relname::text,
+                   pg_class.oid::text,
+                   pg_roles.rolname::text,
+                   pg_class.relacl::text,
+                   sequences.start_value::text,
+                   sequences.minimum_value::text,
+                   sequences.maximum_value::text,
+                   sequences.increment::text,
+                   (SELECT cache_value FROM {{STRSQLSAFENAME}})::text,
+                   (SELECT (CASE WHEN is_cycled THEN 'Yes' ELSE 'No' END) FROM {{STRSQLSAFENAME}})::text,
+                   (SELECT (CASE WHEN is_called THEN 'Yes' ELSE 'No' END) FROM {{STRSQLSAFENAME}})::text,
+                   description::text
+              FROM pg_class
+         LEFT JOIN pg_roles ON pg_roles.oid = pg_class.relowner
+         LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+         LEFT JOIN information_schema.sequences ON sequences.sequence_schema = pg_namespace.nspname
+                                AND sequences.sequence_name = pg_class.relname
+         LEFT JOIN pg_description ON pg_description.objoid = pg_class.oid AND pg_description.objsubid = 0
+             WHERE pg_class.relkind = 'S' AND pg_class.oid = '{{INTOID}}'
+          ORDER BY sort;
+         */});
+    }
+
 }
 
 
@@ -289,8 +367,7 @@ listQuery.objectSchema = listQuery.schemaContents = ml(function () {/*
         UNION
         SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Tables' AS name, 'objectTableList' AS obj_query, (SELECT count(relname) AS result
                  FROM pg_class rel
-                WHERE relkind IN ('r','s','t')
-                  AND rel.relnamespace = '{{INTOID}}'::oid) AS obj_count
+                WHERE relkind IN ('r','s','t','p') AND NOT relispartition AND rel.relnamespace = '{{INTOID}}'::oid) AS obj_count
         UNION
         SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Trigger Functions' AS name, 'objectTriggerFunction' AS obj_query, (SELECT count(proname) AS result
                FROM pg_proc
@@ -633,7 +710,7 @@ SELECT count(attname) AS result
 titleRefreshQuery.objectTableList = titleRefreshQuery.tableNumber = ml(function () {/*
     SELECT count(relname) AS result
       FROM pg_class rel
-     WHERE relkind IN ('r','s','t') AND rel.relnamespace = {{INTOID}};
+     WHERE relkind IN ('r','s','t','p') AND NOT relispartition AND rel.relnamespace = {{INTOID}};
 */});
 
 
@@ -744,8 +821,8 @@ listQuery.objectTableList = ml(function () {/*
       SELECT pg_class.oid, quote_ident(relname) AS name, pg_namespace.nspname AS schema_name, '' AS bullet, 'TB' AS separate_bullet
         FROM pg_class
    LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
-       WHERE relkind IN ('r','s','t') AND pg_class.relnamespace = {{INTOID}}
-    ORDER BY relname;
+       WHERE relkind IN ('r','s','t','p') AND NOT relispartition AND pg_class.relnamespace = {{INTOID}}
+    ORDER BY 2;
 */});
 
 
@@ -1847,7 +1924,7 @@ scriptQuery.objectSequence = ml(function () {/*
               E'     -- restart sequence at desired value:\n' ||
               E'     ALTER SEQUENCE {{STRSQLSAFENAME}} RESTART WITH ' || (SELECT last_value FROM {{STRSQLSAFENAME}})::text || E';\n' ||
               E'     -- advance sequence to clear out it''s cache:\n' ||
-               '     SELECT nextval(''{{STRSQLSAFENAME}}'') FROM generate_series(1, ' || (SELECT cache_value FROM {{STRSQLSAFENAME}})::text || E');\n' ||
+               '     SELECT nextval(''{{STRSQLSAFENAME}}'') FROM generate_series(1, ' || seq.seqcache::text || E');\n' ||
                '*' || E'/\n\n' ||
 
               'CREATE SEQUENCE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || E'\n' ||
@@ -1855,8 +1932,8 @@ scriptQuery.objectSequence = ml(function () {/*
               '  MINVALUE '  || s.minimum_value || E'\n' ||
               '  MAXVALUE '  || s.maximum_value || E'\n' ||
               '  START '     || {{STRSQLSAFENAME}}.last_value || E'\n' ||
-              '  CACHE '     || (SELECT cache_value FROM {{STRSQLSAFENAME}})::text || E'\n' ||
-              '  ' || (CASE WHEN (SELECT is_cycled FROM {{STRSQLSAFENAME}}) THEN '' ELSE 'NO ' END) || E'CYCLE' ||
+              '  CACHE '     || seq.seqcache || E'\n' ||
+              '  ' || (CASE WHEN (SELECT seq.seqcycle FROM {{STRSQLSAFENAME}}) THEN '' ELSE 'NO ' END) || E'CYCLE' ||
               COALESCE((SELECT E'\n  OWNED BY ' || pg_depend.refobjid::regclass || '.' || pg_attribute.attname
                            FROM pg_depend
                            JOIN pg_attribute ON pg_attribute.attrelid = pg_depend.refobjid
@@ -1871,6 +1948,7 @@ scriptQuery.objectSequence = ml(function () {/*
 
         FROM {{STRSQLSAFENAME}}, pg_class c
         LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
+        LEFT JOIN pg_sequence seq ON c.oid = seq.seqrelid
         LEFT JOIN pg_roles ON pg_roles.oid = c.relowner
         LEFT JOIN pg_description ON pg_description.objoid = c.oid
         LEFT JOIN information_schema.sequences s ON s.sequence_schema = n.nspname
@@ -1934,7 +2012,7 @@ scriptQuery.objectSequenceDump = ml(function () {/*
               E'     -- restart sequence at desired value:\n' ||
               E'     ALTER SEQUENCE {{STRSQLSAFENAME}} RESTART WITH ' || (SELECT last_value FROM {{STRSQLSAFENAME}})::text || E';\n' ||
               E'     -- advance sequence to clear out it''s cache:\n' ||
-               '     SELECT nextval(''{{STRSQLSAFENAME}}'') FROM generate_series(1, ' || (SELECT cache_value FROM {{STRSQLSAFENAME}})::text || E');\n' ||
+               '     SELECT nextval(''{{STRSQLSAFENAME}}'') FROM generate_series(1, ' || seq.seqcache::text || E');\n' ||
                '*' || E'/\n\n' ||
 
               'CREATE SEQUENCE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || E'\n' ||
@@ -1942,8 +2020,8 @@ scriptQuery.objectSequenceDump = ml(function () {/*
               '  MINVALUE '  || s.minimum_value || E'\n' ||
               '  MAXVALUE '  || s.maximum_value || E'\n' ||
               '  START '     || {{STRSQLSAFENAME}}.last_value || E'\n' ||
-              '  CACHE '     || (SELECT cache_value FROM {{STRSQLSAFENAME}})::text || E'\n' ||
-              '  ' || (CASE WHEN (SELECT is_cycled FROM {{STRSQLSAFENAME}}) THEN '' ELSE 'NO ' END) || E'CYCLE' ||
+              '  CACHE '     || seq.seqcache || E'\n' ||
+              '  ' || (CASE WHEN (SELECT seq.seqcycle FROM {{STRSQLSAFENAME}}) THEN '' ELSE 'NO ' END) || E'CYCLE' ||
               E';\n\nALTER SEQUENCE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || ' OWNER TO ' || pg_roles.rolname || E';\n\n' ||
               '-- ALTER SEQUENCE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || E' RESTART;\n\n' ||
               COALESCE('COMMENT ON SEQUENCE
@@ -1952,6 +2030,7 @@ scriptQuery.objectSequenceDump = ml(function () {/*
 
         FROM {{STRSQLSAFENAME}}, pg_class c
         LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
+        LEFT JOIN pg_sequence seq ON c.oid = seq.seqrelid
         LEFT JOIN pg_roles ON pg_roles.oid = c.relowner
         LEFT JOIN pg_description ON pg_description.objoid = c.oid
         LEFT JOIN information_schema.sequences s ON s.sequence_schema = n.nspname
@@ -2112,7 +2191,7 @@ scriptQuery.objectTable = ml(function () {/*
                         E',\n'),
                     '') ||
                     COALESCE(em2.con_full, '') ||
-            E'\n)' || (E' WITH (\n  ' ||
+            E'\n)' || (COALESCE(' PARTITION BY ' || (CASE WHEN pg_class.relkind = 'p' THEN pg_get_partkeydef({{INTOID}}::oid) ELSE NULL END) || E'\n', ' ')) || (E'WITH (\n  ' ||
                             CASE WHEN pg_class.relhasoids THEN
                                 'OIDS=TRUE'
                             ELSE
@@ -2219,7 +2298,7 @@ scriptQuery.objectTable = ml(function () {/*
         LEFT JOIN pg_catalog.pg_stat_user_tables ON pg_stat_user_tables.relid = pg_class.oid
         WHERE pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}'
         GROUP BY pg_namespace.nspname, pg_class.relname, pg_class.relpersistence, pg_class.relacl,
-                pg_class.relhasoids, pg_roles.rolname, em2.oid, em2.con_full, reloptions) --pg_description.description
+                pg_class.relhasoids, pg_roles.rolname, em2.oid, em2.con_full, reloptions, pg_class.relkind) --pg_description.description
 
         -- This section pulls the GRANT lines
         || COALESCE((SELECT E'\n\n' || (SELECT array_to_string(array_agg( 'GRANT ' ||
@@ -2296,6 +2375,16 @@ scriptQuery.objectTable = ml(function () {/*
         LEFT JOIN pg_attribute att ON att.attrelid = pg_class.oid
         JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
         WHERE (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}') AND (regexp_split_to_array((att.attacl)::text, '[=/]'))[2] ~ '(r|w|a|x)\*')ok),'')), '')
+
+        -- Displays partitions
+        || COALESCE((SELECT E'\n\n-- Partitions SQL\n\n' || string_agg('CREATE TABLE ' || nsp.nspname || '.' || rel.relname || ' PARTITION OF ' || nsp2.nspname || '.' || rel2.relname || E'\n  ' || pg_get_expr(rel.relpartbound, rel.oid) || ';', E'\n\n' ORDER BY rel.oid)
+            FROM
+                (SELECT * FROM pg_inherits WHERE inhparent = {{INTOID}}::oid) inh
+                LEFT JOIN pg_class rel ON inh.inhrelid = rel.oid
+                LEFT JOIN pg_namespace nsp ON rel.relnamespace = nsp.oid
+                LEFT JOIN pg_class rel2 ON rel2.oid = inh.inhparent
+                LEFT JOIN pg_namespace nsp2 ON rel2.relnamespace = nsp2.oid
+                WHERE rel.relispartition), '')
 
         -- Displays RULEs
         || COALESCE((SELECT E'\n\n' || array_to_string((SELECT array_agg(perms) FROM (
@@ -2535,7 +2624,7 @@ scriptQuery.objectTableNoComment = ml(function () {/*
                         E',\n'),
                     '') ||
                     COALESCE(em2.con_full, '') ||
-            E'\n)' || (E' WITH (\n  ' ||
+            E'\n)' || (COALESCE(' PARTITION BY ' || (CASE WHEN pg_class.relkind = 'p' THEN pg_get_partkeydef({{INTOID}}::oid) ELSE NULL END) || E'\n', ' ')) || E'WITH (\n  ' ||
                             CASE WHEN pg_class.relhasoids THEN
                                 'OIDS=TRUE'
                             ELSE
@@ -2641,7 +2730,7 @@ scriptQuery.objectTableNoComment = ml(function () {/*
         LEFT JOIN pg_catalog.pg_stat_user_tables ON pg_stat_user_tables.relid = pg_class.oid
         WHERE pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}'
         GROUP BY pg_namespace.nspname, pg_class.relname, pg_class.relacl,
-                pg_class.relhasoids, pg_roles.rolname, em2.oid, em2.con_full, reloptions) --pg_description.description
+                pg_class.relhasoids, pg_roles.rolname, em2.oid, em2.con_full, reloptions, pg_class.relkind) --pg_description.description
 
         -- This section pulls the GRANT lines
         || COALESCE((SELECT E'\n\n' || (SELECT array_to_string(array_agg( 'GRANT ' ||
@@ -2719,6 +2808,16 @@ scriptQuery.objectTableNoComment = ml(function () {/*
         JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
         WHERE (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}') AND (regexp_split_to_array((att.attacl)::text, '[=/]'))[2] ~ '(r|w|a|x)\*')ok),'')), '')
 
+        -- Displays partitions
+        || COALESCE((SELECT E'\n\n-- Partitions SQL\n\n' || string_agg('CREATE TABLE ' || nsp.nspname || '.' || rel.relname || ' PARTITION OF ' || nsp2.nspname || '.' || rel2.relname || E'\n  ' || pg_get_expr(rel.relpartbound, rel.oid) || ';', E'\n\n' ORDER BY rel.oid)
+            FROM
+                (SELECT * FROM pg_inherits WHERE inhparent = {{INTOID}}::oid) inh
+                LEFT JOIN pg_class rel ON inh.inhrelid = rel.oid
+                LEFT JOIN pg_namespace nsp ON rel.relnamespace = nsp.oid
+                LEFT JOIN pg_class rel2 ON rel2.oid = inh.inhparent
+                LEFT JOIN pg_namespace nsp2 ON rel2.relnamespace = nsp2.oid
+                WHERE rel.relispartition), '')
+
         -- Displays RULEs
         || COALESCE((SELECT E'\n\n' || array_to_string((SELECT array_agg(perms) FROM (
 
@@ -2795,7 +2894,11 @@ scriptQuery.objectTableDump = ml(function () {/*
                         E',\n'),
                     '') ||
                     COALESCE(em2.con_full, '') ||
+<<<<<<< HEAD
             E'\n)' || (E' WITH (\n  ' ||
+=======
+            E'\n)' || (COALESCE(' PARTITION BY ' || (CASE WHEN pg_class.relkind = 'p' THEN pg_get_partkeydef({{INTOID}}::oid) ELSE NULL END) || E'\n', ' ')) || (E'WITH (\n  ' || 
+>>>>>>> 5c7e03a61835b0432d6e452b409b3a8053764076
                             CASE WHEN pg_class.relhasoids THEN
                                 'OIDS=TRUE'
                             ELSE
@@ -2902,8 +3005,13 @@ scriptQuery.objectTableDump = ml(function () {/*
         LEFT JOIN pg_catalog.pg_stat_user_tables ON pg_stat_user_tables.relid = pg_class.oid
         WHERE pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}'
         GROUP BY pg_namespace.nspname, pg_class.relname, pg_class.relacl,
+<<<<<<< HEAD
                 pg_class.relhasoids, pg_roles.rolname, em2.oid, em2.con_full, reloptions) --pg_description.description
 
+=======
+                pg_class.relhasoids, pg_roles.rolname, em2.oid, em2.con_full, reloptions, pg_class.relkind) --pg_description.description
+                
+>>>>>>> 5c7e03a61835b0432d6e452b409b3a8053764076
         -- This section pulls the GRANT lines
         || COALESCE((SELECT E'\n\n' || (SELECT array_to_string(array_agg( 'GRANT ' ||
         	(SELECT array_to_string((SELECT array_agg(perms ORDER BY srt)
@@ -2979,6 +3087,19 @@ scriptQuery.objectTableDump = ml(function () {/*
         LEFT JOIN pg_attribute att ON att.attrelid = pg_class.oid
         JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
         WHERE (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}') AND (regexp_split_to_array((att.attacl)::text, '[=/]'))[2] ~ '(r|w|a|x)\*')ok),'')), '')
+<<<<<<< HEAD
+=======
+        
+        -- Displays partitions
+        || COALESCE((SELECT E'\n\n-- Partitions SQL\n\n' || string_agg('CREATE TABLE ' || nsp.nspname || '.' || rel.relname || ' PARTITION OF ' || nsp2.nspname || '.' || rel2.relname || E'\n  ' || pg_get_expr(rel.relpartbound, rel.oid) || ';', E'\n\n' ORDER BY rel.oid)
+            FROM
+                (SELECT * FROM pg_inherits WHERE inhparent = {{INTOID}}::oid) inh
+                LEFT JOIN pg_class rel ON inh.inhrelid = rel.oid
+                LEFT JOIN pg_namespace nsp ON rel.relnamespace = nsp.oid
+                LEFT JOIN pg_class rel2 ON rel2.oid = inh.inhparent
+                LEFT JOIN pg_namespace nsp2 ON rel2.relnamespace = nsp2.oid
+                WHERE rel.relispartition), '')
+>>>>>>> 5c7e03a61835b0432d6e452b409b3a8053764076
 
         -- Displays RULEs
         || COALESCE((SELECT E'\n\n' || array_to_string((SELECT array_agg(perms) FROM (
@@ -3097,6 +3218,16 @@ scriptQuery.objectTableNoCreate = ml(function () {/*
         LEFT JOIN pg_attribute att ON att.attrelid = pg_class.oid
         JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
         WHERE (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}') AND (regexp_split_to_array((att.attacl)::text, '[=/]'))[2] ~ '(r|w|a|x)\*')ok),'')), '')
+
+        -- Displays partitions
+        || COALESCE((SELECT E'\n\n-- Partitions SQL\n\n' || string_agg('CREATE TABLE ' || nsp.nspname || '.' || rel.relname || ' PARTITION OF ' || nsp2.nspname || '.' || rel2.relname || E'\n  ' || pg_get_expr(rel.relpartbound, rel.oid) || ';', E'\n\n' ORDER BY rel.oid)
+            FROM
+                (SELECT * FROM pg_inherits WHERE inhparent = {{INTOID}}::oid) inh
+                LEFT JOIN pg_class rel ON inh.inhrelid = rel.oid
+                LEFT JOIN pg_namespace nsp ON rel.relnamespace = nsp.oid
+                LEFT JOIN pg_class rel2 ON rel2.oid = inh.inhparent
+                LEFT JOIN pg_namespace nsp2 ON rel2.relnamespace = nsp2.oid
+                WHERE rel.relispartition), '')
 
         -- Displays RULEs
         || COALESCE((SELECT E'\n\n' || array_to_string((SELECT array_agg(perms) FROM (
@@ -5069,44 +5200,6 @@ LEFT JOIN pg_operator opr_commutator ON opr_commutator.oid = pg_operator.oprcom
 LEFT JOIN pg_operator opr_negator ON opr_negator.oid = pg_operator.oprnegate
 LEFT JOIN pg_description ON pg_description.objoid = pg_operator.oid AND pg_description.objsubid = 0
     WHERE pg_operator.oid = '{{INTOID}}'
- ORDER BY sort;
-*/});
-
-propQuery.prop_sequence = propQuery.objectSequence = ml(function () {/*
-   SELECT 1 AS sort,
-          'Name',
-          'OID',
-          'Owner',
-          'ACL',
-          'Current Value',
-          'Minimum Value',
-          'Maximum Value',
-          'Increment Value',
-          'Cache',
-          'Cycled?',
-          'Called?',
-          'Comment'
-UNION ALL
-   SELECT 2 AS sort,
-          pg_class.relname::text,
-          pg_class.oid::text,
-          pg_roles.rolname::text,
-          pg_class.relacl::text,
-          sequences.start_value::text,
-          sequences.minimum_value::text,
-          sequences.maximum_value::text,
-          sequences.increment::text,
-          (SELECT cache_value FROM {{STRSQLSAFENAME}})::text,
-          (SELECT (CASE WHEN is_cycled THEN 'Yes' ELSE 'No' END) FROM {{STRSQLSAFENAME}})::text,
-          (SELECT (CASE WHEN is_called THEN 'Yes' ELSE 'No' END) FROM {{STRSQLSAFENAME}})::text,
-          description::text
-     FROM pg_class
-LEFT JOIN pg_roles ON pg_roles.oid = pg_class.relowner
-LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
-LEFT JOIN information_schema.sequences ON sequences.sequence_schema = pg_namespace.nspname
-				       AND sequences.sequence_name = pg_class.relname
-LEFT JOIN pg_description ON pg_description.objoid = pg_class.oid AND pg_description.objsubid = 0
-    WHERE pg_class.relkind = 'S' AND pg_class.oid = '{{INTOID}}'
  ORDER BY sort;
 */});
 
