@@ -815,6 +815,7 @@ function treePrepareQuery(strQuery, oid, strName, sqlSafeName) {
                       , 'P' // PG Catalog Schema
                       , 'S' // Servers
                       , 'T' // Tablespaces
+                      , 'N' // Publications
                     ]
                   , arrNames = [
                         'Group Roles'            // G
@@ -828,6 +829,7 @@ function treePrepareQuery(strQuery, oid, strName, sqlSafeName) {
                       , 'PG Catalog Schema'      // P
                       , 'Servers'                // S
                       , 'Tablespaces'            // T
+                      , 'Publications'           // N
                     ];
 
                 var arrAnswerParts, strOid, strName, divElement, arrElements, i, len
@@ -1003,6 +1005,9 @@ function treePrepareQuery(strQuery, oid, strName, sqlSafeName) {
 
                     } else if (arrShown[i] === 'F') {
                         jsnRow.query = 'objectForeignDataWrapper';
+
+                    } else if (arrShown[i] === 'N') {
+                        jsnRow.query = 'objectPublication';
 
                     } else {
                         //jsnRow.action = treeLoadSchema;
@@ -1284,7 +1289,8 @@ function dialogAddSchema(target) {
                                         (treeGlobals.shownItems.indexOf('Casts') > -1) &&
                                         (treeGlobals.shownItems.indexOf('Servers') > -1) &&
                                         (treeGlobals.shownItems.indexOf('Tablespaces') > -1) &&
-                                        (treeGlobals.shownItems.indexOf('Foreign Data Wrappers') > -1)
+                                        (treeGlobals.shownItems.indexOf('Foreign Data Wrappers') > -1) &&
+                                        (treeGlobals.shownItems.indexOf('Publications') > -1)
                                     ) + '">' +
                                 '&nbsp;Select All/None</gs-checkbox>';
 
@@ -1294,6 +1300,7 @@ function dialogAddSchema(target) {
             strMoreHTML += htmlFunction('checkbox-fdw', '', 'Foreign Data Wrappers', (treeGlobals.shownItems.indexOf('Foreign Data Wrappers') > -1));
             strMoreHTML += htmlFunction('checkbox-info-schema', '', 'Information Schema', (treeGlobals.shownItems.indexOf('Information Schema') > -1));
             strMoreHTML += htmlFunction('checkbox-languages', '', 'Languages', (treeGlobals.shownItems.indexOf('Languages') > -1));
+            strMoreHTML += htmlFunction('checkbox-publications', '', 'Publications', (treeGlobals.shownItems.indexOf('Publications') > -1));
 
             bolAllSchemasVisible = true;
             for (i = 1, len = arrList.length; i < len; i += 1) {
@@ -1362,6 +1369,7 @@ function dialogAddSchema(target) {
               , 'P' // PG Catalog Schema
               , 'S' // Servers
               , 'T' // Tablespaces
+              , 'N' // Publications
             ];
 
         if (strAnswer !== 'Cancel') {
@@ -1379,6 +1387,7 @@ function dialogAddSchema(target) {
             if (xtag.query(allListContainer, '.checkbox-pg-schema')[0].value === 'true') { arrShown.push('P'); }
             if (xtag.query(allListContainer, '.checkbox-servers')[0].value === 'true') { arrShown.push('S'); }
             if (xtag.query(allListContainer, '.checkbox-tablespaces')[0].value === 'true') { arrShown.push('T'); }
+            if (xtag.query(allListContainer, '.checkbox-publications')[0].value === 'true') { arrShown.push('N'); }
 
             // handle "schemas"
             arrCheckbox = xtag.query(schemaListContainer, '.checkbox-schema');
