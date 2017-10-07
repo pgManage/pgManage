@@ -2565,6 +2565,9 @@ var treeStructure = [
     [1, 'folder', 'objectTablespace'],
         [2, 'script', 'objectTablespace'],
 
+	[1, 'folder', 'objectPublication'],
+		[2, 'script', 'objectPublication'],
+
     // schema
     [1, 'folder,script', 'objectSchema'],
         [2, '', 'objectNothing'],
@@ -3328,6 +3331,11 @@ listQuery.objectCast = listQuery.casts = ml(function () {/*
        JOIN pg_type st ON st.oid = castsource
        JOIN pg_type tt ON tt.oid = casttarget
    ORDER BY name;
+*/});
+
+listQuery.objectPublication = listQuery.publications = ml(function () {/*
+	SELECT oid, pubname AS name FROM pg_catalog.pg_publication
+	    ORDER BY name;
 */});
 
 
@@ -4231,7 +4239,7 @@ scriptQuery.objectSequence = ml(function () {/*
                                              AND s.sequence_name = c.relname
         WHERE c.relkind = 'S'::char AND (c.oid = {{INTOID}} OR n.nspname || '.' || c.relname = '{{STRSQLSAFENAME}}')),'');
     */});
-    
+
 scriptQuery.objectSequenceDump = ml(function () {/*
         SELECT (SELECT '-- DROP SEQUENCE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || E';\n\n' ||
 
@@ -4313,7 +4321,7 @@ scriptQuery.objectSequenceDump = ml(function () {/*
                                              AND s.sequence_name = c.relname
         WHERE c.relkind = 'S'::char AND (c.oid = {{INTOID}} OR n.nspname || '.' || c.relname = '{{STRSQLSAFENAME}}')),'');
     */});
-    
+
 scriptQuery.objectSequencesOwned = ml(function () {/*
     SELECT string_agg(E'ALTER SEQUENCE ' || objid::regclass || ' OWNED BY ' || pg_depend.refobjid::regclass || '.' || quote_ident(pg_attribute.attname) || ';', E'\n\n')
        FROM pg_depend
@@ -4383,11 +4391,11 @@ SELECT '-- Constraint: ' || conname || E';\n\n' ||
 */});
 
 scriptQuery.objectSchemaTriggers = ml(function () {/*
-    SELECT string_agg(E'\n\n' || '-- Trigger: ' || quote_ident(pg_trigger.tgname) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname) || E';\n' || 
+    SELECT string_agg(E'\n\n' || '-- Trigger: ' || quote_ident(pg_trigger.tgname) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname) || E';\n' ||
     	'-- DROP TRIGGER ' || quote_ident(pg_trigger.tgname) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname) || E';\n' ||
     	regexp_replace(regexp_replace(regexp_replace(regexp_replace(pg_get_triggerdef(pg_trigger.oid, true),
     	' BEFORE ', E'\n   BEFORE '), ' ON ', E'\n   ON '), ' FOR ', E'\n   FOR '), ' EXECUTE ', E'\n   EXECUTE ') || E';\n\n', E'\n')
-    FROM pg_class 
+    FROM pg_class
     JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
     JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
     WHERE (pg_namespace.nspname = '{{SCHEMA}}') AND pg_trigger.tgisinternal != TRUE;
@@ -4694,7 +4702,7 @@ scriptQuery.objectView = ml(function () {/*
 scriptQuery.objectViewDump = ml(function () {/*
         SELECT  (SELECT array_to_string(array_agg(full_sql), E'\n')
         	FROM (SELECT '-- DROP VIEW ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || E';\n\n' ||
-        	       'CREATE OR REPLACE VIEW ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || 
+        	       'CREATE OR REPLACE VIEW ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) ||
         	       COALESCE(' WITH (' || array_to_string(reloptions, ', ') || ')', '')
         	       || E' AS\n' ||
         	       pg_get_viewdef(c.oid, 100) || E'\n\n' ||
@@ -4707,8 +4715,8 @@ scriptQuery.objectViewDump = ml(function () {/*
         	LEFT JOIN pg_roles ON pg_roles.oid = c.relowner
         	LEFT JOIN pg_description ON pg_description.objoid = c.oid
         	 WHERE (c.relkind = 'v'::char OR c.relkind = 'm'::char) AND (c.oid = {{INTOID}} OR (n.nspname || '.' || c.relname) = '{{STRSQLSAFENAME}}')) em)
-         
-        || COALESCE((SELECT E'\n' || (SELECT array_to_string(array_agg( 'GRANT ' || 
+
+        || COALESCE((SELECT E'\n' || (SELECT array_to_string(array_agg( 'GRANT ' ||
         	(SELECT array_to_string((SELECT array_agg(perms ORDER BY srt)
         	FROM (	SELECT 1 as srt, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'r($|[^*])' THEN 'SELECT' END as perms
         		UNION SELECT 2, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'w($|[^*])' THEN 'UPDATE' END
@@ -4719,16 +4727,16 @@ scriptQuery.objectViewDump = ml(function () {/*
         		UNION SELECT 7, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 't($|[^*])' THEN 'TRIGGER' END ) em
         		WHERE perms is not null),',')) ||
         	' ON TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || ' TO ' ||
-        	CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE ((regexp_split_to_array(unnest::text,'[=/]'))[1]) END || 
+        	CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE ((regexp_split_to_array(unnest::text,'[=/]'))[1]) END ||
         	';' ), E'\n')
-        	FROM unnest(relacl) 
-        	WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|a|d|D|x|t)($|[^*])' 
+        	FROM unnest(relacl)
+        	WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|a|d|D|x|t)($|[^*])'
         	)
-        FROM pg_class 
+        FROM pg_class
         JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
         WHERE pg_class.oid = {{INTOID}} OR (pg_namespace.nspname || '.' || pg_class.relname) = '{{STRSQLSAFENAME}}' ),'')
-        
-        || COALESCE((SELECT E'\n\n' || (SELECT array_to_string(array_agg( 'GRANT ' || 
+
+        || COALESCE((SELECT E'\n\n' || (SELECT array_to_string(array_agg( 'GRANT ' ||
         	(SELECT array_to_string((SELECT array_agg(perms ORDER BY srt)
         	FROM (	SELECT 1 as srt, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'r\*' THEN 'SELECT' END as perms
         		UNION SELECT 2, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'w\*' THEN 'UPDATE' END
@@ -4739,15 +4747,15 @@ scriptQuery.objectViewDump = ml(function () {/*
         		UNION SELECT 7, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 't\*' THEN 'TRIGGER' END ) em
         		WHERE perms is not null),',')) ||
         	' ON TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || ' TO ' ||
-        	CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE ((regexp_split_to_array(unnest::text,'[=/]'))[1]) END || 
+        	CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE ((regexp_split_to_array(unnest::text,'[=/]'))[1]) END ||
         	' WITH GRANT OPTION;'), E'\n')
-        	FROM unnest(relacl) 
+        	FROM unnest(relacl)
         	WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|a|d|D|x|t)\*' )
-        FROM pg_class 
+        FROM pg_class
         JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
         WHERE pg_class.oid = {{INTOID}} OR (pg_namespace.nspname || '.' || pg_class.relname) = '{{STRSQLSAFENAME}}' ), '')
-        	
-        
+
+
         || COALESCE((SELECT E'\n' || array_to_string(array_agg(drp),E'\n')
         	FROM ( SELECT E'\n-- DROP RULE ' || quote_ident(pg_rewrite.rulename) ||
         		  ' ON ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || E';\n' ||
@@ -4759,7 +4767,7 @@ scriptQuery.objectViewDump = ml(function () {/*
          WHERE pg_rewrite.rulename <> '_RETURN' AND (c.oid = {{INTOID}} OR (n.nspname || '.' || c.relname) = '{{STRSQLSAFENAME}}')) em
         	),'');
     */});
-    
+
 scriptQuery.objectViewNoComment = ml(function () {/*
         SELECT  (SELECT array_to_string(array_agg(full_sql), E'\n')
         	FROM (SELECT '-- DROP VIEW ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || E';\n\n' ||
@@ -4864,6 +4872,47 @@ scriptQuery.objectCast = ml(function () {/*
         LEFT JOIN pg_catalog.pg_proc ON pg_proc.oid = pg_cast.castfunc
         LEFT JOIN pg_catalog.pg_namespace nsp ON nsp.oid = pg_proc.pronamespace
         WHERE pg_cast.oid = {{INTOID}} OR (format_type(pg_type1.oid,NULL) || '->' || format_type(pg_type2.oid,pg_type2.typtypmod)) = '{{STRSQLSAFENAME}}';
+    */});
+
+associatedButtons.objectPublication = [];
+scriptQuery.objectPublication = ml(function () {/*
+SELECT '-- DROP PUBLICATION ' || pg_publication.pubname || E' \n\n'
+    || 'CREATE PUBLICATION ' || pg_publication.pubname || ' FOR ' ||-- pg_publication_rel.prpubid ||
+    CASE WHEN pg_publication.puballtables = 't' THEN
+        'ALL TABLES'
+	ELSE
+    	'TABLE ' || (
+    	SELECT string_agg(pg_publication_tables.schemaname || '.'  || pg_publication_tables.tablename, ', '::text) FROM pg_catalog.pg_publication
+            LEFT JOIN pg_catalog.pg_publication_tables ON pg_publication.pubname = pg_publication_tables.pubname
+            WHERE pg_publication.oid = {{INTOID}}
+        )
+    END ||
+    CASE WHEN (SELECT '' || pubinsert || '' || pubupdate || '' || pubdelete || '' FROM pg_catalog.pg_publication WHERE pg_publication.oid = {{INTOID}}) = 'truetruetrue' THEN
+        ''
+	ELSE
+    	E'\n    WITH (' || (
+    	SELECT 'publish = ''' ||
+            CASE WHEN pg_publication.pubinsert THEN
+                CASE WHEN pg_publication.pubupdate THEN
+                    CASE WHEN pg_publication.pubdelete THEN 'insert, update, delete' ELSE 'insert, update' END
+                ELSE
+                    CASE WHEN pg_publication.pubdelete THEN 'insert, delete' ELSE 'insert' END
+                END
+            ELSE
+                CASE WHEN pg_publication.pubupdate THEN
+                    CASE WHEN pg_publication.pubdelete THEN 'update, delete' ELSE 'update' END
+                ELSE
+                    CASE WHEN pg_publication.pubdelete THEN ', delete' ELSE '' END
+                END
+            END
+                || '''' FROM pg_catalog.pg_publication
+        WHERE oid = {{INTOID}}
+    	) || ')'
+    END || ';'
+FROM pg_catalog.pg_publication
+LEFT JOIN pg_catalog.pg_publication_rel ON pg_publication.oid = pg_publication_rel.prpubid
+WHERE pg_publication.oid = {{INTOID}}
+LIMIT 1;
     */});
 
 associatedButtons.informationSchemaView = [];
