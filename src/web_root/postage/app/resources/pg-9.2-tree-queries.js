@@ -2894,11 +2894,7 @@ scriptQuery.objectTableDump = ml(function () {/*
                         E',\n'),
                     '') ||
                     COALESCE(em2.con_full, '') ||
-<<<<<<< HEAD
-            E'\n)' || (E' WITH (\n  ' ||
-=======
-            E'\n)' || (COALESCE(' PARTITION BY ' || (CASE WHEN pg_class.relkind = 'p' THEN pg_get_partkeydef({{INTOID}}::oid) ELSE NULL END) || E'\n', ' ')) || (E'WITH (\n  ' || 
->>>>>>> 5c7e03a61835b0432d6e452b409b3a8053764076
+            E'\n)' || (COALESCE(' PARTITION BY ' || (CASE WHEN pg_class.relkind = 'p' THEN pg_get_partkeydef({{INTOID}}::oid) ELSE NULL END) || E'\n', ' ')) || (E'WITH (\n  ' ||
                             CASE WHEN pg_class.relhasoids THEN
                                 'OIDS=TRUE'
                             ELSE
@@ -3005,13 +3001,8 @@ scriptQuery.objectTableDump = ml(function () {/*
         LEFT JOIN pg_catalog.pg_stat_user_tables ON pg_stat_user_tables.relid = pg_class.oid
         WHERE pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}'
         GROUP BY pg_namespace.nspname, pg_class.relname, pg_class.relacl,
-<<<<<<< HEAD
-                pg_class.relhasoids, pg_roles.rolname, em2.oid, em2.con_full, reloptions) --pg_description.description
-
-=======
                 pg_class.relhasoids, pg_roles.rolname, em2.oid, em2.con_full, reloptions, pg_class.relkind) --pg_description.description
-                
->>>>>>> 5c7e03a61835b0432d6e452b409b3a8053764076
+
         -- This section pulls the GRANT lines
         || COALESCE((SELECT E'\n\n' || (SELECT array_to_string(array_agg( 'GRANT ' ||
         	(SELECT array_to_string((SELECT array_agg(perms ORDER BY srt)
@@ -3087,9 +3078,7 @@ scriptQuery.objectTableDump = ml(function () {/*
         LEFT JOIN pg_attribute att ON att.attrelid = pg_class.oid
         JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
         WHERE (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}') AND (regexp_split_to_array((att.attacl)::text, '[=/]'))[2] ~ '(r|w|a|x)\*')ok),'')), '')
-<<<<<<< HEAD
-=======
-        
+
         -- Displays partitions
         || COALESCE((SELECT E'\n\n-- Partitions SQL\n\n' || string_agg('CREATE TABLE ' || nsp.nspname || '.' || rel.relname || ' PARTITION OF ' || nsp2.nspname || '.' || rel2.relname || E'\n  ' || pg_get_expr(rel.relpartbound, rel.oid) || ';', E'\n\n' ORDER BY rel.oid)
             FROM
@@ -3099,7 +3088,6 @@ scriptQuery.objectTableDump = ml(function () {/*
                 LEFT JOIN pg_class rel2 ON rel2.oid = inh.inhparent
                 LEFT JOIN pg_namespace nsp2 ON rel2.relnamespace = nsp2.oid
                 WHERE rel.relispartition), '')
->>>>>>> 5c7e03a61835b0432d6e452b409b3a8053764076
 
         -- Displays RULEs
         || COALESCE((SELECT E'\n\n' || array_to_string((SELECT array_agg(perms) FROM (

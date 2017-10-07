@@ -1256,9 +1256,9 @@ function dialogAddSchema(target) {
         getListData(listQuery.schemas, document.getElementById('showhide-loader-container'), function (arrList) {
             var i, len, strHTML, htmlFunction, strMoreHTML, bolAllSchemasVisible;
 
-            htmlFunction = function (strClass, strAttributes, buttonContent, value) {
+            htmlFunction = function (strClass, strAttributes, buttonContent, value, hidden) {
                 return '<gs-checkbox class="text-left checkbox-list ' + strClass + '" ' + strAttributes + ' ' +
-                                    'data-name="' + encodeHTML(buttonContent) + '" value="' + (value || 'false') + '">' +
+                                    'data-name="' + encodeHTML(buttonContent) + '" ' + ((hidden) ? 'hidden' : '') + ' value="' + (value || 'false') + '">' +
                             '&nbsp;' + encodeHTML(buttonContent) +
                         '</gs-checkbox>';
             };
@@ -1300,7 +1300,13 @@ function dialogAddSchema(target) {
             strMoreHTML += htmlFunction('checkbox-fdw', '', 'Foreign Data Wrappers', (treeGlobals.shownItems.indexOf('Foreign Data Wrappers') > -1));
             strMoreHTML += htmlFunction('checkbox-info-schema', '', 'Information Schema', (treeGlobals.shownItems.indexOf('Information Schema') > -1));
             strMoreHTML += htmlFunction('checkbox-languages', '', 'Languages', (treeGlobals.shownItems.indexOf('Languages') > -1));
-            strMoreHTML += htmlFunction('checkbox-publications', '', 'Publications', (treeGlobals.shownItems.indexOf('Publications') > -1));
+
+			console.log(contextData.versionText.match(/[0-9]+\.[0-9]+\.[0-9]+/));
+			if (contextData.versionText.match(/[0-9]+\.[0-9]+\.[0-9]+/)) {
+	            strMoreHTML += htmlFunction('checkbox-publications', '', 'Publications', (treeGlobals.shownItems.indexOf('Publications') > -1), true);
+			} else {
+				strMoreHTML += htmlFunction('checkbox-publications', '', 'Publications', (treeGlobals.shownItems.indexOf('Publications') > -1));
+			}
 
             bolAllSchemasVisible = true;
             for (i = 1, len = arrList.length; i < len; i += 1) {
