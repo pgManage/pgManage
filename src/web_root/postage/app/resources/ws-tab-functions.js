@@ -911,7 +911,7 @@ function fillTab(tabElement, jsnParameters) {
 
     } else if (tabElement.tabType === 'design-table') {
         tabElement.relatedFrame.innerHTML =
-                '<iframe class="full-iframe" src="frames/frame-table.html?oid=' + jsnParameters.oid + '"></iframe>';
+                '<iframe class="full-iframe" src="frames/frame-table.html?oid=' + jsnParameters.oid + '&versionNum=' + contextData.minorVersionNumber + '"></iframe>';
 
     } else if (tabElement.tabType === 'datasheet') {
         tabElement.relatedFrame.innerHTML =
