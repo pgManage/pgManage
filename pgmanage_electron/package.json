@@ -60,7 +60,7 @@
     "electron": "^1.6.2",
     "electron-builder": "^17.10.0"
   },
-  "homepage": "https://github.com/workflowproducts/pgmanage/blob/master/README.md",
+  "homepage": "https://github.com/pgManage/pgManage/blob/master/README.md",
   "keywords": [
     "pgManage",
     "Electron",
@@ -68,7 +68,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/workflowproducts/pgmanage.git"
+    "url": "git+https://github.com/pgManage/pgManage.git"
   },
   "scripts": {
     "start": "electron app",

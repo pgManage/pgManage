@@ -132,5 +132,5 @@ Copyright (c) 2017 Workflow Products, LLC
 
 Created by Annunziato Tocci
 
-Report bugs to https://github.com/workflowproducts/pgmanage/issues  
+Report bugs to https://github.com/pgManage/pgManage/issues  
 Send us feedback! Current contact information can be found at workflowproducts.com  

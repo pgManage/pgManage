@@ -233,9 +233,9 @@ function menuOptions(target) {
                 <gs-button class="pgmanage-menu-item-button" dialogclose id="clear-cache-button"
                             no-focus iconleft onclick="buttonReloadWindow()" icon="refresh">Clear Cache</gs-button>
                 <gs-button class="pgmanage-menu-item-button" dialogclose no-focus iconleft target="_blank"
-                            href="https://github.com/workflowproducts/pgmanage/" icon="github">pgManage On Github</gs-button>
+                            href="https://github.com/pgManage/pgManage/" icon="github">pgManage On Github</gs-button>
                 <gs-button class="pgmanage-menu-item-button" dialogclose no-focus iconleft target="_blank"
-                            href="https://github.com/workflowproducts/pgmanage/issues" icon="bug">Report An Issue</gs-button>
+                            href="https://github.com/pgManage/pgManage/issues" icon="bug">Report An Issue</gs-button>
                 <gs-button class="pgmanage-menu-item-button" dialogclose no-focus iconleft onclick="dialogOptions();" icon="gear">pgManage Options</gs-button>
             </gs-body>
         </gs-page>

@@ -1,6 +1,6 @@
 # Installing pgManage (Web Server mode) ON WINDOWS
 
-## Please note that we put a lot of effort into making sure pgManage installs cleanly on every platform. If you have an issue please [report it](https://github.com/workflowproducts/pgmanage/issues) and we'll get it fixed. 
+## Please note that we put a lot of effort into making sure pgManage installs cleanly on every platform. If you have an issue please [report it](https://github.com/pgManage/pgManage/issues) and we'll get it fixed. 
 
 ## Dependencies
 
@@ -8,14 +8,14 @@ There are a couple of dependencies but we're currently shipping them all with th
 
 ####DOWNLOADING PGMANAGE
 
-https://github.com/workflowproducts/pgmanage/releases
+https://github.com/pgManage/pgManage/releases
 
 
 ####NOTICE: INSTALLING PGMANAGE SERVER ON *NIX SYSTEMS IS EXPLAINED IN THE DOCUMENT: INSTALL_WEB_SERVER_MODE.md
 
 ####INSTALLING PGMANAGE
 
-Download and install the Electron version of pgManage from https://github.com/workflowproducts/pgmanage/releases
+Download and install the Electron version of pgManage from https://github.com/pgManage/pgManage/releases
 
 It should be named something like: pgManage.Windows.#.#.##.zip
 

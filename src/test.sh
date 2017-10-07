@@ -16,7 +16,7 @@ fi
 
 rm -rf pgmanage-master master.zip ~/.mozilla ~/.pgmanage
 
-wget https://github.com/workflowproducts/pgmanage/archive/master.zip
+wget https://github.com/pgManage/pgManage/archive/master.zip
 unzip master.zip
 cd pgmanage-master/
 

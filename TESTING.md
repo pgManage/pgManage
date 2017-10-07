@@ -4,7 +4,7 @@ su -
 pkg install
 pkg install unzip postgresql96-server gmake wget
 exit
-wget https://github.com/workflowproducts/pgmanage/archive/master.zip
+wget https://github.com/pgManage/pgManage/archive/master.zip
 unzip master.zip
 cd pgmanage-master/
 ./configure
@@ -78,7 +78,7 @@ gmake uninstall
 su -
 pkg_add unzip postgresql-server gmake wget
 exit
-wget https://github.com/workflowproducts/pgmanage/archive/master.zip
+wget https://github.com/pgManage/pgManage/archive/master.zip
 unzip master.zip
 cd pgmanage-master/
 ./configure
@@ -151,7 +151,7 @@ In terminal:
 ```
 sudo apt-get install postgresql-server-dev-9.5 postgresql-9.5
 export PATH="/usr/lib/postgresql/9.5/bin:$PATH"
-wget https://github.com/workflowproducts/pgmanage/archive/master.zip
+wget https://github.com/pgManage/pgManage/archive/master.zip
 unzip master.zip 
 cd pgmanage-master/
 ./configure && make
@@ -222,7 +222,7 @@ make uninstall
 # Fedora pgManage
 In terminal:
 ```
-wget https://github.com/workflowproducts/pgmanage/archive/master.zip
+wget https://github.com/pgManage/pgManage/archive/master.zip
 unzip master.zip 
 cd pgmanage-master/
 ./configure && make
@@ -292,7 +292,7 @@ Use Google Chrome
 
 In terminal:
 ```
-curl -OL https://github.com/workflowproducts/pgmanage/archive/master.zip
+curl -OL https://github.com/pgManage/pgManage/archive/master.zip
 unzip master.zip 
 cd pgmanage-master/
 ./configure

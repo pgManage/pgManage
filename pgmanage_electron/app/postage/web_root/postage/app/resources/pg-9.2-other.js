@@ -1,14 +1,49 @@
 var bolOtherLoaded = true;
+var currentTab = document.getElementsByClassName('current-tab')[0];
+var bolDebug = false;
+var bolPanelDebug = false;
+var resultsScroll = 0;
+var glb_CSSEditor;
+
+function hideOtherTables(tabnum, safeid) {
+    var foundHidden = false;
+    var gs_table = xtag.query(document.getElementById('sql-results-area-' + tabnum + '-container'), 'gs-table');
+    for (var i = 0, len = gs_table.length; i < len; i++) {
+        if (gs_table[i].classList.contains('notHidden')) {
+            foundHidden = true;
+        }
+    }
+
+    for (var i = 0, len = gs_table.length; i < len; i++) {
+        if (gs_table[i].getAttribute('id') === safeid) {
+            if (!foundHidden) {
+                gs_table[i].classList.add('notHidden');
+            } else {
+                if (gs_table[i].classList.contains('notHidden')) {
+                    gs_table[i].classList.remove('notHidden');
+                }
+            }
+        }
+    }
+}
 
 // fetch info about the current context so that we dont have to load it in muliple places
 var contextData = {};
 function loadContextData(callback) {
     'use strict';
     var finishFunction = function () {
-        if (contextData.databaseName     !== undefined && contextData.sessionUser           !== undefined && contextData.currentUser    !== undefined &&
-            contextData.versionNumber    !== undefined && contextData.versionText           !== undefined && contextData.port           !== undefined &&
-            contextData.connectionString !== undefined && contextData.connectionName        !== undefined && contextData.pgmanageVersion !== undefined &&
-            contextData.userIsSuper      !== undefined && contextData.connectionStringParts !== undefined && contextData.dataDirectory  !== undefined) {
+        if (contextData.databaseName          !== undefined &&
+            contextData.sessionUser           !== undefined &&
+            contextData.currentUser           !== undefined &&
+            contextData.versionNumber         !== undefined &&
+            contextData.versionText           !== undefined &&
+            contextData.port                  !== undefined &&
+            contextData.connectionString      !== undefined &&
+            contextData.connectionName        !== undefined &&
+            contextData.pgmanageVersion        !== undefined &&
+            contextData.userIsSuper           !== undefined &&
+            contextData.connectionStringParts !== undefined &&
+            contextData.dataDirectory         !== undefined) {
             callback();
         }
     };
@@ -29,12 +64,17 @@ function loadContextData(callback) {
             // if message 0
             if (data.intCallbackNumber === 0) {
                 arrColumns = data.strMessage.split('\t');
-
+				
                 contextData.databaseName = arrColumns[0];
                 contextData.sessionUser = arrColumns[1];
                 contextData.currentUser = arrColumns[2];
                 contextData.versionText = arrColumns[3];
-                contextData.versionNumber = contextData.versionText.match(/[0-9]+\.[0-9]+\.[0-9]+/)[0];
+
+				if (contextData.versionText.match(/[0-9]+\.[0-9]+\.[0-9]+/)) {
+                	contextData.versionNumber = contextData.versionText.match(/[0-9]+\.[0-9]+\.[0-9]+/)[0];
+				} else {
+					contextData.versionNumber = contextData.versionText.match(/[0-9]+\.[0-9]+/)[0];
+				}
 
                 // get minor version
                 if (contextData.versionNumber.match(/\./g).length === 2) {
@@ -119,9 +159,11 @@ function startPanelResize(target) {
 
         } else {
             intCurrentLeft = GS.mousePosition(event).left;
+            //intCurrentLeft = event.clientX;
+            target.style.maxWidth = intCurrentLeft + 'px';
+            target.style.width = '100%';
 
-            target.style.width = intCurrentLeft + 'px';
-
+            GS.log(bolPanelDebug, 'intCurrentLeft: ' + intCurrentLeft + 'target.style.width: ' + target.style.width);
             event.preventDefault();
             event.stopPropagation();
         }
@@ -148,7 +190,7 @@ function menuUser(target) {
     'use strict';
     var templateElement = document.createElement('template');
 
-    templateElement.setAttribute('data-max-width', '11em');
+    templateElement.setAttribute('data-max-width', '15em');
     templateElement.setAttribute('data-overlay-close', 'true');
     templateElement.innerHTML = ml(function () {/*
         <gs-page>
@@ -163,7 +205,12 @@ function menuUser(target) {
         </gs-page>
     */});
 
-    GS.openDialogToElement(target, templateElement, 'down');
+    GS.openDialogToElement(target, templateElement, 'down', function () {}, function () {
+        var currentTab = document.getElementsByClassName('current-tab')[0];
+		if (currentTab && currentTab.relatedEditor) {
+			currentTab.relatedEditor.focus();
+		}
+	});
 }
 
 function buttonReloadWindow() {
@@ -177,7 +224,7 @@ function menuTools(target) {
     'use strict';
     var templateElement = document.createElement('template');
 
-    templateElement.setAttribute('data-max-width', '11em');
+    templateElement.setAttribute('data-max-width', '15em');
     templateElement.setAttribute('data-overlay-close', 'true');
     templateElement.innerHTML = ml(function () {/*
         <gs-page>
@@ -208,20 +255,19 @@ function menuTools(target) {
 
     // dialogAbout()
 
-    GS.openDialogToElement(target, templateElement, 'down', function () {
-        //if we are in electron, remove the clear cache button
-        if (window.process && window.process.type === 'renderer') {
-            var element = document.getElementById('clear-cache-button');
-            element.parentNode.removeChild(element);
-        }
-    });
+    GS.openDialogToElement(target, templateElement, 'down', function () {}, function () {
+        var currentTab = document.getElementsByClassName('current-tab')[0];
+		if (currentTab && currentTab.relatedEditor) {
+			currentTab.relatedEditor.focus();
+		}
+	});
 }
 
 function menuOptions(target) {
     'use strict';
     var templateElement = document.createElement('template');
 
-    templateElement.setAttribute('data-max-width', '11em');
+    templateElement.setAttribute('data-max-width', '15em');
     templateElement.setAttribute('data-overlay-close', 'true');
     templateElement.innerHTML = ml(function () {/*
         <gs-page>
@@ -233,9 +279,9 @@ function menuOptions(target) {
                 <gs-button class="pgmanage-menu-item-button" dialogclose id="clear-cache-button"
                             no-focus iconleft onclick="buttonReloadWindow()" icon="refresh">Clear Cache</gs-button>
                 <gs-button class="pgmanage-menu-item-button" dialogclose no-focus iconleft target="_blank"
-                            href="https://github.com/workflowproducts/pgmanage/" icon="github">pgManage On Github</gs-button>
+                            href="https://github.com/pgManage/pgManage/" icon="github">pgManage On Github</gs-button>
                 <gs-button class="pgmanage-menu-item-button" dialogclose no-focus iconleft target="_blank"
-                            href="https://github.com/workflowproducts/pgmanage/issues" icon="bug">Report An Issue</gs-button>
+                            href="https://github.com/pgManage/pgManage/issues" icon="bug">Report An Issue</gs-button>
                 <gs-button class="pgmanage-menu-item-button" dialogclose no-focus iconleft onclick="dialogOptions();" icon="gear">pgManage Options</gs-button>
             </gs-body>
         </gs-page>
@@ -246,17 +292,25 @@ function menuOptions(target) {
     GS.openDialogToElement(target, templateElement, 'down', function () {
         //if we are in electron, remove the clear cache button
         if (window.process && window.process.type === 'renderer') {
-            var element = document.getElementById('clear-cache-button');
-            element.parentNode.removeChild(element);
+            var buttonElement = document.getElementById('clear-cache-button');
+
+            if (buttonElement) {
+                buttonElement.parentNode.removeChild(buttonElement);
+            }
         }
-    });
+    }, function () {
+        var currentTab = document.getElementsByClassName('current-tab')[0];
+		if (currentTab && currentTab.relatedEditor) {
+			currentTab.relatedEditor.focus();
+		}
+	});
 }
 
 function menuTab(target) {
     'use strict';
     var templateElement = document.createElement('template');
 
-    templateElement.setAttribute('data-max-width', '11em');
+    templateElement.setAttribute('data-max-width', '15em');
     templateElement.setAttribute('data-overlay-close', 'true');
     if (window.process && window.process.type === 'renderer') {
         var app = require('electron').remote.app;
@@ -287,9 +341,7 @@ function menuTab(target) {
                     <gs-button class="pgmanage-menu-item-button" dialogclose iconleft
                             onclick="dialogClosedTabs()" no-focus icon="clock-o"
                             title="All closed tabs">View All Closed Tabs</gs-button>
-                    <gs-button class="pgmanage-menu-item-button" dialogclose
-                            onclick="window.opn('{{TABPATH}}')" no-focus
-                            title="Open tab Folder">Open tab Folder</gs-button>
+                    <gs-button class="pgmanage-menu-item-button" dialogclose onclick="window.opn('{{TABPATH}}')" iconleft no-focus icon="folder-open-o" title="Open tab Folder">Open tab Folder</gs-button>
                 </gs-body>
             </gs-page>
         */}).replace(/\{\{TABPATH\}\}/gi,
@@ -321,7 +373,12 @@ function menuTab(target) {
         */});
     }
 
-    GS.openDialogToElement(target, templateElement, 'down');
+    GS.openDialogToElement(target, templateElement, 'down', function () {}, function () {
+        var currentTab = document.getElementsByClassName('current-tab')[0];
+		if (currentTab && currentTab.relatedEditor) {
+			currentTab.relatedEditor.focus();
+		}
+	});
 }
 
 function dialogReloadConf() {
@@ -385,29 +442,12 @@ function dialogSplash() {
         <gs-page>
             <gs-body>
                 <div id="splash">
-                    <iframe style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; border: 0 none; z-index: 150; background-color: #FFFFFF;" class="full-iframe" src="https://news.workflowproducts.com/splash/pgmanage.html?app=pgmanage&version={{PGMANAGE}}&postgres={{POSTGRES}}"></iframe>
+                    <iframe style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; border: 0 none; z-index: 150; background-color: #FFFFFF;" class="full-iframe" src="/pgmanage/splash.html"></iframe>
                 </div>
             </gs-body>
         </gs-page>
     */}).replace(/\{\{PGMANAGE\}\}/g, contextData.pgmanageVersion).replace(/\{\{POSTGRES\}\}/g, contextData.versionNumber);
     GS.openDialog(templateElement);
-
-    var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4) {
-            if (xhr.status !== 200) {
-                document.getElementById('splash').innerHTML = ml(function () {/*
-                    <gs-container padded>
-                        <h2>pgManage Version Information & News could not load.</h2>
-                        <h3><a href="https://news.workflowproducts.com/splash/pgmanage.html?app=pgmanage&version={{PGMANAGE}}&postgres={{POSTGRES}}">https://news.workflowproducts.com/splash/pgmanage.html</a></h3>
-                        <h3>This may be an issue with your firewall. Does it block SSL-enabled websites?</h3>
-                    </gs-container>
-                */}).replace(/\{\{PGMANAGE\}\}/g, contextData.pgmanageVersion).replace(/\{\{POSTGRES\}\}/g, contextData.versionNumber);
-            };
-        };
-    };
-    xhr.open('HEAD', "https://news.workflowproducts.com/splash/pgmanage.html?app=pgmanage");
-    xhr.send();
 }
 
 
@@ -416,7 +456,7 @@ function dialogSwitchDatabase(target) {
     'use strict';
     var templateElement = document.createElement('template'), afterOpen, beforeClose;
 
-    templateElement.setAttribute('data-max-width', '11em');
+    templateElement.setAttribute('data-max-width', '15em');
     templateElement.setAttribute('data-overlay-close', 'true');
     templateElement.innerHTML = ml(function () {/*
         <gs-page>
@@ -430,19 +470,27 @@ function dialogSwitchDatabase(target) {
                                 'SELECT datname::text FROM pg_catalog.pg_database ORDER BY 1',
                                 function (data, error) {
             if (!error) {
-                // if we have a data packet: build up strHTML with the database names
-                if (data.strMessage !== '\\.' && data.strMessage.trim()) {
-                    arrDatabases = data.strMessage.split('\n');
+                // sometimes, the user closes the dialog before the list finishes loading, in this case, just ignore future responses
+                if (document.getElementById('database-container')) {
+                    // if we have a data packet: build up strHTML with the database names
+                    if (data.strMessage !== '\\.' && data.strMessage.trim()) {
+                        arrDatabases = data.strMessage.split('\n');
 
-                    for (i = 0, len = arrDatabases.length; i < len; i += 1) {
-                        strHTML += '<gs-button class="pgmanage-menu-item-button" dialogclose no-focus>' + encodeHTML(GS.decodeFromTabDelimited(arrDatabases[i])) + '</gs-button>';
+                        for (i = 0, len = arrDatabases.length; i < len; i += 1) {
+                            strHTML += (
+                                '<gs-button class="pgmanage-menu-item-button" dialogclose no-focus>' +
+                                    encodeHTML(GS.decodeFromTabDelimited(arrDatabases[i])) +
+                                '</gs-button>'
+                            );
+                        }
+
+                    // else if we've gotten to the end of the responses: fill the database list
+                    } else if (data.strMessage === '\\.') {
+                        document.getElementById('database-container').innerHTML = (
+                            (target.getAttribute('icon') !== 'database' ? '<center><b>Switch Database</b></center>' : '') +
+                            strHTML
+                        );
                     }
-
-                // else if we've gotten to the end of the responses: fill the database list
-                } else if (data.strMessage === '\\.') {
-                    document.getElementById('database-container').innerHTML =
-                        (target.getAttribute('icon') !== 'database' ? '<center><b>Switch Database</b></center>' : '') +
-                        strHTML;
                 }
 
             } else {
@@ -462,6 +510,10 @@ function dialogSwitchDatabase(target) {
                 }
             });
         }
+        var currentTab = document.getElementsByClassName('current-tab')[0];
+		if (currentTab && currentTab.relatedEditor) {
+			currentTab.relatedEditor.focus();
+		}
     });
 }
 
@@ -761,240 +813,389 @@ function dialogOptions() {
         <gs-page>
             <gs-header><center><h3>pgManage Options</h3></center></gs-header>
             <gs-body padded>
-                <h3>General</h3>
+                <gs-grid min-width="all {reflow}; 1200px {1,1};" gutter>
+                    <gs-block>
+                        <h3>General</h3>
+                        <div>
+                            <label for="pgmanage-options-left-panel" style="min-width: 7.25em;">Panel Width:</label>
+                            <gs-text id="pgmanage-options-left-panel"></gs-text>
 
-                <div>
-                    <label for="pgmanage-options-left-panel" style="min-width: 7.25em;">Panel Width:</label>
-                    <gs-text id="pgmanage-options-left-panel" flex></gs-text>
+                            <label for="pgmanage-options-beautify" style="min-width: 7.25em;">Automatic Beautify:</label>
+                            <gs-checkbox id="pgmanage-options-beautify"></gs-checkbox>
 
-                    <label>SQL Toolbar Button Style:</label>
-                    <gs-optionbox id="button-options" style="padding: 0 0.25em 0.25em 0.25em;">
-                        <gs-option value="true">Labeled</gs-option>
-                        <gs-option value="false">Unlabeled</gs-option>
-                    </gs-optionbox>
-                </div>
+                            <label for="pgmanage-options-Comma" style="min-width: 7.25em;">Comma First Formatting:</label>
+                            <gs-checkbox id="pgmanage-options-Comma"></gs-checkbox>
 
-
-                <h3>Clip Options</h3>
-                <div>
-                    <gs-grid widths="1,1" gutter>
-                        <gs-block>
-                            <gs-optionbox id="clip-options-quote-which" style="padding: 0 0.25em 0.25em 0.25em;">
-                                    <label>Escape Values When:</label>
-                                    <gs-option value="none">Nothing</gs-option>
-                                    <gs-option value="strings">Strings</gs-option>
-                                    <gs-option value="all">All Fields</gs-option>
+                            <label>SQL Toolbar Button Style:</label>
+                            <gs-optionbox id="button-options" style="padding: 0 0.25em 0.25em 0.25em;">
+                                <gs-option value="true">Labeled</gs-option>
+                                <gs-option value="false">Unlabeled</gs-option>
                             </gs-optionbox>
-                        </gs-block>
-                        <gs-block>
-                            <gs-optionbox id="clip-options-column-names" style="padding: 0 0.25em 0.25em 0.25em;">
-                                    <label>Include Column Names:</label>
-                                    <gs-option value="true">Always</gs-option>
-                                    <gs-option value="false">Only When Selected</gs-option>
+
+                            <label>SQL Explain Graph Style:</label>
+                            <gs-optionbox id="graph-options" style="padding: 0 0.25em 0.25em 0.25em;">
+                                <gs-option value="true">Horizontal</gs-option>
+                                <gs-option value="false">Vertical</gs-option>
                             </gs-optionbox>
-                        </gs-block>
-                    </gs-grid>
-                </div>
-                <div>
-                    <div flex-horizontal>
-                        <label for="clip-options-quote-char" style="min-width: 7.25em;">Escape Values with Char:</label>
-                        <gs-combo id="clip-options-quote-char" flex>
-                            <template>
-                                <table>
+                        </div>
+                    </gs-block>
+
+                    <gs-block>
+                        <h3>Clip Options</h3>
+                        <div class="clip-options">
+                            <gs-checkbox flex-horizontal value="true" class="pref-copy-headers">
+                                <label flex style="text-align: right;">Copy Headers</label>
+                            </gs-checkbox>
+                            <gs-checkbox flex-horizontal value="true" class="pref-copy-selectors">
+                                <label flex style="text-align: right;">Copy Row Numbers</label>
+                            </gs-checkbox>
+                            <div flex-horizontal flex-fill class="option-row">
+                                <div flex>
+                                    <gs-select class="pref-quote-char" mini>
+                                        <option value="\">Backslash (\)</option>
+                                        <option value="/">Forward Slash (/)</option>
+                                        <option value="|">Pipe (|)</option>
+                                        <option value="&quot;">Double Quote (&quot;)</option>
+                                        <option value="'">Single Quote (')</option>
+                                    </gs-select>
+                                </div>
+                                <div style="width: 55em;">Quote Character</div>
+                            </div>
+                            <div flex-horizontal flex-fill class="option-row">
+                                <div flex>
+                                    <gs-select class="pref-escape-char" mini>
+                                        <option value="\">Backslash (\)</option>
+                                        <option value="/">Forward Slash (/)</option>
+                                        <option value="|">Pipe (|)</option>
+                                        <option value="&quot;">Double Quote (&quot;)</option>
+                                        <option value="'">Single Quote (')</option>
+                                    </gs-select>
+                                </div>
+                                <div style="width: 55em;">Escape Character</div>
+                            </div>
+                            <div flex-horizontal flex-fill class="option-row">
+                                <div flex>
+                                    <gs-select class="pref-copy-quote" mini>
+                                        <option value="always">Always</option>
+                                        <option value="never">Never</option>
+                                        <option value="strings">Only on strings</option>
+                                        <option value="delimiter-in-content">
+                                            Cell contains separator
+                                        </option>
+                                    </gs-select>
+                                </div>
+                                <div style="width: 55em;">Quote</div>
+                            </div>
+                            <div flex-horizontal flex-fill class="option-row">
+                                <div flex>
+                                    <gs-select class="pref-delimiter-record" mini>
+                                        <option value="{{DOS_RETURN}}">DOS (\r\n)</option>
+                                        <option value="{{MAC_RETURN}}">Mac (\r)</option>
+                                        <option value="{{UNIX_RETURN}}">UNIX (\n)</option>
+                                        <option value="|">Vertical Bar (|)</option>
+                                        <option value=",">Comma (,)</option>
+                                        <option value="{{TAB}}">Tab</option>
+                                    </gs-select>
+                                </div>
+                                <div style="width: 55em;">Record Separator</div>
+                            </div>
+                            <div flex-horizontal flex-fill class="option-row">
+                                <div flex>
+                                    <gs-select class="pref-delimiter-cell" mini>
+                                        <option value="{{DOS_RETURN}}">DOS (\r\n)</option>
+                                        <option value="{{MAC_RETURN}}">Mac (\r)</option>
+                                        <option value="{{UNIX_RETURN}}">UNIX (\n)</option>
+                                        <option value="|">Vertical Bar (|)</option>
+                                        <option value=",">Comma (,)</option>
+                                        <option value="{{TAB}}">Tab</option>
+                                    </gs-select>
+                                </div>
+                                <div style="width: 55em;">Cell Separator</div>
+                            </div>
+                            <div flex-horizontal flex-fill class="option-row">
+                                <div flex>
+                                    <gs-select class="pref-null-value" mini>
+                                        <option value="">(nothing)</option>
+                                        <option value="NULL">"NULL"</option>
+                                        <option value="null">"null"</option>
+                                        <option value="EMPTY">"EMPTY"</option>
+                                        <option value="empty">"empty"</option>
+                                        <option value="Nothing">"Nothing"</option>
+                                    </gs-select>
+                                </div>
+                                <div style="width: 55em;">Empty values</div>
+                            </div>
+                            <div flex-horizontal flex-fill class="option-row">
+                                <div flex>
+                                    <gs-select class="pref-copy-types" mini>
+                                        <option value="text">Text</option>
+                                        <option value="html">HTML</option>
+                                        <option value="text,html">Both</option>
+                                    </gs-select>
+                                </div>
+                                <div style="width: 55em;">Copy types</div>
+                            </div>
+                            <gs-checkbox flex-horizontal value="true" class="pref-ask">
+                                <label flex style="text-align: right;">Always ask me</label>
+                            </gs-checkbox>
+                        </div>
+                    </gs-block>
+
+                    <gs-block>
+                        <h3>Page Zoom Levels</h3>
+                        <div style="width: 35em">
+                            <!--<div id="options-container" style="position: relative; min-height: 10em;">-->
+                            <div id="options-container">
+                                <table class="simple-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Page</th>
+                                            <th style="width: 10em;">Setting Value</th>
+                                        </tr>
+                                    </thead>
                                     <tbody>
-                                        <tr value="&#34;"><td>(Double Quote)</td></tr>
-                                        <tr value="&#39;"><td>(Single Quote)</td></tr>
+                                        {{ZOOM}}
                                     </tbody>
                                 </table>
-                            </template>
-                        </gs-combo>
-                    </div>
-                    <div flex-horizontal>
-                        <label for="clip-options-field-delimiter" style="min-width: 7.25em;">Field Delimiter:</label>
-                        <gs-combo id="clip-options-field-delimiter" flex>
-                            <template>
-                                <table>
-                                    <tbody>
-                                        <tr value="&#9;"><td>(Tab)</td></tr>
-                                        <tr value="&#44;"><td>(Comma)</td></tr>
-                                        <tr value="&#124;"><td>(Vertical Bar)</td></tr>
-                                    </tbody>
-                                </table>
-                            </template>
-                        </gs-combo>
-                    </div>
-                    <div flex-horizontal>
-                        <label for="clip-options-null-values" style="min-width: 7.25em;">Null Values:</label>
-                        <gs-combo id="clip-options-null-values" flex>
-                            <template>
-                                <table>
-                                    <tbody>
-                                        <tr value="&lt;NULL&gt;"><td>&lt;NULL&gt;</td></tr>
-                                        <tr value="NULL"><td>NULL</td></tr>
-                                        <tr value=""><td>(Nothing)</td></tr>
-                                    </tbody>
-                                </table>
-                            </template>
-                        </gs-combo>
-                    </div>
-                </div>
+                            </div>
+                        </div>
+                    </gs-block>
 
-                <h3>Page Zoom Levels</h3>
-                <div style="width: 35em">
-                    <!--<div id="options-container" style="position: relative; min-height: 10em;">-->
-                    <div id="options-container">
-                        <table class="simple-table">
-                            <thead>
-                                <tr>
-                                    <th>Page</th>
-                                    <th style="width: 10em;">Setting Value</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {{ZOOM}}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                    <gs-block>
+                        <h3 style="float: left;" id="KeyboardShortCuts">Keyboard Shortcuts</h3>
+                        <div id="shortcuts-options-container">
+                            <table class="simple-table">
+                                <thead>
+                                    <tr>
+                                        <th style="padding: 0.75em;">Meta Key&nbsp;&nbsp;<gs-button id="metaKeyReset" inline>Reset</gs-button></th>
+                                        <th style="padding: 0.75em;">Key&nbsp;&nbsp;<gs-button id="keyReset" inline>Reset</gs-button></th>
+                                        <th style="padding: 0.75em;">Function</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
 
-                <h3 style="float: left;" id="KeyboardShortCuts">Keyboard Shortcuts</h3>
-                <div id="shortcuts-options-container">
-                    <table class="simple-table">
-                        <thead>
-                            <tr>
-                                <th style="padding: 0.75em;">Meta Key&nbsp;&nbsp;<gs-button id="metaKeyReset" inline>Reset</gs-button></th>
-                                <th style="padding: 0.75em;">Key&nbsp;&nbsp;<gs-button id="keyReset" inline>Reset</gs-button></th>
-                                <th style="padding: 0.75em;">Function</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
+                                        <td>
+                                            <gs-select id="shortcutMetaKeyNewTab" mini>
+                                                <option value="Command">Command/Windows Key</option>
+                                                <option value="Control">Control</option>
+                                                <option value="Option">Option/Alt</option>
+                                                <option value="Shift">Shift</option>
+                                                <option value="None">None</option>
+                                            </gs-select>
+                                        </td>
+                                        <td><gs-text id="ShortcutKeyNewTab" mini></gs-text></td>
+                                        <td><gs-static value="New Tab"></gs-static></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <gs-select id="shortcutMetaKeySaveTab" mini>
+                                                <option value="Command">Command/Windows Key</option>
+                                                <option value="Control">Control</option>
+                                                <option value="Option">Option/Alt</option>
+                                                <option value="Shift">Shift</option>
+                                                <option value="None">None</option>
+                                            </gs-select>
+                                        </td>
+                                        <td><gs-text id="ShortcutKeySaveTab" mini></gs-text></td>
+                                        <td><gs-static value="Save Tab"></gs-static></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <gs-select id="shortcutMetaKeyRunQuery" mini>
+                                                <option value="Command">Command/Windows Key</option>
+                                                <option value="Control">Control</option>
+                                                <option value="Option">Option/Alt</option>
+                                                <option value="Shift">Shift</option>
+                                                <option value="None">None</option>
+                                            </gs-select>
+                                        </td>
+                                        <td><gs-text id="ShortcutKeyRunQuery" mini></gs-text></td>
+                                        <td><gs-static value="Run Query"></gs-static></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <gs-select id="shortcutMetaKeyRunCursorQuery" mini>
+                                                <option value="Command">Command/Windows Key</option>
+                                                <option value="Control">Control</option>
+                                                <option value="Option">Option/Alt</option>
+                                                <option value="Shift">Shift</option>
+                                                <option value="None">None</option>
+                                            </gs-select>
+                                        </td>
+                                        <td><gs-text id="ShortcutKeyRunCursorQuery" mini></gs-text></td>
+                                        <td><gs-static value="Run Query Under Cursor"></gs-static></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <gs-select id="shortcutMetaKeyFindDocumentation" mini>
+                                                <option value="Command">Command/Windows Key</option>
+                                                <option value="Control">Control</option>
+                                                <option value="Option">Option/Alt</option>
+                                                <option value="Shift">Shift</option>
+                                                <option value="None">None</option>
+                                            </gs-select>
+                                        </td>
+                                        <td><gs-text id="ShortcutKeyFindDocumentation" mini></gs-text></td>
+                                        <td><gs-static value="Find Documentation"></gs-static></td>
+                                    </tr>
+                                    <tr>
 
-                                <td>
-                                    <gs-select id="shortcutMetaKeyNewTab" mini>
-                                        <option value="Command">Command/Windows Key</option>
-                                        <option value="Control">Control</option>
-                                        <option value="Option">Option/Alt</option>
-                                        <option value="Shift">Shift</option>
-                                        <option value="None">None</option>
-                                    </gs-select>
-                                </td>
-                                <td><gs-text id="ShortcutKeyNewTab" mini></gs-text></td>
-                                <td><gs-static value="New Tab"></gs-static></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <gs-select id="shortcutMetaKeySaveTab" mini>
-                                        <option value="Command">Command/Windows Key</option>
-                                        <option value="Control">Control</option>
-                                        <option value="Option">Option/Alt</option>
-                                        <option value="Shift">Shift</option>
-                                        <option value="None">None</option>
-                                    </gs-select>
-                                </td>
-                                <td><gs-text id="ShortcutKeySaveTab" mini></gs-text></td>
-                                <td><gs-static value="Save Tab"></gs-static></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <gs-select id="shortcutMetaKeyRunQuery" mini>
-                                        <option value="Command">Command/Windows Key</option>
-                                        <option value="Control">Control</option>
-                                        <option value="Option">Option/Alt</option>
-                                        <option value="Shift">Shift</option>
-                                        <option value="None">None</option>
-                                    </gs-select>
-                                </td>
-                                <td><gs-text id="ShortcutKeyRunQuery" mini></gs-text></td>
-                                <td><gs-static value="Run Query"></gs-static></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <gs-select id="shortcutMetaKeyRunCursorQuery" mini>
-                                        <option value="Command">Command/Windows Key</option>
-                                        <option value="Control">Control</option>
-                                        <option value="Option">Option/Alt</option>
-                                        <option value="Shift">Shift</option>
-                                        <option value="None">None</option>
-                                    </gs-select>
-                                </td>
-                                <td><gs-text id="ShortcutKeyRunCursorQuery" mini></gs-text></td>
-                                <td><gs-static value="Run Query Under Cursor"></gs-static></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <gs-select id="shortcutMetaKeyFindDocumentation" mini>
-                                        <option value="Command">Command/Windows Key</option>
-                                        <option value="Control">Control</option>
-                                        <option value="Option">Option/Alt</option>
-                                        <option value="Shift">Shift</option>
-                                        <option value="None">None</option>
-                                    </gs-select>
-                                </td>
-                                <td><gs-text id="ShortcutKeyFindDocumentation" mini></gs-text></td>
-                                <td><gs-static value="Find Documentation"></gs-static></td>
-                            </tr>
-                            <tr>
+                                        <td>
+                                            <gs-select id="shortcutMetaKeyExplain" mini>
+                                                <option value="Command">Command/Windows Key</option>
+                                                <option value="Control">Control</option>
+                                                <option value="Option">Option/Alt</option>
+                                                <option value="Shift">Shift</option>
+                                                <option value="None">None</option>
+                                            </gs-select>
+                                        </td>
+                                        <td><gs-text id="ShortcutKeyExplain" mini></gs-text></td>
+                                        <td><gs-static value="Explain"></gs-static></td>
+                                    </tr>
+                                    <tr>
 
-                                <td>
-                                    <gs-select id="shortcutMetaKeyExplain" mini>
-                                        <option value="Command">Command/Windows Key</option>
-                                        <option value="Control">Control</option>
-                                        <option value="Option">Option/Alt</option>
-                                        <option value="Shift">Shift</option>
-                                        <option value="None">None</option>
-                                    </gs-select>
-                                </td>
-                                <td><gs-text id="ShortcutKeyExplain" mini></gs-text></td>
-                                <td><gs-static value="Explain"></gs-static></td>
-                            </tr>
-                            <tr>
-
-                                <td>
-                                    <gs-select id="shortcutMetaKeyExplainAnalyze" mini>
-                                        <option value="Command">Command/Windows Key</option>
-                                        <option value="Control">Control</option>
-                                        <option value="Option">Option/Alt</option>
-                                        <option value="Shift">Shift</option>
-                                        <option value="None">None</option>
-                                    </gs-select>
-                                </td>
-                                <td><gs-text id="ShortcutKeyExplainAnalyze" mini></gs-text></td>
-                                <td><gs-static value="Explain Analyze"></gs-static></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <gs-select id="shortcutMetaKeyHome" mini>
-                                        <option value="Command">Command/Windows Key</option>
-                                        <option value="Control">Control</option>
-                                        <option value="Option">Option/Alt</option>
-                                        <option value="Shift">Shift</option>
-                                        <option value="None">None</option>
-                                    </gs-select>
-                                </td>
-                                <td><gs-text id="ShortcutKeyHome" mini></gs-text></td>
-                                <td><gs-static value="Home"></gs-static></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                                        <td>
+                                            <gs-select id="shortcutMetaKeyExplainAnalyze" mini>
+                                                <option value="Command">Command/Windows Key</option>
+                                                <option value="Control">Control</option>
+                                                <option value="Option">Option/Alt</option>
+                                                <option value="Shift">Shift</option>
+                                                <option value="None">None</option>
+                                            </gs-select>
+                                        </td>
+                                        <td><gs-text id="ShortcutKeyExplainAnalyze" mini></gs-text></td>
+                                        <td><gs-static value="Explain Analyze"></gs-static></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <gs-select id="shortcutMetaKeyHome" mini>
+                                                <option value="Command">Command/Windows Key</option>
+                                                <option value="Control">Control</option>
+                                                <option value="Option">Option/Alt</option>
+                                                <option value="Shift">Shift</option>
+                                                <option value="None">None</option>
+                                            </gs-select>
+                                        </td>
+                                        <td><gs-text id="ShortcutKeyHome" mini></gs-text></td>
+                                        <td><gs-static value="Home"></gs-static></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </gs-block>
+                </gs-grid>
 
                 <h3>Custom CSS Stylesheet</h3>
                 <div id="customCSSAce"></div>
-                <div><p>This Ace is stored in your local storage. Because this can get emptied it's recommended to save a copy.</p><div>
+                <div><p>This Ace is stored in your local storage. Because this can get emptied it's recommended to save a copy.</p></div>
             </gs-body>
             <gs-footer><gs-button dialogclose id="settingsClose">Done</gs-button></gs-footer>
         </gs-page>
-    */}).replace('{{ZOOM}}', strZoom);
+    */})
+        .replace('{{ZOOM}}', strZoom)
+        .replace(/\{\{UNIX_RETURN\}\}/gi, '\n')
+        .replace(/\{\{TAB\}\}/gi, '\t');
 
     GS.openDialog(templateElement, function () {
-        //left panel
+        var dialog = this;
+        var copyHeadersControl;
+        var copySelectorsControl;
+        var copyQuoteCharControl;
+        var copyEscapeCharControl;
+        var copyQuoteWhenControl;
+        var copyCellDelimiterControl;
+        var copyRecordDelimiterControl;
+        var copyNullControl;
+        var copyTypesControl;
+        var askControl;
+
+        copyHeadersControl = xtag.query(dialog, '.pref-copy-headers')[0];
+        copySelectorsControl = xtag.query(dialog, '.pref-copy-selectors')[0];
+        copyQuoteCharControl = xtag.query(dialog, '.pref-quote-char')[0];
+        copyEscapeCharControl = xtag.query(dialog, '.pref-escape-char')[0];
+        copyQuoteWhenControl = xtag.query(dialog, '.pref-copy-quote')[0];
+        copyCellDelimiterControl = xtag.query(dialog, '.pref-delimiter-cell')[0];
+        copyRecordDelimiterControl = xtag.query(dialog, '.pref-delimiter-record')[0];
+        copyNullControl = xtag.query(dialog, '.pref-null-value')[0];
+        copyTypesControl = xtag.query(dialog, '.pref-copy-types')[0];
+        askControl = xtag.query(dialog, '.pref-ask')[0];
+
+        askControl.value = localStorage.askCopySettings;
+        askControl.addEventListener('change', function () {
+            localStorage.askCopySettings = askControl.value;
+        });
+
+        copyQuoteWhenControl.value = getClipSetting('quoteType');
+        copyQuoteCharControl.value = getClipSetting('quoteChar');
+        copyEscapeCharControl.value = getClipSetting('escapeChar');
+        copyCellDelimiterControl.value = getClipSetting('fieldDelimiter');
+        copyRecordDelimiterControl.value = getClipSetting('recordDelimiter');
+        copyNullControl.value = getClipSetting('nullValues');
+        copyHeadersControl.value = getClipSetting('columnNames');
+        copySelectorsControl.value = getClipSetting('rowNumbers');
+        copyTypesControl.value = getClipSetting('copyTypes');
+
+        function setAllClipSettings() {
+            var arrElements, i, len;
+
+            // save clip settings
+            setClipSetting('quoteType', copyQuoteWhenControl.value);
+            setClipSetting('quoteChar', copyQuoteCharControl.value);
+            setClipSetting('escapeChar', copyEscapeCharControl.value);
+            setClipSetting('fieldDelimiter', copyCellDelimiterControl.value);
+            setClipSetting('recordDelimiter', copyRecordDelimiterControl.value);
+            setClipSetting('nullValues', copyNullControl.value);
+            setClipSetting('columnNames', copyHeadersControl.value);
+            setClipSetting('rowNumbers', copySelectorsControl.value);
+            setClipSetting('copyTypes', copyTypesControl.value);
+
+            // set all the table elements clip setting attributes
+            arrElements = xtag.query(document, 'gs-table.results-table');
+            xtag.query(document, '.tab-frame iframe').forEach(function (cur) {
+                arrElements.push.apply(arrElements, xtag.query(cur.contentWindow.document, 'gs-table'));
+            });
+
+            for (i = 0, len = arrElements.length; i < len; i += 1) {
+                arrElements[i].setAttribute('copy-quote-when', getClipSetting('quoteType'));
+                arrElements[i].setAttribute('copy-quote-char', getClipSetting('quoteChar'));
+                arrElements[i].setAttribute('copy-escape-char', getClipSetting('escapeChar'));
+                arrElements[i].setAttribute('copy-delimiter-cell', getClipSetting('fieldDelimiter'));
+                arrElements[i].setAttribute('copy-delimiter-record', getClipSetting('recordDelimiter'));
+                arrElements[i].setAttribute('copy-null-cell', getClipSetting('nullValues'));
+                arrElements[i].setAttribute('copy-header', getClipSetting('columnNames'));
+                arrElements[i].setAttribute('copy-selectors', getClipSetting('rowNumbers'));
+                arrElements[i].setAttribute('copy-types', getClipSetting('copyTypes'));
+            }
+        }
+
+        copyQuoteWhenControl.addEventListener('change', setAllClipSettings);
+        copyQuoteCharControl.addEventListener('change', setAllClipSettings);
+        copyEscapeCharControl.addEventListener('change', setAllClipSettings);
+        copyCellDelimiterControl.addEventListener('change', setAllClipSettings);
+        copyRecordDelimiterControl.addEventListener('change', setAllClipSettings);
+        copyNullControl.addEventListener('change', setAllClipSettings);
+        copyHeadersControl.addEventListener('change', setAllClipSettings);
+        copySelectorsControl.addEventListener('change', setAllClipSettings);
+        copyTypesControl.addEventListener('change', setAllClipSettings);
+
+        document.getElementById('pgmanage-options-beautify').value = localStorage.bolBeautify;
+        document.getElementById('pgmanage-options-beautify').addEventListener('change', function () {
+            localStorage.bolBeautify = document.getElementById('pgmanage-options-beautify').value;
+        });
+
+        document.getElementById('pgmanage-options-Comma').value = localStorage.bolComma;
+        document.getElementById('pgmanage-options-Comma').addEventListener('change', function () {
+            localStorage.bolComma = document.getElementById('pgmanage-options-Comma').value;
+        });
+
         document.getElementById('pgmanage-options-left-panel').value = localStorage.leftPanelWidth;
         document.getElementById('pgmanage-options-left-panel').addEventListener('change', function () {
             localStorage.leftPanelWidth = document.getElementById('pgmanage-options-left-panel').value;
         });
 
         var CSSEditor = ace.edit('customCSSAce');
+        glb_CSSEditor = CSSEditor;
         CSSEditor.setTheme('ace/theme/eclipse');
         CSSEditor.getSession().setMode('ace/mode/css');
         CSSEditor.setShowPrintMargin(false);
@@ -1031,18 +1232,15 @@ function dialogOptions() {
 
 
         // set control values
-        document.getElementById('clip-options-quote-which').value = getClipSetting("quoteType");
         document.getElementById('button-options').value = localStorage.labeledButtons;
-        document.getElementById('clip-options-quote-char').value = getClipSetting("quoteChar");
-        document.getElementById('clip-options-field-delimiter').value = getClipSetting("fieldDelimiter");
-        document.getElementById('clip-options-null-values').value = getClipSetting("nullValues");
-        document.getElementById('clip-options-column-names').value = getClipSetting("columnNames");
+        document.getElementById('graph-options').value = localStorage.horizontalGraph;
 
-
-        document.getElementById('clip-options-quote-which').addEventListener('change', setAllClipSettings);
         document.getElementById('button-options').addEventListener('change', function () {
             refreshButtons(document.getElementById('button-options').value);
             //console.log(document.getElementById('button-options').value);
+        });
+        document.getElementById('graph-options').addEventListener('change', function () {
+            localStorage.horizontalGraph = document.getElementById('graph-options').value;
         });
         CSSEditor.addEventListener('change', function () {
             customCSSText = CSSEditor.getValue();
@@ -1141,33 +1339,6 @@ function dialogOptions() {
             document.getElementById('ShortcutKeyHome').value = event.key;
         });
 
-        document.getElementById('clip-options-quote-char').addEventListener('change', setAllClipSettings);
-        document.getElementById('clip-options-field-delimiter').addEventListener('change', setAllClipSettings);
-        document.getElementById('clip-options-null-values').addEventListener('change', setAllClipSettings);
-        document.getElementById('clip-options-column-names').addEventListener('change', setAllClipSettings);
-
-        function setAllClipSettings() {
-            var arrElements, i, len;
-
-            // save clip settings
-            setClipSetting("quoteType", document.getElementById('clip-options-quote-which').value);
-            setClipSetting("quoteChar", document.getElementById('clip-options-quote-char').value);
-            setClipSetting("fieldDelimiter", document.getElementById('clip-options-field-delimiter').value);
-            setClipSetting("nullValues", document.getElementById('clip-options-null-values').value);
-            setClipSetting("columnNames", document.getElementById('clip-options-column-names').value);
-
-            // set all the table elements clip setting attributes
-            arrElements = xtag.query(document.getElementsByClassName('current-tab')[0].relatedResultsArea, 'table.results-table');
-
-            for (i = 0, len = arrElements.length; i < len; i += 1) {
-                arrElements[i].setAttribute('quote-type', getClipSetting("quoteType"));
-                arrElements[i].setAttribute('quote-char', getClipSetting("quoteChar"));
-                arrElements[i].setAttribute('field-delimiter', getClipSetting("fieldDelimiter"));
-                arrElements[i].setAttribute('null-values', getClipSetting("nullValues"));
-                arrElements[i].setAttribute('column-names', getClipSetting("columnNames"));
-            }
-        }
-
 
         var i, len;
         for (i=0,len=localStorage.length;i < len;i++) {
@@ -1228,6 +1399,10 @@ function dialogOptions() {
 
         refreshCustomCSS(customCSSText);
         refreshShortcutKeys(ShortcutKeysText);
+        var currentTab = document.getElementsByClassName('current-tab')[0];
+		if (currentTab.relatedEditor) {
+            currentTab.relatedEditor.focus();
+        }
     });
 }
 
@@ -1428,8 +1603,10 @@ var strHomeToken =  ((localStorage.ShortcutHome.split(',')[0]) ? localStorage.Sh
     templateElement.setAttribute('data-overlay-close', 'true');
     templateElement.innerHTML = ml(function () {/*
         <gs-page>
-            <gs-header><center><h3>Editor Info</h3></center></gs-header>
+            <gs-header><center><h3>pgManage Help</h3></center></gs-header>
             <gs-body padded>
+				<h2 style="padding-left: 0; margin-bottom: 0; padding-bottom: 0;">Ace</h2>
+				<hr />
                 <i>SQL tab windows use <a href="http://ace.c9.io/" target="_blank">Ace Editor</a>.</i><br /><br />
 
                 Ace is a very capable text editor. Here are some tips to get you started:<br />
@@ -1440,9 +1617,9 @@ var strHomeToken =  ((localStorage.ShortcutHome.split(',')[0]) ? localStorage.Sh
 
                     <li>Queries won't be syntax highlighted unless the first character of the query is at the beginning of its line or if it's inside a <code>BEGIN...END</code> statement.</li>
 
-                    <li>Ace is double dollar sign aware. When the first character inside a dollar quote is a <kbd>RETURN</kbd>, the contents of the string are syntax highlighted. When the first character is not a return, everything inside is colored as a quoted string.</li>
+                    <li>Ace is double dollar sign aware. When a dollar tag is at the beginning of the line, the contents of the string are syntax highlighted. When the dollar tag is not at the beginning of the line, everything inside is colored as a quoted string.</li>
 
-                    <li>You can type using multiple cursors at once. To select in multiple places, hold down <kbd>CMD</kbd> (might be <kbd>CTRL</kbd> on Windows) and click in several places. To put a cursor in the same place on multiple lines, hold <kbd>OPTION</kbd> and then click and drag.</li>
+                    <li>You can type using multiple cursors at once. To select in multiple places, hold down <kbd>CMD</kbd> (<kbd>CTRL</kbd> on Windows) and click in several places. To put a cursor in the same place on multiple lines, hold <kbd>OPTION</kbd> and then click and drag.</li>
                 </ul>
                 Tab Shortcuts: (Configurable in "pgManage Options" <a style="text-decoration: underline; cursor: pointer; color: #0000FF;" onclick="dialogOptions();" dialogclose>Here</a>)<br />
                 <ul>
@@ -1979,7 +2156,7 @@ function loadHeaderText() {
     //                '<small>Db:</small> ' + encodeHTML(contextData.databaseName) + ' ' +
     //                '<small>Connection:</small> ' + encodeHTML(contextData.connectionName);
 
-    shortText = encodeHTML(contextData.databaseName + '@' + contextData.connectionName + '(' + contextData.sessionUser + ')');
+    shortText = encodeHTML(contextData.sessionUser + '@' + contextData.connectionName + '(' + contextData.databaseName + ')');
 
     document.getElementById('header-text-container').innerHTML = shortText;
     document.getElementById('header-text-container').setAttribute('title', longText);
@@ -2229,18 +2406,31 @@ function dialogAbout() {
 }
 
 function getCurrentQuery() {
-    var currentTab = document.getElementsByClassName('current-tab')[0], editor = currentTab.relatedEditor,
+    GS.log(bolDebug, currentTab);
+    var editor = currentTab.relatedEditor,
         editorSelectionRange = editor.getSelectionRange(), strQuery = editor.getValue(),
-        intStart = 0, intEnd = 0, i, len, arrLines, strRunQuery,
-        intStartRow, intStartColumn, intEndRow, intEndColumn;
+        intStart = 0, intEnd = 0, i, len, arrLines, strRunQuery = '',
+        intStartRow, intStartColumn, intEndRow, intEndColumn, intI, intLen;
 
     // if an editor was found using the current tab
     if (editor) {
         arrLines = strQuery.split('\n');
 
-        if (editorSelectionRange.start.row !== editorSelectionRange.end.row ||
-            editorSelectionRange.start.column !== editorSelectionRange.end.column) {
-
+        if (editor.currentSelections.length > 1) {
+            var Range = require("ace/range").Range;
+            editor.selection.setSelectionRange(new Range(
+                editor.currentSelections[0].start.row,
+                editor.currentSelections[0].start.column,
+                editor.currentSelections[editor.currentSelections.length - 1].end.row,
+                editor.currentSelections[editor.currentSelections.length - 1].end.column
+            ));
+            editorSelectionRange = editor.getSelectionRange();
+            //console.log(editorSelectionRange);
+        }
+        if (
+            editorSelectionRange.start.row !== editorSelectionRange.end.row ||
+            editorSelectionRange.start.column !== editorSelectionRange.end.column
+        ) {
             intStartRow    = editorSelectionRange.start.row;
             intStartColumn = editorSelectionRange.start.column;
             intEndRow      = editorSelectionRange.end.row;
@@ -2274,6 +2464,13 @@ function getCurrentQuery() {
 
             strRunQuery = (strQuery || ' ');
         }
+        console.log({
+        'strQuery': (strRunQuery || ''),
+        'start_row': intStartRow,
+        'start_column': intStartColumn,
+        'end_row': intEndRow,
+        'end_column': intEndColumn
+    });
     }
 
     return {
@@ -2291,9 +2488,13 @@ function getClipSetting(propertyName) {
     savedSettings = {
         "quoteType":      (savedSettings.quoteType || "strings"),
         "quoteChar":      (savedSettings.quoteChar || "'"),
+        "escapeChar":      (savedSettings.escapeChar || "\\"),
         "fieldDelimiter": (savedSettings.fieldDelimiter || "\t"),
+        "recordDelimiter":    (savedSettings.recordDelimiter || "\n"),
         "nullValues":     (savedSettings.nullValues || "NULL"),
-        "columnNames":    (savedSettings.columnNames || "true")
+        "columnNames":    (savedSettings.columnNames || "never"),
+        "rowNumbers":    (savedSettings.rowNumbers || "never"),
+        "copyTypes":    (savedSettings.copyTypes || "text")
     };
 
     return savedSettings[propertyName];
@@ -2305,6 +2506,294 @@ function setClipSetting(propertyName, newValue) {
     savedSettings[propertyName] = newValue;
 
     localStorage.clip_settings = JSON.stringify(savedSettings);
+}
+
+function beforeTableCopyFunction(event) {
+    // This is for when a user uses the "Recopy" button in the datasheet copy options dialog
+    if (event.forceCopy) {
+        return;
+    }
+
+    var getCopyParameters = function (element) {
+        var headerMode;
+        var selectorMode;
+        var quoteChar;
+        var escapeChar;
+        var quoteMode;
+        var recordDelimiter;
+        var cellDelimiter;
+        var nullString;
+        var copyTypes;
+
+        // we need the user to be able to override the copy parameters so that
+        //      they can format the copy in the way they need
+        // if the attribute is present for a parameter, fill the variable with
+        //      the attribute (and default to empty string) else default to
+        //      parameter default
+        quoteMode = element.getAttribute('copy-quote-when') || getClipSetting('quoteType');
+        quoteChar = element.getAttribute('copy-quote-char') || getClipSetting('quoteChar');
+        escapeChar = element.getAttribute('copy-escape-char') || getClipSetting('escapeChar');
+        cellDelimiter = element.getAttribute('copy-delimiter-cell') || getClipSetting('fieldDelimiter');
+        recordDelimiter = element.getAttribute('copy-delimiter-record') || getClipSetting('recordDelimiter');
+        nullString = element.getAttribute('copy-null-cell') || getClipSetting('nullValues');
+        headerMode = element.getAttribute('copy-header') || getClipSetting('columnNames');
+        selectorMode = element.getAttribute('copy-selectors') || getClipSetting('rowNumbers');
+        copyTypes = element.getAttribute('copy-types') || getClipSetting('copyTypes');
+
+        // we need to return multiple variables but return only allows one
+        //      return value, so we'll return in JSON
+        return {
+            "headerMode": headerMode,
+            "selectorMode": selectorMode,
+            "quoteChar": quoteChar,
+            "escapeChar": escapeChar,
+            "quoteMode": quoteMode,
+            "recordDelimiter": recordDelimiter,
+            "cellDelimiter": cellDelimiter,
+            "nullString": nullString,
+            "copyTypes": copyTypes
+        };
+    };
+    var tableElement = this;
+    var template;
+
+    if (!tableElement.forceCopy && localStorage.askCopySettings !== 'false') {
+        event.preventDefault();
+
+        template = document.createElement('template');
+        template.setAttribute('data-max-width', '24em');
+        template.innerHTML = ml(function () {/*
+            <gs-page class="clip-options">
+                <gs-header>
+                    <center><h3>Paste Format</div></center>
+                </gs-header>
+                <gs-body padded>
+                    <gs-checkbox flex-horizontal value="true" class="pref-copy-headers">
+                        <label flex style="text-align: right;">Copy Headers</label>
+                    </gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" class="pref-copy-selectors">
+                        <label flex style="text-align: right;">Copy Row Numbers</label>
+                    </gs-checkbox>
+                    <div flex-horizontal flex-fill class="option-row">
+                        <div flex>
+                            <gs-select class="pref-quote-char" mini>
+                                <option value="\">Backslash (\)</option>
+                                <option value="/">Forward Slash (/)</option>
+                                <option value="|">Pipe (|)</option>
+                                <option value="&quot;">Double Quote (&quot;)</option>
+                                <option value="'">Single Quote (')</option>
+                            </gs-select>
+                        </div>
+                        <div style="width: 16em;">Quote Character</div>
+                    </div>
+                    <div flex-horizontal flex-fill class="option-row">
+                        <div flex>
+                            <gs-select class="pref-escape-char" mini>
+                                <option value="\">Backslash (\)</option>
+                                <option value="/">Forward Slash (/)</option>
+                                <option value="|">Pipe (|)</option>
+                                <option value="&quot;">Double Quote (&quot;)</option>
+                                <option value="'">Single Quote (')</option>
+                            </gs-select>
+                        </div>
+                        <div style="width: 16em;">Escape Character</div>
+                    </div>
+                    <div flex-horizontal flex-fill class="option-row">
+                        <div flex>
+                            <gs-select class="pref-copy-quote" mini>
+                                <option value="always">Always</option>
+                                <option value="never">Never</option>
+                                <option value="strings">Only on strings</option>
+                                <option value="delimiter-in-content">
+                                    Cell contains separator
+                                </option>
+                            </gs-select>
+                        </div>
+                        <div style="width: 16em;">Quote</div>
+                    </div>
+                    <div flex-horizontal flex-fill class="option-row">
+                        <div flex>
+                            <gs-select class="pref-delimiter-record" mini>
+                                <option value="{{DOS_RETURN}}">DOS (\r\n)</option>
+                                <option value="{{MAC_RETURN}}">Mac (\r)</option>
+                                <option value="{{UNIX_RETURN}}">UNIX (\n)</option>
+                                <option value="|">Vertical Bar (|)</option>
+                                <option value=",">Comma (,)</option>
+                                <option value="{{TAB}}">Tab</option>
+                            </gs-select>
+                        </div>
+                        <div style="width: 16em;">Record Separator</div>
+                    </div>
+                    <div flex-horizontal flex-fill class="option-row">
+                        <div flex>
+                            <gs-select class="pref-delimiter-cell" mini>
+                                <option value="{{DOS_RETURN}}">DOS (\r\n)</option>
+                                <option value="{{MAC_RETURN}}">Mac (\r)</option>
+                                <option value="{{UNIX_RETURN}}">UNIX (\n)</option>
+                                <option value="|">Vertical Bar (|)</option>
+                                <option value=",">Comma (,)</option>
+                                <option value="{{TAB}}">Tab</option>
+                            </gs-select>
+                        </div>
+                        <div style="width: 16em;">Cell Separator</div>
+                    </div>
+                    <div flex-horizontal flex-fill class="option-row">
+                        <div flex>
+                            <gs-select class="pref-null-value" mini>
+                                <option value="">(nothing)</option>
+                                <option value="NULL">"NULL"</option>
+                                <option value="null">"null"</option>
+                                <option value="EMPTY">"EMPTY"</option>
+                                <option value="empty">"empty"</option>
+                                <option value="Nothing">"Nothing"</option>
+                            </gs-select>
+                        </div>
+                        <div style="width: 16em;">Empty values</div>
+                    </div>
+                    <div flex-horizontal flex-fill class="option-row">
+                        <div flex>
+                            <gs-select class="pref-copy-types" mini>
+                                <option value="text">Text</option>
+                                <option value="html">HTML</option>
+                                <option value="text,html">Both</option>
+                            </gs-select>
+                        </div>
+                        <div style="width: 16em;">Copy types</div>
+                    </div>
+                    <gs-checkbox flex-horizontal value="true" class="pref-save">
+                        <label flex style="text-align: right;">Remember settings</label>
+                    </gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" class="pref-ask">
+                        <label flex style="text-align: right;">Always ask me</label>
+                    </gs-checkbox>
+                    <hr />
+                    <gs-grid gutter>
+                        <gs-block>
+                            <gs-button dialogclose>Cancel</gs-button>
+                        </gs-block>
+                        <gs-block>
+                            <gs-button bg-primary class="copy-button">Copy</gs-button>
+                        </gs-block>
+                    </gs-grid>
+                </gs-body>
+            </gs-page>
+        */})
+            .replace(/\{\{UNIX_RETURN\}\}/gi, '\n')
+            .replace(/\{\{TAB\}\}/gi, '\t');
+        var copyHeadersControl;
+        var copySelectorsControl;
+        var copyQuoteCharControl;
+        var copyEscapeCharControl;
+        var copyQuoteWhenControl;
+        var copyCellDelimiterControl;
+        var copyRecordDelimiterControl;
+        var copyNullControl;
+        var copyTypesControl;
+        var saveControl;
+        var askControl;
+
+        GS.openDialog(template, function () {
+            var dialog = this;
+            var jsnCopy;
+
+            // we want the top gs-page to have corner rounding
+            dialog.classList.add('gs-table-contextmenu');
+
+            // we need the current copy parameters
+            jsnCopy = getCopyParameters(tableElement);
+
+            // find all of the control elements
+            copyHeadersControl = xtag.query(dialog, '.pref-copy-headers')[0];
+            copySelectorsControl = xtag.query(dialog, '.pref-copy-selectors')[0];
+            copyQuoteCharControl = xtag.query(dialog, '.pref-quote-char')[0];
+            copyEscapeCharControl = xtag.query(dialog, '.pref-escape-char')[0];
+            copyQuoteWhenControl = xtag.query(dialog, '.pref-copy-quote')[0];
+            copyCellDelimiterControl = xtag.query(dialog, '.pref-delimiter-cell')[0];
+            copyRecordDelimiterControl = xtag.query(dialog, '.pref-delimiter-record')[0];
+            copyNullControl = xtag.query(dialog, '.pref-null-value')[0];
+            copyTypesControl = xtag.query(dialog, '.pref-copy-types')[0];
+            saveControl = xtag.query(dialog, '.pref-save')[0];
+            askControl = xtag.query(dialog, '.pref-ask')[0];
+
+            copyHeadersControl.value = jsnCopy.headerMode !== 'never';
+            copySelectorsControl.value = jsnCopy.selectorMode !== 'never';
+            copyQuoteCharControl.value = jsnCopy.quoteChar;
+            copyEscapeCharControl.value = jsnCopy.escapeChar;
+            copyQuoteWhenControl.value = jsnCopy.quoteMode;
+            copyCellDelimiterControl.value = jsnCopy.cellDelimiter;
+            copyRecordDelimiterControl.value = jsnCopy.recordDelimiter;
+            copyNullControl.value = jsnCopy.nullString;
+            copyTypesControl.value = jsnCopy.copyTypes;
+
+            xtag.query(dialog, '.copy-button')[0].addEventListener('click', function () {
+                GS.closeDialog(dialog);
+
+                var strCopyHeaders;
+                var strCopySelectors;
+                var strQuoteChar;
+                var strEscapeChar;
+                var strQuoteMode;
+                var strCellDelimiter;
+                var strRecordDelimiter;
+                var strNullValue;
+                var strCopyTypes;
+
+                // gather the control values
+                strCopyHeaders = copyHeadersControl.value;
+                strCopySelectors = copySelectorsControl.value;
+                strQuoteChar = copyQuoteCharControl.value;
+                strEscapeChar = copyEscapeCharControl.value;
+                strQuoteMode = copyQuoteWhenControl.value;
+                strCellDelimiter = copyCellDelimiterControl.value;
+                strRecordDelimiter = copyRecordDelimiterControl.value;
+                strNullValue = copyNullControl.value;
+                strCopyTypes = copyTypesControl.value;
+
+                // save the copy settings
+                tableElement.setAttribute('copy-header', strCopyHeaders);
+                tableElement.setAttribute('copy-selectors', strCopySelectors);
+                tableElement.setAttribute('copy-quote-char', strQuoteChar);
+                tableElement.setAttribute('copy-escape-char', strEscapeChar);
+                tableElement.setAttribute('copy-quote-when', strQuoteMode);
+                tableElement.setAttribute('copy-delimiter-cell', strCellDelimiter);
+                tableElement.setAttribute('copy-delimiter-record', strRecordDelimiter);
+                tableElement.setAttribute('copy-null-cell', strNullValue);
+                tableElement.setAttribute('copy-types', strCopyTypes);
+
+                tableElement.forceCopy = true;
+                tableElement.elems.hiddenFocusControl.focus();
+                document.execCommand('copy');
+
+                if (saveControl.value === 'false') {
+                    tableElement.setAttribute('copy-header', jsnCopy.headerMode);
+                    tableElement.setAttribute('copy-selectors', jsnCopy.selectorMode);
+                    tableElement.setAttribute('copy-quote-char', jsnCopy.quoteChar);
+                    tableElement.setAttribute('copy-escape-char', jsnCopy.escapeChar);
+                    tableElement.setAttribute('copy-quote-when', jsnCopy.quoteMode);
+                    tableElement.setAttribute('copy-delimiter-cell', jsnCopy.cellDelimiter);
+                    tableElement.setAttribute('copy-delimiter-record', jsnCopy.recordDelimiter);
+                    tableElement.setAttribute('copy-null-cell', jsnCopy.nullString);
+                    tableElement.setAttribute('copy-types', jsnCopy.copyTypes);
+                } else {
+                    setClipSetting('quoteType', copyQuoteWhenControl.value);
+                    setClipSetting('quoteChar', copyQuoteCharControl.value);
+                    setClipSetting('escapeChar', copyEscapeCharControl.value);
+                    setClipSetting('fieldDelimiter', copyCellDelimiterControl.value);
+                    setClipSetting('recordDelimiter', copyRecordDelimiterControl.value);
+                    setClipSetting('nullValues', copyNullControl.value);
+                    setClipSetting('columnNames', copyHeadersControl.value === 'true' ? 'always' : 'never');
+                    setClipSetting('rowNumbers', copySelectorsControl.value === 'true' ? 'always' : 'never');
+                    setClipSetting('copyTypes', copyTypesControl.value);
+                }
+
+                localStorage.askCopySettings = askControl.value;
+            });
+        }, null, null);
+
+
+    } else {
+        tableElement.forceCopy = undefined;
+    }
 }
 
 function highlightCurrentCursorQuery(tabElement, jsnQueryStart, jsnQueryEnd) {
@@ -2330,7 +2819,7 @@ function highlightCurrentCursorQuery(tabElement, jsnQueryStart, jsnQueryEnd) {
 }
 
 function removeMarkerHighlighted() {
-    var tabElement = document.getElementsByClassName('current-tab')[0];
+    var tabElement = currentTab;
     if (tabElement.openCursorQueryMarker) {
         tabElement.relatedEditor.getSession().removeMarker(tabElement.openCursorQueryMarker);
         tabElement.openCursorQueryMarker = null;
@@ -2343,7 +2832,10 @@ function removeMarkerHighlighted() {
 // this function is run when we send the queries through the websocket,
 //      it adds a loader, disables the "Clear" button and shows/binds the "Stop Execution" button
 function executeHelperStartExecute() {
-    var currentTab = document.getElementsByClassName('current-tab')[0];
+    if (dataLoadTest) {
+        console.time('query-load');
+    }
+    GS.log(bolDebug, currentTab);
     var editor = currentTab.relatedEditor;
 
     GS.addLoader(editor.container.parentNode.parentNode, 'Executing Query...');
@@ -2355,21 +2847,33 @@ function executeHelperStartExecute() {
     currentTab.relatedResultsHeaderElement.classList.add('executing');
     currentTab.relatedStopButton.removeAttribute('hidden');
     currentTab.relatedStopButton.addEventListener('click', executeHelperCancelSignalHandler);
-	console.log('test1');
+	//console.log('test1');
     currentTab.relatedStopSocketButton.addEventListener('click', executeHelperStopSocket);
 }
 
 // this function is run when we encounter an error or we've recieved the last transmission,
 //      it enables the "Clear" button and hides/unbinds the "Stop Loading" button
 function executeHelperEndLoading() {
-    var currentTab = document.getElementsByClassName('current-tab')[0];
+    GS.log(bolDebug, currentTab);
     var editor = currentTab.relatedEditor;
 
     currentTab.relatedClearButton.removeAttribute('hidden');
     currentTab.relatedResultsHeaderElement.classList.remove('executing');
+
+    if (currentTab.relatedResultsArea.children.length > 0) {
+        var spaceHeight = currentTab.relatedResultsArea.lastChild.clientHeight;
+        spaceHeight = currentTab.relatedResultsArea.clientHeight - spaceHeight;
+        if (spaceHeight < 0) {
+            spaceHeight = 0;
+        }
+        var heightElem = document.createElement('div');
+        heightElem.style.height = spaceHeight + 'px';
+        currentTab.relatedResultsArea.appendChild(heightElem);
+    }
+
     currentTab.handlingQuery = false;
     currentTab.relatedStopSocketButton.setAttribute('hidden', '');
-	console.log('test2');
+	//console.log('test2');
     currentTab.relatedStopSocketButton.removeEventListener('click', executeHelperStopSocket);
 }
 
@@ -2377,8 +2881,8 @@ function executeHelperEndLoading() {
 //      it uses the "currentTab.currentMessageID" variable to send a "CANCEL" signal
 //      through the websocket
 function executeHelperCancelSignalHandler() {
-    var currentTab = document.getElementsByClassName('current-tab')[0];
-    GS.requestFromSocket(GS.querySocket, 'CANCEL', '', currentTab.currentMessageID);
+    GS.log(bolDebug, currentTab);
+    GS.requestFromSocket(GS.websockets[currentTab.relatedSocket], 'CANCEL', '', currentTab.currentMessageID);
 }
 
 // this function is run when the user clicks "Show Query",
@@ -2405,7 +2909,7 @@ function executeHelperBindShowQueryButton(element, strQuery) {
 //      it also changes the results pane header (the tally results portion) to "(Loading Stopped)"
 //      it also runs the "executeHelperEndExecute" and "executeHelperEndLoading" functions
 function executeHelperStopLoadingHandler() {
-    var currentTab = document.getElementsByClassName('current-tab')[0];
+    GS.log(bolDebug, currentTab);
     currentTab.bolIgnoreMessages = true;
     currentTab.relatedResultsTallyElement.innerHTML = ' (Loading Stopped)';
     executeHelperEndExecute();
@@ -2415,7 +2919,7 @@ function executeHelperStopLoadingHandler() {
 // this function is run when we get our first callback,
 //      it removes the loader, hides/unbinds the "Stop Execution" button
 function executeHelperEndExecute() {
-    var currentTab = document.getElementsByClassName('current-tab')[0];
+    GS.log(bolDebug, currentTab);
     var editor = currentTab.relatedEditor;
 
     GS.removeLoader(editor.container.parentNode.parentNode);
@@ -2425,10 +2929,10 @@ function executeHelperEndExecute() {
 }
 
 // This function updates the results header Success/Error tally
-function executeHelperUpdateTally(intQuery, intError) {
-    var currentTab = document.getElementsByClassName('current-tab')[0];
+function executeHelperUpdateTally(resultsTallyElement, intQuery, intError) {
+    GS.log(bolDebug, currentTab);
 
-    currentTab.relatedResultsTallyElement.innerHTML = (
+    resultsTallyElement.innerHTML = (
         ' (<b>Pass: ' + (intQuery - intError) + '</b>, <b>Fail: ' + (intError) + '</b>)'
     );
 }
@@ -2436,7 +2940,7 @@ function executeHelperUpdateTally(intQuery, intError) {
 // this function is run when we get our first callback,
 //      it shows and binds the "Stop Loading" button
 function executeHelperStartLoading() {
-    var currentTab = document.getElementsByClassName('current-tab')[0];
+    GS.log(bolDebug, currentTab);
 
     currentTab.relatedClearButton.setAttribute('hidden', '');
     currentTab.relatedStopSocketButton.removeAttribute('hidden');
@@ -2445,10 +2949,9 @@ function executeHelperStartLoading() {
 }
 
 function executeHelperStopSocket() {
-    var currentTab = document.getElementsByClassName('current-tab')[0];
-	console.log('test3');
+    GS.log(bolDebug, currentTab);
 
-    GS.requestFromSocket(GS.querySocket, 'CANCEL', '', currentTab.currentMessageID);
+    GS.requestFromSocket(GS.websockets[currentTab.relatedSocket], 'CANCEL', '', currentTab.currentMessageID);
     executeHelperStopLoadingHandler();
     currentTab.bolIgnoreMessages = true;
 }
@@ -2456,9 +2959,10 @@ function executeHelperStopSocket() {
 
 // executes SQL in current tab
 var arrExecuteHistory = [];
+var dataLoadTest = false;
 function executeScript(bolCursorQuery) {
     'use strict';
-    var currentTab = document.getElementsByClassName('current-tab')[0];
+    currentTab = document.getElementsByClassName('current-tab')[0];
     var editor = currentTab.relatedEditor;
     var resultsContainer = currentTab.relatedResultsArea;
     var resultsTallyElement = currentTab.relatedResultsTallyElement;
@@ -2477,6 +2981,11 @@ function executeScript(bolCursorQuery) {
     var intCursorPos;
     var strScript;
     var jsnSelection;
+
+
+    document.getElementById('sql-results-area-' + currentTab.intTabNumber + '').style.overflow = 'auto';
+
+    executeHelperUpdateTally(resultsTallyElement, 0, 0);
 
     // if we found an editor to get the query from and the current tab is not already running a query
     if (editor && currentTab.handlingQuery !== true) {
@@ -2526,15 +3035,44 @@ function executeScript(bolCursorQuery) {
         intQuery = 0;            // number query the callback is on
         intErrorStartLine = 0;   // number of lines in the queries that successfully ran, so that we can offset the error annotation
 		intErrorStartChar = 0;   // number of chars in the queries that successfully ran, so that we can offset the cursor properly
-
         // begin
+
+        //console.log('test');
         executeHelperStartExecute();
-        currentTab.currentMessageID = GS.requestRawFromSocket(GS.querySocket, jsnCurrentQuery.strQuery, function (data, error) {
-            var tableElement, scrollElement, trElement, arrRecords
-              , arrCells, intRows, strHTML, arrLines, strError
-              , intLine, i, len, col_i, col_len, rec_i, rec_len
-              , warningHTML, buttonContainerElement, strCSS
-              , styleElement;
+
+        var bolResized;
+        var arrData = [];
+        var tableElement;
+        var intRecords;
+        var countElement;
+        currentTab.currentMessageID = GS.requestRawFromSocket(GS.websockets[currentTab.relatedSocket], jsnCurrentQuery.strQuery, function (data, error) {
+            var scrollElement;
+            var trElement;
+            var arrRecords;
+            var arrCells;
+            var intRows;
+            var strHTML;
+            var arrLines;
+            var strError;
+            var intLine;
+            var i;
+            var len;
+            var j;
+            var len2;
+            var col_i;
+            var col_len;
+            var rec_i;
+            var rec_len;
+            var warningHTML;
+            var buttonContainerElement;
+            var strCSS;
+            var styleElement;
+            var tempData = [];
+            var tabNumber;
+            var idNumber;
+            var tableID;
+            var columnType;
+            var tempArr = [];
 
             if (currentTab.bolIgnoreMessages === false) {
                 // get name of query if applicable
@@ -2553,8 +3091,156 @@ function executeScript(bolCursorQuery) {
                         executeHelperStartLoading();
                     }
 
+
+                    if (data.strQuery.toLowerCase().indexOf('alter table') !== -1 && data.strQuery.toLowerCase().indexOf('rename to') !== -1) {
+                        var strObjName, trimmedQuery, oidQuery, schemaOID, strSchemaName, strNewName;
+                        trimmedQuery = data.strQuery.substring(parseInt(data.strQuery.toLowerCase().indexOf('alter table '), 10) + 12, data.strQuery.length);
+                        strNewName = trimmedQuery.substring(parseInt(trimmedQuery.toLowerCase().indexOf('rename to '), 10) + 10, trimmedQuery.length - 1);
+                        trimmedQuery = trimmedQuery.substring(0, parseInt(trimmedQuery.toLowerCase().indexOf('rename to '), 10)).trim();
+                        //console.log(data.strQuery);
+                        //console.log(trimmedQuery);
+                        //console.log(strNewName);
+                        if (trimmedQuery.indexOf(' ') !== -1) {
+                            trimmedQuery = trimmedQuery.substring(0, trimmedQuery.toLowerCase().indexOf(' '));
+                        }
+
+                        if (trimmedQuery.indexOf(';') !== -1) {
+                            trimmedQuery = trimmedQuery.substring(0, trimmedQuery.toLowerCase().indexOf(';'));
+                        }
+                        strObjName = trimmedQuery;
+
+                        strSchemaName = strObjName.substring(0, strObjName.indexOf('.'));
+                        var schemaoidQuery = ml(function () {/*
+                        SELECT oid
+                            FROM pg_namespace
+                            WHERE nspname = '{{NAMETOKEN}}'
+                            ORDER BY nspname;
+                        */}).replace(/\{\{NAMETOKEN\}\}/g, strSchemaName);
+                        getSingleCellData(schemaoidQuery, function (newSchemaOID) {
+                            schemaOID = newSchemaOID;
+                            strObjName = strObjName.substring(parseInt(strObjName.indexOf('.'), 10) + 1, strObjName.length)
+                            oidQuery = ml(function () {/*
+                            SELECT oid
+                                FROM pg_class
+                                WHERE relnamespace = '{{SCHEMAOID}}' AND relname = '{{NAMETOKEN}}'
+                            */}).replace(/\{\{NAMETOKEN\}\}/g, strObjName).replace(/\{\{SCHEMAOID\}\}/g, schemaOID);
+
+                            //console.log(oidQuery);
+                            getSingleCellData(oidQuery, function (newOID) {
+                                for (i = 0, len = treeGlobals.data.length; i < len; i++) {
+                                    if (treeGlobals.data[i].name.toLowerCase() === strObjName.toLowerCase() && treeGlobals.data[i].schemaName === strSchemaName) {
+                                        treeGlobals.data[i].oid = newOID;
+                                    }
+                                }
+                            });
+
+                        });
+                    } else if (data.strQuery.toLowerCase().indexOf('drop ') !== -1) {
+                        var strObjName, trimmedQuery, oidQuery, schemaOID, strSchemaName;
+                        trimmedQuery = data.strQuery.substring(parseInt(data.strQuery.toLowerCase().indexOf('drop '), 10) + 5, data.strQuery.length);
+                        trimmedQuery = trimmedQuery.substring(parseInt(trimmedQuery.toLowerCase().indexOf(' '), 10) + 1, trimmedQuery.length);
+
+                        if (trimmedQuery.indexOf(' ') !== -1) {
+                            trimmedQuery = trimmedQuery.substring(0, trimmedQuery.toLowerCase().indexOf(' '));
+                        }
+
+                        if (trimmedQuery.indexOf(';') !== -1) {
+                            trimmedQuery = trimmedQuery.substring(0, trimmedQuery.toLowerCase().indexOf(';'));
+                        }
+                        strObjName = trimmedQuery;
+
+                        if (data.strQuery.toLowerCase().indexOf('drop schema') !== -1) {
+                            oidQuery = ml(function () {/*
+                            SELECT oid
+                                FROM pg_namespace
+                                WHERE nspname = '{{NAMETOKEN}}'
+                                ORDER BY nspname;
+                            */}).replace(/\{\{NAMETOKEN\}\}/g, strObjName);
+
+                            getSingleCellData(oidQuery, function (newOID) {
+                                //console.log(newOID);
+                                for (i = 0, len = treeGlobals.data.length; i < len; i++) {
+                                    if (treeGlobals.data[i].name.toLowerCase() === strObjName.toLowerCase()) {
+                                        treeGlobals.data[i].oid = newOID;
+                                    }
+                                }
+                            });
+                        } else if (data.strQuery.toLowerCase().indexOf('drop table') !== -1 || data.strQuery.toLowerCase().indexOf('drop view') !== -1) {
+                            strSchemaName = strObjName.substring(0, strObjName.indexOf('.'));
+                            var schemaoidQuery = ml(function () {/*
+                            SELECT oid
+                                FROM pg_namespace
+                                WHERE nspname = '{{NAMETOKEN}}'
+                                ORDER BY nspname;
+                            */}).replace(/\{\{NAMETOKEN\}\}/g, strSchemaName);
+                            getSingleCellData(schemaoidQuery, function (newSchemaOID) {
+                                schemaOID = newSchemaOID;
+                                strObjName = strObjName.substring(parseInt(strObjName.indexOf('.'), 10) + 1, strObjName.length)
+                                oidQuery = ml(function () {/*
+                                SELECT oid
+                                    FROM pg_class
+                                    WHERE relnamespace = '{{SCHEMAOID}}' AND relname = '{{NAMETOKEN}}'
+                                */}).replace(/\{\{NAMETOKEN\}\}/g, strObjName).replace(/\{\{SCHEMAOID\}\}/g, schemaOID);
+
+                                //console.log(oidQuery);
+                                getSingleCellData(oidQuery, function (newOID) {
+                                    for (i = 0, len = treeGlobals.data.length; i < len; i++) {
+                                        if (treeGlobals.data[i].name.toLowerCase() === strObjName.toLowerCase() && treeGlobals.data[i].schemaName === strSchemaName) {
+                                            treeGlobals.data[i].oid = newOID;
+                                        }
+                                    }
+                                });
+
+                            });
+                        } else if (data.strQuery.toLowerCase().indexOf('drop function') !== -1) {
+                            trimmedQuery = data.strQuery.substring(parseInt(data.strQuery.toLowerCase().indexOf('drop '), 10) + 5, data.strQuery.length);
+                            trimmedQuery = trimmedQuery.substring(parseInt(trimmedQuery.toLowerCase().indexOf(' '), 10) + 1, trimmedQuery.length);
+                            if (trimmedQuery.indexOf(';') !== -1) {
+                                trimmedQuery = trimmedQuery.substring(0, trimmedQuery.toLowerCase().indexOf(';'));
+                            }
+                            strObjName = trimmedQuery;
+                            strSchemaName = strObjName.substring(0, strObjName.indexOf('.'));
+                            var strFullObjName = strObjName.substring(strSchemaName.length + 1, strObjName.length);
+                            strObjName = strObjName.substring(strSchemaName.length + 1, strObjName.indexOf('('));
+                            //console.log(strObjName);
+                            var schemaoidQuery = ml(function () {/*
+                            SELECT oid
+                                FROM pg_namespace
+                                WHERE nspname = '{{NAMETOKEN}}'
+                                ORDER BY nspname;
+                            */}).replace(/\{\{NAMETOKEN\}\}/g, strSchemaName);
+                            getSingleCellData(schemaoidQuery, function (newSchemaOID) {
+                                schemaOID = newSchemaOID;
+                                strObjName = strObjName.substring(parseInt(strObjName.indexOf('.'), 10) + 1, strObjName.length)
+                                oidQuery = ml(function () {/*
+                                    SELECT pr.oid
+                                        FROM pg_proc pr
+                                        JOIN pg_type typ ON typ.oid = pr.prorettype
+                                        WHERE proisagg = FALSE AND typname <> 'trigger' AND pr.pronamespace = '{{SCHEMAOID}}' AND proname = '{{NAMETOKEN}}';
+                                */}).replace(/\{\{NAMETOKEN\}\}/g, strObjName).replace(/\{\{SCHEMAOID\}\}/g, schemaOID);
+                                //console.log(oidQuery);
+                                getSingleCellData(oidQuery, function (newOID) {
+                                    for (i = 0, len = treeGlobals.data.length; i < len; i++) {
+                                        if (treeGlobals.data[i].name.toLowerCase() === strFullObjName.toLowerCase() && treeGlobals.data[i].schemaName === strSchemaName) {
+                                            treeGlobals.data[i].oid = newOID;
+                                        }
+                                    }
+                                });
+
+                            });
+                        }
+                    }
+
                     if (data.bolLastMessage) {
                         executeHelperEndLoading();
+						if (data.bolTransactionOpen) {
+							if (currentTab.relatedCommitButton) {
+							    currentTab.relatedCommitButton.removeAttribute('disabled');
+							}
+							if (currentTab.relatedRollbackButton) {
+							    currentTab.relatedRollbackButton.removeAttribute('disabled');
+							}
+						}
                     }
                     if (data.intCallbackNumberThisQuery === 0) {
                         if (data.strQuery.trim()) {
@@ -2573,6 +3259,8 @@ function executeScript(bolCursorQuery) {
                         intErrorStartLine += (data.strQuery.match(/\n/gim) || []).length;
 						intErrorStartChar += data.strQuery.length;
                     }
+
+                    //console.log(data.strMessage, data.bolLastMessage);
 
                     // handle putting the response in the results pane
 
@@ -2613,14 +3301,14 @@ function executeScript(bolCursorQuery) {
                                         '</div>' + warningHTML;
 
                             divElement = document.createElement('div');
-                            divElement.innerHTML =  strHTML + '<pre>' + intRows + ' Row' + (intRows === 1 ? '' : 's') + ' Affected</pre><br />';
+                            divElement.innerHTML = strHTML + '<pre>' + intRows + ' Row' + (intRows === 1 ? '' : 's') + ' Affected</pre><br />';
 
                             resultsContainer.appendChild(divElement);
                             executeHelperBindShowQueryButton(xtag.query(divElement, '.button-show-query')[0], data.strQuery);
                             intQuery += 1;
 
                             // update the success and error tally
-                            executeHelperUpdateTally(intQuery, intError);
+                            executeHelperUpdateTally(resultsTallyElement, intQuery, intError);
 
                         // else if empty
                         } else if (data.strMessage === 'EMPTY') {
@@ -2662,219 +3350,380 @@ function executeScript(bolCursorQuery) {
                             intQuery += 1;
 
                             // update the success and error tally
-                            executeHelperUpdateTally(intQuery, intError);
+                            executeHelperUpdateTally(resultsTallyElement, intQuery, intError);
 
                         // else if result query
                         } else if (data.arrColumnNames.length > 0) {
+                            if (dataLoadTest === true) {
+                                if (data.strMessage === '\\.') {
+                                    console.timeEnd('query-load');
+                                }
+                                return true;
+                            }
 
 
-                            // if this is the first callback for this query: set up title, table and header
                             if (data.intCallbackNumberThisQuery === 0) {
+                                console.time('Query load execution');
+								console.log(data);
+                                // create the table element
                                 divElement = document.createElement('div');
                                 scrollElement = document.createElement('div');
-
                                 scrollElement.classList.add('result-table-scroll-container');
+                                bolResized = false;
 
-                                for (i = 0, len = data.arrMessages.length, warningHTML = ''; i < len; i += 1) {
-                                    //console.log('"' + data.arrMessages[i].level + '"', '"' + data.arrMessages[i].content + '"');
-                                    warningHTML += '<i>' +
-                                                        '<b>' + data.arrMessages[i].level + ':</b> ' +
-                                                        encodeHTML(data.arrMessages[i].content) +
-                                                    '</i><br/>';
+                                i = 0;
+                                len = data.arrMessages.length;
+                                warningHTML = '';
+                                while (i < len) {
+                                    warningHTML += (
+                                        '<i>' +
+                                            '<b>' + data.arrMessages[i].level + ':</b> ' +
+                                            encodeHTML(data.arrMessages[i].content) +
+                                        '</i>' +
+                                        '<br />'
+                                    );
+
+                                    i += 1;
                                 }
 
-                                strHTML = '<div flex-horizontal>' +
-                                                '<h5 flex>Query #' + (data.intQueryNumber + 1) + strQueryName + ':</h5>' +
-                                                '<div>';
+                                strHTML = (
+                                    '<div flex-horizontal>' +
+                                        '<h5 flex>Query #' + (data.intQueryNumber + 1) + strQueryName + ':</h5>' +
+                                        '<div>'
+                                );
 
-                                if (data.dteStart && data.dteEnd && !isNaN(data.dteStart.getTime()) && !isNaN(data.dteEnd.getTime())) {
-                                    strHTML +=
+                                // if we have all of the query execution time
+                                //      data, show it
+                                if (
+                                    data.dteStart &&
+                                    data.dteEnd &&
+                                    !isNaN(data.dteStart.getTime()) &&
+                                    !isNaN(data.dteEnd.getTime())
+                                ) {
+                                    strHTML += (
                                         '<small>' +
-                                            'Approx. ' + ((data.dteEnd.getTime() - data.dteStart.getTime()) / 1000).toFixed(3) + ' seconds' +
-                                        '</small>';
+                                            'Approx. ' +
+                                            (
+                                                (
+                                                    data.dteEnd.getTime() -
+                                                    data.dteStart.getTime()
+                                                ) / 1000
+                                            ).toFixed(3) + ' seconds' +
+                                        '</small>'
+                                    );
                                 }
 
                                 strHTML += '<br />';
 
+                                // if we have a record number, show it
                                 if (data.intRows !== undefined) {
-                                    strHTML += '<small id="row-count-' + data.intQueryNumber + '"><span id="loaded-row-count-' + data.intQueryNumber + '">0</span> of ' + data.intRows + ' rows loaded</small>';
+                                    strHTML += (
+                                        '<small id="row-count-' + data.intQueryNumber + '">' +
+                                            '<span id="loaded-row-count-' + data.intQueryNumber + '">0</span> of ' +
+                                            data.intRows + ' rows loaded' +
+                                        '</small>'
+                                    );
                                 }
 
-
-                                strHTML +=      '</div>' +
-                                                '<span>&nbsp;</span>' +
-                                                '<gs-button class="button-show-query" no-focus>Query</gs-button>' +
-                                            '</div>' + warningHTML;
+                                strHTML += (
+                                        '</div>' +
+                                        '<span>&nbsp;</span>' +
+                                        '<gs-button class="button-show-query" no-focus>Query</gs-button>' +
+                                    '</div>' +
+                                    warningHTML
+                                );
 
                                 divElement.innerHTML = strHTML;
 
+                                // append query info and results container
                                 divElement.appendChild(scrollElement);
                                 resultsContainer.appendChild(divElement);
-                                executeHelperBindShowQueryButton(xtag.query(divElement, '.button-show-query')[0], data.strQuery);
 
-                                strHTML = '<thead><tr><th>#</th>';
-                                strCSS = '';
-                                for (col_i = 0, col_len = data.arrColumnNames.length; col_i < col_len; col_i += 1) {
-                                    strHTML += '<th>';
-                                    strHTML +=     '<b>';
-                                    strHTML +=     encodeHTML(GS.decodeFromTabDelimited(data.arrColumnNames[col_i]));
-                                    strHTML +=     '</b><br />';
-                                    strHTML +=     '<small>';
-                                    strHTML +=          encodeHTML(GS.decodeFromTabDelimited(data.arrColumnTypes[col_i]));
-                                    strHTML +=     '</small>';
-                                    strHTML += '</th>';
+                                // we want the "Show Query" buttons to work
+                                executeHelperBindShowQueryButton(
+                                    xtag.query(divElement, '.button-show-query')[0],
+                                    data.strQuery
+                                );
 
+                                tabNumber = currentTab.intTabNumber;
+                                idNumber = tabNumber + '-' + xtag.query(resultsContainer, 'gs-table').length;
+                                tableID = 'Table' + idNumber + '';
 
-                                    //int2 / smallint
-                                    //int4 / integer
-                                    //int8 / bigint
-                                    //numeric
-                                    //float
-                                    //decimal
-                                    //real
-                                    //double
-                                    //money
-                                    //oid
+                                // generate hud templates
+                                strHTML = ml(function () {/*
+                                    <template for="top-hud">
+                                        <gs-button onclick="document.getElementById('{{TABLEID}}').openPrefs(this)" inline no-focus icononly icon="sliders">&nbsp;</gs-button>
+                                        <gs-button onclick="document.getElementById('{{TABLEID}}').toggleFullscreen(this)" inline id="toggleFullscreen-{{IDNUM}}" no-focus icononly icon="arrows-alt">&nbsp;</gs-button>
+                                        <gs-button id="toggle{{TABLEID}}" onclick="hideOtherTables({{IDNUM}}, '{{TABLEID}}'); document.getElementById('{{TABLEID}}').toggleFullContainer('sql-results-area-{{IDNUM}}', this)" inline no-focus icononly icon="expand">&nbsp;</gs-button>
+                                        <gs-button onclick="document.getElementById('{{TABLEID}}').resizeAllColumns()"
+                                                inline no-focus
+                                                title="Resize all columns to fit their content. The new widths will be based on the content of the visible cells.">AutoFit</gs-button>
+                                    </template>
+                                    <template for="bottom-hud">
+                                        <gs-button inline no-focus icononly onclick="document.getElementById('{{TABLEID}}').goToLine('first')" icon="step-backward">&nbsp;</gs-button>
+                                        <gs-button inline no-focus icononly onclick="document.getElementById('{{TABLEID}}').goToLine('previous')" icon="caret-left">&nbsp;</gs-button>
+                                        <gs-current-record inline for="{{TABLEID}}"></gs-current-record>
+                                        <gs-button inline no-focus icononly onclick="document.getElementById('{{TABLEID}}').goToLine('next')" icon="caret-right">&nbsp;</gs-button>
+                                        <gs-button inline no-focus icononly onclick="document.getElementById('{{TABLEID}}').goToLine('last')" icon="step-forward">&nbsp;</gs-button>
+                                    </template>
+                                */}).replace(/{{TABLEID}}/gi, tableID)
+                                    .replace(/{{IDNUM}}/gi, tabNumber);
 
-                                    // if this column is a number type: align column text to the right
-                                    if ((/^(int|smallint|bigint|numeric|float|decimal|real|double|money|oid)/gi).test(data.arrColumnTypes[col_i])) {
-                                        strCSS += ' table[data-query-number="' + data.intQueryNumber + '"] tbody tr :nth-child(' + (col_i + 2) + ') { ';
-                                        strCSS += '     text-align: right;';
-                                        strCSS += ' } ';
+                                // generate header template
+                                strHTML += '<template for="header-record">';
+                                i = 0;
+                                len = data.arrColumnNames.length;
+                                while (i < len) {
+                                    // appreviate some of the types
+                                    if (data.arrColumnTypes[i].indexOf("character vary") === 0) {
+                                        columnType = (
+                                            'varchar' +
+                                            data.arrColumnTypes[i].substring(17, data.arrColumnTypes[i].length)
+                                        );
+                                    } else if (data.arrColumnTypes[i] === "timestamp with time zone") {
+                                        columnType = 'timestamptz';
+                                    } else {
+                                        columnType = data.arrColumnTypes[i];
                                     }
+
+                                    strHTML += (
+                                        '<gs-cell style="line-height: normal; padding-top: 2px; width: 20px;">' +
+                                            data.arrColumnNames[i] +
+                                            '<br />' +
+                                            '<small>(' + columnType + ')</small>' +
+                                        '</gs-cell>'
+                                    );
+                                    i += 1;
                                 }
-                                strHTML += '</tr></thead>';
+                                strHTML += '</template>';
 
 
-                                tableElement = document.createElement('table');
-                                tableElement.classList.add('results-table');
-                                tableElement.setAttribute('data-query-number', data.intQueryNumber);
+                                // generate record cell template
+                                strHTML += '<template for="data-record">';
+                                i = 0;
+                                len = data.arrColumnNames.length;
+                                while (i < len) {
+                                    // appreviate some of the types
+                                    if (data.arrColumnTypes[i].indexOf("character vary") === 0) {
+                                        columnType = (
+                                            'varchar' +
+                                            data.arrColumnTypes[i].substring(17, data.arrColumnTypes[i].length)
+                                        );
+
+                                    } else if (data.arrColumnTypes[i] === "timestamp with time zone") {
+                                        columnType = 'timestamptz';
+
+                                    } else {
+                                        columnType = data.arrColumnTypes[i];
+                                    }
+									if (columnType !== 'int2'
+										&& columnType !== 'smallint'
+										&& columnType !== 'int4'
+										&& columnType !== 'integer'
+										&& columnType !== 'int8'
+										&& columnType !== 'bigint'
+										&& columnType !== 'numeric'
+										&& columnType !== 'float'
+										&& columnType !== 'decimal'
+										&& columnType !== 'real'
+										&& columnType !== 'double'
+										&& columnType !== 'money'
+										&& columnType !== 'oid'
+									) {
+	                                    strHTML += (
+	                                        '<gs-cell class="result-cell">{{! arrRow[' + i + '] }}</gs-cell>'
+	                                    );
+									} else {
+										strHTML += (
+	                                        '<gs-cell class="result-cell" style="text-align: right;">{{! arrRow[' + i + '] }}</gs-cell>'
+	                                    );
+									}
+                                    i += 1;
+                                }
+                                strHTML += '</template>';
+
+
+                                // generate copy cell template
+                                strHTML += '<template for="copy">';
+                                i = 0;
+                                len = data.arrColumnNames.length;
+                                while (i < len) {
+                                    strHTML += (
+                                        '<gs-cell header="' + data.arrColumnNames[i] + '">{{= arrRow[' + i + '] }}</gs-cell>'
+                                    );
+                                    i += 1;
+                                }
+                                strHTML += '</template>';
+
+                                tableElement = document.createElement('gs-table');
                                 tableElement.innerHTML = strHTML;
+                                tableElement.setAttribute('id', tableID);
+                                tableElement.setAttribute('no-delete', '');
+                                tableElement.setAttribute('no-update', '');
+                                tableElement.setAttribute('null-string', 'NULL');
+                                tableElement.classList.add('results-table');
                                 scrollElement.appendChild(tableElement);
 
-                                styleElement = document.createElement('style');
-                                styleElement.innerHTML = strCSS;
-                                scrollElement.appendChild(styleElement);
+                                tableElement.setAttribute('copy-quote-when', getClipSetting('quoteType'));
+                                tableElement.setAttribute('copy-quote-char', getClipSetting('quoteChar'));
+                                tableElement.setAttribute('copy-escape-char', getClipSetting('escapeChar'));
+                                tableElement.setAttribute('copy-delimiter-cell', getClipSetting('fieldDelimiter'));
+                                tableElement.setAttribute('copy-delimiter-record', getClipSetting('recordDelimiter'));
+                                tableElement.setAttribute('copy-null-cell', getClipSetting('nullValues'));
+                                tableElement.setAttribute('copy-header', getClipSetting('columnNames'));
+                                tableElement.setAttribute('copy-selectors', getClipSetting('rowNumbers'));
+                                tableElement.setAttribute('copy-types', getClipSetting('copyTypes'));
 
-                                currentTargetTbody = document.createElement('tbody');
-                                tableElement.appendChild(currentTargetTbody);
+                                tableElement.addEventListener('openFullContainer', function () {
+                                    currentTab.resultsScroll = document.getElementById('sql-results-area-' + tabNumber + '').scrollTop;
+                                    document.getElementById('sql-results-area-' + tabNumber + '').scrollTop = 0;
+                                    document.getElementById('sql-results-area-' + tabNumber + '').style.overflow = 'hidden';
+                                });
 
-                                // set table attributes for copy settings
-                                tableElement.setAttribute('quote-type', getClipSetting("quoteType"));
-                                tableElement.setAttribute('quote-char', getClipSetting("quoteChar"));
-                                tableElement.setAttribute('field-delimiter', getClipSetting("fieldDelimiter"));
-                                tableElement.setAttribute('null-values', getClipSetting("nullValues"));
-                                tableElement.setAttribute('column-names', getClipSetting("columnNames"));
+                                tableElement.addEventListener('closeFullContainer', function () {
+                                    document.getElementById('sql-results-area-' + tabNumber + '').scrollTop = currentTab.resultsScroll;
+                                    document.getElementById('sql-results-area-' + tabNumber + '').style.overflow = 'auto';
+                                });
 
-                                // make the table selectable
-                                GS.makeTableSelectable(tableElement, evt.touchDevice);
+                                tableElement.addEventListener('before_copy', beforeTableCopyFunction);
+
+                                // reset array so that we don't override the data for the previous table
+                                arrData = Array(data.intRows);
+                                tableElement.internalData.records = arrData;
+                                tableElement.internalData.columnNames = data.arrColumnNames;
+
+                                // tempArr = [];
+                                // i = 0;
+                                // len = data.arrColumnNames.length;
+                                // while (i < len) {
+                                //     tempArr.push('text');
+                                //     i += 1;
+                                // }
+                                tableElement.internalData.columnTypes = data.arrColumnTypes;
+
+                                tempArr = [];
+                                i = 0;
+                                len = data.arrColumnNames.length;
+                                while (i < len) {
+                                    tempArr.push('on');
+                                    i += 1;
+                                }
+                                tableElement.internalData.columnFilterStatuses = tempArr;
+
+                                tempArr = [];
+                                i = 0;
+                                len = data.arrColumnNames.length;
+                                while (i < len) {
+                                    tempArr.push([]);
+                                    i += 1;
+                                }
+                                tableElement.internalData.columnFilters = tempArr;
+
+                                tempArr = [];
+                                i = 0;
+                                len = data.arrColumnNames.length;
+                                while (i < len) {
+                                    tempArr.push({});
+                                    i += 1;
+                                }
+                                tableElement.internalData.columnListFilters = tempArr;
+
+                                tempArr = [];
+                                i = 0;
+                                len = data.arrColumnNames.length;
+                                while (i < len) {
+                                    tempArr.push('neutral');
+                                    i += 1;
+                                }
+                                tableElement.internalData.columnOrders = tempArr;
+
+                                tableElement.internalDisplay.headerHeight = 37;
+
+                                countElement = document.getElementById('loaded-row-count-' + data.intQueryNumber);
+                                intRecords = 0;
+                                intQuery += 1;
+                                executeHelperUpdateTally(resultsTallyElement, intQuery, intError);
                             }
 
+                            if (data.strMessage === '\\.') {
+                                // finish loaded count
+                                document.getElementById('row-count-' + data.intQueryNumber).textContent = data.intRows + ' rows loaded';
 
-
-                            //console.log('0***', data);
-                            // if not end query, therefore: results
-                            if (data.strMessage !== '\\.') {
-								var loadedRowCount = document.getElementById('loaded-row-count-' + data.intQueryNumber);
-								loadedRowCount.innerHTML = (parseInt(loadedRowCount.innerHTML, 10) + 10).toString();
-
-                                arrRecords = data.strMessage.split('\n');
-                                strHTML = '';
-
-                                //console.log(
-                                //    '1***',
-                                //    data.intCallbackNumberThisQuery,
-                                //    data.intQueryNumber,
-                                //    arrRecords
-                                //);
-
-                                for (rec_i = 0, rec_len = arrRecords.length; rec_i < rec_len; rec_i += 1) {
-                                    // if appending this would make more than 10 records: save to data store
-                                    if (data.intCallbackNumberThisQuery >= 1) {
-                                        //console.log(
-                                        //    '2***',
-                                        //    intRecordsThisQuery,
-                                        //    currentTab.arrQueryDataStore[data.intQueryNumber].length,
-                                        //    arrRecords[rec_i]
-                                        //);
-                                        currentTab.arrQueryDataStore[data.intQueryNumber].push((intRecordsThisQuery + 1) + '\t' + arrRecords[rec_i]);
-
-                                        // if this is the first time adding to the data store: add append buttons below the table
-                                        if (currentTab.arrQueryDataStore[data.intQueryNumber].length === 1) {
-                                            //console.log('3***');
-                                            buttonContainerElement = document.createElement('div');
-                                            buttonContainerElement.style.whiteSpace = 'normal';
-
-                                            GS.insertElementAfter(buttonContainerElement, currentTargetTbody.parentNode);
-
-                                            buttonContainerElement.innerHTML = ml(function () {/*
-                                                <gs-grid min-width="all {reflow}; 482px {1,1,1,1};">
-                                                    <gs-block>
-                                                        <gs-button onclick="showMoreResults(this, {{QUERY}}, 10)">Show 10 More</gs-button>
-                                                    </gs-block>
-                                                    <gs-block>
-                                                        <gs-button onclick="showMoreResults(this, {{QUERY}}, 100)">Show 100 More</gs-button>
-                                                    </gs-block>
-                                                    <gs-block>
-                                                        <gs-button onclick="showMoreResults(this, {{QUERY}}, 1000)">Show 1000 More</gs-button>
-                                                    </gs-block>
-                                                    <gs-block>
-                                                        <gs-button onclick="showMoreResults(this, {{QUERY}}, 'all')">Show All</gs-button>
-                                                    </gs-block>
-                                                </gs-grid>
-                                            */}).replace(/\{\{QUERY\}\}/gi, data.intQueryNumber);
-                                        }
-
-                                    // else append to the dom
-                                    } else {
-                                        trElement = document.createElement('tr');
-                                        arrCells = arrRecords[rec_i].split('\t');
-
-                                        //console.log(
-                                        //    '4***',
-                                        //    arrCells
-                                        //);
-
-                                        strHTML = '<th>' + (intRecordsThisQuery + 1) + '</th>';
-                                        for (col_i = 0, col_len = arrCells.length; col_i < col_len; col_i += 1) {
-                                            strHTML += '<td>';
-                                            strHTML += encodeHTML(GS.decodeFromTabDelimited(arrCells[col_i]));
-                                                            //.replace(/&/g, '&amp;')
-                                                            //.replace(/"/g, '&quot;')
-                                                            //.replace(/'/g, '&#39;')
-                                                            //.replace(/</g, '&lt;')
-                                                            //.replace(/>/g, '&gt;');
-                                            strHTML += '</td>';
-                                        }
-                                        trElement.innerHTML = strHTML;
-
-                                        currentTargetTbody.appendChild(trElement);
-                                    }
-
-                                    intRecordsThisQuery += 1;
+                                // trigger one last re-render
+                                tableElement.internalDisplay.fullRenderRequired = true;
+                                tableElement.refresh();
+                                if (!bolResized) {
+                                    bolResized = true;
+                                    tableElement.resizeAllColumns();
                                 }
 
-                            // else if end message
-                            } else if (data.strMessage === '\\.') {
-								var rowCount = document.getElementById('row-count-' + data.intQueryNumber);
-								rowCount.innerHTML = data.intRows + ' rows';
+                                // clear table element
+                                tableElement = null;
 
-                                //console.log('5***');
-                                // add a br for spacing/padding
-                                resultsContainer.appendChild(document.createElement('br'));
-                                // set part number to 0 and add one to the query number
-                                intQuery += 1;
+                                console.timeEnd('Query load execution');
 
-                                // update the success and error tally
-                                executeHelperUpdateTally(intQuery, intError);
+                            } else {
+                                var index;
+                                var strRecord;
+                                var strMessage;
 
-                                intRecordsThisQuery = 0;
-                                currentTab.relatedClearButton.removeAttribute('disabled');
-                                currentTab.relatedStopLoadingButton.setAttribute('hidden', '');
-                                currentTab.relatedStopLoadingButton.removeEventListener('click', executeHelperStopLoadingHandler);
+                                // add data to table
+                                strMessage = data.strMessage + '\n';
+                                i = 0;
+                                while (i < 1000) {
+                                    index = strMessage.indexOf('\n');
+                                    strRecord = strMessage.substring(0, index);
+                                    strMessage = strMessage.substring(index + 1);
+
+                                    if (strRecord !== '' || strMessage !== '') {
+                                        arrData[intRecords] = strRecord;
+                                        intRecords += 1;
+                                    } else {
+                                        break;
+                                    }
+
+                                    i += 1;
+                                }
+
+                                // updated loaded count
+                                if (data.intCallbackNumberThisQuery % 150 === 0) {
+                                    if (window.requestAnimationFrame) {
+                                        if (!window['frameThingRequested' + data.intQueryNumber]) {
+                                            window['frameThingAmount' + data.intQueryNumber] = intRecords;
+                                            window['frameThingRequested' + data.intQueryNumber] = true;
+                                            window.requestAnimationFrame(function () {
+                                                window['frameThingRequested' + data.intQueryNumber] = false;
+                                                countElement.textContent = window['frameThingAmount' + data.intQueryNumber];
+                                            });
+                                        } else {
+                                            window['frameThingAmount' + data.intQueryNumber] = intRecords;
+                                        }
+                                    }
+                                }
+
+                                // use the row count to determine a fixed number of scroll render points
+                                // or
+                                // use current time and if the scroll render has been x milliseconds, rerender
+                                // or
+                                // rerender every x data packets
+
+                                if (
+                                    data.intCallbackNumberThisQuery === 4// ||
+                                    //data.intCallbackNumberThisQuery % 1000 === 0
+                                ) {
+                                    tableElement.refresh();
+                                    tableElement.resizeAllColumns();
+                                    bolResized = true;
+                                }
+
+                                // every rerender should be put into a requestAnimationFrame, if available
                             }
                         }
-                    }
+                    } else {
+						if (xtag.query(xtag.query(document.body, '.current-tab')[0].relatedResultsArea, 'gs-table').length === 1) {
+							GS.triggerEvent(document.getElementById('toggle' + xtag.query(xtag.query(document.body, '.current-tab')[0].relatedResultsArea, 'gs-table')[0].getAttribute('id')), 'click');
+						}
+					}
                 } else {
                     executeHelperEndExecute();
                     executeHelperEndLoading();
@@ -2907,10 +3756,14 @@ function executeScript(bolCursorQuery) {
                             intLine = parseInt(arrLines[i].substring(arrLines[i].indexOf(' ') + 1, arrLines[i].indexOf(':')), 10);
                         }
                     }
+                    var data_error_text = encodeHTML(GS.decodeFromTabDelimited(data.error_text));
+                    if (data_error_text.toLowerCase().indexOf('cannot run inside a transaction block') !== -1) {
+                        data_error_text += 'Try placing "COMMIT;" before the statement and "BEGIN;" after.';
+                    }
 
                     divElement = document.createElement('div');
                     divElement.innerHTML = '<h4 id="error' + intQuery + '">Query #' + (intQuery) + strQueryName + ' Error:</h4>' + warningHTML +
-                                            '<pre>' + encodeHTML(GS.decodeFromTabDelimited(data.error_text)) + '</pre>'; //strError ||
+                                            '<pre>' + data_error_text + '</pre>'; //strError ||
                     resultsContainer.appendChild(divElement);
                     resultsContainer.appendChild(document.createElement('br'));
                     //resultsContainer.scrollTop = resultsContainer.scrollHeight + resultsContainer.offsetHeight;
@@ -2925,12 +3778,12 @@ function executeScript(bolCursorQuery) {
 						var intErrorCol = parseInt(data.error_position, 10) - 1;
 						var i = 0;
 						var len = intLine - 1;
-					    console.log(len, intLine, arrLines.length);
-					    console.log(jsnCurrentQuery.strQuery);
-					    console.log(intErrorStartChar);
-					    console.log(intErrorStartChar);
+					    //console.log(len, intLine, arrLines.length);
+					    //console.log(jsnCurrentQuery.strQuery);
+					    //console.log(intErrorStartChar);
+					    //console.log(intErrorStartChar);
 						while (i < len) {
-						    console.log(i, arrLines[i], arrLines[i].length);
+						    //console.log(i, arrLines[i], arrLines[i].length);
 							intErrorCol -= arrLines[i].length + 1;
 							i += 1
 						}
@@ -2945,17 +3798,33 @@ function executeScript(bolCursorQuery) {
 								column: intErrorCol || 0
 							}
 						});
-					}
-                    if (intLine) {
+
                         editor.getSession().setAnnotations([
                             {'row': jsnCurrentQuery.start_row + intErrorStartLine + (intLine - 1), 'column': intErrorCol || 0,
                                 'text': strError, 'type': 'error'}
                         ]);
                         editor.scrollToLine((jsnCurrentQuery.start_row + intErrorStartLine + (intLine - 1)), true, true);
+					} else {
+					    editor.getSelection().setSelectionRange({
+							start: {
+								row: jsnCurrentQuery.start_row + intErrorStartLine,
+								column: intErrorCol || 0
+							},
+							end: {
+								row: jsnCurrentQuery.start_row + intErrorStartLine,
+								column: intErrorCol || 0
+							}
+						});
+
+                        editor.getSession().setAnnotations([
+                            {'row': jsnCurrentQuery.start_row + intErrorStartLine, 'column': intErrorCol || 0,
+                                'text': strError, 'type': 'error'}
+                        ]);
+                        editor.scrollToLine((jsnCurrentQuery.start_row + intErrorStartLine), true, true);
                     }
 
                     // update the success and error tally
-                    executeHelperUpdateTally(intQuery, intError);
+                    executeHelperUpdateTally(resultsTallyElement, intQuery, intError);
 
                     //editor.gotoLine(
                     //    (jsnCurrentQuery.start_row + intLine),
@@ -2970,7 +3839,7 @@ function executeScript(bolCursorQuery) {
 
 function showMoreResults(buttonElement, intQuery, howMany) {
     'use strict';
-    var currentTab = document.getElementsByClassName('current-tab')[0];
+    GS.log(bolDebug, currentTab);
     var i, len, col_i, col_len, tbodyElement, trElement, gridElement, arrRecords, strHTML, arrCells;
 
     tbodyElement = xtag.query(
@@ -3099,8 +3968,8 @@ function dialogExecuteHistory() {
 //
 function exportCSV() {
     'use strict';
-    var currentTab = document.getElementsByClassName('current-tab')[0]
-      , editor = currentTab.relatedEditor, templateElement = document.createElement('template')
+    GS.log(bolDebug, currentTab);
+    var editor = currentTab.relatedEditor, templateElement = document.createElement('template')
       , jsnCurrentQuery;
 
     // if we found an editor to get the query from
@@ -3402,7 +4271,7 @@ function exportCSV() {
 }
 
 function openInNewWindow() {
-    var currentTab = document.getElementsByClassName('current-tab')[0];
+    GS.log(bolDebug, currentTab);
     window.open('index.html?leftpanel=false&view=tab:' + encodeURIComponent(currentTab.filePath), Math.random().toString(), 'left=' + (window.screenX + 100) + ',width=' + window.innerWidth + ',height=' + window.innerHeight);
 }
 

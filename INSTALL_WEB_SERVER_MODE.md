@@ -1,6 +1,6 @@
 # Installing pgManage (Web Server mode)
 
-## Please note that we put a lot of effort into making sure pgManage installs cleanly on every platform. If you have an issue please [report it](https://github.com/workflowproducts/pgmanage/issues) and we'll get it fixed. 
+## Please note that we put a lot of effort into making sure pgManage installs cleanly on every platform. If you have an issue please [report it](https://github.com/pgManage/pgManage/issues) and we'll get it fixed. 
 
 ## Dependencies
 
@@ -21,7 +21,7 @@ Or if you choose LibreSSL, make sure its `openssl` is first in the $PATH (On Ope
 
 ####DOWNLOADING PGMANAGE
 
-https://github.com/workflowproducts/pgmanage/releases
+https://github.com/pgManage/pgManage/releases
 
 
 #### NOTICE: INSTALLING PGMANAGE SERVER ON WINDOWS IS EXPLAINED IN THE DOCUMENT: INSTALL_WEB_SERVER_MODE_WIN.md

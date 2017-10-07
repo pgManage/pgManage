@@ -150,7 +150,7 @@
             document.addEventListener('DOMContentLoaded', function () {
                 'use strict';
 
-                ajaxJSON('https://api.github.com/repos/workflowproducts/pgmanage/issues/comments', '', function (data, error) {
+                ajaxJSON('https://api.github.com/repos/pgManage/pgManage/issues/comments', '', function (data, error) {
                     if (!error) {
                         for (var i = 0, len = data.length; i < len; i += 1) {
                             var elem = document.createElement('div');

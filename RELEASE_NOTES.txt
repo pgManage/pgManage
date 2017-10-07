@@ -1,41 +1,41 @@
 Changes since 3.2.17:
 pgManage:
 - Fix `super_only` error to be more specific
-- Fix tab folder icon (closes workflowproducts/pgmanage#351)
-- Don't require superuser by default (for workflowproducts/pgmanage#353)
-- Disable timeout by default (for workflowproducts/pgmanage#353)
-- Fixed page curls in pgmanage frames (closes workflowproducts/pgmanage#362)
-- Relabel ACE button to Help (closes workflowproducts/pgmanage#359)
-- Fix table designer issues (closes workflowproducts/pgmanage#364)
-- Add shortcuts to toolbar (closes workflowproducts/pgmanage#358)
-- Fix CTRL-W closing application in electron (closes workflowproducts/pgmanage#356)
-- Fix UNLOGGED, REAL and TEMP (closes workflowproducts/pgmanage#370)
-- Add automatically resizing when you run one record returning query (closes workflowproducts/pgmanage#369)
-- Prevent editor from losing focus (closes workflowproducts/pgmanage#361)
-- Make NULL a placeholder text (closes workflowproducts/pgmanage#368)
-- Fix justification of integers and number columns (closes workflowproducts/pgmanage#31)
-- Add zoom-to-fit to explain graph (for workflowproducts/pgmanage#363)
-- Add horizontal explain graph (for workflowproducts/pgmanage#363)
-- Add EXPLAIN and EXPLAIN ANALYZE to history (closes workflowproducts/pgmanage#360)
-- Add `hostaddr` warning to config editor (closes workflowproducts/pgmanage#367)
-- Fix carriage returns (closes workflowproducts/pgmanage#373)
-- Fix query detection in update rules (working on workflowproducts/pgmanage#372)
-- Autocomplete 'SELECT schema.' now shows functions in that schema (closes workflowproducts/pgmanage#374)
-- Fix multiple cursor query execute (closes workflowproducts/pgmanage#375)
-- Usernames are now qouted (closes workflowproducts/pgmanage#376)
-- Fix schema dump dropping sequences owned by a table (closes workflowproducts/pgmanage#385)
-- Fix schema dump sequences owned by clause (closes workflowproducts/pgmanage#382)
-- Fix schema dump OPERATOR drop statements (closes workflowproducts/pgmanage#381)
-- Fix schema dump dropping indexes (closes workflowproducts/pgmanage#379)
-- Fix schema dump triggers to come after the functions they call (closes workflowproducts/pgmanage#378)
-- Make snippets popup when you complete the first word (closes workflowproducts/pgmanage#377)
-- Fix E'\n's being converted to actual newlines (for workflowproducts/pgmanage#380)
-- Add generation of md5sums for packages (closes workflowproducts/pgmanage#383)
-- Fix beautify with multiple cursors (closes workflowproducts/pgmanage#386)
-- Fixed beautify mangling query (closes workflowproducts/pgmanage#388)
-- Make pgmanage ask for copy options when you copy (closes workflowproducts/pgmanage#390)
-- Fixed beautify extra space (closes workflowproducts/pgmanage#392)
-- Fix clicking on current connection de-focusing password input (closes workflowproducts/pgmanage#387)
+- Fix tab folder icon (closes pgManage/pgManage#351)
+- Don't require superuser by default (for pgManage/pgManage#353)
+- Disable timeout by default (for pgManage/pgManage#353)
+- Fixed page curls in pgmanage frames (closes pgManage/pgManage#362)
+- Relabel ACE button to Help (closes pgManage/pgManage#359)
+- Fix table designer issues (closes pgManage/pgManage#364)
+- Add shortcuts to toolbar (closes pgManage/pgManage#358)
+- Fix CTRL-W closing application in electron (closes pgManage/pgManage#356)
+- Fix UNLOGGED, REAL and TEMP (closes pgManage/pgManage#370)
+- Add automatically resizing when you run one record returning query (closes pgManage/pgManage#369)
+- Prevent editor from losing focus (closes pgManage/pgManage#361)
+- Make NULL a placeholder text (closes pgManage/pgManage#368)
+- Fix justification of integers and number columns (closes pgManage/pgManage#31)
+- Add zoom-to-fit to explain graph (for pgManage/pgManage#363)
+- Add horizontal explain graph (for pgManage/pgManage#363)
+- Add EXPLAIN and EXPLAIN ANALYZE to history (closes pgManage/pgManage#360)
+- Add `hostaddr` warning to config editor (closes pgManage/pgManage#367)
+- Fix carriage returns (closes pgManage/pgManage#373)
+- Fix query detection in update rules (working on pgManage/pgManage#372)
+- Autocomplete 'SELECT schema.' now shows functions in that schema (closes pgManage/pgManage#374)
+- Fix multiple cursor query execute (closes pgManage/pgManage#375)
+- Usernames are now qouted (closes pgManage/pgManage#376)
+- Fix schema dump dropping sequences owned by a table (closes pgManage/pgManage#385)
+- Fix schema dump sequences owned by clause (closes pgManage/pgManage#382)
+- Fix schema dump OPERATOR drop statements (closes pgManage/pgManage#381)
+- Fix schema dump dropping indexes (closes pgManage/pgManage#379)
+- Fix schema dump triggers to come after the functions they call (closes pgManage/pgManage#378)
+- Make snippets popup when you complete the first word (closes pgManage/pgManage#377)
+- Fix E'\n's being converted to actual newlines (for pgManage/pgManage#380)
+- Add generation of md5sums for packages (closes pgManage/pgManage#383)
+- Fix beautify with multiple cursors (closes pgManage/pgManage#386)
+- Fixed beautify mangling query (closes pgManage/pgManage#388)
+- Make pgmanage ask for copy options when you copy (closes pgManage/pgManage#390)
+- Fixed beautify extra space (closes pgManage/pgManage#392)
+- Fix clicking on current connection de-focusing password input (closes pgManage/pgManage#387)
 
 Envelope:
 - Fix auth check for `/env` to instead check for `/env/`
@@ -48,60 +48,60 @@ Both:
 
 Changes since 3.2.16:
 pgManage:
-- Make headers visible rather than seeing "####" (PR workflowproducts/pgmanage#328)
-- Fix running pgmanage from a different disk drive (for workflowproducts/pgmanage#339)
-- Fix configure to accept --prefix, fix Makefile to create mandir (closes workflowproducts/pgmanage#343)
-- Disable context data in pgManage (closes workflowproducts/pgmanage#336)
-- Fix line indicator when Postgres doesn't supply a line number with an error (closes workflowproducts/pgmanage#329)
-- Add autofit button (closes workflowproducts/pgmanage#345)
-- Fix file save/save as in pgmanage (closes workflowproducts/pgmanage#330)
-- Fix raw not returning NULL properly (closes workflowproducts/pgmanage#332)
-- Changed transaction block errors to include a solution (closes workflowproducts/pgmanage#349)
+- Make headers visible rather than seeing "####" (PR pgManage/pgManage#328)
+- Fix running pgmanage from a different disk drive (for pgManage/pgManage#339)
+- Fix configure to accept --prefix, fix Makefile to create mandir (closes pgManage/pgManage#343)
+- Disable context data in pgManage (closes pgManage/pgManage#336)
+- Fix line indicator when Postgres doesn't supply a line number with an error (closes pgManage/pgManage#329)
+- Add autofit button (closes pgManage/pgManage#345)
+- Fix file save/save as in pgmanage (closes pgManage/pgManage#330)
+- Fix raw not returning NULL properly (closes pgManage/pgManage#332)
+- Changed transaction block errors to include a solution (closes pgManage/pgManage#349)
 
 Both:
-- Fix openssl on mac linking to static library (closes workflowproducts/pgmanage#343)
-- Fix UPDATE/DELETE hashes (closes workflowproducts/pgmanage#347)
+- Fix openssl on mac linking to static library (closes pgManage/pgManage#343)
+- Fix UPDATE/DELETE hashes (closes pgManage/pgManage#347)
 
 
 Changes since 3.2.15:
 pgManage:
-- Rewrite generate script for table designer (closed workflowproducts/pgmanage#307)
-- Fix beautify not working on tables (closed workflowproducts/pgmanage#318)
-- Fix dollar tag syntax highlighting (closed workflowproducts/pgmanage#274)
-- Fix function utility comment script on table functions (closed workflowproducts/pgmanage#319)
-- Fix object browser losing track of replaced view (closed workflowproducts/pgmanage#220)
-- Fix object browser losing track of replaced schema (closed workflowproducts/pgmanage#251)
-- Fix column permissions in table script (closed workflowproducts/pgmanage#316)
+- Rewrite generate script for table designer (closed pgManage/pgManage#307)
+- Fix beautify not working on tables (closed pgManage/pgManage#318)
+- Fix dollar tag syntax highlighting (closed pgManage/pgManage#274)
+- Fix function utility comment script on table functions (closed pgManage/pgManage#319)
+- Fix object browser losing track of replaced view (closed pgManage/pgManage#220)
+- Fix object browser losing track of replaced schema (closed pgManage/pgManage#251)
+- Fix column permissions in table script (closed pgManage/pgManage#316)
 
 Envelope:
 - Fix GS-Time showing PM at wrong time (closed workflowproducts/envelope#68)
 
 Both:
-- Fix datasheet inserting a record scrolls to the top (closed workflowproducts/pgmanage#309)
-- Fix datasheet column resizing behaviors (closed workflowproducts/envelope#70, workflowproducts/pgmanage#315)
-- Fix datasheet allows cursor while multiple columns are selected (closed workflowproducts/pgmanage#308)
-- Fix datasheet updating selection after changing a cell (closed workflowproducts/pgmanage#311)
+- Fix datasheet inserting a record scrolls to the top (closed pgManage/pgManage#309)
+- Fix datasheet column resizing behaviors (closed workflowproducts/envelope#70, pgManage/pgManage#315)
+- Fix datasheet allows cursor while multiple columns are selected (closed pgManage/pgManage#308)
+- Fix datasheet updating selection after changing a cell (closed pgManage/pgManage#311)
 
 
 Changes since 3.2.14:
 pgManage:
-- Fix datasheet preventing scrolling of the results pane (closed workflowproducts/pgmanage#306)
-- Fix returns not scrolling the viewport (closed workflowproducts/pgmanage#279)
-- Fix LOGIN and PASSWORD on same line in CREATE ROLE script (closed workflowproducts/pgmanage#305)
-- Fix Object CREATE scripts (closed workflowproducts/pgmanage#240)
-- Add Javascript error notifications (closed workflowproducts/pgmanage#265)
-- Fix autocomplete not working after a parenthesis (closed workflowproducts/pgmanage#292)
-- Fix materialized view definitions not showing (closed workflowproducts/pgmanage#300)
-- Fix autocomplete not offering snippets when typing a subquery (closed workflowproducts/pgmanage#256)
+- Fix datasheet preventing scrolling of the results pane (closed pgManage/pgManage#306)
+- Fix returns not scrolling the viewport (closed pgManage/pgManage#279)
+- Fix LOGIN and PASSWORD on same line in CREATE ROLE script (closed pgManage/pgManage#305)
+- Fix Object CREATE scripts (closed pgManage/pgManage#240)
+- Add Javascript error notifications (closed pgManage/pgManage#265)
+- Fix autocomplete not working after a parenthesis (closed pgManage/pgManage#292)
+- Fix materialized view definitions not showing (closed pgManage/pgManage#300)
+- Fix autocomplete not offering snippets when typing a subquery (closed pgManage/pgManage#256)
 
 Both: 
-- Add multi-column updating to datasheet (closed workflowproducts/pgmanage#286)
-- Fix side-scrolling on datasheet (closed workflowproducts/pgmanage#291)
+- Add multi-column updating to datasheet (closed pgManage/pgManage#286)
+- Fix side-scrolling on datasheet (closed pgManage/pgManage#291)
 
 
 Changes since 3.2.13:
 pgManage:
-- Fix datasheet not working when a column name has a dash in it (closed workflowproducts/pgmanage#298)
+- Fix datasheet not working when a column name has a dash in it (closed pgManage/pgManage#298)
 - Datasheet: Allow copy record to use new arrRow column access method
 
 Envelope:
@@ -115,14 +115,14 @@ Changes since 3.2.12:
 pgManage:
 - New autocomplete
 - Fix electron pgmanage to use extraResources instead of disabling asar
-- Fix multiple instances of pgmanage (closed workflowproducts/pgmanage#267)
-- Make Beautify check itself before wrecking itself (closed workflowproducts/pgmanage#262)
-- Fix column headings disappearing after scrolling (closed workflowproducts/pgmanage #40)
-- Make Query Result Columns Only as Wide as Necessary (closed workflowproducts/pgmanage#165)
-- Fix switching tabs during a query execution (closed workflowproducts/pgmanage#227)
-- Fix Beautify not recognizing UNION (closed workflowproducts/pgmanage#260)
-- Fix Beautify mangling VIEW RULES (closed workflowproducts/pgmanage#261)
-- CREATE FUNCTION snippet puts in a single dollar sign instead of a $BODY$ tag (closed workflowproducts/pgmanage#254)
+- Fix multiple instances of pgmanage (closed pgManage/pgManage#267)
+- Make Beautify check itself before wrecking itself (closed pgManage/pgManage#262)
+- Fix column headings disappearing after scrolling (closed pgManage/pgManage #40)
+- Make Query Result Columns Only as Wide as Necessary (closed pgManage/pgManage#165)
+- Fix switching tabs during a query execution (closed pgManage/pgManage#227)
+- Fix Beautify not recognizing UNION (closed pgManage/pgManage#260)
+- Fix Beautify mangling VIEW RULES (closed pgManage/pgManage#261)
+- CREATE FUNCTION snippet puts in a single dollar sign instead of a $BODY$ tag (closed pgManage/pgManage#254)
 
 Envelope:
 - Fix file rename to not overwrite files
@@ -150,12 +150,12 @@ Both:
 Changes since 3.2.11:
 pgManage:
 - Fix HTML in explain table
-- Stop drop down showing up for SPACE (closes workflowproducts/pgmanage#257)
-- Fix autocomplete with double-quoted entity names (closes workflowproducts/pgmanage#246)
-- Fix tab suddenly not working in code editor (closes workflowproducts/pgmanage#255)
-- Fix CREATE FUNCTION listed twice in autocomplete dropdown (closes workflowproducts/pgmanage#253)
-- Fix duplicate letters when typing (closes workflowproducts/pgmanage#252)
-- Fix CREATE FUNCTION to have a $BODY$ tag (closes workflowproducts/pgmanage#254)
+- Stop drop down showing up for SPACE (closes pgManage/pgManage#257)
+- Fix autocomplete with double-quoted entity names (closes pgManage/pgManage#246)
+- Fix tab suddenly not working in code editor (closes pgManage/pgManage#255)
+- Fix CREATE FUNCTION listed twice in autocomplete dropdown (closes pgManage/pgManage#253)
+- Fix duplicate letters when typing (closes pgManage/pgManage#252)
+- Fix CREATE FUNCTION to have a $BODY$ tag (closes pgManage/pgManage#254)
 
 Both:
 - Remove LibreSSL Source (closes workflowproducts/envelope#59)
@@ -164,13 +164,13 @@ Both:
 Changes since 3.2.10:
 pgManage:
 - Fix crash when raw request is pending and socket is closed
-- Find and replace buttons now give feedback (closes workflowproducts/pgmanage#239)
-- Object Browser vertical scroll bar stops working (closes workflowproducts/pgmanage#242)
-- Beautify RULES improvements (closes workflowproducts/pgmanage#241)
-- Beautify remove some extra spacing (closes workflowproducts/pgmanage#249)
-- Fix autocomplete PL/PGSQL variables (closes workflowproducts/pgmanage#247)
-- Fix autocomplete inserts entire word instead of completing word (closes workflowproducts/pgmanage#244)
-- Fix autocomplete not sorting alphabetically (closes workflowproducts/pgmanage#245)
+- Find and replace buttons now give feedback (closes pgManage/pgManage#239)
+- Object Browser vertical scroll bar stops working (closes pgManage/pgManage#242)
+- Beautify RULES improvements (closes pgManage/pgManage#241)
+- Beautify remove some extra spacing (closes pgManage/pgManage#249)
+- Fix autocomplete PL/PGSQL variables (closes pgManage/pgManage#247)
+- Fix autocomplete inserts entire word instead of completing word (closes pgManage/pgManage#244)
+- Fix autocomplete not sorting alphabetically (closes pgManage/pgManage#245)
 
 Envelope:
 - Fix crash when ws_file_free called twice
@@ -215,14 +215,14 @@ Both:
 Changes since 3.2.6:
 pgManage:
 Fix beautify issue
-Fix context menu (close workflowproducts/pgmanage#200)
-Move cursor to error position (close workflowproducts/pgmanage#208)
-Focus editor after clicking RUN button (close workflowproducts/pgmanage#202)
-Split 'Tools' menu into 'Tools' and 'Options' (close workflowproducts/pgmanage#197)
+Fix context menu (close pgManage/pgManage#200)
+Move cursor to error position (close pgManage/pgManage#208)
+Focus editor after clicking RUN button (close pgManage/pgManage#202)
+Split 'Tools' menu into 'Tools' and 'Options' (close pgManage/pgManage#197)
 Set width of history/notify buttons
-Fix object browser line padding (close workflowproducts/pgmanage#210)
-Make clicks in the object browser not affect the focus (close workflowproducts/pgmanage#209)
-Fix 'too many levels of symbolic links error' (close workflowproducts/pgmanage#215)
+Fix object browser line padding (close pgManage/pgManage#210)
+Make clicks in the object browser not affect the focus (close pgManage/pgManage#209)
+Fix 'too many levels of symbolic links error' (close pgManage/pgManage#215)
 Restructured autocomplete
 Fix issue where autocomplete popup would not insert when you clicked it
 
@@ -241,8 +241,8 @@ Fix typing bugs
 
 Changes since 3.2.4:
 pgManage:
-Fix constraint query (closed workflowproducts/pgmanage#205)
-Fix header buttons in configuration editor (closed workflowproducts/pgmanage#203)
+Fix constraint query (closed pgManage/pgManage#205)
+Fix header buttons in configuration editor (closed pgManage/pgManage#203)
 Update windows libpq (9.6.2) and windows libressl (2.5.3)
 Fix memory issues in JS
 
@@ -264,25 +264,25 @@ Add horizontal parameters for scroll functions
 
 Changes since 3.2.2
 pgManage:
-Add depesz based explain (closed workflowproducts/pgmanage#176)
+Add depesz based explain (closed pgManage/pgManage#176)
 Fix query highlighting
-Fix triangle icons (closed workflowproducts/pgmanage#185)
-Fix tree queries for constraint (closed workflowproducts/pgmanage#187)
-Add second run option to only run the query under the cursor (closed workflowproducts/pgmanage #171)
-Add session user to current user information (closed workflowproducts/pgmanage#180)
-Fix problem with query detection (closed workflowproducts/pgmanage#179)
-Fix escaping for odd names (closed workflowproducts/pgmanage#178)
-Remove lowercasing database and user (closed workflowproducts/pgmanage#178)
-Add declared variables to autocomplete (closed workflowproducts/pgmanage#170)
-Fix ws_raw socket close (related to workflowproducts/pgmanage#174)
-Add a keyboard shortcut editor (closed workflowproducts/pgmanage#167)
-Fix view scripts opening when you click the arrow (closed workflowproducts/pgmanage#169)
+Fix triangle icons (closed pgManage/pgManage#185)
+Fix tree queries for constraint (closed pgManage/pgManage#187)
+Add second run option to only run the query under the cursor (closed pgManage/pgManage #171)
+Add session user to current user information (closed pgManage/pgManage#180)
+Fix problem with query detection (closed pgManage/pgManage#179)
+Fix escaping for odd names (closed pgManage/pgManage#178)
+Remove lowercasing database and user (closed pgManage/pgManage#178)
+Add declared variables to autocomplete (closed pgManage/pgManage#170)
+Fix ws_raw socket close (related to pgManage/pgManage#174)
+Add a keyboard shortcut editor (closed pgManage/pgManage#167)
+Fix view scripts opening when you click the arrow (closed pgManage/pgManage#169)
 Fix windows installation when installer is on a different drive
-Fix arrowing in some autocomplete situations (closed workflowproducts/pgmanage#182)
+Fix arrowing in some autocomplete situations (closed pgManage/pgManage#182)
 Make Ctrl/Cmd+s save shortcut in tab editor
 Add ORDER BY to all INSERT tests with more than one record (prevents a fail that happens sometimes)
 Add alert to tell the tester when the API tests are done
-Fix Beautify to work properly (closed workflowproducts/pgmanage#183)
+Fix Beautify to work properly (closed pgManage/pgManage#183)
 make Beautify run when opening a VIEW script
 
 Envelope:
@@ -297,7 +297,7 @@ Add GROUP BY to websocket SELECT
 Changes since 3.2.1:
 pgManage:
 Clear Electron cache when opening a window
-Fix database list code to not clear HTML every 10 records (closed workflowproducts/pgmanage#164)
+Fix database list code to not clear HTML every 10 records (closed pgManage/pgManage#164)
 
 Envelope:
 Fix limit property not templating
@@ -322,38 +322,38 @@ Fix caching issues
 Changes since 3.2.0-beta:
 pgManage:
 Add options dialog
-Fix .deb dependencies (closed workflowproducts/pgmanage#162)
-Added stop button when loading records (closed workflowproducts/pgmanage#96)
-Fix error notifications (closes workflowproducts/pgmanage#156)
-Add localStorage for shown/hidden items (closes workflowproducts/pgmanage#159)
+Fix .deb dependencies (closed pgManage/pgManage#162)
+Added stop button when loading records (closed pgManage/pgManage#96)
+Fix error notifications (closes pgManage/pgManage#156)
+Add localStorage for shown/hidden items (closes pgManage/pgManage#159)
 Add HTML man page to configuration editor
-Added thicker lines to explain graph where the cost is higher (closed workflowproducts/pgmanage#102)
-Fixed autocomplete with multiple cursors (closed workflowproducts/pgmanage#120)
-Fix update to return records if you update the PK column (closed workflowproducts/pgmanage#100)
-Add button to open tab folder (closed workflowproducts/pgmanage#117)
-Stat page: allow to set interval and add a cut of time (closed workflowproducts/pgmanage#152)
-Added CTRL-O shortcut to open a new SQL tab (closed workflowproducts/pgmanage#154)
-Add text explain (closed workflowproducts/pgmanage#137)
-Add SQL beautifier (closed workflowproducts/pgmanage#42)
-Group table/view-specific objects under their parent table/view (closed workflowproducts/pgmanage#146)
-Add prefix/help options to configure (closed workflowproducts/pgmanage#151)
-Add button to open tabs in a new window (closed workflowproducts/pgmanage#150)
-Change process manager to a tab (for workflowproducts/pgmanage#139)
-Add Order By dropdowns to process manager (for workflowproducts/pgmanage#139)
-Add horizontal mode for toolbar (closed workflowproducts/pgmanage#142)
-Fixed index scripts (closed workflowproducts/pgmanage#145)
-Add AUTOCOMMIT to RAW API (closed workflowproducts/pgmanage#124)
-Change autocomplete to popup when you delete a character (closed workflowproducts/pgmanage#147)
+Added thicker lines to explain graph where the cost is higher (closed pgManage/pgManage#102)
+Fixed autocomplete with multiple cursors (closed pgManage/pgManage#120)
+Fix update to return records if you update the PK column (closed pgManage/pgManage#100)
+Add button to open tab folder (closed pgManage/pgManage#117)
+Stat page: allow to set interval and add a cut of time (closed pgManage/pgManage#152)
+Added CTRL-O shortcut to open a new SQL tab (closed pgManage/pgManage#154)
+Add text explain (closed pgManage/pgManage#137)
+Add SQL beautifier (closed pgManage/pgManage#42)
+Group table/view-specific objects under their parent table/view (closed pgManage/pgManage#146)
+Add prefix/help options to configure (closed pgManage/pgManage#151)
+Add button to open tabs in a new window (closed pgManage/pgManage#150)
+Change process manager to a tab (for pgManage/pgManage#139)
+Add Order By dropdowns to process manager (for pgManage/pgManage#139)
+Add horizontal mode for toolbar (closed pgManage/pgManage#142)
+Fixed index scripts (closed pgManage/pgManage#145)
+Add AUTOCOMMIT to RAW API (closed pgManage/pgManage#124)
+Change autocomplete to popup when you delete a character (closed pgManage/pgManage#147)
 Added "All" checkbox to dump schema to script dialog
-Make pgmanage pick new port if needed (closed workflowproducts/pgmanage#141)
+Make pgmanage pick new port if needed (closed pgManage/pgManage#141)
 Splash page will error when it can't be reached
 Notices will appear one to a line
-Schema dump updated to include more objects (closed workflowproducts/pgmanage#144)
-Fixed extra scrollbar on home ace (closed workflowproducts/pgmanage#134)
-Add PGPASS editor (closed workflowproducts/pgmanage#125)
-Make external links open in default browser (closed workflowproducts/pgmanage#128)
-Add keyboard shorcuts for EXPLAIN and EXPLAIN ANALYZE (closed workflowproducts/pgmanage#130)
-Add zoom functionality (closed workflowproducts/pgmanage#126)
+Schema dump updated to include more objects (closed pgManage/pgManage#144)
+Fixed extra scrollbar on home ace (closed pgManage/pgManage#134)
+Add PGPASS editor (closed pgManage/pgManage#125)
+Make external links open in default browser (closed pgManage/pgManage#128)
+Add keyboard shorcuts for EXPLAIN and EXPLAIN ANALYZE (closed pgManage/pgManage#130)
+Add zoom functionality (closed pgManage/pgManage#126)
 
 Envelope:
 Fix gs-page doc page
@@ -363,14 +363,14 @@ Fix search page to not split results from same file (closed workflowproducts/env
 Add "clearable" attribute to the gs-optionbox
 Added attribute to gs-memo to allow tab characters
 GS.setCookie now defaults to thirty days when there is no expiration date supplied (closed workflowproducts/envelope#21)
-Fixed envelope row count not updating (closed workflowproducts/pgmanage#121)
+Fixed envelope row count not updating (closed pgManage/pgManage#121)
 
 Both:
 New testing system
 Add PQflush to allow much larger INSERT and UPDATE requests
 Fix file descriptor checks in ws_tab, ws_file, http_upload
 Add optional ORDER BY to INSERT request and UPDATE request
-Add fallback_application_name to db_framework (closed workflowproducts/pgmanage#133)
+Add fallback_application_name to db_framework (closed pgManage/pgManage#133)
 Upgrade to Windows projects to VS2017
 
 Added column documentation to these elements:
@@ -483,61 +483,61 @@ Fixed query detection inside of a CREATE FUNCTION statement
 Added a highlight to the first word of the detected query
 Fixed issue with autocomplete where a backslashed character prevented autocomplete from getting the correct prefixes
 made it so that query detection was aware of how parenthesis can end a query
-re-write explain graph (closes workflowproducts/pgmanage#77)
+re-write explain graph (closes pgManage/pgManage#77)
 Fix explain graph clicking
-Fix custom connection bug related to workflowproducts/pgmanage#83
+Fix custom connection bug related to pgManage/pgManage#83
 Add category to Linux packages
 Fix DMG background to not have notice about no code-signing
 added a `gs-interval` element
 Make DB_get_row_lengths return `ssize_t`
 Allow no password when logging in (for PostgresApp/PostgresApp#365)
-Add listen-for-return to default dialog buttons (closes workflowproducts/pgmanage#85)
+Add listen-for-return to default dialog buttons (closes pgManage/pgManage#85)
 
 Changes since 3.1.1 and 2.2.1:
-Fix version number inconsistency (closes workflowproducts/pgmanage#62)
+Fix version number inconsistency (closes pgManage/pgManage#62)
 Fix inconsistency in checkbox type handling
-Error messages had extra slashes (closes workflowproducts/pgmanage#76)
+Error messages had extra slashes (closes pgManage/pgManage#76)
 Added designer attributes for flex, gs-grid padding and gutter, gs-body padded
 Updated template code to work on IE Edge (.children on .content issue)
-Fix activity page (closes workflowproducts/pgmanage#74)
+Fix activity page (closes pgManage/pgManage#74)
 Fix occasional issue where results can't be scrolled even though there is too much to see at once.
-Fix issue where comments on columns break table script generation (closes workflowproducts/pgmanage#81)
+Fix issue where comments on columns break table script generation (closes pgManage/pgManage#81)
 Remove strlen in accept (fixes crash when there is no return from the PostgreSQL function)
-Fix raw errors (closes workflowproducts/pgmanage#79)
+Fix raw errors (closes pgManage/pgManage#79)
 
 Changes since 3.1.0 and 2.2.0:
-Make NSIS installer check for ucrt (closes workflowproducts/pgmanage#67)
-Add column list to tree view (closes workflowproducts/pgmanage#9)
-Clipboard handle container for text (closes workflowproducts/pgmanage#69)
-Add NULL to cells that don't exist (closes workflowproducts/pgmanage#68)
-Fix clip options label (closes workflowproducts/pgmanage#66)
-Fix raw error reporting to not be truncated at 255 chars (for workflowproducts/pgmanage#65)
-Make raw errors more detailed like PGAdmin (closes workflowproducts/pgmanage#65)
+Make NSIS installer check for ucrt (closes pgManage/pgManage#67)
+Add column list to tree view (closes pgManage/pgManage#9)
+Clipboard handle container for text (closes pgManage/pgManage#69)
+Add NULL to cells that don't exist (closes pgManage/pgManage#68)
+Fix clip options label (closes pgManage/pgManage#66)
+Fix raw error reporting to not be truncated at 255 chars (for pgManage/pgManage#65)
+Make raw errors more detailed like PGAdmin (closes pgManage/pgManage#65)
 Fixed pgManage issue where in certain cases results could not be seen.
 Fixed pgManage issue where switching to a tab with results in it: the top portion of the results was chopped off.
 Speed up update on complex views (workflowproducts/envelope#23)
 Remove .trim()s (closes workflowproducts/envelope#64)
-Fix autocomplete scroll (closes workflowproducts/pgmanage#54)
-Add cancel option to login (closes workflowproducts/pgmanage#50)
-Fix mac dmg image to be taller (closes workflowproducts/pgmanage#61)
+Fix autocomplete scroll (closes pgManage/pgManage#54)
+Add cancel option to login (closes pgManage/pgManage#50)
+Fix mac dmg image to be taller (closes pgManage/pgManage#61)
 Fix grep search in envelope
-fix `make install` not creating sbin (closes workflowproducts/pgmanage#58)
-Merge pull request workflowproducts/pgmanage#63 from anthonydb/master (Minor spelling and grammar updates to text)
+fix `make install` not creating sbin (closes pgManage/pgManage#58)
+Merge pull request pgManage/pgManage#63 from anthonydb/master (Minor spelling and grammar updates to text)
 
 Changes since 3.0.0 and 2.1.0:
 Fix http_accept to be able to return long strings
 Fix hang when TLS is enabled
 Envelope now says 'ENVELOPE IS SHUTTING DOWN' instead of 'PGMANAGE IS SHUTTING DOWN' (closes workflowproducts/envelope#20)
-Fix * in export force quotes on columns (closes workflowproducts/pgmanage#12)
+Fix * in export force quotes on columns (closes pgManage/pgManage#12)
 Add [type] attribute to checkbox
 Add `make destroy`
 Fix connection list not selecting first connection
 Fix gs-checkbox element `inserted` function by changing "this" to "element"
 Make Github links open in browser
-Add some instructions to DMG background (closes workflowproducts/pgmanage#37)
+Add some instructions to DMG background (closes pgManage/pgManage#37)
 Fix search page on Windows to use forward slashes
-Fix saving of localStorage/cookies (closes workflowproducts/pgmanage#47)
-Fix closing window when a tab is not saved (closes workflowproducts/pgmanage#45)
+Fix saving of localStorage/cookies (closes pgManage/pgManage#47)
+Fix closing window when a tab is not saved (closes pgManage/pgManage#45)
 Update LibreSSL to 2.4.3
 Improve pass-through Makefile
 Fix missing decrement_idle
@@ -573,7 +573,7 @@ Changes since 2.1.0RC6 and 3.0.0RC2:
 make http_ev work on *nix systems (addresses #20)
 add compiler check to configure (closes #21)
 check if config file exists before installing it (closes #25)
-add ability to open new windows in electron pgmanage (closes workflowproducts/pgmanage#29)
+add ability to open new windows in electron pgmanage (closes pgManage/pgManage#29)
 add libpq as a depenedency for deb/rpm targets
 move 'Edit Configuration' button to electron menubar (closes #18)
 add actionnc_/acceptnc_

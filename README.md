@@ -7,12 +7,12 @@ A fast replacement for PGAdmin!
 # If this is your first time trying pgManage:
 # Do not use 'GIT CLONE' to get pgManage!
 
-If you'd like to try pgManage please go to ["Releases"](https://github.com/workflowproducts/pgmanage/releases) and download the appropriate package for your OS. The names of these packages start with "pgManage", not "Source Code". The team has spent a ridiculous amount of time ensuring you have an easy, convenient installer for your OS. Please use it. Compiling pgManage from source will only give you the server version and all first time users should try the desktop version first. 
+If you'd like to try pgManage please go to ["Releases"](https://github.com/pgManage/pgManage/releases) and download the appropriate package for your OS. The names of these packages start with "pgManage", not "Source Code". The team has spent a ridiculous amount of time ensuring you have an easy, convenient installer for your OS. Please use it. Compiling pgManage from source will only give you the server version and all first time users should try the desktop version first. 
 
 pgManage can be run in two modes:
 
 ### Application mode
-Releases marked "3.x.x" are Application mode packages. They run in a desktop window and can connect to Postgres locally or remotely. Please go to ["Releases"](https://github.com/workflowproducts/pgmanage/releases) and download the appropriate package for your OS. The names of these packages start with "pgManage". Do NOT download the versions marked "Source Code". These packages are self contained and very easy to install and remove. Note that all the thanks for our wonderful installation process goes to Github and the Electron team. If you are inexperienced in compiling software you want this mode.
+Releases marked "3.x.x" are Application mode packages. They run in a desktop window and can connect to Postgres locally or remotely. Please go to ["Releases"](https://github.com/pgManage/pgManage/releases) and download the appropriate package for your OS. The names of these packages start with "pgManage". Do NOT download the versions marked "Source Code". These packages are self contained and very easy to install and remove. Note that all the thanks for our wonderful installation process goes to Github and the Electron team. If you are inexperienced in compiling software you want this mode.
 
 Installing on Linux is a bit less easy than macOS/Windows:
 - To install on Ubuntu, download the .deb package and run: `sudo apt install ./pgManage-whatever.deb`
@@ -29,7 +29,7 @@ Currently we release twice a month.
 
 ## FEEDBACK AND BUG REPORTS
 
-Please contact us with your feedback! Github issues and pull requests are welcome. Please report any issues you have for [FREE support](https://github.com/workflowproducts/pgmanage/issues). We can also be reached by phone. Current contact info is available at [WorkflowProducts.com](http://www.workflowproducts.com/about.html). We welcome phone calls during normal daytime hours Central Standard Time.
+Please contact us with your feedback! Github issues and pull requests are welcome. Please report any issues you have for [FREE support](https://github.com/pgManage/pgManage/issues). We can also be reached by phone. Current contact info is available at [WorkflowProducts.com](http://www.workflowproducts.com/about.html). We welcome phone calls during normal daytime hours Central Standard Time.
 
 ## Licensing
 
@@ -65,19 +65,19 @@ pgManage is officially in maintenance mode. This means several things and to avo
 
 1) We will be fixing bugs. Please file issues and we will fix them. We won't turn them over in one day like we have been unless they are work-stopping. Expect once a month releases. 
 
-2) There are no features we're working on in private. If work is being done it will now be listed in [issues](https://github.com/workflowproducts/pgmanage/issues). Previously we had a private list of items we were working on. Those are all completed. Additionally, pgManage has all the major features we wanted. Any further features would likely be small and there is no benefit to keeping small items secret. If you have a proposal for a feature please post it under the issue tracker.
+2) There are no features we're working on in private. If work is being done it will now be listed in [issues](https://github.com/pgManage/pgManage/issues). Previously we had a private list of items we were working on. Those are all completed. Additionally, pgManage has all the major features we wanted. Any further features would likely be small and there is no benefit to keeping small items secret. If you have a proposal for a feature please post it under the issue tracker.
 
 3) Why are we stopping when there are so many things we could do? Workflow Products needs to devote more resources to making money. Now that pgManage is complete we need to take the opportunity to focus on something we can monetize.
 
 ## Internationalization
 
-Anyone wishing to contribute to a translation, please post to [issue #59](https://github.com/workflowproducts/pgmanage/issues/59).
+Anyone wishing to contribute to a translation, please post to [issue #59](https://github.com/pgManage/pgManage/issues/59).
 
-Since pgManage runs in a browser we don't really know what will happen if you use pgManage with a non-UTF8 PostgreSQL database. If you experience a problem then please post an issue to [Github Issues](https://github.com/workflowproducts/pgmanage/issues). 
+Since pgManage runs in a browser we don't really know what will happen if you use pgManage with a non-UTF8 PostgreSQL database. If you experience a problem then please post an issue to [Github Issues](https://github.com/pgManage/pgManage/issues). 
 
 ## Contributing
 
-The best way to contribute to pgManage is to start by posting an issue. Please read the [README_DEV](https://github.com/workflowproducts/pgmanage/blob/master/README_DEV.md) file for full details.
+The best way to contribute to pgManage is to start by posting an issue. Please read the [README_DEV](https://github.com/pgManage/pgManage/blob/master/README_DEV.md) file for full details.
 
 If you'd like to support pgManage and you're in a position to get us paid work then that helps a lot. We mostly do fussy custom ERP solutions for the Aerospace and Medical industries. Any kind of accounting or inventory application is right up our alley, especially the complex stuff. Our specialty is implementing new systems without disrupting operations (training-free implementations). Check out our website or give us a call [WorkflowProducts.com](http://www.workflowproducts.com/about.html).
 
