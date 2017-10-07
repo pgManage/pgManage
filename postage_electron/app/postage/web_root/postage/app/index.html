@@ -13,7 +13,7 @@
             }
         </style>
 
-        <title>PgManage</title>
+        <title>pgManage</title>
 
 
 
@@ -147,7 +147,7 @@
             There has been an error with the Database connection.{{ADDIN}}</pre>
                             </gs-body>
                             <gs-footer>
-                                <gs-button onclick="buttonReloadWindow();">Reload PgManage</gs-button>
+                                <gs-button onclick="buttonReloadWindow();">Reload pgManage</gs-button>
                             </gs-footer>
                         </gs-page>
                     */}).replace('{{ADDIN}}', (addinText ? '\n\n' + addinText : ''));
@@ -188,7 +188,7 @@
                     zoomStart();
 
                     // put connection name in tab name
-                    document.title = 'PgManage: ' + contextData.connectionName;
+                    document.title = 'pgManage: ' + contextData.connectionName;
                 });
 
                 //// if we're too small for the panel: close the panel
@@ -570,7 +570,7 @@
 
                 divElement.setAttribute('id','loading-screen');
                 divElement.innerHTML =
-                    '<div id="loading-icon">Loading PgManage...</div>';
+                    '<div id="loading-icon">Loading pgManage...</div>';
 
                 document.body.appendChild(divElement);
 

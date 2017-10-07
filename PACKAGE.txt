@@ -7,14 +7,14 @@ TURN ON THE ERROR LOGS!!!!!
 Mac package:
 cd Repos/pgmanage/
 ./package-nix.sh
-This outputs pgmanage_electron/dist/PgManage-VERSION.dmg
+This outputs pgmanage_electron/dist/pgManage-VERSION.dmg
 
 
 Mac test:
-Install PgManage from DMG
+Install pgManage from DMG
 Open Terminal
-/Applications/PgManage.app/Contents/MacOS/PgManage
-Go to PgManage
+/Applications/pgManage.app/Contents/MacOS/pgManage
+Go to pgManage
 Cmd+Q
 Go back to Terminal
 nano ~/.pgmanage/pgmanage-connections.conf
@@ -33,12 +33,12 @@ Win package:
 Use VS2017 x86 Native Tools Prompt
 cd \Users\nunzio\Repos\pgmanage
 package-windows
-make sure to delete old version and rename wfprod_group/pgmanage/packages/PgManage Windows VERSION/
-This outputs pgmanage_electron/dist/PgManage Setup VERSION.exe
+make sure to delete old version and rename wfprod_group/pgmanage/packages/pgManage Windows VERSION/
+This outputs pgmanage_electron/dist/pgManage Setup VERSION.exe
 
 
 Win test:
-Install PgManage from EXE
+Install pgManage from EXE
 edit connections
 delete and paste:
 

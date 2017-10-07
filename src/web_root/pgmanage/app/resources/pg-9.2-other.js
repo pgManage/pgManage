@@ -64,12 +64,17 @@ function loadContextData(callback) {
             // if message 0
             if (data.intCallbackNumber === 0) {
                 arrColumns = data.strMessage.split('\t');
-
+				
                 contextData.databaseName = arrColumns[0];
                 contextData.sessionUser = arrColumns[1];
                 contextData.currentUser = arrColumns[2];
                 contextData.versionText = arrColumns[3];
-                contextData.versionNumber = contextData.versionText.match(/[0-9]+\.[0-9]+\.[0-9]+/)[0];
+
+				if (contextData.versionText.match(/[0-9]+\.[0-9]+\.[0-9]+/)) {
+                	contextData.versionNumber = contextData.versionText.match(/[0-9]+\.[0-9]+\.[0-9]+/)[0];
+				} else {
+					contextData.versionNumber = contextData.versionText.match(/[0-9]+\.[0-9]+/)[0];
+				}
 
                 // get minor version
                 if (contextData.versionNumber.match(/\./g).length === 2) {
@@ -268,16 +273,16 @@ function menuOptions(target) {
         <gs-page>
             <gs-body>
                 <gs-button class="pgmanage-menu-item-button" dialogclose
-                            no-focus iconleft onclick="dialogSplash()" icon="info">About PgManage</gs-button>
+                            no-focus iconleft onclick="dialogSplash()" icon="info">About pgManage</gs-button>
                 <gs-button class="pgmanage-menu-item-button" dialogclose
                             no-focus iconleft onclick="GS.showShimmed()" icon="heartbeat">Browser Support</gs-button>
                 <gs-button class="pgmanage-menu-item-button" dialogclose id="clear-cache-button"
                             no-focus iconleft onclick="buttonReloadWindow()" icon="refresh">Clear Cache</gs-button>
                 <gs-button class="pgmanage-menu-item-button" dialogclose no-focus iconleft target="_blank"
-                            href="https://github.com/workflowproducts/pgmanage/" icon="github">PgManage On Github</gs-button>
+                            href="https://github.com/workflowproducts/pgmanage/" icon="github">pgManage On Github</gs-button>
                 <gs-button class="pgmanage-menu-item-button" dialogclose no-focus iconleft target="_blank"
                             href="https://github.com/workflowproducts/pgmanage/issues" icon="bug">Report An Issue</gs-button>
-                <gs-button class="pgmanage-menu-item-button" dialogclose no-focus iconleft onclick="dialogOptions();" icon="gear">PgManage Options</gs-button>
+                <gs-button class="pgmanage-menu-item-button" dialogclose no-focus iconleft onclick="dialogOptions();" icon="gear">pgManage Options</gs-button>
             </gs-body>
         </gs-page>
     */});
@@ -437,11 +442,11 @@ function dialogSplash() {
         <gs-page>
             <gs-body>
                 <div id="splash">
-                    <iframe style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; border: 0 none; z-index: 150; background-color: #FFFFFF;" class="full-iframe" src="/pgmanage/splash.html?version={{POSTAGE}}&postgres={{POSTGRES}}"></iframe>
+                    <iframe style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; border: 0 none; z-index: 150; background-color: #FFFFFF;" class="full-iframe" src="/pgmanage/splash.html?version={{PGMANAGE}}&postgres={{POSTGRES}}"></iframe>
                 </div>
             </gs-body>
         </gs-page>
-    */}).replace(/\{\{POSTAGE\}\}/g, contextData.pgmanageVersion).replace(/\{\{POSTGRES\}\}/g, contextData.versionNumber);
+    */}).replace(/\{\{PGMANAGE\}\}/g, contextData.pgmanageVersion).replace(/\{\{POSTGRES\}\}/g, contextData.versionNumber);
     GS.openDialog(templateElement);
 }
 
@@ -780,7 +785,7 @@ function dialogSettings() {
 
 var customCSSText;
 
-// PgManage Options in localStorage
+// pgManage Options in localStorage
 function dialogOptions() {
     'use strict';
     var templateElement = document.createElement('template');
@@ -806,7 +811,7 @@ function dialogOptions() {
     }
     templateElement.innerHTML = ml(function () {/*
         <gs-page>
-            <gs-header><center><h3>PgManage Options</h3></center></gs-header>
+            <gs-header><center><h3>pgManage Options</h3></center></gs-header>
             <gs-body padded>
                 <gs-grid min-width="all {reflow}; 1200px {1,1};" gutter>
                     <gs-block>
@@ -1115,12 +1120,12 @@ function dialogOptions() {
         copyNullControl = xtag.query(dialog, '.pref-null-value')[0];
         copyTypesControl = xtag.query(dialog, '.pref-copy-types')[0];
         askControl = xtag.query(dialog, '.pref-ask')[0];
-        
+
         askControl.value = localStorage.askCopySettings;
         askControl.addEventListener('change', function () {
             localStorage.askCopySettings = askControl.value;
         });
-        
+
         copyQuoteWhenControl.value = getClipSetting('quoteType');
         copyQuoteCharControl.value = getClipSetting('quoteChar');
         copyEscapeCharControl.value = getClipSetting('escapeChar');
@@ -1598,7 +1603,7 @@ var strHomeToken =  ((localStorage.ShortcutHome.split(',')[0]) ? localStorage.Sh
     templateElement.setAttribute('data-overlay-close', 'true');
     templateElement.innerHTML = ml(function () {/*
         <gs-page>
-            <gs-header><center><h3>PgManage Help</h3></center></gs-header>
+            <gs-header><center><h3>pgManage Help</h3></center></gs-header>
             <gs-body padded>
 				<h2 style="padding-left: 0; margin-bottom: 0; padding-bottom: 0;">Ace</h2>
 				<hr />
@@ -1616,7 +1621,7 @@ var strHomeToken =  ((localStorage.ShortcutHome.split(',')[0]) ? localStorage.Sh
 
                     <li>You can type using multiple cursors at once. To select in multiple places, hold down <kbd>CMD</kbd> (<kbd>CTRL</kbd> on Windows) and click in several places. To put a cursor in the same place on multiple lines, hold <kbd>OPTION</kbd> and then click and drag.</li>
                 </ul>
-                Tab Shortcuts: (Configurable in "PgManage Options" <a style="text-decoration: underline; cursor: pointer; color: #0000FF;" onclick="dialogOptions();" dialogclose>Here</a>)<br />
+                Tab Shortcuts: (Configurable in "pgManage Options" <a style="text-decoration: underline; cursor: pointer; color: #0000FF;" onclick="dialogOptions();" dialogclose>Here</a>)<br />
                 <ul>
                     <li>Use "{{F5TOKEN}}" to run Queries inside the Ace Editor.</li>
 
@@ -2151,7 +2156,7 @@ function loadHeaderText() {
     //                '<small>Db:</small> ' + encodeHTML(contextData.databaseName) + ' ' +
     //                '<small>Connection:</small> ' + encodeHTML(contextData.connectionName);
 
-    shortText = encodeHTML(contextData.databaseName + '@' + contextData.connectionName + '(' + contextData.sessionUser + ')');
+    shortText = encodeHTML(contextData.sessionUser + '@' + contextData.connectionName + '(' + contextData.databaseName + ')');
 
     document.getElementById('header-text-container').innerHTML = shortText;
     document.getElementById('header-text-container').setAttribute('title', longText);
@@ -2362,11 +2367,11 @@ function dialogAbout() {
     templateElement.setAttribute('data-overlay-close', 'true');
     templateElement.innerHTML = ml(function () {/*
         <gs-page>
-            <gs-header><center><h3>About PgManage Version: {{POSTAGE}}</h3></center></gs-header>
+            <gs-header><center><h3>About pgManage Version: {{PGMANAGE}}</h3></center></gs-header>
             <gs-body padded>
 
-                PgManage is a web-based PostgreSQL database development and administration tool.<br />
-                PgManage utilizes these technologies:<br />
+                pgManage is a web-based PostgreSQL database development and administration tool.<br />
+                pgManage utilizes these technologies:<br />
                 <ul>
                     <li>doT.js Version 1.0.3 (<a href="http://olado.github.io/doT/" target="_blank">Link</a>)</li>
                     <li>Ace Editor Version 1.1.01 (<a href="http://ace.c9.io/" target="_blank">Link</a>)</li>
@@ -2381,7 +2386,7 @@ function dialogAbout() {
                 </ul>
                 <small>We recommend that users use Google Chrome for best performance.</small><br /><br />
                 All other source code and documentation copyright Workflow Products, LLC. All Rights Reserved.<br /><br />
-                PgManage is built on the Envelope platform. The Envelope platform is available for many platforms and most
+                pgManage is built on the Envelope platform. The Envelope platform is available for many platforms and most
                     embedded devices. If you'd like your application built using Envelope technology please contact us.<br /><br />
                 Commercial license terms for the Envelope platform are available for a small fee. Contact us for details.<br /><br />
                 <center><b>Workflow Products, L.L.C.</b></center>
@@ -2395,7 +2400,7 @@ function dialogAbout() {
                 <gs-button dialogclose>Done</gs-button>
             </gs-footer>
         </gs-page>
-    */}).replace(/\{\{POSTAGE\}\}/g, contextData.pgmanageVersion);
+    */}).replace(/\{\{PGMANAGE\}\}/g, contextData.pgmanageVersion);
 
     GS.openDialog(templateElement);
 }
@@ -2425,7 +2430,7 @@ function getCurrentQuery() {
         if (
             editorSelectionRange.start.row !== editorSelectionRange.end.row ||
             editorSelectionRange.start.column !== editorSelectionRange.end.column
-        ) {    
+        ) {
             intStartRow    = editorSelectionRange.start.row;
             intStartColumn = editorSelectionRange.start.column;
             intEndRow      = editorSelectionRange.end.row;
@@ -2732,7 +2737,7 @@ function beforeTableCopyFunction(event) {
                 var strRecordDelimiter;
                 var strNullValue;
                 var strCopyTypes;
-    
+
                 // gather the control values
                 strCopyHeaders = copyHeadersControl.value;
                 strCopySelectors = copySelectorsControl.value;
@@ -2754,7 +2759,7 @@ function beforeTableCopyFunction(event) {
                 tableElement.setAttribute('copy-delimiter-record', strRecordDelimiter);
                 tableElement.setAttribute('copy-null-cell', strNullValue);
                 tableElement.setAttribute('copy-types', strCopyTypes);
-                
+
                 tableElement.forceCopy = true;
                 tableElement.elems.hiddenFocusControl.focus();
                 document.execCommand('copy');
@@ -2785,7 +2790,7 @@ function beforeTableCopyFunction(event) {
             });
         }, null, null);
 
-        
+
     } else {
         tableElement.forceCopy = undefined;
     }
@@ -3574,12 +3579,12 @@ function executeScript(bolCursorQuery) {
                                     document.getElementById('sql-results-area-' + tabNumber + '').scrollTop = 0;
                                     document.getElementById('sql-results-area-' + tabNumber + '').style.overflow = 'hidden';
                                 });
-                                
+
                                 tableElement.addEventListener('closeFullContainer', function () {
                                     document.getElementById('sql-results-area-' + tabNumber + '').scrollTop = currentTab.resultsScroll;
                                     document.getElementById('sql-results-area-' + tabNumber + '').style.overflow = 'auto';
                                 });
-                                
+
                                 tableElement.addEventListener('before_copy', beforeTableCopyFunction);
 
                                 // reset array so that we don't override the data for the previous table

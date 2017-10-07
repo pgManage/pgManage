@@ -1,6 +1,6 @@
 ## Is Electron a problem or a tool?
 
-The article ["Electron is Flash for the desktop"](https://josephg.com/blog/electron-is-flash-for-the-desktop/) caused a bit of a commotion among the PgManage team recently. Speed has of course been central to our cause since the inception of PgManage as "A fast alternative to PGAdmin" so it struck us right in the gut.
+The article ["Electron is Flash for the desktop"](https://josephg.com/blog/electron-is-flash-for-the-desktop/) caused a bit of a commotion among the pgManage team recently. Speed has of course been central to our cause since the inception of pgManage as "A fast alternative to PGAdmin" so it struck us right in the gut.
 
 My initial reaction was to fire up Task Manager, take out a stop watch and start testing. We learned a few things from that and for that reason I think that "Electron is Flash for the desktop" was a worthwhile read.
 
@@ -8,7 +8,7 @@ My initial reaction was to fire up Task Manager, take out a stop watch and start
 
 My first takeaway from the article was that we hadn't been watching our memory usage in Electron. Memory usage is important and can lead to all kinds of bottlenecks. So I looked into it. 
 
-We had a memory leak! It was a bad one too. Memory usage just grew and grew. This was especially disappointing since we spend a lot of time making sure we don't have memory leaks in C. We use Valgrind and other time consuming tactics to be certain PgManage is performing well and freeing memory. 
+We had a memory leak! It was a bad one too. Memory usage just grew and grew. This was especially disappointing since we spend a lot of time making sure we don't have memory leaks in C. We use Valgrind and other time consuming tactics to be certain pgManage is performing well and freeing memory. 
 
 **Our problem was that we had completely overlooked the web browser.** We were not properly attaching various items to DOM elements so they were essentially global objects. Once they were no longer needed the DOM was destroyed but the globals were not. 
 
@@ -16,15 +16,15 @@ Shortly after discovery we dealt with the leak and the problem appears to be gon
 
 ## Making a cross platform application is hard. Electron has its perks.
 
-Although PgManage started out as a web server intended for command line install, we spent a lot of time on install issues from the very beginning. Much of this was our own fault.
+Although pgManage started out as a web server intended for command line install, we spent a lot of time on install issues from the very beginning. Much of this was our own fault.
 
-One big mistake was attempting to use the new LIBTLS library from LibreSSL. It seemed like a good idea at the time. Recently, we've decided we can't wait for LIBTLS to become usable in a cross-platform way so we went to the OpenSSL API. Now we don't have to ship LibreSSL with PgManage, so if you want to use LibreSSL you'll need to install it yourself. 
+One big mistake was attempting to use the new LIBTLS library from LibreSSL. It seemed like a good idea at the time. Recently, we've decided we can't wait for LIBTLS to become usable in a cross-platform way so we went to the OpenSSL API. Now we don't have to ship LibreSSL with pgManage, so if you want to use LibreSSL you'll need to install it yourself. 
 
 Another mistake was attempting to write a command line installer. Very few people used it. I can say that with authority because I can't remember ever using it successfully. It was a hard problem and we would have been better off putting more effort into making configure-make-install work better instead.
 
 ## Are you persuaded by facts? 
 
-Electron solved all of our install issues in just a few days. We have continued to pursue making PgManage install well on many platforms with configure-make-install but most users can download the binaries and be up and running in seconds. 
+Electron solved all of our install issues in just a few days. We have continued to pursue making pgManage install well on many platforms with configure-make-install but most users can download the binaries and be up and running in seconds. 
 
 Mac install went to a dmg--just drag it to your applications folder. Install on Windows is only fifteen seconds and no longer requires an uninstall first. These times are reasonable and are much faster than installing from source. Take a look at these stats for a typical windows box:
 
@@ -32,53 +32,53 @@ Mac install went to a dmg--just drag it to your applications folder. Install on 
             Install   Startup
 PGAdmin3    ~10sec    4sec
 PGAdmin4    ~60sec    25sec # updated for 1.6
-PgManage     ~15sec    4sec
+pgManage     ~15sec    4sec
 ```
 
-I think it's reasonable to say that Electron is perfectly fine as regards install and startup times as we've implemented it. I know there are apps that use Electron that start up slowly, but that is not a problem inherent to Electron--PgManage proves that. Considering that our goal has always been to deliver a fast app, we have yet to see how Electron prevents us from doing so as far as install and startup times are concerned.
+I think it's reasonable to say that Electron is perfectly fine as regards install and startup times as we've implemented it. I know there are apps that use Electron that start up slowly, but that is not a problem inherent to Electron--pgManage proves that. Considering that our goal has always been to deliver a fast app, we have yet to see how Electron prevents us from doing so as far as install and startup times are concerned.
 
 ## Is Electron the problem, or is your code slow?
 
-We've covered memory, install and startup issues. PgManage doesn't really use Node in Electron so I can't comment on that. What's left is performance for practical matters, like displaying query results. Let's get right to the stopwatch times.
+We've covered memory, install and startup issues. pgManage doesn't really use Node in Electron so I can't comment on that. What's left is performance for practical matters, like displaying query results. Let's get right to the stopwatch times.
 
 Loading time from 'run' to display of data in grid. We used this query: "SELECT * FROM wtkv2.rtime;". It returns 37k records. The data is part of our internal punch clock app and was chosen just because it was there.
 
 ```
  pgAdmin3:        18sec
  pgAdmin4:         2sec # updated for 1.6 
- PgManage(3.2.12): 12sec
- PgManage(3.2.13):  2sec
- PgManage(3.2.16)   2sec # This update copies the pgAdmin4 model of displaying as soon as the first records are available. 
+ pgManage(3.2.12): 12sec
+ pgManage(3.2.13):  2sec
+ pgManage(3.2.16)   2sec # This update copies the pgAdmin4 model of displaying as soon as the first records are available. 
 ```
 
 There you have it. We've been working on a faster grid for displaying table data for some time. It uses Websockets to get the data and a tab delimited transfer format. 
 
 Note that 3.2.12 was quite slow, yet a liberal application of time and talent caused 3.2.13 to become extremely fast. 
 
-This isn't the whole picture. I'm confident that PgManage's grid has slowed down over the last few months. We haven't been fixing or improving the old grid code because we knew it was destined to be replaced. Like many other Electron projects we're resource constrained and performance suffered.
+This isn't the whole picture. I'm confident that pgManage's grid has slowed down over the last few months. We haven't been fixing or improving the old grid code because we knew it was destined to be replaced. Like many other Electron projects we're resource constrained and performance suffered.
 
 ## Update 7/22/17
 
-We've got two new numbers you may find interesting. PgManage and PGAdmin4 display the first records of a result set as soon as they are available and in that task they are roughly the same. However, time to scroll to the last record of a result set is wildly different. PGAdmin4 takes over two minutes to get to the bottom whereas PgManage can be scrolled to the last record within six seconds.
+We've got two new numbers you may find interesting. pgManage and PGAdmin4 display the first records of a result set as soon as they are available and in that task they are roughly the same. However, time to scroll to the last record of a result set is wildly different. PGAdmin4 takes over two minutes to get to the bottom whereas pgManage can be scrolled to the last record within six seconds.
 
 Clearly 3nterpriseDb is working hard to close the performance gap and we are thankful. The PostgreSQL community deserves good tools and although it is unfortunate that it took a little tiny struggling company to wake people up, we're glad that in the end it happened.
 
 
 ## Do you believe more choices make for a better ecosystem?
 
-PgManage fills a gap in the PostgreSQL ecosystem. That's not a criticism of the PGAdmin team. I'm sure they are as resource constrained as we are and making software is hard. I'm sure the reason the PGAdmin team dropped PGAdmin3 was probably because the code base is sixteen years old! That's an amazing accomplishment and all of us here with the PgManage team are thankful for their efforts over the years. We certainly could not have done what they did back in 2000ish when they started. We've only managed to build PgManage on the shoulders of Github, Cloud9, Laura Doktorova's dot.js, and others and for that we're very thankful.
+pgManage fills a gap in the PostgreSQL ecosystem. That's not a criticism of the PGAdmin team. I'm sure they are as resource constrained as we are and making software is hard. I'm sure the reason the PGAdmin team dropped PGAdmin3 was probably because the code base is sixteen years old! That's an amazing accomplishment and all of us here with the pgManage team are thankful for their efforts over the years. We certainly could not have done what they did back in 2000ish when they started. We've only managed to build pgManage on the shoulders of Github, Cloud9, Laura Doktorova's dot.js, and others and for that we're very thankful.
 
-I'm also sure PGAdmin4 has come along nicely and will become the de-facto choice for people who want a graphical client. It is the official client of PostgreSQL and as such they only need to be 'good enough' to win nearly all the users looking for a free client. People who wish to pay will of course overlook PgManage because it's free. (Wait, that doesn't leave us with many users...)
+I'm also sure PGAdmin4 has come along nicely and will become the de-facto choice for people who want a graphical client. It is the official client of PostgreSQL and as such they only need to be 'good enough' to win nearly all the users looking for a free client. People who wish to pay will of course overlook pgManage because it's free. (Wait, that doesn't leave us with many users...)
 
-If you do use PgManage, please file issues on Github. We need users to step up a little more than other projects because of our limited audience!
+If you do use pgManage, please file issues on Github. We need users to step up a little more than other projects because of our limited audience!
 
 ## Do you consider yourself open minded and adventurous?
 
 If I could leave you with one thought it would be that Electron is not a reason to disuade you from trying any project. 
 
-You may feel that a native application could do better than PgManage on the times we posted. I'm willing to accept that but sceptical. 
+You may feel that a native application could do better than pgManage on the times we posted. I'm willing to accept that but sceptical. 
 
-However, I think the facts speak for themselves in asserting that the difference between PgManage 3.2.12 and PgManage 3.2.13 was a swing from performing poorly (due to lack of effort on the programmer's part) to performing very well. As a result, we think the facts support the idea that **Electron performance is up to the programmer.**
+However, I think the facts speak for themselves in asserting that the difference between pgManage 3.2.12 and pgManage 3.2.13 was a swing from performing poorly (due to lack of effort on the programmer's part) to performing very well. As a result, we think the facts support the idea that **Electron performance is up to the programmer.**
 
 ## Do you appreciate freedom? 
 
@@ -86,9 +86,9 @@ Using web technologies to draw the interface also gives a good deal more freedom
 
 ## Do you consider yourself helpful?
 
-Of course, if someone wants to sponser PgManage we can test a native implementation and if it performs better we'll release it. You'll get no argument from me. Until that happens I hope you'll give projects like PgManage a try. 
+Of course, if someone wants to sponser pgManage we can test a native implementation and if it performs better we'll release it. You'll get no argument from me. Until that happens I hope you'll give projects like pgManage a try. 
 
-If they are unacceptable for any reason, file an issue and move on if you have to. Join us as part of the solution. We really do appreciate everyone who let's us know about their experiences with PgManage. I'm sure most other projects do too.
+If they are unacceptable for any reason, file an issue and move on if you have to. Join us as part of the solution. We really do appreciate everyone who let's us know about their experiences with pgManage. I'm sure most other projects do too.
 
 Thank you for reading.
 

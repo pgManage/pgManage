@@ -911,7 +911,7 @@ function fillTab(tabElement, jsnParameters) {
 
     } else if (tabElement.tabType === 'design-table') {
         tabElement.relatedFrame.innerHTML =
-                '<iframe class="full-iframe" src="frames/frame-table.html?oid=' + jsnParameters.oid + '"></iframe>';
+                '<iframe class="full-iframe" src="frames/frame-table.html?oid=' + jsnParameters.oid + '&versionNum=' + contextData.minorVersionNumber + '"></iframe>';
 
     } else if (tabElement.tabType === 'datasheet') {
         tabElement.relatedFrame.innerHTML =
@@ -1144,7 +1144,7 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
         //console.log(document.activeElement);
 
         // if the focus isn't in the rename control and isn't the delete button: allow sort
-        if (document.activeElement !== tabElement.innerRenameControl && !event.target.classList.contains('delete-button')) {
+        if (!event.target.classList.contains('rename-control') && !event.target.classList.contains('delete-button')) {
             sortHandler = function (event) {
                 var intMouseLeft = GS.mousePosition(event).left, intLeft = intMouseLeft - intTabBarOffsetLeft,
                     matchedElement, bolMatchedLast, i, len;
@@ -1359,7 +1359,7 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
                             <gs-button icononly inline remove-all class="button-csv" icon="file-text" onclick="exportCSV()"
                                     title="Download a single query's results as a file" remove-all no-focus><label>Export</label></gs-button>
                             <gs-button inline remove-all class="button-ace-info" icon-left icon="question-circle" onclick="dialogAceInfo()"
-                                    title="Information and tips about PgManage" remove-all no-focus>
+                                    title="Information and tips about pgManage" remove-all no-focus>
 								<span class="ace-toolbar-labeled-only ace-help-text">Help</span>
                             </gs-button>
                             <gs-button icononly inline remove-all icon="black-tie" onclick="beautifySQL()" title="Beautify the Current SQL" no-focus><label>Beautify</label></gs-button>

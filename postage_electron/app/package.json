@@ -16,10 +16,10 @@
     "opn": "^4.0.2",
     "tcp-port-used": "0.1.2"
   },
-  "description": "PgManage",
+  "description": "pgManage",
   "email": "nunzio@workflowproducts.com",
   "license": "Apache-2.0",
   "main": "main.js",
-  "name": "PgManage",
+  "name": "pgManage",
   "version": "3.2.18"
 }

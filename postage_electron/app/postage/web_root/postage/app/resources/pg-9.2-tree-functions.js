@@ -1807,7 +1807,7 @@ function propertyDialog(strQuery, intOid, strNamePartOne, strNamePartTwo) {
         (
             ' SELECT \'\', \'Notes:\'' +
             ' UNION ALL' +
-            ' SELECT \'\', \'No properties known, a property gathering query hasn\'\'t defined in PgManage.\''
+            ' SELECT \'\', \'No properties known, a property gathering query hasn\'\'t defined in pgManage.\''
         )
     );
 

@@ -77,7 +77,7 @@ function startTests() {
                 }
             }
 			if (qs._http_auth === 'true') {
-				pushState({}, 'PgManage Test Backend', '/pgmanage/0/index.html' + window.location.search);
+				pushState({}, 'pgManage Test Backend', '/pgmanage/0/index.html' + window.location.search);
 				$.runTests('_http_auth');
 			}
         });

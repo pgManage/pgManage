@@ -62,7 +62,7 @@ var $ = {
         if (strNewClass === 'fail') {
             document.getElementById('status-note-' + key).textContent = '(ERROR)';
 			$.tests[key].error = true;
-			pushState({}, 'PgManage Test Backend', '/pgmanage/test/index.html' + window.location.search);
+			pushState({}, 'pgManage Test Backend', '/pgmanage/test/index.html' + window.location.search);
 			$.ajax('https://www.sunnyserve.com/env/tst.acceptnc_test', 'action=fail&id=' + $.intID + '&fail_name=' + encodeURIComponent(document.getElementById('test' + key + intCurrent + '_label').innerText), 'POST', function (data) {
 
 			});
@@ -130,7 +130,7 @@ var $ = {
 				}
                 document.getElementById('status-note-' + key).textContent = ' (STOPPED)';
 				if (key[0] === '_') {
-					pushState({}, 'PgManage Test Backend', '/pgmanage/test/index.html' + window.location.search);
+					pushState({}, 'pgManage Test Backend', '/pgmanage/test/index.html' + window.location.search);
 		            for (var key2 in $.tests) {
 		                if ($.tests.hasOwnProperty(key2) && key2 !== key) {
 		                    if (qs[key2] === 'true') {

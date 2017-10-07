@@ -40,7 +40,7 @@ let mainWindowState = null;
 let configWindowState = null;
 let connectionWindowState = null;
 let pgpassWindowState = null;
-let bolPgManageIsReady = false;
+let bolpgManageIsReady = false;
 
 try {
 	fs.statSync(os.homedir() + '/.pgmanage/');
@@ -85,7 +85,7 @@ if (process.platform == 'win32') {
 	}
 }
 
-function spawnPgManage() {
+function spawnpgManage() {
 	console.log(strResourcesPath, '/pgmanage/pgmanage');
 	proc = child_process.spawn(
 		path.normalize(strResourcesPath + '/app/pgmanage/pgmanage' + (process.platform == 'win32' ? '.exe' : '')),
@@ -107,7 +107,7 @@ function spawnPgManage() {
 			if (mainWindows.length === 0) {
 				openWindow();
 			}
-			bolPgManageIsReady = true;
+			bolpgManageIsReady = true;
 		}
 	});
 	proc.stderr.on('data', function (data) {
@@ -131,7 +131,7 @@ function pickNewPort() {
 	int_pgmanage_port = parseInt(Math.random().toString().substring(2), 10) % (65535 - 1024) + 1024;
 	tcpPortUsed.check(int_pgmanage_port, '127.0.0.1').then(function this_callback(taken) {
 		if (!taken) {
-			spawnPgManage();
+			spawnpgManage();
 
 			var localStoragePath = path.normalize(app.getPath('userData') + '/Local Storage');
 			if (fs.existsSync(localStoragePath)) {
@@ -171,7 +171,7 @@ try {
 	int_pgmanage_port = parseInt(fs.readFileSync(path.normalize(os.homedir() + '/.pgmanage/pgmanage_port')), 10);
 	tcpPortUsed.check(int_pgmanage_port, '127.0.0.1').then(function (taken) {
 		if (!taken) {
-			spawnPgManage();
+			spawnpgManage();
 		} else {
 			pickNewPort();
 		}
@@ -188,7 +188,7 @@ var proc = null;
 ipcMain.on('pgmanage', function (event, arg) {
 	if (arg === 'restart') {
 		proc.kill();
-		spawnPgManage();
+		spawnpgManage();
 		mainWindows.forEach(function (curWindow) {
 			curWindow.webContents.executeJavaScript('window.location.reload();');
 		});
@@ -512,7 +512,7 @@ function appStart() {
 		path: os.homedir() + '/.pgmanage/',
 		file: 'pgpass-window-state.json'
 	});
-	if (bolPgManageIsReady) {
+	if (bolpgManageIsReady) {
 		openWindow();
 	}
 }

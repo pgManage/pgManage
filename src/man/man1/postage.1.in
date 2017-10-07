@@ -45,9 +45,9 @@ All log output is pushed to stderr, if you are pushing that to a file, then you 
 .br
        \fBString;\fP defaults to @prefix@/etc/pgmanage/pgmanage\.conf
 .br
-       You can use this option to tell PgManage where to look for the configuration file\. A sample configuration file is provided in @prefix@/etc/pgmanage\. If there is no file specified PgManage will look in the current directory for a config file\. If no config file is found PgManage will proceed with default values\.
+       You can use this option to tell pgManage where to look for the configuration file\. A sample configuration file is provided in @prefix@/etc/pgmanage\. If there is no file specified pgManage will look in the current directory for a config file\. If no config file is found pgManage will proceed with default values\.
 .P
-The following options can be specified on the command line or in the configuration file\. In the event a value is specified on the command line and in the config file, PgManage will always use the command line option\. Note that if no option is specified then some options will be set to a default value\.
+The following options can be specified on the command line or in the configuration file\. In the event a value is specified on the command line and in the config file, pgManage will always use the command line option\. Note that if no option is specified then some options will be set to a default value\.
 .P
 \fB[command line short]\fP or \fB[command line long]\fP or \fB[config file]\fP
 .P
@@ -55,39 +55,39 @@ The following options can be specified on the command line or in the configurati
 .br
        \fBString;\fP defaults to @prefix@/etc/pgmanage/pgmanage\-connections\.conf
 .br
-       When you install PgManage, the Makefile will generate a path to the sample pgmanage\-connections\.conf file and put it in the sample config file\. Use this option to tell PgManage where your connection list is located\.
+       When you install pgManage, the Makefile will generate a path to the sample pgmanage\-connections\.conf file and put it in the sample config file\. Use this option to tell pgManage where your connection list is located\.
 .br
-       If not specified, PgManage looks in the same folder as the config file for a file named pgmanage\-connections\.conf\. If PgManage can't find a connection file, it will error\.
+       If not specified, pgManage looks in the same folder as the config file for a file named pgmanage\-connections\.conf\. If pgManage can't find a connection file, it will error\.
 .P
 \fB\-s\fP or \fB\-\-super\-only=\fP or \fBsuper_only=\fP
 .br
        \fBBoolean;\fP defaults to false
 .br
-       This tells PgManage whether or not to only allow super users to login\. The recommended value is true and will restrict users who are not super users from logging in to any PostgreSQL instance through PgManage\. Note that a connection will be made to PostgreSQL in order to test if the user is a superuser\.  
+       This tells pgManage whether or not to only allow super users to login\. The recommended value is true and will restrict users who are not super users from logging in to any PostgreSQL instance through pgManage\. Note that a connection will be made to PostgreSQL in order to test if the user is a superuser\.  
 .P
 \fB\-g\fP or \fB\-\-login\-group=\fP or \fBlogin_group=\fP
 .br
        \fBString;\fP no default
 .br
-       This tells PgManage to only allow users in a certain PostgreSQL group to login to PgManage\. Note that a connection will be made to PostgreSQL in order to test if the user is a member of the login group\.
+       This tells pgManage to only allow users in a certain PostgreSQL group to login to pgManage\. Note that a connection will be made to PostgreSQL in order to test if the user is a member of the login group\.
 .P
 \fB\-r\fP or \fB\-\-web\-root=\fP or \fBweb_root=\fP
 .br
        \fBString;\fP Defaults to @prefix@/etc/pgmanage/web_root
 .br
-       This tells PgManage where the HTML files have been installed to\.
+       This tells pgManage where the HTML files have been installed to\.
 .P
 \fB\-a\fP or \fB\-\-data\-root=\fP or \fBdata_root=\fP
 .br
        \fBString;\fP defaults to ~/\.pgmanage/
 .br
-       This tells PgManage where to put the SQL file history\. All tabs are saved to this location so that if you get disconnected from PgManage you don't lose your work\.
+       This tells pgManage where to put the SQL file history\. All tabs are saved to this location so that if you get disconnected from pgManage you don't lose your work\.
 .P
 \fB\-p\fP or \fB\-\-pgmanage\-port=\fP or \fBpgmanage_port=\fP
 .br
        \fBInteger;\fP defaults to 8080
 .br
-       This tells PgManage what port to listen on for browser requests\.
+       This tells pgManage what port to listen on for browser requests\.
 .P
 \fB\-j\fP or \fB\-\-tls\-cert=\fP or \fBtls_cert=\fP
 .br
@@ -95,15 +95,15 @@ The following options can be specified on the command line or in the configurati
 .br
        \fBString;\fP no defaults
 .br
-       These options tell PgManage where the TLS Certificate and Key files reside\. If you use these options then you'll only be able to access PgManage through a secure TLS connection\.
+       These options tell pgManage where the TLS Certificate and Key files reside\. If you use these options then you'll only be able to access pgManage through a secure TLS connection\.
 .br
-       These options are only necessary if you wish to connect directly to PgManage using a secure TLS connection\. As an alternative, you can set up PgManage in a reverse proxy configuration\. This allows your web server to terminate the secure connection and pass on the request to PgManage\. You can find help to set up this configuration in the INSTALL_NGINX file that came with your distribution\.
+       These options are only necessary if you wish to connect directly to pgManage using a secure TLS connection\. As an alternative, you can set up pgManage in a reverse proxy configuration\. This allows your web server to terminate the secure connection and pass on the request to pgManage\. You can find help to set up this configuration in the INSTALL_NGINX file that came with your distribution\.
 .P
 \fB\-n\fP or \fB\-\-allow\-custom\-connections=\fP or \fBallow_custom_connections=\fP
 .br
        \fBBoolean;\fP defaults to false
 .br
-       This tells PgManage whether or not to allow anyone to use a custom connection from the login screen\.
+       This tells pgManage whether or not to allow anyone to use a custom connection from the login screen\.
 .P
 \fB\-l\fP or \fB\-\-log\-level=\fP or \fBlog_level=\fP
 .br
@@ -121,10 +121,10 @@ The following options can be specified on the command line or in the configurati
 \fB\-x\fP or \fB\-\-local\-only=\fP
        \fBBoolean;\fP defaults to false
 .br
-       This tells PgManage whether or not to set the listening socket to local addresses only\.
+       This tells pgManage whether or not to set the listening socket to local addresses only\.
 .SH SETTING UP A CONNECTION TO A POSTGRESQL SERVER
 .P
-PgManage requires at least one PostgreSQL server be listed in the pgmanage\-connections\.conf file\. This version of PgManage doesn't allow you to specify a server from the command line\. Enter only one PostgreSQL server per line\.
+pgManage requires at least one PostgreSQL server be listed in the pgmanage\-connections\.conf file\. This version of pgManage doesn't allow you to specify a server from the command line\. Enter only one PostgreSQL server per line\.
 .P
 \fBThe format of a connection string is:\fR  
 .P
@@ -136,7 +136,7 @@ PgManage requires at least one PostgreSQL server be listed in the pgmanage\-conn
 .P
 Detailed information about PostgreSQL connection strings is available at: http://www\.postgresql\.org/docs/current/static/libpq\-connect\.html
 .P
-Note that you do not enter your user name or password in this file\. That information will be entered on the login screen\. If you put a username or password in this file, it will be removed by PgManage before attempting to connect to a database\.
+Note that you do not enter your user name or password in this file\. That information will be entered on the login screen\. If you put a username or password in this file, it will be removed by pgManage before attempting to connect to a database\.
 .SS EXAMPLE CONNECTION STRINGS:
 .P
 .RS 2

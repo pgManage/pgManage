@@ -75,22 +75,22 @@ Makefile
 *.lo
 .deps
 /pgmanage_gui_mac/build/
-/pgmanage_installer_mac/PgManage/
-/pgmanage_installer_mac/PgManage*.pkg
+/pgmanage_installer_mac/pgManage/
+/pgmanage_installer_mac/pgManage*.pkg
 
 /dependencies/libev/CVS/Template
 *.core
 
-visualstudio/pgmanage/PgManageGUI/bin/Release/PgManageGUI.exe.config
-visualstudio/pgmanage/PgManageGUI/obj/Release/App.g.cs
-visualstudio/pgmanage/PgManageGUI/obj/Release/MainWindow.baml
-visualstudio/pgmanage/PgManageGUI/obj/Release/MainWindow.g.cs
-visualstudio/pgmanage/PgManageGUI/obj/Release/PgManageGUI.Properties.Resources.resources
-visualstudio/pgmanage/PgManageGUI/obj/Release/PgManageGUI.csproj.FileListAbsolute.txt
-visualstudio/pgmanage/PgManageGUI/obj/Release/PgManageGUI.csproj.GenerateResource.Cache
-visualstudio/pgmanage/PgManageGUI/obj/Release/PgManageGUI.g.resources
-visualstudio/pgmanage/PgManageGUI/obj/Release/PgManageGUI_MarkupCompile.cache
-visualstudio/pgmanage/PgManageGUI/obj/Release/PgManageGUI_MarkupCompile.lref
+visualstudio/pgmanage/pgManageGUI/bin/Release/pgManageGUI.exe.config
+visualstudio/pgmanage/pgManageGUI/obj/Release/App.g.cs
+visualstudio/pgmanage/pgManageGUI/obj/Release/MainWindow.baml
+visualstudio/pgmanage/pgManageGUI/obj/Release/MainWindow.g.cs
+visualstudio/pgmanage/pgManageGUI/obj/Release/pgManageGUI.Properties.Resources.resources
+visualstudio/pgmanage/pgManageGUI/obj/Release/pgManageGUI.csproj.FileListAbsolute.txt
+visualstudio/pgmanage/pgManageGUI/obj/Release/pgManageGUI.csproj.GenerateResource.Cache
+visualstudio/pgmanage/pgManageGUI/obj/Release/pgManageGUI.g.resources
+visualstudio/pgmanage/pgManageGUI/obj/Release/pgManageGUI_MarkupCompile.cache
+visualstudio/pgmanage/pgManageGUI/obj/Release/pgManageGUI_MarkupCompile.lref
 
 apps/nc/.libs/nc
 apps/nc/nc
@@ -140,8 +140,8 @@ openssl.pc
 /dependencies/libressl/ssl/libssl.la
 /dependencies/libressl/tls/libtls.la
 
-PgManage.app
-PgManageMac.dmg
+pgManage.app
+pgManageMac.dmg
 pgmanage_installer_mac/old
 pgmanage_gui_mac/old
 /db_framework_odbc

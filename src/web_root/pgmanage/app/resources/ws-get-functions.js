@@ -194,6 +194,6 @@ function getObjectTypeTitle(strQuery, callback) {
 // old function, DO NOT USE, use "getScript" instead
 function getScriptForAce() {
     'use strict';
-    console.warn('PgManage warning: old function in use: "getScriptForAce". The stack trace should appear below this log.');
+    console.warn('pgManage warning: old function in use: "getScriptForAce". The stack trace should appear below this log.');
     console.trace('getScriptForAce');
 }

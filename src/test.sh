@@ -62,7 +62,7 @@ if test $(uname -s) = "Linux"; then
 	cp ../src/config/pgmanage.conf ~/.pgmanage
 	cp ../src/config/pgmanage-connections-test.conf ~/.pgmanage/pgmanage-connections.conf
 
-	/opt/PgManage/pgmanage --pgmanage-test & export PGMANAGEPID="$!"
+	/opt/pgManage/pgmanage --pgmanage-test & export PGMANAGEPID="$!"
 	printf "HTTP/1.1 200 OK\r\n\r\n\r\n" | ncat -l -p 45654
 	kill $PGMANAGEPID
 
@@ -72,7 +72,7 @@ if test $(uname -s) = "Linux"; then
 		md5sum ./dist/*.deb >> /mnt/Groups/wfprod_group/pgmanage/packages/md5s.txt
 	}
 	command -v yum >/dev/null 2>&1 && {
-		sudo yum -y remove PgManage
+		sudo yum -y remove pgManage
 		cp -f ./dist/*.rpm /mnt/Groups/wfprod_group/pgmanage/packages/
 		md5sum ./dist/*.rpm >> /mnt/Groups/wfprod_group/pgmanage/packages/md5s.txt
 	}

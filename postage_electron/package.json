@@ -62,7 +62,7 @@
   },
   "homepage": "https://github.com/workflowproducts/pgmanage/blob/master/README.md",
   "keywords": [
-    "PgManage",
+    "pgManage",
     "Electron",
     "PostgreSQL"
   ],

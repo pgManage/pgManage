@@ -1,6 +1,6 @@
 # Attention Contributors!!
 
-At this time, PgManage is under an Apache license. The Apache license seems to have been written in such a way that you don't need to obtain contributor license agreements, but then, Apache makes you sign them anyway. Therefore, please pay special attention to the following section "Contributor License Agreements".
+At this time, pgManage is under an Apache license. The Apache license seems to have been written in such a way that you don't need to obtain contributor license agreements, but then, Apache makes you sign them anyway. Therefore, please pay special attention to the following section "Contributor License Agreements".
 
 # Contributor License Agreements
 
@@ -65,6 +65,6 @@ Using GDB and Valgrind at the same time (Yikes!), I found some related informati
 ## Dependencies
 
 #### LIBEV
-Different versions of libev may not work with every version of PgManage. To avoid problems, the PgManage compile process is set up to statically compile libev. This way we control what version you use.
+Different versions of libev may not work with every version of pgManage. To avoid problems, the pgManage compile process is set up to statically compile libev. This way we control what version you use.
 
 Copyright 2016 Workflow Products LLC

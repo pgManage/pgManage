@@ -75,7 +75,7 @@ function loadHome() {
                 if (xhr.status !== 200) {
                     document.getElementById('iframe-news').innerHTML = ml(function () {/*
                         <gs-container padded>
-                            <h2>PgManage Version Information & News could not load.</h2>
+                            <h2>pgManage Version Information & News could not load.</h2>
                             <h3><a href="https://news.workflowproducts.com/splash/pgmanage.html?app=pgmanage&version={{PGMANAGE}}&postgres={{POSTGRES}}">https://news.workflowproducts.com/splash/pgmanage.html</a></h3>
                             <h3>This may be an issue with your firewall. Does it block SSL-enabled websites?</h3>
                         </gs-container>

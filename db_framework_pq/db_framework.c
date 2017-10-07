@@ -17,7 +17,7 @@ static void db_copy_out_check_cb(EV_P, ev_check *w, int revents);
 static void db_cnxn_cb(EV_P, ev_io *w, int revents);
 
 #define SUN_PROGRAM_LOWER_NAME "pgmanage"
-#define SUN_PROGRAM_WORD_NAME "PgManage"
+#define SUN_PROGRAM_WORD_NAME "pgManage"
 #define SUN_PROGRAM_UPPER_NAME "PGMANAGE"
 
 void db_conn_error_cb(EV_P, ev_check *w, int revents) {

@@ -1,4 +1,4 @@
 node_modules
 app/pgmanage
-/PgManage-*
+/pgManage-*
 /dist

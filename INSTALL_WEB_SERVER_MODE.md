@@ -1,14 +1,14 @@
-# Installing PgManage (Web Server mode)
+# Installing pgManage (Web Server mode)
 
-## Please note that we put a lot of effort into making sure PgManage installs cleanly on every platform. If you have an issue please [report it](https://github.com/workflowproducts/pgmanage/issues) and we'll get it fixed. 
+## Please note that we put a lot of effort into making sure pgManage installs cleanly on every platform. If you have an issue please [report it](https://github.com/workflowproducts/pgmanage/issues) and we'll get it fixed. 
 
 ## Dependencies
 
 #### LIBPQ
-In order for PgManage to talk to PostgreSQL you need to have the libpq library installed. If you don't have LibPQ or the PgManage compile process can't find it, please consult the file INSTALL_LIBPQ for some OS-specific advice on how to get libpq.
+In order for pgManage to talk to PostgreSQL you need to have the libpq library installed. If you don't have LibPQ or the pgManage compile process can't find it, please consult the file INSTALL_LIBPQ for some OS-specific advice on how to get libpq.
 
 #### SSL
-PgManage works with OpenSSL or LibreSSL, if you wish to use OpenSSL:
+pgManage works with OpenSSL or LibreSSL, if you wish to use OpenSSL:
 ```
 sudo apt install libssl-devel # Ubuntu
 sudo dnf install openssl-devel # Fedora
@@ -28,7 +28,7 @@ https://github.com/workflowproducts/pgmanage/releases
 
 #### INSTALLING PGMANAGE
 
-If you'd like to test PgManage before you install, see the section "Testing PgManage Before Installing" further down.
+If you'd like to test pgManage before you install, see the section "Testing pgManage Before Installing" further down.
 
     cd pgmanage
     ./configure
@@ -36,11 +36,11 @@ If you'd like to test PgManage before you install, see the section "Testing PgMa
     sudo make install
 
 If you are on OpenBSD or FreeBSD, use gmake instead.
-PgManage will be installed in `/usr/local/sbin`. All other files such as the html, javascript and configuration files will be installed to `/usr/local/etc/pgmanage`.
+pgManage will be installed in `/usr/local/sbin`. All other files such as the html, javascript and configuration files will be installed to `/usr/local/etc/pgmanage`.
 
 #### RUNNING PGMANAGE
 
-To run PgManage:
+To run pgManage:
 
     /usr/local/sbin/pgmanage
 
@@ -52,13 +52,13 @@ Long Version:
 
 #### Configuring PGMANAGE
 
-Before running PgManage for the first time you may want to configure some options. All the options are explained in the PgManage man file:
+Before running pgManage for the first time you may want to configure some options. All the options are explained in the pgManage man file:
 
     man pgmanage
 
-Current configuration options allow you to set various paths, various access restrictions, web port and log level. Note that in order to make PgManage publish to HTTPS, you need to add paths for a TLS cert and key.
+Current configuration options allow you to set various paths, various access restrictions, web port and log level. Note that in order to make pgManage publish to HTTPS, you need to add paths for a TLS cert and key.
 
-You'll also need to set up a connection string to tell PgManage where your PostgreSQL databases are published. The default connection string config file located in /usr/local/etc/pgmanage/. There are examples in the provided pgmanage-connections.conf file and further info is available in the man file.
+You'll also need to set up a connection string to tell pgManage where your PostgreSQL databases are published. The default connection string config file located in /usr/local/etc/pgmanage/. There are examples in the provided pgmanage-connections.conf file and further info is available in the man file.
 
 #### TESTING PGMANAGE BEFORE INSTALLING
 
@@ -68,22 +68,22 @@ You'll also need to set up a connection string to tell PgManage where your Postg
     nano config/pgmanage-connections.conf
     make test
 
-If you want to test PgManage before you install, edit the `config/pgmanage-connections.conf` file to add a connection string for your Postgres database. Instructions for adding a connection string are included in the PgManage man page. To look at the PgManage man page before installing PgManage:
+If you want to test pgManage before you install, edit the `config/pgmanage-connections.conf` file to add a connection string for your Postgres database. Instructions for adding a connection string are included in the pgManage man page. To look at the pgManage man page before installing pgManage:
 
     ./configure
     man -M man pgmanage
 
-By default PgManage runs on port 8080, so if you need to change that you do it in the `pgmanage.conf` file. You can also set other options like whether to use TLS to connect.
+By default pgManage runs on port 8080, so if you need to change that you do it in the `pgmanage.conf` file. You can also set other options like whether to use TLS to connect.
 
-Once you've added a connection string to the pgmanage-connections.conf file, start the PgManage server with:
+Once you've added a connection string to the pgmanage-connections.conf file, start the pgManage server with:
 
     make test
 
-PgManage will push a message like:
+pgManage will push a message like:
 
     Open http(s)://<this computer's ip>:8080/ in your web browser
 
-Once you see that message that means PgManage is running, open your web browser to the link shown.
+Once you see that message that means pgManage is running, open your web browser to the link shown.
 
 #### UNINSTALLING PGMANAGE
 
@@ -93,7 +93,7 @@ If you still have your original build directory then:
     ./configure
     make uninstall
     
-PgManage saves SQL scripts that you create in PgManage to the .pgmanage folder. If you're removing PgManage you may want to remove the .pgmanage directory.
+pgManage saves SQL scripts that you create in pgManage to the .pgmanage folder. If you're removing pgManage you may want to remove the .pgmanage directory.
 
     rm -r ~/.pgmanage/
 

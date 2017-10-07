@@ -1,5 +1,5 @@
 Changes since 3.2.17:
-PgManage:
+pgManage:
 - Fix `super_only` error to be more specific
 - Fix tab folder icon (closes workflowproducts/pgmanage#351)
 - Don't require superuser by default (for workflowproducts/pgmanage#353)
@@ -47,11 +47,11 @@ Both:
 - Fix insert and update for columns with backslashes
 
 Changes since 3.2.16:
-PgManage:
+pgManage:
 - Make headers visible rather than seeing "####" (PR workflowproducts/pgmanage#328)
 - Fix running pgmanage from a different disk drive (for workflowproducts/pgmanage#339)
 - Fix configure to accept --prefix, fix Makefile to create mandir (closes workflowproducts/pgmanage#343)
-- Disable context data in PgManage (closes workflowproducts/pgmanage#336)
+- Disable context data in pgManage (closes workflowproducts/pgmanage#336)
 - Fix line indicator when Postgres doesn't supply a line number with an error (closes workflowproducts/pgmanage#329)
 - Add autofit button (closes workflowproducts/pgmanage#345)
 - Fix file save/save as in pgmanage (closes workflowproducts/pgmanage#330)
@@ -64,7 +64,7 @@ Both:
 
 
 Changes since 3.2.15:
-PgManage:
+pgManage:
 - Rewrite generate script for table designer (closed workflowproducts/pgmanage#307)
 - Fix beautify not working on tables (closed workflowproducts/pgmanage#318)
 - Fix dollar tag syntax highlighting (closed workflowproducts/pgmanage#274)
@@ -84,7 +84,7 @@ Both:
 
 
 Changes since 3.2.14:
-PgManage:
+pgManage:
 - Fix datasheet preventing scrolling of the results pane (closed workflowproducts/pgmanage#306)
 - Fix returns not scrolling the viewport (closed workflowproducts/pgmanage#279)
 - Fix LOGIN and PASSWORD on same line in CREATE ROLE script (closed workflowproducts/pgmanage#305)
@@ -100,7 +100,7 @@ Both:
 
 
 Changes since 3.2.13:
-PgManage:
+pgManage:
 - Fix datasheet not working when a column name has a dash in it (closed workflowproducts/pgmanage#298)
 - Datasheet: Allow copy record to use new arrRow column access method
 
@@ -112,7 +112,7 @@ Both:
 
 
 Changes since 3.2.12:
-PgManage:
+pgManage:
 - New autocomplete
 - Fix electron pgmanage to use extraResources instead of disabling asar
 - Fix multiple instances of pgmanage (closed workflowproducts/pgmanage#267)
@@ -148,7 +148,7 @@ Both:
 
 
 Changes since 3.2.11:
-PgManage:
+pgManage:
 - Fix HTML in explain table
 - Stop drop down showing up for SPACE (closes workflowproducts/pgmanage#257)
 - Fix autocomplete with double-quoted entity names (closes workflowproducts/pgmanage#246)
@@ -162,7 +162,7 @@ Both:
 - Update Windows LibreSSL
 
 Changes since 3.2.10:
-PgManage:
+pgManage:
 - Fix crash when raw request is pending and socket is closed
 - Find and replace buttons now give feedback (closes workflowproducts/pgmanage#239)
 - Object Browser vertical scroll bar stops working (closes workflowproducts/pgmanage#242)
@@ -180,7 +180,7 @@ Both:
 - Unescape source of SELECT request when it's arbitrary
 
 Changes since 3.2.9:
-PgManage:
+pgManage:
 - Fix autocomplete casting popup cutting out a colon when you insert
 - Fix autocomplete not closing when you "wordleft"
 - Fix Beautify handling double single quotes in strings
@@ -194,11 +194,11 @@ Both:
 - Fix file handling on OpenBSD 6.1
 
 Changes since 3.2.8:
-PgManage:
+pgManage:
 - Repackage all installers with latest JavaScript
 
 Changes since 3.2.7:
-PgManage:
+pgManage:
 - Fixed autocomplete after dot
 - Fix crash when running empty query
 - Fix crash when closing socket while raw is running
@@ -213,7 +213,7 @@ Both:
 - Add user-agent to context info
 
 Changes since 3.2.6:
-PgManage:
+pgManage:
 Fix beautify issue
 Fix context menu (close workflowproducts/pgmanage#200)
 Move cursor to error position (close workflowproducts/pgmanage#208)
@@ -236,11 +236,11 @@ Fix empty login_group
 Fix makefiles to have all target at the top
 
 Changes since 3.2.5:
-PgManage:
+pgManage:
 Fix typing bugs
 
 Changes since 3.2.4:
-PgManage:
+pgManage:
 Fix constraint query (closed workflowproducts/pgmanage#205)
 Fix header buttons in configuration editor (closed workflowproducts/pgmanage#203)
 Update windows libpq (9.6.2) and windows libressl (2.5.3)
@@ -250,7 +250,7 @@ Both:
 Add arbitrary FROM to ws_select, remove group by from ws_select
 
 Changes since 3.2.3:
-PgManage:
+pgManage:
 Fix punctuation in an error
 Fix cursor query split
 Fix proccess manager button layout
@@ -263,7 +263,7 @@ Add horizontal parameters for scroll functions
 
 
 Changes since 3.2.2
-PgManage:
+pgManage:
 Add depesz based explain (closed workflowproducts/pgmanage#176)
 Fix query highlighting
 Fix triangle icons (closed workflowproducts/pgmanage#185)
@@ -295,7 +295,7 @@ Add GROUP BY to websocket SELECT
 
 
 Changes since 3.2.1:
-PgManage:
+pgManage:
 Clear Electron cache when opening a window
 Fix database list code to not clear HTML every 10 records (closed workflowproducts/pgmanage#164)
 
@@ -311,7 +311,7 @@ Error when an RSV bit is set in a websocket message (closed workflowproducts/env
 
 
 Changes since 3.2.0:
-PgManage:
+pgManage:
 Remove "Clear Cache" button in Electron version
 Make "Reload" menu option a hard refresh
 
@@ -320,7 +320,7 @@ Fix caching issues
 
 
 Changes since 3.2.0-beta:
-PgManage:
+pgManage:
 Add options dialog
 Fix .deb dependencies (closed workflowproducts/pgmanage#162)
 Added stop button when loading records (closed workflowproducts/pgmanage#96)
@@ -384,7 +384,7 @@ Added column documentation to these elements:
 
 
 Changes since 3.1.3:
-PgManage:
+pgManage:
 - Redesigned autocomplete experience
 - Fix hang when running a query to kill the current backend process
 - Fixed autocomplete not opening correctly when there is an underline in the middle of a word
@@ -513,8 +513,8 @@ Add NULL to cells that don't exist (closes workflowproducts/pgmanage#68)
 Fix clip options label (closes workflowproducts/pgmanage#66)
 Fix raw error reporting to not be truncated at 255 chars (for workflowproducts/pgmanage#65)
 Make raw errors more detailed like PGAdmin (closes workflowproducts/pgmanage#65)
-Fixed PgManage issue where in certain cases results could not be seen.
-Fixed PgManage issue where switching to a tab with results in it: the top portion of the results was chopped off.
+Fixed pgManage issue where in certain cases results could not be seen.
+Fixed pgManage issue where switching to a tab with results in it: the top portion of the results was chopped off.
 Speed up update on complex views (workflowproducts/envelope#23)
 Remove .trim()s (closes workflowproducts/envelope#64)
 Fix autocomplete scroll (closes workflowproducts/pgmanage#54)
@@ -546,7 +546,7 @@ Make logout select last connection on login page
 Fix default pgmanage-connections.conf to not use sslmode=allow
 Fix logout crash
 Made record highlight more obvious
-Fix data-grid columns list in PgManage
+Fix data-grid columns list in pgManage
 Fix crash when waiting for query and logging out
 Fix raw fail to wait for rollback to finish before moving on to the next request
 Fix some memory leaks
@@ -560,7 +560,7 @@ fix 100% cpu and remove a UTIL_DEBUG
 fix crash when logging out during a select (closes #20)
 fix TAB WRITE FAIL 1 test (closes #34)
 add electron-context-menu (for workflowproducts/envelope#10)
-remove PgManageGUI (closes workflowproducts/envelope#11)
+remove pgManageGUI (closes workflowproducts/envelope#11)
 add windows libpq envelope
 fix re-opening window on macOS
 

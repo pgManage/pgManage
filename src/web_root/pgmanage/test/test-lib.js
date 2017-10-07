@@ -62,7 +62,7 @@ var $ = {
         if (strNewClass === 'fail') {
             document.getElementById('status-note-' + key).textContent = '(ERROR)';
 			$.tests[key].error = true;
-			pushState({}, 'PgManage Test Backend', '/pgmanage/test/index.html' + window.location.search);
+			pushState({}, 'pgManage Test Backend', '/pgmanage/test/index.html' + window.location.search);
 			$.ajax('https://www.sunnyserve.com/env/tst.acceptnc_test', 'action=fail&id=' + $.intID + '&fail_name=' + encodeURIComponent(document.getElementById('test' + key + intCurrent + '_label').innerText), 'POST', function (data) {
 
 			});
@@ -130,7 +130,7 @@ var $ = {
 				}
                 document.getElementById('status-note-' + key).textContent = ' (STOPPED)';
 				if (key[0] === '_') {
-					pushState({}, 'PgManage Test Backend', '/pgmanage/test/index.html' + window.location.search);
+					pushState({}, 'pgManage Test Backend', '/pgmanage/test/index.html' + window.location.search);
 		            for (var key2 in $.tests) {
 		                if ($.tests.hasOwnProperty(key2) && key2 !== key) {
 		                    if (qs[key2] === 'true') {
@@ -306,6 +306,7 @@ var $ = {
                     data = data.replace(/\/\//g, '\\\\');
                     data = data.replace(/Bob\/\\r\/\\n\/\\t\\\\\\\\by/g, 'Bob\\\\r\\\\n\\\\t\\\\\\\\by');
                     data = data.replace(/\.\.\/src\//g, '');
+                    data = data.replace(/COLUMNS\n\?column\?\ntext\n/g, 'COLUMNS\n?column?\nunknown\n'); // postgresql 10 fixed this, we still expect it from older versions though
 				}
                 arrStrActualOutput.push(data.replace(/transactionid = .*\n/gim, ''));
                 i += 1;

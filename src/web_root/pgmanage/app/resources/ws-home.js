@@ -27,11 +27,11 @@ function loadHome() {
                     <div id="sql-ace-area-home" class="ace-area"></div>
                 </div>
                 <div style="width: 100%; height: 100%;" id="iframe-news">
-                    <iframe style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; border: 0 none; z-index: 150; background-color: #FFFFFF;" src="/pgmanage/splash.html?version={{POSTAGE}}&postgres={{POSTGRES}}"></iframe>
+                    <iframe style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; border: 0 none; z-index: 150; background-color: #FFFFFF;" src="/pgmanage/splash.html?version={{PGMANAGE}}&postgres={{POSTGRES}}"></iframe>
                 </div>
     			<div style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; border: 0 none; z-index: 200; background-color: #FFFFFF; overflow: auto;" id="object-details-container" hidden></div>
             </div>
-        */}).replace(/\{\{POSTAGE\}\}/g, contextData.pgmanageVersion).replace(/\{\{POSTGRES\}\}/g, contextData.versionNumber);
+        */}).replace(/\{\{PGMANAGE\}\}/g, contextData.pgmanageVersion).replace(/\{\{POSTGRES\}\}/g, contextData.versionNumber);
     
         // create ace
         homeEditor = ace.edit('sql-ace-area-home');

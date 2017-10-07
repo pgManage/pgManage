@@ -1,4 +1,4 @@
-# FreeBSD PgManage
+# FreeBSD pgManage
 ```
 su -
 pkg install
@@ -73,7 +73,7 @@ cd /home/super/envelope-master
 gmake uninstall
 ```
 
-# OpenBSD PgManage
+# OpenBSD pgManage
 ```
 su -
 pkg_add unzip postgresql-server gmake wget
@@ -146,7 +146,7 @@ cd /home/super/envelope-master
 gmake uninstall
 ```
 
-# Ubuntu PgManage
+# Ubuntu pgManage
 In terminal:
 ```
 sudo apt-get install postgresql-server-dev-9.5 postgresql-9.5
@@ -159,7 +159,7 @@ make test
 ```
 
 In your browser:
-Go to the PgManage testing page: http://127.0.0.1:8080/pgmanage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
+Go to the pgManage testing page: http://127.0.0.1:8080/pgmanage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
 
 Back in Terminal:
 ```
@@ -172,7 +172,7 @@ make test-common
 ```
 
 In your browser:
-Go to the PgManage testing page: http://127.0.0.1:8080/pgmanage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
+Go to the pgManage testing page: http://127.0.0.1:8080/pgmanage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
 
 Make sure to kill the PostgreSQL process from `make test-common` before moving on.
 
@@ -219,7 +219,7 @@ cd /home/super/envelope-master/
 make uninstall
 ```
 
-# Fedora PgManage
+# Fedora pgManage
 In terminal:
 ```
 wget https://github.com/workflowproducts/pgmanage/archive/master.zip
@@ -230,7 +230,7 @@ make test
 ```
 
 In your browser:
-Go to the PgManage testing page: http://127.0.0.1:8080/pgmanage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
+Go to the pgManage testing page: http://127.0.0.1:8080/pgmanage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
 
 Back in Terminal:
 ```
@@ -242,7 +242,7 @@ make test-common
 /usr/local/sbin/pgmanage
 ```
 In your browser:
-Go to the PgManage testing page: http://127.0.0.1:8080/pgmanage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
+Go to the pgManage testing page: http://127.0.0.1:8080/pgmanage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
 
 Make sure to kill the PostgreSQL process from `make test-common` before moving on.
 
@@ -287,7 +287,7 @@ cd /home/super/envelope-master/
 make uninstall
 ```
 
-# macOS PgManage:
+# macOS pgManage:
 Use Google Chrome
 
 In terminal:
@@ -300,7 +300,7 @@ make all test
 ```
 
 In your browser:
-Go to the PgManage testing page: http://127.0.0.1:8080/pgmanage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
+Go to the pgManage testing page: http://127.0.0.1:8080/pgmanage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
 
 Back in Terminal:
 ```
@@ -313,7 +313,7 @@ make test-common
 ```
 
 In your browser:
-Go to the PgManage testing page: http://127.0.0.1:8080/pgmanage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
+Go to the pgManage testing page: http://127.0.0.1:8080/pgmanage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
 
 Make sure to kill the PostgreSQL process from `make test-common` before moving on.
 

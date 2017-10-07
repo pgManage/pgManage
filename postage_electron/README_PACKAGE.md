@@ -1,4 +1,4 @@
-## To package PgManage with Electron
+## To package pgManage with Electron
 1. You need to compile pgmanage.
 2. Run `update.bat` (Windows) or `update.sh` (macOS/Linux)
 3. run these commands:

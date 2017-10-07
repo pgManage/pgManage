@@ -17,7 +17,7 @@
 #include "util_ini.h"
 
 #define SUN_PROGRAM_LOWER_NAME "pgmanage"
-#define SUN_PROGRAM_WORD_NAME "PgManage"
+#define SUN_PROGRAM_WORD_NAME "pgManage"
 #define SUN_PROGRAM_UPPER_NAME "PGMANAGE"
 
 extern char *str_global_config_file;

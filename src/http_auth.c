@@ -197,7 +197,7 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 		SDEBUG("ptr_conn: %s", ptr_conn);
 
 		size_t int_temp = 0;
-		SFINISH_SNCAT(str_cookie_name, &int_temp, "pgmanage_", (size_t)8, ptr_conn, strlen(ptr_conn));
+		SFINISH_SNCAT(str_cookie_name, &int_temp, "pgmanage_", (size_t)9, ptr_conn, strlen(ptr_conn));
 
 		SFREE_PWORD(str_form_data);
 		client_auth->str_cookie_encrypted = str_cookie(client_auth->parent->str_request, client_auth->parent->int_request_len, str_cookie_name, &client_auth->int_cookie_encrypted_len);
@@ -337,7 +337,7 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 		SDEBUG("ptr_conn: %s", ptr_conn);
 
 		size_t int_temp = 0;
-		SFINISH_SNCAT(str_cookie_name, &int_temp, "pgmanage_", (size_t)8, ptr_conn, strlen(ptr_conn));
+		SFINISH_SNCAT(str_cookie_name, &int_temp, "pgmanage_", (size_t)9, ptr_conn, strlen(ptr_conn));
 
 		SFREE_PWORD(str_form_data);
 		client_auth->str_cookie_encrypted = str_cookie(client_auth->parent->str_request, client_auth->parent->int_request_len, str_cookie_name, &client_auth->int_cookie_encrypted_len);
@@ -482,7 +482,7 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 		SDEBUG("ptr_conn: %s", ptr_conn);
 
 		size_t int_temp = 0;
-		SFINISH_SNCAT(str_cookie_name, &int_temp, "pgmanage_", (size_t)8, ptr_conn, strlen(ptr_conn));
+		SFINISH_SNCAT(str_cookie_name, &int_temp, "pgmanage_", (size_t)9, ptr_conn, strlen(ptr_conn));
 
 		client_auth->str_cookie_encrypted = str_cookie(client_auth->parent->str_request, client_auth->parent->int_request_len, str_cookie_name, &client_auth->int_cookie_encrypted_len);
 		if (client_auth->str_cookie_encrypted != NULL) {

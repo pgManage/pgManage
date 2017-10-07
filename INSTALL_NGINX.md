@@ -1,12 +1,12 @@
 ##INSTRUCTIONS FOR INSTALLING PGMANAGE BEHIND NGINX
 
-In the typical case, you'll want to install PgManage behind a firewall, then VPN or tunnel to the server and use your browser to access PgManage through the tunnel. You can do all that without setting PgManage up behind a web server.
+In the typical case, you'll want to install pgManage behind a firewall, then VPN or tunnel to the server and use your browser to access pgManage through the tunnel. You can do all that without setting pgManage up behind a web server.
 
-But there may be a case where you want to make an instance of PgManage accessible through a web server. In that case these instructions may appeal to you.
+But there may be a case where you want to make an instance of pgManage accessible through a web server. In that case these instructions may appeal to you.
 
-The general idea is for the web browser to communicate with the web server under SSL or TLS. Then pass the unencrypted request to the PgManage server. This way you can publish more than one secure website on the default TLS port 443. This prevents you from needing to specify a port when connecting to PgManage and simplifies firewall setup for multiple PgManage servers behind one web server. This configuration is called a reverse proxy.
+The general idea is for the web browser to communicate with the web server under SSL or TLS. Then pass the unencrypted request to the pgManage server. This way you can publish more than one secure website on the default TLS port 443. This prevents you from needing to specify a port when connecting to pgManage and simplifies firewall setup for multiple pgManage servers behind one web server. This configuration is called a reverse proxy.
 
-If your web server is NOT on the same server as the PgManage server then using a reverse proxy can offload the TLS overhead to the web server but now you have the problem of the web server talking to the PgManage server in the clear. Usually, this is NOT what you want. You'll need to set up a secure tunnel from the web server to the PgManage server or protect the traffic from your web server to PgManage. 
+If your web server is NOT on the same server as the pgManage server then using a reverse proxy can offload the TLS overhead to the web server but now you have the problem of the web server talking to the pgManage server in the clear. Usually, this is NOT what you want. You'll need to set up a secure tunnel from the web server to the pgManage server or protect the traffic from your web server to pgManage. 
 
 ####Here is a sample NGINX configuration:
 

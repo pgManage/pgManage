@@ -25,7 +25,7 @@ function createTestDataResponse(rowPrefix, intCount) {
 	return arrRet;
 }
 
-﻿$.tests = {
+$.tests = {
 	_http_auth: {
 		 tests: [
 			 ['List Connections', 'ajax', 200, '/pgmanage/auth', 'action=list',

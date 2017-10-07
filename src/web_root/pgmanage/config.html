@@ -6,7 +6,7 @@
         <meta name="apple-mobile-web-app-status-bar-style" content="black" />
         <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
 
-        <title>PgManage Configuration editor</title>
+        <title>pgManage Configuration editor</title>
 
 		<script src="js/greyspots.js" type="text/javascript"></script>
         <script src="js/ace/ace.js" data-ace-base="js/ace/" type="text/javascript" charset="utf-8"></script>
@@ -38,7 +38,7 @@
 
 			document.title = file;
 
-			function restartPgManage() {
+			function restartpgManage() {
 			    "use strict";
 				ipcRenderer.send('pgmanage', 'restart');
 			}
@@ -194,8 +194,8 @@
 				<div flex-horizontal>
 					<div id="header-text-container" flex>Configuration Editor</div>
 					<gs-button inline class="header-button-text" style="width: 15em;" hidden href="https://www.postgresql.org/docs/current/static/libpq-pgpass.html" target="_blank" id="pgpass_docs">PGPASS Documentation</gs-button>
-					<gs-button inline class="header-button-text" style="width: 12em;" href="app/pgmanage.1.html" target="_blank" id="man_page">PgManage Man Page</gs-button>
-					<gs-button inline class="header-button-text" style="width: 10em;" onclick="restartPgManage();">Reload PgManage</gs-button>
+					<gs-button inline class="header-button-text" style="width: 12em;" href="app/pgmanage.1.html" target="_blank" id="man_page">pgManage Man Page</gs-button>
+					<gs-button inline class="header-button-text" style="width: 10em;" onclick="restartpgManage();">Reload pgManage</gs-button>
 				</div>
 			</gs-header>
             <gs-body>

@@ -39,46 +39,46 @@ All log output is pushed to stderr, if you are pushing that to a file, then you 
 
 `-c` or `--config-file=`  
        `String;` defaults to @prefix@/etc/pgmanage/pgmanage.conf  
-       You can use this option to tell PgManage where to look for the configuration file. A sample configuration file is provided in @prefix@/etc/pgmanage. If there is no file specified PgManage will look in the current directory for a config file. If no config file is found PgManage will proceed with default values.
+       You can use this option to tell pgManage where to look for the configuration file. A sample configuration file is provided in @prefix@/etc/pgmanage. If there is no file specified pgManage will look in the current directory for a config file. If no config file is found pgManage will proceed with default values.
 
-The following options can be specified on the command line or in the configuration file. In the event a value is specified on the command line and in the config file, PgManage will always use the command line option. Note that if no option is specified then some options will be set to a default value.
+The following options can be specified on the command line or in the configuration file. In the event a value is specified on the command line and in the config file, pgManage will always use the command line option. Note that if no option is specified then some options will be set to a default value.
 
 `[command line short]` or `[command line long]` or `[config file]`
 
 `-d` or `--connection-file=` or `connection_file=`  
        `String;` defaults to @prefix@/etc/pgmanage/pgmanage-connections.conf  
-       When you install PgManage, the Makefile will generate a path to the sample pgmanage-connections.conf file and put it in the sample config file. Use this option to tell PgManage where your connection list is located.  
-       If not specified, PgManage looks in the same folder as the config file for a file named pgmanage-connections.conf. If PgManage can't find a connection file, it will error.
+       When you install pgManage, the Makefile will generate a path to the sample pgmanage-connections.conf file and put it in the sample config file. Use this option to tell pgManage where your connection list is located.  
+       If not specified, pgManage looks in the same folder as the config file for a file named pgmanage-connections.conf. If pgManage can't find a connection file, it will error.
 
 `-s` or `--super-only=` or `super_only=`  
        `Boolean;` defaults to false  
-       This tells PgManage whether or not to only allow super users to login. The recommended value is true and will restrict users who are not super users from logging in to any PostgreSQL instance through PgManage. Note that a connection will be made to PostgreSQL in order to test if the user is a superuser.  
+       This tells pgManage whether or not to only allow super users to login. The recommended value is true and will restrict users who are not super users from logging in to any PostgreSQL instance through pgManage. Note that a connection will be made to PostgreSQL in order to test if the user is a superuser.  
 
 `-g` or `--login-group=` or `login_group=`  
        `String;` no default  
-       This tells PgManage to only allow users in a certain PostgreSQL group to login to PgManage. Note that a connection will be made to PostgreSQL in order to test if the user is a member of the login group.
+       This tells pgManage to only allow users in a certain PostgreSQL group to login to pgManage. Note that a connection will be made to PostgreSQL in order to test if the user is a member of the login group.
 
 `-r` or `--web-root=` or `web_root=`  
        `String;` Defaults to @prefix@/etc/pgmanage/web_root  
-       This tells PgManage where the HTML files have been installed to.
+       This tells pgManage where the HTML files have been installed to.
 
 `-a` or `--data-root=` or `data_root=`  
        `String;` defaults to ~/.pgmanage/  
-       This tells PgManage where to put the SQL file history. All tabs are saved to this location so that if you get disconnected from PgManage you don't lose your work.
+       This tells pgManage where to put the SQL file history. All tabs are saved to this location so that if you get disconnected from pgManage you don't lose your work.
 
 `-p` or `--pgmanage-port=` or `pgmanage_port=`  
        `Integer;` defaults to 8080  
-       This tells PgManage what port to listen on for browser requests.
+       This tells pgManage what port to listen on for browser requests.
 
 `-j` or `--tls-cert=` or `tls_cert=`  
 `-k` or `--tls-key=` or `tls_key=`  
        `String;` no defaults  
-       These options tell PgManage where the TLS Certificate and Key files reside. If you use these options then you'll only be able to access PgManage through a secure TLS connection.  
-       These options are only necessary if you wish to connect directly to PgManage using a secure TLS connection. As an alternative, you can set up PgManage in a reverse proxy configuration. This allows your web server to terminate the secure connection and pass on the request to PgManage. You can find help to set up this configuration in the INSTALL_NGINX file that came with your distribution.
+       These options tell pgManage where the TLS Certificate and Key files reside. If you use these options then you'll only be able to access pgManage through a secure TLS connection.  
+       These options are only necessary if you wish to connect directly to pgManage using a secure TLS connection. As an alternative, you can set up pgManage in a reverse proxy configuration. This allows your web server to terminate the secure connection and pass on the request to pgManage. You can find help to set up this configuration in the INSTALL_NGINX file that came with your distribution.
 
 `-n` or `--allow-custom-connections=` or `allow_custom_connections=`  
        `Boolean;` defaults to false  
-       This tells PgManage whether or not to allow anyone to use a custom connection from the login screen.
+       This tells pgManage whether or not to allow anyone to use a custom connection from the login screen.
 
 `-l` or `--log-level=` or `log_level=`  
        `String;` defaults to error  
@@ -91,11 +91,11 @@ The following options can be specified on the command line or in the configurati
 
 `-x` or `--local-only=`
        `Boolean;` defaults to false  
-       This tells PgManage whether or not to set the listening socket to local addresses only.
+       This tells pgManage whether or not to set the listening socket to local addresses only.
 
 ## SETTING UP A CONNECTION TO A POSTGRESQL SERVER
 
-PgManage requires at least one PostgreSQL server be listed in the pgmanage-connections.conf file. This version of PgManage doesn't allow you to specify a server from the command line. Enter only one PostgreSQL server per line.
+pgManage requires at least one PostgreSQL server be listed in the pgmanage-connections.conf file. This version of pgManage doesn't allow you to specify a server from the command line. Enter only one PostgreSQL server per line.
 
 **The format of a connection string is:**  
 ```
@@ -104,7 +104,7 @@ PgManage requires at least one PostgreSQL server be listed in the pgmanage-conne
 
 Detailed information about PostgreSQL connection strings is available at: http://www.postgresql.org/docs/current/static/libpq-connect.html
 
-Note that you do not enter your user name or password in this file. That information will be entered on the login screen. If you put a username or password in this file, it will be removed by PgManage before attempting to connect to a database.
+Note that you do not enter your user name or password in this file. That information will be entered on the login screen. If you put a username or password in this file, it will be removed by pgManage before attempting to connect to a database.
 
 #### EXAMPLE CONNECTION STRINGS:
 ```

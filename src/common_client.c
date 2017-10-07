@@ -528,11 +528,13 @@ void client_cb(EV_P, ev_io *w, int revents) {
 			if (bstrstr(str_upper_request, client->int_request_len, "SEC-WEBSOCKET-KEY", strlen("SEC-WEBSOCKET-KEY")) != NULL) {
 				str_uri_temp = str_uri_path(client->str_request, client->int_request_len, &int_uri_length);
 				SERROR_CHECK(str_uri_temp != NULL, "str_uri_path failed");
-				char *ptr_slash = strchr(str_uri_temp + 9, '/');
+				SINFO("str_uri_temp: %s", str_uri_temp);
+				char *ptr_slash = strchr(str_uri_temp + 10, '/');
 				if (ptr_slash != NULL) {
 					*ptr_slash = 0;
 					SERROR_SNCAT(str_conn_index, &int_conn_index_len,
 						str_uri_temp + 10, strlen(str_uri_temp + 10));
+					SINFO("str_uri_temp: %s", str_uri_temp);
 					SERROR_SNCAT(client->str_cookie_name, &int_cookie_name_len,
 						"pgmanage_", (size_t)9,
 						str_conn_index, strlen(str_conn_index));
@@ -679,8 +681,8 @@ void client_cb(EV_P, ev_io *w, int revents) {
 			} else {
 				str_uri_temp = str_uri_path(client->str_request, client->int_request_len, &int_uri_length);
 				SERROR_CHECK(str_uri_temp != NULL, "str_uri_path failed");
-				if (int_uri_length > 8) {
-					char *ptr_slash = strchr(str_uri_temp + 9, '/');
+				if (int_uri_length > 9) {
+					char *ptr_slash = strchr(str_uri_temp + 10, '/');
 					if (ptr_slash != NULL) {
 						*ptr_slash = 0;
 						SERROR_SNCAT(str_conn_index, &int_conn_index_len,

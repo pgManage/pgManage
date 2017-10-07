@@ -1,1 +1,1 @@
-Macs have alot of valgrind errors in clib, and in other places. This suppressions file is meant to remove those, not pgmanage or envelope warnings. PgManage and envelope should run clean in other OS's. Some OS's do have suppressions but they are built in.
+Macs have alot of valgrind errors in clib, and in other places. This suppressions file is meant to remove those, not pgmanage or envelope warnings. pgManage and envelope should run clean in other OS's. Some OS's do have suppressions but they are built in.

@@ -1,14 +1,14 @@
 # TROUBLESHOOTING MISSING LIBPQ
 
-In order for PgManage to talk to PostgreSQL you need to have the libpq library installed. 
+In order for pgManage to talk to PostgreSQL you need to have the libpq library installed. 
 
-By default on Mac OS X, you'll have a PostgreSQL install with no libpq header files. If you then install PostgreSQL but don't add it to your PATH then the PgManage configure will say that it found pg_config (but it will be the wrong one) and fail to find the libpq header files. To fix this situation, make sure you add the proper pgsql/bin folder in the beginning of your path.
+By default on Mac OS X, you'll have a PostgreSQL install with no libpq header files. If you then install PostgreSQL but don't add it to your PATH then the pgManage configure will say that it found pg_config (but it will be the wrong one) and fail to find the libpq header files. To fix this situation, make sure you add the proper pgsql/bin folder in the beginning of your path.
 
 On any other distribution where you have PostgreSQL installed, you'll typically have libpq already. If the installer can't find your libpq then you may need to add a path to your environment so that the compiler can find it.
 
 ## PROBLEM 1: I HAVE LIBPQ BUT PGMANAGE STILL WON'T INSTALL
 
-PgManage finds your libpq files using a command called `pg_config`. This command might be in a non-standard location. Try editing your `~/.profile` and add a line to the end of the file like this:
+pgManage finds your libpq files using a command called `pg_config`. This command might be in a non-standard location. Try editing your `~/.profile` and add a line to the end of the file like this:
 
 	export PATH=/FULLPATHTOTHEbinFOLDERTHATHASPG_CONFIG/:$PATH
 
@@ -16,7 +16,7 @@ Typically, the folder will be in `/usr/local/pgsql/bin`.
 
 Make sure that once you finished editing your `~/.profile` that you get out of that shell and get back in so that the change takes effect.
 
-The path to your libpq can be found with `pg_config`. The PgManage configure process attempts to do this for you but if it can't find `pg_config` then it will fail. To fix this situation you need to add `pg_config` to your path.
+The path to your libpq can be found with `pg_config`. The pgManage configure process attempts to do this for you but if it can't find `pg_config` then it will fail. To fix this situation you need to add `pg_config` to your path.
 
 ## PROBLEM 2: I DON'T HAVE LIBPQ
 
@@ -84,9 +84,9 @@ More information at http://www.postgresql.org/download/linux/suse/
 
 #### Mac OS Sierra (10.12)
 
-If you're installing PgManage from source then first make sure you need it. The main reasons to install PgManage from source are explained in the README. If you don't need PgManage from source then installing from a package will solve the problem starting from release 3.1.4.
+If you're installing pgManage from source then first make sure you need it. The main reasons to install pgManage from source are explained in the README. If you don't need pgManage from source then installing from a package will solve the problem starting from release 3.1.4.
 
-If you must install PgManage from source, then you'll need to install a version of LIBPQ that has SSL enabled. The easiest way to do this on Mac is (usually) to install PostgreSQL from source. If anyone solves this problem in an easier way please let us know and we'll update this document.
+If you must install pgManage from source, then you'll need to install a version of LIBPQ that has SSL enabled. The easiest way to do this on Mac is (usually) to install PostgreSQL from source. If anyone solves this problem in an easier way please let us know and we'll update this document.
 
 
 

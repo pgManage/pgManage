@@ -2817,14 +2817,14 @@ if (typeof HTMLTemplateElement === 'undefined') {
       
       window.addEventListener('load', function () {
           'use strict';
-          var bolOpen, intMaxHeight, curlElement, menuElement, strPgManageUName, strHTML, toggleCurl;
+          var bolOpen, intMaxHeight, curlElement, menuElement, strpgManageUName, strHTML, toggleCurl;
           
           if (window.bolCurl !== false) {
               bolOpen = false;
               intMaxHeight = 0;
               curlElement = document.createElement('div');
               menuElement = document.createElement('div');
-              strPgManageUName = GS.getCookie('pgmanage_uname');
+              strpgManageUName = GS.getCookie('pgmanage_uname');
               strHTML = '';
               
               curlElement.setAttribute('id', 'gs-document-curl-container');
@@ -6202,7 +6202,7 @@ if (typeof HTMLTemplateElement === 'undefined') {
       var sequence = 0, jsnMessages = {}, arrWaitingCalls = [];
       GS.openSocket = function (strLink, relinkSessionID, relinkSessionNotifications, socketname) {
           var strLoc = window.location.toString(),
-              intUrlStart = strLoc.indexOf('/pgmanage/') + 9,
+              intUrlStart = strLoc.indexOf('/pgmanage/') + 10,
               strConn = strLoc.substring(intUrlStart, strLoc.substring(intUrlStart).indexOf('/') + intUrlStart),
               strURL = '';
   
@@ -46116,7 +46116,7 @@ if (typeof HTMLTemplateElement === 'undefined') {
                               //      That, young grasshopper, is because through
                               //      my travels I've found .splice() to be
                               //      significantly slower than simply rebuilding
-                              //      the array. This is what I do in PgManage's
+                              //      the array. This is what I do in pgManage's
                               //      tree code.
                               arrRecords = [];
                               arrRecordHeights = [];
@@ -46911,7 +46911,7 @@ if (typeof HTMLTemplateElement === 'undefined') {
               //      That, young grasshopper, is because through
               //      my travels I've found .splice() to be
               //      significantly slower than simply rebuilding
-              //      the array. This is what I do in PgManage's
+              //      the array. This is what I do in pgManage's
               //      tree code.
               arrRecords = [];
               arrRecordHeights = [];

@@ -34,7 +34,7 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 	int_conn_index = (size_t)strtol(str_conn_index, NULL, 10);
 
 	////DECRYPT
-	SDEBUG("client->str_cookie_name: %s", client->str_cookie_name);
+	SINFO("client->str_cookie_name: %s", client->str_cookie_name);
 	str_cookie_encrypted = str_cookie(client->str_request, client->int_request_len, client->str_cookie_name, &int_cookie_len);
 	if (str_cookie_encrypted == NULL || int_cookie_len <= 0) {
 		SFINISH("No Cookie.");

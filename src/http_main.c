@@ -24,8 +24,8 @@ void http_main_cnxn_cb(EV_P, void *cb_data, DB_conn *conn) {
 	str_uri = str_uri_path(client->str_request, client->int_request_len, &int_uri_len);
 	SFINISH_CHECK(str_uri, "str_uri_path failed");
 
-	if (isdigit(str_uri[9])) {
-		char *str_temp = strchr(str_uri + 9, '/');
+	if (isdigit(str_uri[10])) {
+		char *str_temp = strchr(str_uri + 10, '/');
 		SFINISH_CHECK(str_temp != NULL, "strchr failed");
 		str_uri_temp = str_uri;
 		SFINISH_SNCAT(str_uri, &int_uri_len,
@@ -46,9 +46,9 @@ void http_main_cnxn_cb(EV_P, void *cb_data, DB_conn *conn) {
 
 	SDEBUG("str_uri: %s", str_uri);
 
-	if (strncmp(str_uri, "/pgmanage/app/upload", 23) == 0) {
+	if (strncmp(str_uri, "/pgmanage/app/upload", 21) == 0) {
 		http_upload_step1(client);
-	} else if (strncmp(str_uri, "/pgmanage/app/export", 23) == 0) {
+	} else if (strncmp(str_uri, "/pgmanage/app/export", 21) == 0) {
 		http_export_step1(client);
 	} else if (strncmp(str_uri, "/pgmanage/app/action_ev", 24) == 0) {
 		http_ev_step1(client);
@@ -155,7 +155,7 @@ void http_main(struct sock_ev_client *client) {
 
 		http_auth(client_auth);
 	} else if (strncmp(str_uri, "/pgmanage/", 10) == 0 && isdigit(str_uri[10])) {
-		if (isdigit(str_uri[9])) {
+		if (isdigit(str_uri[10])) {
 			str_uri_temp = str_uri;
 			char *str_temp = strchr(str_uri_temp + 10, '/');
 			SFINISH_CHECK(str_temp != NULL, "strchr failed");
@@ -165,11 +165,11 @@ void http_main(struct sock_ev_client *client) {
 			SFREE(str_uri_temp);
 		}
 
-		SDEBUG("str_uri: %s", str_uri);
+		SINFO("str_uri: %s", str_uri);
 
 		//don't check the database connection for file requests (except download)
-		if (strncmp(str_uri, "/pgmanage/app/upload", 23) == 0 ||
-			strncmp(str_uri, "/pgmanage/app/export", 23) == 0 ||
+		if (strncmp(str_uri, "/pgmanage/app/upload", 21) == 0 ||
+			strncmp(str_uri, "/pgmanage/app/export", 21) == 0 ||
 			strncmp(str_uri, "/pgmanage/app/action_ev", 24) == 0 ||
 			strncmp(str_uri, "/pgmanage/app/action_info", 26) == 0 ||
 			strncmp(str_uri, "/pgmanage/app/download/", 23) == 0) {
