@@ -23,6 +23,8 @@
 
         <script>
         //COLUMN REORDER NOT WORKING
+            var versionNum = GS.qryGetVal(GS.getQueryString(), 'versionNum');
+            handleQueryVersionDifferences(versionNum);
             var bolCurl = false;
             var strTableName, strSchemaName, strHasOids, strConstraints, arrConstraint, strGrantsEtc, arrColumn = [], strRelOptions, dependency_script, strOwner, arrConstraint = [];
             var strDumpQuery = ''
@@ -257,12 +259,14 @@
                     getSingleCellData(oidQuery, function (newOID) {
 					 	// console.log4);
                         arrDropObjects[intI][4] = newOID;
-                        var scriptForCreate = arrDropObjects[intI][5].replace(/\{\{INTOID\}\}/gi, newOID);
-                        getSingleCellData(scriptForCreate, function (dependddef) {
-						 	// console.log5);
-                            strDumpQuery += '\n\n\n' + dependddef + '\n';
-						 	// console.logdependddef);
-                        });
+                        if (arrDropObjects[intI][5].replace) {
+                            var scriptForCreate = arrDropObjects[intI][5].replace(/\{\{INTOID\}\}/gi, newOID);
+                            getSingleCellData(scriptForCreate, function (dependddef) {
+                                // console.log5);
+                                strDumpQuery += '\n\n\n' + dependddef + '\n';
+                                // console.logdependddef);
+                            });
+                        }
                     });
                 });
             }
@@ -314,7 +318,15 @@
                     strDumpQuery += arrRow[i].children[2].children[0].value;
                     strDumpQuery += ' ';
                     strDumpQuery += arrRow[i].children[3].children[0].value;
-                    strDumpQuery += arrRow[i].children[4].children[0].value === 'true' ? ' NOT NULL' : '';
+                    if (parseFloat(versionNum, 10) >= 10) {
+                        strDumpQuery += (
+                            arrRow[i].children[7].children[0].value !== '\\N' ?
+                                ' GENERATED ' + (arrRow[i].children[7].children[0].value === 'a' ? 'ALWAYS' : 'BY DEFAULT') + ' AS IDENTITY' :
+                                (arrRow[i].children[4].children[0].value === 'true' ? ' NOT NULL' : '')
+                        );
+                    } else {
+                        strDumpQuery += (arrRow[i].children[4].children[0].value === 'true' ? ' NOT NULL' : '');
+                    }
                     strDumpQuery += arrRow[i].children[5].children[0].value !== '' ? ' DEFAULT ' : '';
                     strDumpQuery += arrRow[i].children[5].children[0].value;
 
@@ -618,16 +630,30 @@
 
                 //console.log(arrRecords);
 
-                //attname\tformat_type\tcol_not_null\tcol_default\tcoll_collation
-                recordHTML = ml(function () {/*
-                    <th>{{! row.grid_record_number }}</th>
-                    <td><gs-button mini icononly class="drag-handle" icon="bars"></gs-button></td>
-                    <td><gs-text mini column="attname" value="{{! row['attname'] }}" placeholder="Column Name" data-value="{{! row['attname'] }}"/></td>
-                    <td><gs-text mini column="format_type" value="{{! row['format_type'] }}" placeholder="Type" data-value="{{! row['format_type'] }}"/></td>
-                    <td><gs-checkbox mini column="col_not_null" value="{{= row['col_not_null'] === "-1" }}" data-value="{{= row['col_not_null'] === "-1" }}"/></td>
-                    <td><gs-text mini column="col_default" value="{{! row['col_default'] }}" placeholder="Default" data-value="{{! row['col_default'] }}"/></td>
-                    <td><gs-text mini column="col_collation" value="{{! row['col_collation'] === '0' ? '' : row['col_collation'] }}" placeholder="Collation"/></td>
-                */});
+                if (parseFloat(versionNum, 10) >= 10) {
+                    //attname\tformat_type\tcol_not_null\tcol_default\tcoll_collation\tattidentity
+                    recordHTML = ml(function () {/*
+                        <th>{{! row.grid_record_number }}</th>
+                        <td><gs-button mini icononly class="drag-handle" icon="bars"></gs-button></td>
+                        <td><gs-text mini column="attname" value="{{! row['attname'] }}" placeholder="Column Name" data-value="{{! row['attname'] }}"/></td>
+                        <td><gs-text mini column="format_type" value="{{! row['format_type'] }}" placeholder="Type" data-value="{{! row['format_type'] }}"/></td>
+                        <td><gs-checkbox mini column="col_not_null" value="{{= row['col_not_null'] === "-1" }}" data-value="{{= row['col_not_null'] === "-1" }}"/></td>
+                        <td><gs-text mini column="col_default" value="{{! row['col_default'] }}" placeholder="Default" data-value="{{! row['col_default'] }}"/></td>
+                        <td><gs-text mini column="col_collation" value="{{! row['col_collation'] === '0' ? '' : row['col_collation'] }}" placeholder="Collation"/></td>
+                        <td><gs-select mini column="attidentity" value="{{! row['attidentity'] || '\\N' }}"><option value="\N">None</option><option value="d">Default</option><option value="a">Always</option></gs-select></td>
+                    */});
+                } else {
+                    //attname\tformat_type\tcol_not_null\tcol_default\tcoll_collation
+                    recordHTML = ml(function () {/*
+                        <th>{{! row.grid_record_number }}</th>
+                        <td><gs-button mini icononly class="drag-handle" icon="bars"></gs-button></td>
+                        <td><gs-text mini column="attname" value="{{! row['attname'] }}" placeholder="Column Name" data-value="{{! row['attname'] }}"/></td>
+                        <td><gs-text mini column="format_type" value="{{! row['format_type'] }}" placeholder="Type" data-value="{{! row['format_type'] }}"/></td>
+                        <td><gs-checkbox mini column="col_not_null" value="{{= row['col_not_null'] === "-1" }}" data-value="{{= row['col_not_null'] === "-1" }}"/></td>
+                        <td><gs-text mini column="col_default" value="{{! row['col_default'] }}" placeholder="Default" data-value="{{! row['col_default'] }}"/></td>
+                        <td><gs-text mini column="col_collation" value="{{! row['col_collation'] === '0' ? '' : row['col_collation'] }}" placeholder="Collation"/></td>
+                    */});
+                }
 
                 // build tbody contents
                 strRecords = doT.template(
@@ -645,6 +671,9 @@
                 strRecords += '<td><gs-checkbox mini    column="col_not_null"   value="0"/></td>';
                 strRecords += '<td><gs-text mini        column="col_default"    placeholder="Default"/></td>';
                 strRecords += '<td><gs-text mini        column="col_collation"  placeholder="Collation"/></td>';
+                if (parseFloat(versionNum, 10) >= 10) {
+                    strRecords += '<td><gs-select mini      column="attidentity"><option value="\N">None</option><option value="d">Default</option><option value="a">Always</option></gs-select></td>';
+                }
                 strRecords += '</tr>';
 
                 //console.log(strRecords);
@@ -659,6 +688,7 @@
                             '<th style="width: 3em;">NOT NULL?</th>' +
                             '<th>Default</th>' +
                             '<th>Collation</th>' +
+                            (parseFloat(versionNum, 10) >= 10 ? '<th>Identity</th>' : '') +
                         '</thead>' +
                         '<tbody>' +
                             strRecords +
@@ -685,6 +715,9 @@
                         strColumnInsert += '<td><gs-checkbox mini    column="col_not_null"   value="0" /></td>';
                         strColumnInsert += '<td><gs-text mini        column="col_default"    placeholder="Default" /></td>';
                         strColumnInsert += '<td><gs-text mini        column="col_collation"  placeholder="Collation" /></td>';
+                        if (parseFloat(versionNum, 10) >= 10) {
+                            strColumnInsert += '<td><gs-select mini      column="attidentity"><option value="\N">None</option><option value="d">Default</option><option value="a">Always</option></gs-select></td>';
+                        }
                         strColumnInsert += '</tr>';
 
                         var temp = document.createElement('table');
@@ -922,8 +955,20 @@
                                     strTableName = GS.decodeFromTabDelimited(strTableName.substring(0, strTableName.indexOf('\t')));
 
                                     //console.log(strSchemaName, strTableName, strHasOids, strRelOptions);
-                                    var strColumns = '';
-                                    GS.requestRawFromSocket(GS.envSocket, ml(function () {/*
+                                    var strColumns = '', strSQL;
+                                    if (parseFloat(versionNum, 10) >= 10) {
+                                        strSQL = ml(function () {/*
+                                         SELECT quote_ident(attname) AS attname, format_type(atttypid, atttypmod),
+                                                (CASE WHEN attnotnull THEN '-1' ELSE '0' END) AS col_not_null,
+                                                (CASE WHEN atthasdef THEN pg_catalog.pg_get_expr(adbin, adrelid) ELSE '' END) AS col_default,
+                                                (CASE WHEN attcollation <> 0 THEN pg_collation.collname ELSE '0' END) AS col_collation, attidentity
+                                           FROM pg_attribute
+                                      LEFT JOIN pg_attrdef ON pg_attrdef.adrelid = pg_attribute.attrelid AND pg_attrdef.adnum = pg_attribute.attnum
+                                      LEFT JOIN pg_collation ON pg_collation.oid = pg_attribute.attcollation
+                                          WHERE pg_attribute.attisdropped IS FALSE AND pg_attribute.attnum > 0 AND attrelid = {{INTOID}}
+                                       ORDER BY attnum ASC*/});
+                                    } else {
+                                        strSQL = ml(function () {/*
                                          SELECT quote_ident(attname) AS attname, format_type(atttypid, atttypmod),
                                                 (CASE WHEN attnotnull THEN '-1' ELSE '0' END) AS col_not_null,
                                                 (CASE WHEN atthasdef THEN pg_catalog.pg_get_expr(adbin, adrelid) ELSE '' END) AS col_default,
@@ -932,7 +977,9 @@
                                       LEFT JOIN pg_attrdef ON pg_attrdef.adrelid = pg_attribute.attrelid AND pg_attrdef.adnum = pg_attribute.attnum
                                       LEFT JOIN pg_collation ON pg_collation.oid = pg_attribute.attcollation
                                           WHERE pg_attribute.attisdropped IS FALSE AND pg_attribute.attnum > 0 AND attrelid = {{INTOID}}
-                                       ORDER BY attnum ASC*/}).replace(/\{\{INTOID\}\}/g, strOID), function (data) {
+                                       ORDER BY attnum ASC*/});
+                                    }
+                                    GS.requestRawFromSocket(GS.envSocket, strSQL.replace(/\{\{INTOID\}\}/g, strOID), function (data) {
 
 
 

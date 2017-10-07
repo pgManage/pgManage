@@ -64,12 +64,17 @@ function loadContextData(callback) {
             // if message 0
             if (data.intCallbackNumber === 0) {
                 arrColumns = data.strMessage.split('\t');
-
+				
                 contextData.databaseName = arrColumns[0];
                 contextData.sessionUser = arrColumns[1];
                 contextData.currentUser = arrColumns[2];
                 contextData.versionText = arrColumns[3];
-                contextData.versionNumber = contextData.versionText.match(/[0-9]+\.[0-9]+\.[0-9]+/)[0];
+
+				if (contextData.versionText.match(/[0-9]+\.[0-9]+\.[0-9]+/)) {
+                	contextData.versionNumber = contextData.versionText.match(/[0-9]+\.[0-9]+\.[0-9]+/)[0];
+				} else {
+					contextData.versionNumber = contextData.versionText.match(/[0-9]+\.[0-9]+/)[0];
+				}
 
                 // get minor version
                 if (contextData.versionNumber.match(/\./g).length === 2) {
@@ -1115,12 +1120,12 @@ function dialogOptions() {
         copyNullControl = xtag.query(dialog, '.pref-null-value')[0];
         copyTypesControl = xtag.query(dialog, '.pref-copy-types')[0];
         askControl = xtag.query(dialog, '.pref-ask')[0];
-        
+
         askControl.value = localStorage.askCopySettings;
         askControl.addEventListener('change', function () {
             localStorage.askCopySettings = askControl.value;
         });
-        
+
         copyQuoteWhenControl.value = getClipSetting('quoteType');
         copyQuoteCharControl.value = getClipSetting('quoteChar');
         copyEscapeCharControl.value = getClipSetting('escapeChar');
@@ -2151,7 +2156,7 @@ function loadHeaderText() {
     //                '<small>Db:</small> ' + encodeHTML(contextData.databaseName) + ' ' +
     //                '<small>Connection:</small> ' + encodeHTML(contextData.connectionName);
 
-    shortText = encodeHTML(contextData.databaseName + '@' + contextData.connectionName + '(' + contextData.sessionUser + ')');
+    shortText = encodeHTML(contextData.sessionUser + '@' + contextData.connectionName + '(' + contextData.databaseName + ')');
 
     document.getElementById('header-text-container').innerHTML = shortText;
     document.getElementById('header-text-container').setAttribute('title', longText);
@@ -2425,7 +2430,7 @@ function getCurrentQuery() {
         if (
             editorSelectionRange.start.row !== editorSelectionRange.end.row ||
             editorSelectionRange.start.column !== editorSelectionRange.end.column
-        ) {    
+        ) {
             intStartRow    = editorSelectionRange.start.row;
             intStartColumn = editorSelectionRange.start.column;
             intEndRow      = editorSelectionRange.end.row;
@@ -2732,7 +2737,7 @@ function beforeTableCopyFunction(event) {
                 var strRecordDelimiter;
                 var strNullValue;
                 var strCopyTypes;
-    
+
                 // gather the control values
                 strCopyHeaders = copyHeadersControl.value;
                 strCopySelectors = copySelectorsControl.value;
@@ -2754,7 +2759,7 @@ function beforeTableCopyFunction(event) {
                 tableElement.setAttribute('copy-delimiter-record', strRecordDelimiter);
                 tableElement.setAttribute('copy-null-cell', strNullValue);
                 tableElement.setAttribute('copy-types', strCopyTypes);
-                
+
                 tableElement.forceCopy = true;
                 tableElement.elems.hiddenFocusControl.focus();
                 document.execCommand('copy');
@@ -2785,7 +2790,7 @@ function beforeTableCopyFunction(event) {
             });
         }, null, null);
 
-        
+
     } else {
         tableElement.forceCopy = undefined;
     }
@@ -3574,12 +3579,12 @@ function executeScript(bolCursorQuery) {
                                     document.getElementById('sql-results-area-' + tabNumber + '').scrollTop = 0;
                                     document.getElementById('sql-results-area-' + tabNumber + '').style.overflow = 'hidden';
                                 });
-                                
+
                                 tableElement.addEventListener('closeFullContainer', function () {
                                     document.getElementById('sql-results-area-' + tabNumber + '').scrollTop = currentTab.resultsScroll;
                                     document.getElementById('sql-results-area-' + tabNumber + '').style.overflow = 'auto';
                                 });
-                                
+
                                 tableElement.addEventListener('before_copy', beforeTableCopyFunction);
 
                                 // reset array so that we don't override the data for the previous table
