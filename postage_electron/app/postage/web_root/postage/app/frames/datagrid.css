@@ -1,0 +1,257 @@
+gs-datagrid {
+    display: block;
+    height: 100%;
+    
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+    
+    display: -webkit-box;
+    display: -moz-box;     /* OLD - iOS 6-, Safari 3.1-6 */
+    display: -ms-flexbox;  /* OLD - Firefox 19- (buggy but mostly works) */
+    display: -webkit-flex; /* TWEENER - IE 10 */
+    display: flex;         /* NEW - Chrome */
+    
+    flex-direction: column;
+    -ms-flex-direction: column;
+    -webkit-flex-direction: column;
+}
+
+gs-datagrid[flex] {
+    height: auto;
+}
+
+gs-datagrid > .root {
+    width: 100%;
+    height: 100%;
+    
+    -webkit-box-flex: 1; /* OLD - iOS 6-, Safari 3.1-6 */
+    -moz-box-flex: 1;    /* OLD - Firefox 19- */
+    width: 100%;         /* For old syntax, otherwise collapses. */
+    -webkit-flex: 1;     /* Chrome */
+    -ms-flex: 1;         /* IE 10 */
+    flex: 1;             /* NEW, Spec - Opera 12.1, Firefox 20+ */
+}
+
+gs-datagrid > .root > .scroll-container {
+    overflow: auto;
+    border: 1px solid #006e00;
+    
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+gs-datagrid table {
+    border: 0 none;
+    table-layout: fixed;
+}
+
+gs-datagrid .floating-button-container {
+    display: inline-block;
+    position: fixed;
+    opacity: 0.2;
+}
+
+gs-datagrid .floating-button-container:hover {
+    opacity: 1;
+}
+
+gs-datagrid .hud-container .refresh-button {
+    border-bottom: 0 none;
+    border-right: 0 none;
+    border-color: #006E00;
+}
+gs-datagrid .hud-container .delete-button {
+    border-bottom: 0 none;
+    border-left: 0 none;
+    border-color: #006E00;
+}
+
+gs-datagrid .hud-container .filter-button {
+    border-bottom: 0 none;
+    border-color: #006E00;
+}
+
+
+
+
+/* ###############################################################
+   ########################## TEXTAREAS ##########################
+   ############################################################### */
+
+gs-datagrid table textarea {
+    display: block;
+    resize: none;
+    width: 100%;
+    border: 0 none;
+    cursor: text;
+    padding: 0 0.1em;
+    height: 1.4em;
+    
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+gs-datagrid textarea.hidden-focus-control {
+    width: 1px;
+    height: 1px;
+    border: 0 none;
+    margin: 0;
+    padding: 0;
+    
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    z-index: -5000;
+    opacity: 0.00000001;
+    
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+
+/* ###############################################################
+   ############################ CELLS ############################
+   ############################################################### */
+
+gs-datagrid table thead th {
+    border-top: 0 none;
+    width: 12em;
+    /*
+    background: #006e00;
+    background: -moz-linear-gradient(top,  #006e00 0%, #3c9640 100%);
+    background: -webkit-linear-gradient(top,  #006e00 0%,#3c9640 100%);
+    background: linear-gradient(to bottom,  #006e00 0%,#3c9640 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#006e00', endColorstr='#3c9640',GradientType=0 );*/
+}
+gs-datagrid table tbody th {
+    border-top: 0 none;
+    width: 12em;
+    /*
+    background: #006e00;
+    background: -moz-linear-gradient(left,  #006e00 0%, #3c9640 100%);
+    background: -webkit-linear-gradient(left,  #006e00 0%,#3c9640 100%);
+    background: linear-gradient(to right,  #006e00 0%,#3c9640 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#006e00', endColorstr='#3c9640',GradientType=1 );*/
+}
+/*
+gs-datagrid table thead th:first-child {
+    background: #006e00;
+    background: -moz-linear-gradient(-45deg,  #006e00 0%, #3c9640 100%);
+    background: -webkit-linear-gradient(-45deg,  #006e00 0%,#3c9640 100%);
+    background: linear-gradient(135deg,  #006e00 0%,#3c9640 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#006e00', endColorstr='#3c9640',GradientType=1 );
+}
+
+gs-datagrid table th,
+gs-datagrid table th b {
+    color: #F0F0F0;
+    font-weight: normal;
+}
+
+gs-datagrid table tbody th[selected] {
+    border-bottom: 2px solid #FFFFCC;
+}
+
+gs-datagrid table thead th[selected] {
+    border-right: 2px solid #FFFFCC;
+}
+*/
+
+gs-datagrid th,
+gs-datagrid td {
+    padding: 0.15em 0.2em;
+    cursor: pointer;
+    
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+
+gs-datagrid th {
+    position: relative;
+}
+
+
+gs-datagrid th, gs-datagrid td {
+    vertical-align: top;
+}
+
+gs-datagrid th:first-child {
+    vertical-align: middle;
+}
+
+
+gs-datagrid thead th {
+    cursor: s-resize;
+    overflow: hidden;
+    width: 150px;
+}
+
+gs-datagrid thead th:first-child {
+    cursor: se-resize;
+}
+
+gs-datagrid tbody th {
+    cursor: e-resize;
+}
+
+
+/* ################################################################
+   ######################### STATE COLORS #########################
+   ################################################################ */
+
+.bg-red > th,
+.bg-red > td {
+    background-color: #FF9090 !important;
+}
+
+.bg-amber > th,
+.bg-amber > td {
+    background-color: #FFDEA0 !important;
+}
+
+.bg-green-fade > th,
+.bg-green-fade > td {
+    -webkit-animation-duration: 1s;
+    animation-duration: 1s;
+    
+    -webkit-animation-iteration-count: 1;
+    animation-iteration-count: 1;
+    
+    -webkit-animation-timing-function: ease-out;
+    animation-timing-function: ease-out;
+    
+    -webkit-animation-name: effect-green-fade;
+    animation-name: effect-green-fade;
+}
+
+/* ############## effect-green-fade ############## */
+@-webkit-keyframes effect-green-fade {
+    0%   {
+        background-color: #90FF90;
+    }
+    100% {
+        background-color: transparent;
+    }
+}
+@keyframes effect-green-fade {
+    0%   {
+        background-color: #90FF90;
+    }
+    100% {
+        background-color: transparent;
+    }
+}

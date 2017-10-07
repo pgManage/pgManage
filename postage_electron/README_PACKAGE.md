@@ -1,5 +1,5 @@
-## To package Postage with Electron
-1. You need to compile postage.
+## To package PgManage with Electron
+1. You need to compile pgmanage.
 2. Run `update.bat` (Windows) or `update.sh` (macOS/Linux)
 3. run these commands:
 ```

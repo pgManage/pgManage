@@ -14,7 +14,7 @@ const BrowserWindow = electron.BrowserWindow;
 
 var shouldQuit = app.makeSingleInstance(function (commandLine, workingDirectory) {
 	// Someone tried to run a second instance, we should create a new window
-	fs.writeFileSync(os.homedir() + '/.postage/postage-SIGHUP', '\n', 'utf8');
+	fs.writeFileSync(os.homedir() + '/.pgmanage/pgmanage-SIGHUP', '\n', 'utf8');
 });
 
 if (shouldQuit) {
@@ -23,10 +23,10 @@ if (shouldQuit) {
 }
 
 var strResourcesPath = path.normalize(process.resourcesPath);
-if (strResourcesPath.indexOf('postage/postage_electron/node_modules/electron/dist/resources') > -1) {
-	strResourcesPath = strResourcesPath.replace('postage/postage_electron/node_modules/electron/dist/resources', 'postage/postage_electron');
-} else if (strResourcesPath.indexOf('postage\\postage_electron\\node_modules\\electron\\dist\\resources') > -1) {
-	strResourcesPath = strResourcesPath.replace('postage\\postage_electron\\node_modules\\electron\\dist\\resources', 'postage\\postage_electron');
+if (strResourcesPath.indexOf('pgmanage/pgmanage_electron/node_modules/electron/dist/resources') > -1) {
+	strResourcesPath = strResourcesPath.replace('pgmanage/pgmanage_electron/node_modules/electron/dist/resources', 'pgmanage/pgmanage_electron');
+} else if (strResourcesPath.indexOf('pgmanage\\pgmanage_electron\\node_modules\\electron\\dist\\resources') > -1) {
+	strResourcesPath = strResourcesPath.replace('pgmanage\\pgmanage_electron\\node_modules\\electron\\dist\\resources', 'pgmanage\\pgmanage_electron');
 }
 
 
@@ -40,26 +40,26 @@ let mainWindowState = null;
 let configWindowState = null;
 let connectionWindowState = null;
 let pgpassWindowState = null;
-let bolPostageIsReady = false;
+let bolPgManageIsReady = false;
 
 try {
-	fs.statSync(os.homedir() + '/.postage/');
-	fs.statSync(os.homedir() + '/.postage/postage.conf');
-	fs.statSync(os.homedir() + '/.postage/postage-connections.conf');
+	fs.statSync(os.homedir() + '/.pgmanage/');
+	fs.statSync(os.homedir() + '/.pgmanage/pgmanage.conf');
+	fs.statSync(os.homedir() + '/.pgmanage/pgmanage-connections.conf');
 } catch (e) {
-	fs.mkdirsSync(os.homedir() + '/.postage/');
-	hidefile.hideSync(os.homedir() + '/.postage/');
+	fs.mkdirsSync(os.homedir() + '/.pgmanage/');
+	hidefile.hideSync(os.homedir() + '/.pgmanage/');
 
-	fs.writeFileSync(os.homedir() + '/.postage/postage-SIGHUP', '\n', 'utf8');
+	fs.writeFileSync(os.homedir() + '/.pgmanage/pgmanage-SIGHUP', '\n', 'utf8');
 
 	console.log('copying config');
-	fs.writeFileSync(os.homedir() + '/.postage/postage.conf', fs.readFileSync(strResourcesPath + '/app/postage/config/postage.conf', 'utf8'), 'utf8');
-	fs.writeFileSync(os.homedir() + '/.postage/postage-connections.conf', fs.readFileSync(strResourcesPath + '/app/postage/config/postage-connections.conf', 'utf8'), 'utf8');
+	fs.writeFileSync(os.homedir() + '/.pgmanage/pgmanage.conf', fs.readFileSync(strResourcesPath + '/app/pgmanage/config/pgmanage.conf', 'utf8'), 'utf8');
+	fs.writeFileSync(os.homedir() + '/.pgmanage/pgmanage-connections.conf', fs.readFileSync(strResourcesPath + '/app/pgmanage/config/pgmanage-connections.conf', 'utf8'), 'utf8');
 }
 
-fs.writeFileSync(os.homedir() + '/.postage/postage-SIGHUP', '\n', 'utf8');
+fs.writeFileSync(os.homedir() + '/.pgmanage/pgmanage-SIGHUP', '\n', 'utf8');
 var lastTime = new Date().getTime();
-fs.watch(os.homedir() + '/.postage/postage-SIGHUP', function (eventType) {
+fs.watch(os.homedir() + '/.pgmanage/pgmanage-SIGHUP', function (eventType) {
 	if (eventType === 'change') {
 		var currTime = new Date().getTime();
 		if ((currTime - lastTime) > 1000) {
@@ -85,16 +85,16 @@ if (process.platform == 'win32') {
 	}
 }
 
-function spawnPostage() {
-	console.log(strResourcesPath, '/postage/postage');
+function spawnPgManage() {
+	console.log(strResourcesPath, '/pgmanage/pgmanage');
 	proc = child_process.spawn(
-		path.normalize(strResourcesPath + '/app/postage/postage' + (process.platform == 'win32' ? '.exe' : '')),
+		path.normalize(strResourcesPath + '/app/pgmanage/pgmanage' + (process.platform == 'win32' ? '.exe' : '')),
 		[
-			'-c', path.normalize(os.homedir() + '/.postage/postage.conf'),
-			'-d', path.normalize(os.homedir() + '/.postage/postage-connections.conf'),
-			'-r', strResourcesPath + path.normalize('/app/postage/web_root'),
+			'-c', path.normalize(os.homedir() + '/.pgmanage/pgmanage.conf'),
+			'-d', path.normalize(os.homedir() + '/.pgmanage/pgmanage-connections.conf'),
+			'-r', strResourcesPath + path.normalize('/app/pgmanage/web_root'),
 			'-x', 't',
-			'-p', int_postage_port
+			'-p', int_pgmanage_port
 		].concat((process.platform == 'win32' ? ['-o', 'stderr'] : [])), {
 			detached: true
 		}
@@ -103,11 +103,11 @@ function spawnPostage() {
 	proc.stdout.on('data', function (data) {
 		console.log('got data:\n' + data);
 		if (data.toString().indexOf('in your web browser') > -1) {
-			fs.writeFileSync(path.normalize(os.homedir() + '/.postage/postage_port'), int_postage_port.toString());
+			fs.writeFileSync(path.normalize(os.homedir() + '/.pgmanage/pgmanage_port'), int_pgmanage_port.toString());
 			if (mainWindows.length === 0) {
 				openWindow();
 			}
-			bolPostageIsReady = true;
+			bolPgManageIsReady = true;
 		}
 	});
 	proc.stderr.on('data', function (data) {
@@ -119,19 +119,19 @@ function spawnPostage() {
 }
 
 function handleRedirect(e, url) {
-	if (url.indexOf('http://127.0.0.1:' + int_postage_port) === -1) {
+	if (url.indexOf('http://127.0.0.1:' + int_pgmanage_port) === -1) {
 		e.preventDefault()
 		electron.shell.openExternal(url);
 	}
 }
 
-var int_postage_port = null;
+var int_pgmanage_port = null;
 
 function pickNewPort() {
-	int_postage_port = parseInt(Math.random().toString().substring(2), 10) % (65535 - 1024) + 1024;
-	tcpPortUsed.check(int_postage_port, '127.0.0.1').then(function this_callback(taken) {
+	int_pgmanage_port = parseInt(Math.random().toString().substring(2), 10) % (65535 - 1024) + 1024;
+	tcpPortUsed.check(int_pgmanage_port, '127.0.0.1').then(function this_callback(taken) {
 		if (!taken) {
-			spawnPostage();
+			spawnPgManage();
 
 			var localStoragePath = path.normalize(app.getPath('userData') + '/Local Storage');
 			if (fs.existsSync(localStoragePath)) {
@@ -147,7 +147,7 @@ function pickNewPort() {
 							console.log(items[i]);
 							var oldPath = path.normalize(localStoragePath + '/' + items[i]);
 							var newPath = path.normalize(localStoragePath + '/' + items[i].replace(/([0-9]+)\.localstorage/gi, function (match) {
-								return int_postage_port.toString() + match.substring(match.indexOf('.'));
+								return int_pgmanage_port.toString() + match.substring(match.indexOf('.'));
 							}));
 							fs.renameSync(oldPath, newPath);
 							console.log(newPath);
@@ -156,8 +156,8 @@ function pickNewPort() {
 				});
 			}
 		} else {
-			int_postage_port = parseInt(Math.random().toString().substring(2), 10) % (65535 - 1024) + 1024;
-			tcpPortUsed.check(int_postage_port, '127.0.0.1').then(this_callback, function (err) {
+			int_pgmanage_port = parseInt(Math.random().toString().substring(2), 10) % (65535 - 1024) + 1024;
+			tcpPortUsed.check(int_pgmanage_port, '127.0.0.1').then(this_callback, function (err) {
 				electron.dialog.showErrorBox('Error', err.message);
 				app.quit();
 			});
@@ -168,10 +168,10 @@ function pickNewPort() {
 }
 
 try {
-	int_postage_port = parseInt(fs.readFileSync(path.normalize(os.homedir() + '/.postage/postage_port')), 10);
-	tcpPortUsed.check(int_postage_port, '127.0.0.1').then(function (taken) {
+	int_pgmanage_port = parseInt(fs.readFileSync(path.normalize(os.homedir() + '/.pgmanage/pgmanage_port')), 10);
+	tcpPortUsed.check(int_pgmanage_port, '127.0.0.1').then(function (taken) {
 		if (!taken) {
-			spawnPostage();
+			spawnPgManage();
 		} else {
 			pickNewPort();
 		}
@@ -185,10 +185,10 @@ try {
 const child_process = require('child_process');
 var proc = null;
 
-ipcMain.on('postage', function (event, arg) {
+ipcMain.on('pgmanage', function (event, arg) {
 	if (arg === 'restart') {
 		proc.kill();
-		spawnPostage();
+		spawnPgManage();
 		mainWindows.forEach(function (curWindow) {
 			curWindow.webContents.executeJavaScript('window.location.reload();');
 		});
@@ -200,7 +200,7 @@ ipcMain.on('postage', function (event, arg) {
 			'height': connectionWindowState.height
 		});
 		connectionWindowState.manage(connectionWindow);
-		connectionWindow.loadURL('http://127.0.0.1:' + int_postage_port + '/postage/config.html?file=postage-connections.conf',  { 'extraHeaders': 'pragma: no-cache\n' });
+		connectionWindow.loadURL('http://127.0.0.1:' + int_pgmanage_port + '/pgmanage/config.html?file=pgmanage-connections.conf',  { 'extraHeaders': 'pragma: no-cache\n' });
 	} else if (arg === 'edit PGPASS') {
 		pgpassWindow = new BrowserWindow({
 			'x': pgpassWindowState.x,
@@ -209,7 +209,7 @@ ipcMain.on('postage', function (event, arg) {
 			'height': pgpassWindowState.height
 		});
 		pgpassWindowState.manage(pgpassWindow);
-		pgpassWindow.loadURL('http://127.0.0.1:' + int_postage_port + '/postage/config.html?file=PGPASS',  { 'extraHeaders': 'pragma: no-cache\n' });
+		pgpassWindow.loadURL('http://127.0.0.1:' + int_pgmanage_port + '/pgmanage/config.html?file=PGPASS',  { 'extraHeaders': 'pragma: no-cache\n' });
 		pgpassWindow.webContents.on('will-navigate', handleRedirect);
 		pgpassWindow.webContents.on('new-window', handleRedirect);
 	}
@@ -235,7 +235,7 @@ function setMenu() {
 					click: openWindow
 				},
 				{
-					label: 'Edit postage.conf',
+					label: 'Edit pgmanage.conf',
 					click: function () {
 						configWindow = new BrowserWindow({
 							'x': configWindowState.x,
@@ -244,11 +244,11 @@ function setMenu() {
 							'height': configWindowState.height
 						});
 						configWindowState.manage(configWindow);
-						configWindow.loadURL('http://127.0.0.1:' + int_postage_port + '/postage/config.html?file=postage.conf',  { 'extraHeaders': 'pragma: no-cache\n' });
+						configWindow.loadURL('http://127.0.0.1:' + int_pgmanage_port + '/pgmanage/config.html?file=pgmanage.conf',  { 'extraHeaders': 'pragma: no-cache\n' });
 					}
 				},
 				{
-					label: 'Edit postage-connections.conf',
+					label: 'Edit pgmanage-connections.conf',
 					click: function () {
 						connectionWindow = new BrowserWindow({
 							'x': connectionWindowState.x,
@@ -257,7 +257,7 @@ function setMenu() {
 							'height': connectionWindowState.height
 						});
 						connectionWindowState.manage(connectionWindow);
-						connectionWindow.loadURL('http://127.0.0.1:' + int_postage_port + '/postage/config.html?file=postage-connections.conf',  { 'extraHeaders': 'pragma: no-cache\n' });
+						connectionWindow.loadURL('http://127.0.0.1:' + int_pgmanage_port + '/pgmanage/config.html?file=pgmanage-connections.conf',  { 'extraHeaders': 'pragma: no-cache\n' });
 					}
 				},
 				{
@@ -270,7 +270,7 @@ function setMenu() {
 							'height': pgpassWindowState.height
 						});
 						pgpassWindowState.manage(pgpassWindow);
-						pgpassWindow.loadURL('http://127.0.0.1:' + int_postage_port + '/postage/config.html?file=PGPASS',  { 'extraHeaders': 'pragma: no-cache\n' });
+						pgpassWindow.loadURL('http://127.0.0.1:' + int_pgmanage_port + '/pgmanage/config.html?file=PGPASS',  { 'extraHeaders': 'pragma: no-cache\n' });
 						pgpassWindow.webContents.on('will-navigate', handleRedirect);
 						pgpassWindow.webContents.on('new-window', handleRedirect);
 					}
@@ -422,9 +422,9 @@ function openWindow() {
 		mainWindows.push(curWindow);
 		mainWindowState.manage(curWindow);
 
-		curWindow.loadURL('http://127.0.0.1:' + int_postage_port + '/postage/' +
-			(process.argv.indexOf('--postage-test') > -1 ? 'test/' : '') + 'index.html' +
-			(process.argv.indexOf('--postage-test') > -1 ? '?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true' : ''),
+		curWindow.loadURL('http://127.0.0.1:' + int_pgmanage_port + '/pgmanage/' +
+			(process.argv.indexOf('--pgmanage-test') > -1 ? 'test/' : '') + 'index.html' +
+			(process.argv.indexOf('--pgmanage-test') > -1 ? '?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true' : ''),
 			{ 'extraHeaders': 'pragma: no-cache\n' });
 
 		// Emitted when the window is closed.
@@ -484,35 +484,35 @@ function openWindow() {
 }
 
 function appStart() {
-	electron.session.defaultSession = electron.session.fromPartition('persist:postage-session123', { cache: false });
+	electron.session.defaultSession = electron.session.fromPartition('persist:pgmanage-session123', { cache: false });
 	mainWindowState = windowStateKeeper({
 		defaultWidth: 1024,
 		defaultHeight: 768,
-		path: os.homedir() + '/.postage/',
+		path: os.homedir() + '/.pgmanage/',
 		file: 'main-window-state.json'
 	});
 
 	configWindowState = windowStateKeeper({
 		defaultWidth: 1024,
 		defaultHeight: 768,
-		path: os.homedir() + '/.postage/',
+		path: os.homedir() + '/.pgmanage/',
 		file: 'config-window-state.json'
 	});
 
 	connectionWindowState = windowStateKeeper({
 		defaultWidth: 1024,
 		defaultHeight: 768,
-		path: os.homedir() + '/.postage/',
+		path: os.homedir() + '/.pgmanage/',
 		file: 'connection-window-state.json'
 	});
 
 	pgpassWindowState = windowStateKeeper({
 		defaultWidth: 1024,
 		defaultHeight: 768,
-		path: os.homedir() + '/.postage/',
+		path: os.homedir() + '/.pgmanage/',
 		file: 'pgpass-window-state.json'
 	});
-	if (bolPostageIsReady) {
+	if (bolPgManageIsReady) {
 		openWindow();
 	}
 }

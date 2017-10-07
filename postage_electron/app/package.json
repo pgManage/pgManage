@@ -5,7 +5,7 @@
     "url": "http://tocci.xyz/"
   },
   "bugs": {
-    "url": "https://github.com/workflowproducts/postage/issues",
+    "url": "https://github.com/workflowproducts/pgmanage/issues",
     "email": "nunzio@workflowproducts.com"
   },
   "dependencies": {
@@ -16,10 +16,10 @@
     "opn": "^4.0.2",
     "tcp-port-used": "0.1.2"
   },
-  "description": "Postage",
+  "description": "PgManage",
   "email": "nunzio@workflowproducts.com",
   "license": "Apache-2.0",
   "main": "main.js",
-  "name": "Postage",
+  "name": "PgManage",
   "version": "3.2.18"
 }

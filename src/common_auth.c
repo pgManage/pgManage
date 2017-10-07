@@ -26,11 +26,11 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 
 	str_uri_temp = str_uri_path(client->str_request, client->int_request_len, &int_uri_length);
 	SFINISH_CHECK(str_uri_temp != NULL, "str_uri_path failed");
-	char *ptr_slash = strchr(str_uri_temp + 9, '/');
+	char *ptr_slash = strchr(str_uri_temp + 10, '/');
 	SFINISH_CHECK(ptr_slash != NULL, "strchr failed!");
 	*ptr_slash = 0;
 	SFINISH_SNCAT(str_conn_index, &int_conn_index_len,
-		str_uri_temp + 9, strlen(str_uri_temp + 9));
+		str_uri_temp + 10, strlen(str_uri_temp + 10));
 	int_conn_index = (size_t)strtol(str_conn_index, NULL, 10);
 
 	////DECRYPT
@@ -314,7 +314,7 @@ finish:
 			size_t int_temp_len = 0;
 			str_temp = snuri(conn_info->str_connection_name, strlen(conn_info->str_connection_name), &int_temp_len);
 			SFINISH_SNFCAT(str_response, &int_response_len,
-				"Refresh: 0; url=/postage/index.html?error=Connection%20timed%20out&connection=", (size_t)78,
+				"Refresh: 0; url=/pgmanage/index.html?error=Connection%20timed%20out&connection=", (size_t)78,
 				str_temp, int_temp_len,
 				"&redirect=", (size_t)10,
 				str_uri, int_uri_length,
@@ -322,7 +322,7 @@ finish:
 			SFREE(str_temp);
 		} else {
 			SFINISH_SNFCAT(str_response, &int_response_len,
-				"Refresh: 0; url=/postage/index.html\015\012\015\012", (size_t)39);
+				"Refresh: 0; url=/pgmanage/index.html\015\012\015\012", (size_t)39);
 		}
 		SFINISH_SNFCAT(str_response, &int_response_len,
 			"You need to login.\012", (size_t)19);

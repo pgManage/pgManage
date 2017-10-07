@@ -1,0 +1,144 @@
+
+/* ###################################################### */
+/* ######################## TREE ######################## */
+/* ###################################################### */
+
+#object-list-ace {
+    background-color: transparent;
+}
+
+#object-list-ace > .ace_scroller {
+    cursor: default;
+}
+
+
+/*
+#object-list-container {
+    padding-left: 0.1em;
+    padding-right: 0.1em;
+}*/
+
+/*#object-list-container .tree-line {
+    cursor: pointer;
+    margin-bottom: 0.2em;
+}*/
+
+/*.name-container {
+    padding-left: 0.1em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+	cursor: pointer;
+    
+    user-select: none !important;
+    -o-user-select: none !important;
+    -ms-user-select: none !important;
+    -moz-user-select: none !important;
+    -khtml-user-select: none !important;
+    -webkit-user-select: none !important;
+}*/
+
+/* hover color */
+/*#object-list-container .tree-line:hover {
+    background-color: #EEEEEE;
+}*/
+
+/* click animations */
+/*#object-list-container .tree-line {
+    background-color: transparent;
+    -webkit-transition: all 150ms ease;
+    transition: all 150ms ease;
+}	
+#object-list-container .tree-line:active {
+    background-color: #AAAAAA;
+    -webkit-animation: none;
+    animation: none;
+}*/
+
+/* selected color */
+/*#object-list-container .tree-line.current-line {
+    background-color: #C8FFC5;
+}*/
+
+/* selected hover color */
+/*#object-list-container .tree-line.current-line:hover {
+    background-color: #B3E4B0;
+}*/
+
+/*.level-spacer {
+    width: 0.8em;
+}*/
+
+/*
+the translate 3px moved the element, which meant if you clicked on the top three pixels the click couldn't finish
+.name-container {
+    / *box-shadow: 0 1px 0 #666, 0 2px 0 #444, 0 3px 3px rgba(0,0,0,0.6);* /
+    -webkit-transition: all 150ms ease;
+    transition: all 150ms ease;
+}	
+.name-container:active{
+    / *box-shadow: 0 1px 0 #666, 0 1px 0 #444, 0 1px 1px rgba(0,0,0,0.9);* /
+    -webkit-transform: translateY(3px);
+    transform: translateY(3px);
+    -webkit-animation: none;
+    animation: none;
+}*/
+
+/* plus and minus icons */
+/*#object-list-container .indicator-container {
+    position: relative;
+    width: 12px;
+}
+
+#object-list-container .indicator {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    margin-top: -4px;
+    width: 5px;
+    height: 5px;
+    border: 1px #000 solid;
+    padding: 1px;
+}
+
+#object-list-container .tree-line:not([open]) .indicator-part-1 {
+    float: left;
+    width: 2px;
+    height: 2px;
+    border-color: #000;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+}
+#object-list-container .tree-line:not([open]) .indicator-part-2 {
+    float: left;
+    width: 2px;
+    height: 2px;
+    border-color: #000;
+    border-style: solid;
+    border-width: 0 0 1px 0;
+}
+#object-list-container .tree-line:not([open]) .indicator-part-3 {
+    float: left;
+    width: 2px;
+    height: 2px;
+    border-color: #000;
+    border-style: solid;
+    border-width: 0 1px 0 0;
+}
+#object-list-container .tree-line[open] .indicator-part-1 {
+    float: left;
+    width: 2px;
+    height: 2px;
+    border-color: #000;
+    border-style: solid;
+    border-width: 0 0 1px 0;
+}
+#object-list-container .tree-line[open] .indicator-part-2 {
+    float: left;
+    width: 3px;
+    height: 2px;
+    border-color: #000;
+    border-style: solid;
+    border-width: 0 0 1px 0;
+}
+*/

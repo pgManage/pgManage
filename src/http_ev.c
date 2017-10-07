@@ -93,7 +93,7 @@ void http_ev_step1(struct sock_ev_client *client) {
 	SFINISH_SALLOC(client_copy_check, sizeof(struct sock_ev_client_copy_check));
 	client_copy_io->client_copy_check = client_copy_check;
 
-	client->cur_request = create_request(client, NULL, NULL, NULL, NULL, 0, POSTAGE_REQ_STANDARD, NULL);
+	client->cur_request = create_request(client, NULL, NULL, NULL, NULL, 0, PGMANAGE_REQ_STANDARD, NULL);
 	SFINISH_CHECK(client->cur_request != NULL, "create_request failed!");
 	client_copy_check->client_request = client->cur_request;
 

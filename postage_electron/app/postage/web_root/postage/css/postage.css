@@ -1,0 +1,265 @@
+
+
+/* ####################################################### */
+/* ####################### HEADERS ####################### */
+/* ####################################################### */
+
+gs-header { /*, gs-footer*/
+    padding: 0.2em !important;
+    color: #FFFFFF;
+    border-bottom: 2px solid #000000;
+    background: #006e00;
+    background: -moz-linear-gradient(top, #006e00 0%, #3c9640 100%);
+    background: -webkit-linear-gradient(top, #006e00 0%,#3c9640 100%);
+    background: linear-gradient(to bottom, #006e00 0%,#3c9640 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#006e00', endColorstr='#3c9640',GradientType=0 );
+}
+
+gs-header.executing {
+    background: #a27c00;
+    background: -moz-linear-gradient(top, #a27c00 0%, #facc00 100%);
+    background: -webkit-linear-gradient(top, #a27c00 0%,#facc00 100%);
+    background: linear-gradient(to bottom, #a27c00 0%,#facc00 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a27c00', endColorstr='#facc00',GradientType=0 );
+}
+
+gs-header.error {
+    background: #6e0400;
+    background: -moz-linear-gradient(top, #6e0400 0%, #934d46 100%);
+    background: -webkit-linear-gradient(top, #6e0400 0%,#934d46 100%);
+    background: linear-gradient(to bottom, #6e0400 0%,#934d46 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#6e0400', endColorstr='#934d46',GradientType=0 );
+}
+
+/* ###################################################### */
+/* ####################### BODIES ####################### */
+/* ###################################################### */
+
+gs-body {
+    background: #ffffff;
+    background: -moz-linear-gradient(top, #ffffff 0%, #ffffff 22%, #ededed 100%);
+    background: -webkit-linear-gradient(top, #ffffff 0%,#ffffff 22%,#ededed 100%);
+    background: linear-gradient(to bottom, #ffffff 0%,#ffffff 22%,#ededed 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ededed',GradientType=0 );
+}
+
+/* ####################################################### */
+/* ####################### DIALOGS ####################### */
+/* ####################################################### */
+
+gs-dialog {
+    border: 2px solid #000;
+}
+
+gs-dialog.error gs-header {
+    color: #FFFFFF;
+    background: #6e0400;
+    background: -moz-linear-gradient(top, #6e0400 0%, #934d46 100%);
+    background: -webkit-linear-gradient(top, #6e0400 0%,#934d46 100%);
+    background: linear-gradient(to bottom, #6e0400 0%,#934d46 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#6e0400', endColorstr='#934d46',GradientType=0 );
+}
+
+div#header-text-container {
+    padding: 0 0.5em;
+}
+#header-text-container {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.clip-options .option-row {
+    color: #111111;
+    margin: 0;
+    box-shadow: none !important;
+    border: 1px solid #eee;
+    line-height: normal;
+    padding: 0.5em;
+    position: relative;
+    background-color: white;
+    border-radius: 0;
+    min-height: 1em;
+    font-size: 1em;
+}
+.clip-options .option-row div {
+    text-align: right;
+
+    padding: 0.25em;
+    margin: 0;
+
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.clip-options .option-row gs-select {
+    padding: 0;
+    margin: 0;
+}
+
+/* ###################################################### */
+/* ################### HEADER BUTTONS ################### */
+/* ###################################################### */
+
+.header-button, .footer-button {
+    /*font-size: 0.7em;*/
+
+    border: 0;
+    color: #FFF;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    font-size: 0.8em;
+}
+
+.header-button-text {
+    /*font-size: 0.7em;*/
+
+    border: 0;
+    color: #FFF;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    font-size: 0.8em;
+
+    /*padding-top: 0.5em;*/
+    /*padding-top: 0.7em; /*0.45em;*/
+    padding-left: 0.75em; /*0.25em;*/
+    padding-right: 0.75em; /*0.25em;*/
+
+    /*text-decoration: underline;*/
+}
+
+.header-button-text[icon]:not([iconright]) {
+    padding-left: 2em !important;
+    padding-right: 2em !important;
+}
+.header-button-text[icon][iconright] {
+    padding-left: 2em !important;
+    padding-right: 2em !important;
+}
+
+.header-button-text[icon]:not([iconright]):after {
+    top: 65% !important;
+    margin-top: -0.6em;
+    left: 0.1em !important
+}
+.header-button-text[icon][iconright]:after {
+    top: 50% !important;
+    margin-top: -0.6em;
+    right: 0.25em !important
+}
+
+.results-header {
+    padding: 0 !important;
+    height: 2.422em;
+    font-family: Helvetica,Arial,sans-serif;
+}
+.results-header .header-button-text {
+    padding-top: 0.7em;
+    font-family: Helvetica,Arial,sans-serif;
+}
+
+/* ####################################################### */
+/* ###################### DOC LINKS ###################### */
+/* ####################################################### */
+
+a.doc-link {
+    display: inline-block;
+    color: #7D7DDE;
+    letter-spacing: -0.5px;
+    font-style: italic;
+}
+
+a.doc-link:after {
+    content: ' \f08e'; /* external-link */
+    font-family: fontawesome;
+}
+
+/* ####################################################### */
+/* ####################### BUTTONS ####################### */
+/* ####################################################### */
+
+gs-button {
+    -webkit-font-smoothing: antialiased;
+}
+
+
+/* ####################################################### */
+/* #################### FANCY BRACKETS #################### */
+/* ####################################################### */
+
+.style-bracket-container {
+    position: relative;
+    padding: 2em 1em;
+}
+
+.style-bracket-header {
+    position: absolute;
+    top: -0.5em;
+    left: 0;
+    width: 100%;
+    color: #CCC;
+
+    text-align: center;
+    line-height: 1em;
+    font-size: 1.2em;
+    padding: 0;
+    margin: 0;
+}
+
+.style-bracket-left {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 2em;
+    pointer-events: none;
+    z-index: 0;
+
+    border-top: 2px solid #CCC;
+    border-left: 2px solid #CCC;
+    border-bottom: 2px solid #CCC;
+    border-radius: 4px 0px 0px 4px;
+}
+
+.style-bracket-right {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 2em;
+    pointer-events: none;
+    z-index: 0;
+
+    border-top: 2px solid #CCC;
+    border-right: 2px solid #CCC;
+    border-bottom: 2px solid #CCC;
+    border-radius: 0px 4px 4px 0px;
+}
+
+/* ########################################################## */
+/* #################### SEARCH ACE POPUP #################### */
+/* ########################################################## */
+
+.ace_search.right {
+    right: 15px;
+}
+
+.ace_searchbtn:hover {
+    background-color: #eee;
+}
+
+.ace_searchbtn:active {
+    background-color: #ccc;
+}
+
+/* ########################################################## */
+/* ##################### OBJECT BROWSER ##################### */
+/* ########################################################## */
+
+#object-list-ace .ace_line {
+	line-height: 1.3em;
+}

@@ -532,9 +532,9 @@ void client_cb(EV_P, ev_io *w, int revents) {
 				if (ptr_slash != NULL) {
 					*ptr_slash = 0;
 					SERROR_SNCAT(str_conn_index, &int_conn_index_len,
-						str_uri_temp + 9, strlen(str_uri_temp + 9));
+						str_uri_temp + 10, strlen(str_uri_temp + 10));
 					SERROR_SNCAT(client->str_cookie_name, &int_cookie_name_len,
-						"postage_", (size_t)8,
+						"pgmanage_", (size_t)9,
 						str_conn_index, strlen(str_conn_index));
 				}
 
@@ -684,9 +684,9 @@ void client_cb(EV_P, ev_io *w, int revents) {
 					if (ptr_slash != NULL) {
 						*ptr_slash = 0;
 						SERROR_SNCAT(str_conn_index, &int_conn_index_len,
-							str_uri_temp + 9, strlen(str_uri_temp + 9));
+							str_uri_temp + 10, strlen(str_uri_temp + 10));
 						SERROR_SNCAT(client->str_cookie_name, &int_cookie_name_len,
-							"postage_", (size_t)8,
+							"pgmanage_", (size_t)9,
 							str_conn_index, strlen(str_conn_index));
 					}
 				}
@@ -883,60 +883,60 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 
 		if (strcmp(str_first_word, "SELECT") == 0) {
 			client_request = create_request(client, frame, str_message_id, str_transaction_id, ptr_query,
-				sizeof(struct sock_ev_client_select), POSTAGE_REQ_SELECT, ws_select_free);
+				sizeof(struct sock_ev_client_select), PGMANAGE_REQ_SELECT, ws_select_free);
 
 			SERROR_CHECK(client_request != NULL, "create_request failed!");
 
 		} else if (strcmp(str_first_word, "INSERT") == 0) {
 			client_request = create_request(client, frame, str_message_id, str_transaction_id, ptr_query,
-				sizeof(struct sock_ev_client_insert), POSTAGE_REQ_INSERT, ws_insert_free);
+				sizeof(struct sock_ev_client_insert), PGMANAGE_REQ_INSERT, ws_insert_free);
 
 			SERROR_CHECK(client_request != NULL, "create_request failed!");
 
 		} else if (strcmp(str_first_word, "UPDATE") == 0) {
 			client_request = create_request(client, frame, str_message_id, str_transaction_id, ptr_query,
-				sizeof(struct sock_ev_client_update), POSTAGE_REQ_UPDATE, ws_update_free);
+				sizeof(struct sock_ev_client_update), PGMANAGE_REQ_UPDATE, ws_update_free);
 
 			SERROR_CHECK(client_request != NULL, "create_request failed!");
 
 		} else if (strcmp(str_first_word, "DELETE") == 0) {
 			client_request = create_request(client, frame, str_message_id, str_transaction_id, ptr_query,
-				sizeof(struct sock_ev_client_delete), POSTAGE_REQ_DELETE, ws_delete_free);
+				sizeof(struct sock_ev_client_delete), PGMANAGE_REQ_DELETE, ws_delete_free);
 
 			SERROR_CHECK(client_request != NULL, "create_request failed!");
 
 		} else if (strcmp(str_first_word, "BEGIN") == 0) {
 			client_request = create_request(client, frame, str_message_id, str_transaction_id, ptr_query,
-				0, POSTAGE_REQ_BEGIN, NULL);
+				0, PGMANAGE_REQ_BEGIN, NULL);
 
 			SERROR_CHECK(client_request != NULL, "create_request failed!");
 
 		} else if (strcmp(str_first_word, "COMMIT") == 0) {
 			client_request = create_request(client, frame, str_message_id, str_transaction_id, ptr_query,
-				0, POSTAGE_REQ_COMMIT, NULL);
+				0, PGMANAGE_REQ_COMMIT, NULL);
 
 			SERROR_CHECK(client_request != NULL, "create_request failed!");
 
 		} else if (strcmp(str_first_word, "ROLLBACK") == 0) {
 			client_request = create_request(client, frame, str_message_id, str_transaction_id, ptr_query,
-				0, POSTAGE_REQ_ROLLBACK, NULL);
+				0, PGMANAGE_REQ_ROLLBACK, NULL);
 
 			SERROR_CHECK(client_request != NULL, "create_request failed!");
 
 		} else if (strcmp(str_first_word, "RAW") == 0) {
 			client_request = create_request(client, frame, str_message_id, str_transaction_id, ptr_query,
-				sizeof(struct sock_ev_client_raw), POSTAGE_REQ_RAW, ws_raw_free);
+				sizeof(struct sock_ev_client_raw), PGMANAGE_REQ_RAW, ws_raw_free);
 
 			SERROR_CHECK(client_request != NULL, "create_request failed!");
 		} else if (strcmp(str_first_word, "TAB") == 0) {
 			client_request = create_request(client, frame, str_message_id, str_transaction_id, ptr_query,
-				sizeof(struct sock_ev_client_tab), POSTAGE_REQ_TAB, ws_tab_free);
+				sizeof(struct sock_ev_client_tab), PGMANAGE_REQ_TAB, ws_tab_free);
 
 			SERROR_CHECK(client_request != NULL, "create_request failed!");
 
 		} else if (strcmp(str_first_word, "INFO") == 0) {
 			client_request = create_request(client, frame, str_message_id, str_transaction_id, ptr_query,
-				0, POSTAGE_REQ_INFO, NULL);
+				0, PGMANAGE_REQ_INFO, NULL);
 
 			SERROR_CHECK(client_request != NULL, "create_request failed!");
 
@@ -994,7 +994,7 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 				SINFO("cur_request branch");
 				struct sock_ev_client_request *client_request = client->cur_request;
 
-				if (client_request->int_req_type == POSTAGE_REQ_RAW && client_request->client_request_data != NULL) {
+				if (client_request->int_req_type == PGMANAGE_REQ_RAW && client_request->client_request_data != NULL) {
 					struct sock_ev_client_raw *client_raw = (struct sock_ev_client_raw *)client_request->client_request_data;
 
 					if (client_raw->copy_check != NULL) {
@@ -1309,37 +1309,37 @@ void client_request_queue_cb(EV_P, ev_check *w, int revents) {
 		decrement_idle(EV_A);
 
 		switch (client_request->int_req_type) {
-			case POSTAGE_REQ_SELECT:
+			case PGMANAGE_REQ_SELECT:
 				client->bol_request_in_progress = true;
 				ws_select_step1(client_request);
 				break;
-			case POSTAGE_REQ_INSERT:
+			case PGMANAGE_REQ_INSERT:
 				client->bol_request_in_progress = true;
 				ws_insert_step1(client_request);
 				break;
-			case POSTAGE_REQ_UPDATE:
+			case PGMANAGE_REQ_UPDATE:
 				client->bol_request_in_progress = true;
 				ws_update_step1(client_request);
 				break;
-			case POSTAGE_REQ_DELETE:
+			case PGMANAGE_REQ_DELETE:
 				client->bol_request_in_progress = true;
 				ws_delete_step1(client_request);
 				break;
-			case POSTAGE_REQ_BEGIN:
-			case POSTAGE_REQ_COMMIT:
-			case POSTAGE_REQ_ROLLBACK:
+			case PGMANAGE_REQ_BEGIN:
+			case PGMANAGE_REQ_COMMIT:
+			case PGMANAGE_REQ_ROLLBACK:
 				SDEBUG("ROLLBACK OK 1");
 				client->bol_request_in_progress = true;
 				client_request->arr_response = DArray_create(sizeof(char *), 1);
 				//clang-format off
 				SFINISH_SNCAT(str_query, &int_query_len,
-					client_request->int_req_type == POSTAGE_REQ_BEGIN ? "BEGIN;" :
-					client_request->int_req_type == POSTAGE_REQ_COMMIT ? "COMMIT;" :
-					client_request->int_req_type == POSTAGE_REQ_ROLLBACK ? "ROLLBACK;" : "",
+					client_request->int_req_type == PGMANAGE_REQ_BEGIN ? "BEGIN;" :
+					client_request->int_req_type == PGMANAGE_REQ_COMMIT ? "COMMIT;" :
+					client_request->int_req_type == PGMANAGE_REQ_ROLLBACK ? "ROLLBACK;" : "",
 					strlen(
-						client_request->int_req_type == POSTAGE_REQ_BEGIN ? "BEGIN;" :
-						client_request->int_req_type == POSTAGE_REQ_COMMIT ? "COMMIT;" :
-						client_request->int_req_type == POSTAGE_REQ_ROLLBACK ? "ROLLBACK;" : ""
+						client_request->int_req_type == PGMANAGE_REQ_BEGIN ? "BEGIN;" :
+						client_request->int_req_type == PGMANAGE_REQ_COMMIT ? "COMMIT;" :
+						client_request->int_req_type == PGMANAGE_REQ_ROLLBACK ? "ROLLBACK;" : ""
 					));
 				//clang-format on
 
@@ -1349,15 +1349,15 @@ void client_request_queue_cb(EV_P, ev_check *w, int revents) {
 				SFREE(str_query);
 
 				break;
-			case POSTAGE_REQ_TAB:
+			case PGMANAGE_REQ_TAB:
 				client->bol_request_in_progress = true;
 				ws_tab_step1(client_request);
 				break;
-			case POSTAGE_REQ_RAW:
+			case PGMANAGE_REQ_RAW:
 				client->bol_request_in_progress = true;
 				ws_raw_step1(client_request);
 				break;
-			case POSTAGE_REQ_INFO:
+			case PGMANAGE_REQ_INFO:
 				client->bol_request_in_progress = true;
 				client_request->arr_response = DArray_create(sizeof(char *), 1);
 

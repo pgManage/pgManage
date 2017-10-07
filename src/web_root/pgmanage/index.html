@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+
+        <title>PgManage Log In</title>
+
+		<script src="/pgmanage/js/greyspots.js" type="text/javascript"></script>
+        <link href="/pgmanage/css/greyspots.css" rel="stylesheet" type="text/css" />
+        <link href="/pgmanage/css/pgmanage.css" rel="stylesheet" type="text/css" />
+        <script src="/pgmanage/js/page-zoom.js" type="text/javascript"></script>
+
+
+        <script>
+var bolCurl = false;
+var bolTutorial = false;
+var ajxCurrent;
+
+function appendError(data) {
+    "use strict";
+    var errorContainer = document.getElementById('container-error');
+
+    data = data.original_response.substring(data.original_response.indexOf('\n') + 1);
+
+    if (errorContainer.textContent) {
+        errorContainer.appendChild(document.createElement('br'));
+    }
+    errorContainer.appendChild(document.createTextNode(data));
+}
+
+function login() {
+    'use strict';
+    var strQueryString = GS.getQueryString();
+    var strConnName = document.getElementById('option-connection').value;
+    var strCustomConn;
+
+    document.getElementById('container-error').textContent = '';
+
+    if (strConnName === 'custom') {
+        strCustomConn = 'host=' + document.getElementById('text-custom-host').value +
+                        ' port=' + document.getElementById('text-custom-port').value +
+                        ' dbname=' + document.getElementById('text-custom-db').value +
+                        ' sslmode=' + document.getElementById('text-custom-ssl').value;
+
+        strCustomConn = '&conn=' + encodeURIComponent(strCustomConn);
+    } else {
+        strCustomConn = '';
+    }
+
+    GS.addLoader('login', 'Logging In...<gs-button onclick="GS.removeLoader(\'login\'); ajxCurrent.abort();">Cancel</gs-button>');
+    ajxCurrent = GS.ajaxJSON('/pgmanage/auth',
+                'action=login' + strCustomConn +
+                   '&connname=' + encodeURIComponent(strConnName) +
+                   '&username=' + encodeURIComponent(document.getElementById('text-username').value) +
+                   '&password=' + encodeURIComponent(document.getElementById('text-password').value),
+                function (data, error) {
+        var strRedirect, arrRedirect, i, len, bolFollow;
+        GS.removeLoader('login');
+
+        if (!error) {
+            localStorage.greyspots_pgmanage_tutorial = bolTutorial;
+            localStorage['greyspots_pgmanage_' + strConnName] = document.getElementById('text-username').value;
+            //localStorage.greyspots_pgmanage_username = document.getElementById('text-username').value;
+
+            strRedirect = GS.qryGetVal(strQueryString, 'redirect');
+
+            if (strRedirect) {
+                // we don't want to redirect with a connection index in the url
+                arrRedirect = strRedirect.split('/');
+
+                // search for connection index
+                for (i = (arrRedirect.length - 1), bolFollow = true; i > -1; i -= 1) {
+                    if (!isNaN(parseInt(arrRedirect[i], 10))) {
+                        bolFollow = false;
+                        break;
+                    }
+                }
+
+                if (bolFollow) {
+                    window.location = strRedirect;
+                } else {
+                    window.location = data.dat;
+                }
+            } else {
+                window.location = data.dat;// + '?cache=no';
+            }
+        } else {
+            appendError(data);
+            GS.ajaxErrorDialog(data);
+            document.getElementById('text-password').value = '';
+        }
+    });
+}
+
+function appendConnection(connName, strButtons) {
+    'use strict';
+    var optionControl = document.getElementById('option-connection');
+    var optionContainer = document.getElementById('predefined-option-container');
+    var optionElement = document.createElement('gs-option');
+
+    //if we are in electron, remove the top right corner
+    if (window.process && window.process.type === 'renderer' && optionControl.children.length === 0) {
+        optionElement.setAttribute('remove-top-right', true);
+    }
+
+    optionElement.setAttribute('value', connName);
+    optionElement.textContent = connName;
+    optionContainer.appendChild(optionElement);
+
+    if (!optionControl.value) {
+        optionControl.value = connName;
+    }
+}
+
+function getConnections() {
+    'use strict';
+    var strQueryString = GS.getQueryString();
+    var strConnName = GS.qryGetVal(strQueryString, 'connection');
+
+    document.getElementById('predefined-option-container').innerHTML = '';
+
+    // get connection list
+    GS.ajaxText('/pgmanage/auth', 'action=list', function (data, error) {
+        var arrConnections, i, len;
+        if (!error) {
+            arrConnections = data.split('\n');
+            for (i = 0, len = arrConnections.length; i < len; i += 1) {
+                appendConnection(arrConnections[i]);
+            }
+
+            try {
+                document.getElementById('option-connection').value = strConnName || arrConnections[0] || '';
+            } catch (e) {}
+            getUserName();
+        } else {
+            appendError(data);
+        }
+    });
+
+    // find out if we can dynamically add connection strings
+    GS.ajaxText('/pgmanage/auth', 'action=canadd', function (data, error) {
+        if (!error) {
+            if (data.trim() === 'true') {
+                var divOneTime = document.getElementById('oneTime');
+
+                divOneTime.setAttribute('class', 'style-bracket-container');
+
+                divOneTime.innerHTML = ml(function () {/*
+                    <label class="style-bracket-header">Or enter a one time connection</label>
+                    <div class="style-bracket-left"></div>
+                    <div class="style-bracket-right"></div>
+                    <gs-option value="custom">
+                        <gs-grid min-width="all {reflow}; 400px {1,1}; 640px {4,2,4,4}">
+                            <gs-block flex-horizontal>
+                                <b>Host:&nbsp;</b>
+                                <gs-text id="text-custom-host" placeholder="host" flex></gs-text>
+                            </gs-block>
+                            <gs-block flex-horizontal>
+                                <b>&nbsp;Port:&nbsp;</b>
+                                <gs-text id="text-custom-port" placeholder="port" flex></gs-text>
+                            </gs-block>
+                            <gs-block flex-horizontal>
+                                <b>&nbsp;DB Name:&nbsp;</b>
+                                <gs-text id="text-custom-db" placeholder="dbname" flex></gs-text>
+                            </gs-block>
+                            <gs-block flex-horizontal>
+                                <b>&nbsp;SSL Mode:&nbsp;</b>
+                                <gs-select id="text-custom-ssl" placeholder="sslmode" value="prefer" flex>
+                                    <option value="disable">Disable</option>
+                                    <option value="allow">Allow</option>
+                                    <option value="prefer">Prefer</option>
+                                    <option value="require">Require</option>
+                                    <option value="verify-ca">Verify Authority</option>
+                                    <option value="verify-full">Verify Full</option>
+                                </gs-select>
+                            </gs-block>
+                        </gs-grid>
+                    </gs-option>
+                */});
+				if (strConnName === 'custom') {
+		            try {
+		                document.getElementById('option-connection').value = strConnName;
+		            } catch (e) {}
+				}
+
+                var divOneTime = document.getElementById('afterOneTime');
+                divOneTime.innerHTML = ml(function () {/*<br/><br/>*/});
+            }
+        } else {
+            appendError(data);
+        }
+    });
+}
+
+// we want the remembered user name to be remembered by connection name
+//      this function puts the current selected connection's associated username into the username field
+function getUserName() {
+    'use strict';
+    var strConnName = document.getElementById('option-connection').value;
+
+    document.getElementById('text-username').value = (localStorage['greyspots_pgmanage_' + strConnName] || '');
+
+    if (!evt.touchDevice && strConnName !== 'custom') {
+        if (document.getElementById('text-username').value) {
+            document.getElementById('text-password').focus();
+        } else {
+            document.getElementById('text-username').focus();
+        }
+    }
+}
+
+window.addEventListener('load', function () {
+    var strQueryString = GS.getQueryString(); //, strUnameCookie = GS.getCookie('greyspots_pgmanage_username');
+
+    zoomStart();
+
+    // fill the error element with any error text from the query string (coalesce to empty string)
+    document.getElementById('container-error').textContent = GS.qryGetVal(strQueryString, 'error') || '';
+
+    // bind keydown for the "text-username" field
+    document.getElementById('text-username').addEventListener('keydown', function (event) {
+        if (event.keyCode === 13 && document.getElementById('text-username').value) {
+            login();
+        }
+    });
+
+	// fixes bug where the string `null` would be sent as the password the first time you click login if you haven't entered a password
+	document.getElementById('text-password').value = '';
+    // bind keydown for the "text-password" field
+    document.getElementById('text-password').addEventListener('keydown', function (event) {
+        if (event.keyCode === 13 && document.getElementById('text-username').value) {
+            login();
+        }
+    });
+
+    // bind click for the "button-login" button
+    document.getElementById('button-login').addEventListener('click', function () {
+        if (document.getElementById('text-username').value) {
+            login();
+        }
+    });
+
+    //if we are in electron, then add a button to edit the connection file
+    if (window.process && window.process.type === 'renderer') {
+        document.getElementById('buttonNewConnections').removeAttribute('hidden');
+        document.getElementById('buttonPGPASS').removeAttribute('hidden');
+
+        var electron = require('electron');
+        var ipcRenderer = electron.ipcRenderer;
+		document.getElementById('buttonNewConnections').addEventListener('click', function () {
+			ipcRenderer.send('pgmanage', 'edit connections');
+		});
+		document.getElementById('buttonPGPASS').addEventListener('click', function () {
+			ipcRenderer.send('pgmanage', 'edit PGPASS');
+		});
+    }
+
+    // when the connection optionbox is changed: try to get a username from the cookie
+    /*document.getElementById('option-connection').addEventListener('change', function (event) {
+        if (event.target.getAttribute('id') === 'option-connection') {
+            getUserName();
+        }
+    });*/
+    document.getElementById('option-connection').addEventListener('click', function (event) {
+        if (event.target.tagName.toLowerCase() === 'gs-option') {
+            getUserName();
+        }
+    });
+
+    // get connection list
+    getConnections();
+});
+        </script>
+        <style>
+            #predefined-option-container gs-option:not(:last-child) {
+                border-bottom: 0 none;
+            }
+            #predefined-option-container gs-option:not(:last-child):not(:first-child) {
+                -webkit-border-radius: 0;
+                -moz-border-radius: 0;
+                -ms-border-radius: 0;
+                -o-border-radius: 0;
+                border-radius: 0;
+            }
+            #predefined-option-container gs-option:first-child {
+                -webkit-border-radius: 0.25em 0 0 0;
+                -moz-border-radius: 0.25em 0 0 0;
+                -ms-border-radius: 0.25em 0 0 0;
+                -o-border-radius: 0.25em 0 0 0;
+                border-radius: 0.25em 0 0 0;
+            }
+            #predefined-option-container gs-option:last-child {
+                -webkit-border-radius: 0 0 0.25em 0.25em;
+                -moz-border-radius: 0 0 0.25em 0.25em;
+                -ms-border-radius: 0 0 0.25em 0.25em;
+                -o-border-radius: 0 0 0.25em 0.25em;
+                border-radius: 0 0 0.25em 0.25em;
+            }
+        </style>
+        <script src="js/settings.js" type="text/javascript"></script>
+        <style id="customCss"></style>
+        <script id="shortcutKeys"></script>
+    </head>
+    <body>
+        <noscript>
+            <div id="message-container">
+                <div id="line-one">Your browser doesn't allow JavaScript</div>
+                <div id="line-two">Please enable Javascript or use a browser that allows Javascript.</div>
+            </div>
+            <style>
+                #message-container {
+                    position: fixed;
+                    left: 0;
+                    top: 0;
+                    width: 100%;
+                    height: 100%;
+                    text-align: center;
+                    z-index: 5000;
+                    background: #FFF;
+                }
+                #line-one {
+                    margin-top: 3em;
+                    font-weight: 900;
+                    font-size: 2em;
+                }
+                #line-two {
+                    font-size: 1.5em;
+                    color: #606060;
+                }
+            </style>
+        </noscript>
+        <gs-page>
+            <gs-body padded>
+                <gs-container id="container-login" min-width="768px">
+                    <center><h3><b>Login</b></h3></center>
+                    <br />
+
+                    <gs-optionbox id="option-connection" no-target mini>
+                        <div class="style-bracket-container">
+                            <label class="style-bracket-header">Choose a server</label>
+                            <div class="style-bracket-left"></div>
+                            <div class="style-bracket-right"></div>
+
+							<gs-button id="buttonNewConnections" hidden style="float: right;" inline bg-primary remove-bottom remove-left>Edit pgmanage-connections.conf</gs-button>
+							<gs-button id="buttonPGPASS" hidden style="float: right;" inline bg-primary remove-bottom remove-right>Edit PGPASS</gs-button>
+
+                            <div id="predefined-option-container" style="clear: both;"></div>
+                        </div>
+                        <br /><br />
+
+                        <div id="oneTime">
+                        </div>
+
+                        <div id="afterOneTime"></div>
+                    </gs-optionbox>
+
+                    <div class="style-bracket-container">
+                        <label class="style-bracket-header">Credentials</label>
+                        <div class="style-bracket-left"></div>
+                        <div class="style-bracket-right"></div>
+
+                        <gs-grid reflow-at="350px" gutter>
+                            <gs-block>
+                                <label for="text-username">Username:</label>
+                                <gs-text id="text-username" placeholder="Username" autocapitalize="off" autocorrect="off" autocomplete="off"></gs-text>
+                            </gs-block>
+                            <gs-block>
+                                <label for="text-password">Password:</label>
+                                <gs-text id="text-password" placeholder="Password" type="password"></gs-text>
+                            </gs-block>
+                        </gs-grid>
+                    </div>
+                    <br /><br />
+                    <gs-button id="button-login" jumbo bg-primary>Log In</gs-button>
+                    <br /><br />
+                </gs-container>
+
+                <gs-container min-width="768px">
+                    <center id="container-error" style="white-space: pre-wrap;" txt-danger></center>
+                </gs-container>
+            </gs-body>
+        </gs-page>
+    </body>
+</html

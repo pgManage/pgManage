@@ -29,7 +29,7 @@ void http_main_cnxn_cb(EV_P, void *cb_data, DB_conn *conn) {
 		SFINISH_CHECK(str_temp != NULL, "strchr failed");
 		str_uri_temp = str_uri;
 		SFINISH_SNCAT(str_uri, &int_uri_len,
-			"/postage/app", (size_t)12,
+			"/pgmanage/app", (size_t)13,
 			str_temp, strlen(str_temp));
 		SFREE(str_uri_temp);
 	}
@@ -46,13 +46,13 @@ void http_main_cnxn_cb(EV_P, void *cb_data, DB_conn *conn) {
 
 	SDEBUG("str_uri: %s", str_uri);
 
-	if (strncmp(str_uri, "/postage/app/upload", 22) == 0) {
+	if (strncmp(str_uri, "/pgmanage/app/upload", 23) == 0) {
 		http_upload_step1(client);
-	} else if (strncmp(str_uri, "/postage/app/export", 22) == 0) {
+	} else if (strncmp(str_uri, "/pgmanage/app/export", 23) == 0) {
 		http_export_step1(client);
-	} else if (strncmp(str_uri, "/postage/app/action_ev", 23) == 0) {
+	} else if (strncmp(str_uri, "/pgmanage/app/action_ev", 24) == 0) {
 		http_ev_step1(client);
-	} else if (strncmp(str_uri, "/postage/app/action_info", 25) == 0) {
+	} else if (strncmp(str_uri, "/pgmanage/app/action_info", 26) == 0) {
 		SFINISH_SNCAT(str_sql, &int_sql_len,
 			"SELECT version() "
 			"UNION ALL "
@@ -140,12 +140,12 @@ void http_main(struct sock_ev_client *client) {
 	SDEBUG("#################################################################################################");
 
 	SDEBUG("str_uri: %s", str_uri);
-	if (strncmp(str_uri, "/postage/", 9) != 0) {
+	if (strncmp(str_uri, "/pgmanage/", 10) != 0) {
 		SFINISH_SNCAT(str_response, &int_response_len,
-			"HTTP/1.1 303 See Other\015\012Connection: close\015\012Location: /postage", (size_t)61,
+			"HTTP/1.1 303 See Other\015\012Connection: close\015\012Location: /pgmanage", (size_t)62,
 			str_full_uri, int_full_uri_len,
 			"\015\012\015\012", (size_t)4);
-	} else if (strncmp(str_uri, "/postage/auth", 14) == 0) {
+	} else if (strncmp(str_uri, "/pgmanage/auth", 15) == 0) {
 		SDEBUG("str_uri: %s", str_uri);
 
 		struct sock_ev_client_auth *client_auth;
@@ -154,13 +154,13 @@ void http_main(struct sock_ev_client *client) {
 		client_auth->parent = client;
 
 		http_auth(client_auth);
-	} else if (strncmp(str_uri, "/postage/", 9) == 0 && isdigit(str_uri[9])) {
+	} else if (strncmp(str_uri, "/pgmanage/", 10) == 0 && isdigit(str_uri[10])) {
 		if (isdigit(str_uri[9])) {
 			str_uri_temp = str_uri;
-			char *str_temp = strchr(str_uri_temp + 9, '/');
+			char *str_temp = strchr(str_uri_temp + 10, '/');
 			SFINISH_CHECK(str_temp != NULL, "strchr failed");
 			SFINISH_SNCAT(str_uri, &int_uri_len,
-				"/postage/app", (size_t)12,
+				"/pgmanage/app", (size_t)13,
 				str_temp, strlen(str_temp));
 			SFREE(str_uri_temp);
 		}
@@ -168,11 +168,11 @@ void http_main(struct sock_ev_client *client) {
 		SDEBUG("str_uri: %s", str_uri);
 
 		//don't check the database connection for file requests (except download)
-		if (strncmp(str_uri, "/postage/app/upload", 22) == 0 ||
-			strncmp(str_uri, "/postage/app/export", 22) == 0 ||
-			strncmp(str_uri, "/postage/app/action_ev", 23) == 0 ||
-			strncmp(str_uri, "/postage/app/action_info", 25) == 0 ||
-			strncmp(str_uri, "/postage/app/download/", 22) == 0) {
+		if (strncmp(str_uri, "/pgmanage/app/upload", 23) == 0 ||
+			strncmp(str_uri, "/pgmanage/app/export", 23) == 0 ||
+			strncmp(str_uri, "/pgmanage/app/action_ev", 24) == 0 ||
+			strncmp(str_uri, "/pgmanage/app/action_info", 26) == 0 ||
+			strncmp(str_uri, "/pgmanage/app/download/", 23) == 0) {
 			// set_cnxn does its own error handling
 			if ((client->conn = set_cnxn(client, http_main_cnxn_cb)) == NULL) {
 				SFINISH_CLIENT_CLOSE(client);

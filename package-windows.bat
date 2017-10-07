@@ -1,17 +1,17 @@
 C:\Users\nunzio\AppData\Local\Programs\Git\bin\git.exe pull
 
-msbuild visualstudio\postage.sln /target:"postage:Clean" /verbosity:normal /p:Configuration=Release
-msbuild visualstudio\postage.sln /target:postage /verbosity:normal /p:Configuration=Release
-cd postage_electron
+msbuild visualstudio\pgmanage.sln /target:"pgmanage:Clean" /verbosity:normal /p:Configuration=Release
+msbuild visualstudio\pgmanage.sln /target:pgmanage /verbosity:normal /p:Configuration=Release
+cd pgmanage_electron
 
-del /S /Q app\postage
-mkdir app\postage
-mkdir app\postage\web_root
-mkdir app\postage\config
-xcopy ..\visualstudio\Release\postage.exe app\postage\
-xcopy ..\visualstudio\lib\x86\* app\postage\
-xcopy ..\src\web_root app\postage\web_root /E
-xcopy ..\src\config app\postage\config /E
+del /S /Q app\pgmanage
+mkdir app\pgmanage
+mkdir app\pgmanage\web_root
+mkdir app\pgmanage\config
+xcopy ..\visualstudio\Release\pgmanage.exe app\pgmanage\
+xcopy ..\visualstudio\lib\x86\* app\pgmanage\
+xcopy ..\src\web_root app\pgmanage\web_root /E
+xcopy ..\src\config app\pgmanage\config /E
 
 npm run dist-win
 

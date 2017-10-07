@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+
+        <title>PgManage Configuration editor</title>
+
+		<script src="js/greyspots.js" type="text/javascript"></script>
+        <script src="js/ace/ace.js" data-ace-base="js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="js/ace/ext-searchbox.js" type="text/javascript"></script>
+		<link href="css/greyspots.css" rel="stylesheet" type="text/css" />
+        <link href="css/pgmanage.css" rel="stylesheet" type="text/css" />
+
+        <script>
+            //jslint es6 browser white:true multivar:true for:true
+            /*global ml,require,window,GS,process,ace*/
+			const os = require('os');
+			const fs = require('fs');
+			const path = require('path');
+			const electron = require('electron');
+			const ipcRenderer = electron.ipcRenderer;
+			window.Range = require('ace/range').Range;
+			const file = GS.qryGetVal(GS.getQueryString(), 'file');
+
+			function getPGPASSLoc() {
+			    "use strict";
+				if (process.platform == 'win32') {
+					return path.normalize(process.env.APPDATA + '/postgresql/pgpass.conf');
+				} else {
+					return os.homedir() + '/.pgpass';
+				}
+			}
+			const filePath = (file === 'PGPASS' ? getPGPASSLoc() : os.homedir() + '/.pgmanage/' + file);
+
+			document.title = file;
+
+			function restartPgManage() {
+			    "use strict";
+				ipcRenderer.send('pgmanage', 'restart');
+			}
+
+			function addWarnings(editor) {
+				var arrAnnotation = [];
+				var arrLine = editor.getSession().getLines(0, editor.getSession().getLength() + 1);
+				var i = 0;
+				var len = arrLine.length;
+
+				while (i < len) {
+					console.log(arrLine[i], i, len);
+					var hostaddrIndex = arrLine[i].indexOf('hostaddr=');
+					if (hostaddrIndex > -1) {
+						arrAnnotation.push({
+							row: i,
+							column: hostaddrIndex,
+							text: '`hostaddr` cannot be used with a .pgpass (https://www.postgresql.org/docs/current/static/libpq-connect.html#LIBPQ-PARAMKEYWORDS)',
+							type: 'warning'
+						});
+					}
+
+					i += 1;
+				}
+
+				editor.getSession().setAnnotations(arrAnnotation);
+			}
+
+			document.addEventListener('DOMContentLoaded', function () {
+			    "use strict";
+				var indicator = document.getElementById('conf-indicator')
+					,	editor;
+
+				document.getElementById('header-text-container').textContent = file;
+				if (file === 'PGPASS') {
+					document.getElementById('pgpass_docs').removeAttribute('hidden');
+					document.getElementById('man_page').setAttribute('hidden', 'true');
+				}
+
+				editor = ace.edit('conf-editor');
+				editor.setTheme('ace/theme/eclipse');
+				editor.getSession().setMode('ace/mode/ini');
+				editor.setShowPrintMargin(false);
+				editor.setDisplayIndentGuides(true);
+				editor.setShowFoldWidgets(false);
+				editor.session.setUseWrapMode('free');
+				editor.setBehavioursEnabled(false);
+				editor.$blockScrolling = Infinity;
+
+				editor.ignoreChange = true;
+
+				fs.readFile(filePath, 'utf8', function readCallback(err, strValue) {
+					if (err) {
+						var templateElement = document.createElement('template');
+						templateElement.innerHTML = ml(function () {/*
+							<gs-page>
+								<gs-header><center><h3>Reading failed!</h3></center></gs-header>
+								<gs-body padded>
+									<center>{{desc}}/center>
+								</gs-body>
+								<gs-footer>
+									<gs-button dialogclose bg-primary tabindex="0">Try Again</gs-button>
+								</gs-footer>
+							</gs-page>
+						*/}).replace(/\{\{desc\}\}/, err.message);
+
+						GS.openDialog(templateElement, function () {
+							indicator.textContent = '';
+
+						}, function (event) {
+							fs.readFile(filePath, 'utf8', readCallback);
+						});
+					} else {
+				        editor.setValue(strValue);
+
+				        editor.ignoreChange = false;
+
+				        editor.session.selection.setRange(new Range(0, 0, 0, 0));
+				        editor.resize(true);
+
+						addWarnings(editor);
+
+				        // reset undo stack so that we can't undo to empty
+				        //      (last time I tried to do this without the timer and didn't find a solution)
+				        setTimeout(function () {
+				            editor.getSession().getUndoManager().reset();
+				        }, 1);
+
+						editor.on('change', function save() {
+							indicator.textContent = 'Saving...';
+							fs.writeFile(filePath, editor.getValue(), 'utf8', function (err) {
+								if (err) {
+									var templateElement = document.createElement('template');
+                                    templateElement.innerHTML = ml(function () {/*
+                                        <gs-page>
+                                            <gs-header><center><h3>Saving failed!</h3></center></gs-header>
+		                                    <gs-body padded>
+		                                        <center>{{desc}}/center>
+		                                    </gs-body>
+		                                    <gs-footer>
+		                                        <gs-button dialogclose bg-primary tabindex="0">Try Again</gs-button>
+		                                    </gs-footer>
+		                                </gs-page>
+		                            */}).replace(/\{\{desc\}\}/, err.message);
+
+		                            GS.openDialog(templateElement, function () {
+										indicator.textContent = '';
+
+	                                }, function (event, strAnswer) {
+		                                save();
+		                            });
+								} else {
+									indicator.textContent = '';
+								}
+							});
+							
+							addWarnings(editor);
+						});
+					}
+				});
+			});
+		</script>
+		<style>
+			#conf-pane, #conf-editor,
+			#conn-pane, #conn-editor {
+				width: 100%;
+				height: 100%;
+				position: relative;
+			}
+
+			#tab-buttons {
+				width: 100%;
+			}
+
+			.indicator {
+				position: absolute;
+
+				top: 0.2em;
+				left: 50%;
+				margin-left: -125px;
+				width: 250px;
+				text-align: center;
+
+				z-index: 50;
+			}
+        </style>
+        <script src="js/settings.js" type="text/javascript"></script>
+        <style id="customCss"></style>
+    </head>
+    <body>
+        <gs-page>
+			<gs-header>
+				<div flex-horizontal>
+					<div id="header-text-container" flex>Configuration Editor</div>
+					<gs-button inline class="header-button-text" style="width: 15em;" hidden href="https://www.postgresql.org/docs/current/static/libpq-pgpass.html" target="_blank" id="pgpass_docs">PGPASS Documentation</gs-button>
+					<gs-button inline class="header-button-text" style="width: 12em;" href="app/pgmanage.1.html" target="_blank" id="man_page">PgManage Man Page</gs-button>
+					<gs-button inline class="header-button-text" style="width: 10em;" onclick="restartPgManage();">Reload PgManage</gs-button>
+				</div>
+			</gs-header>
+            <gs-body>
+				<div id="conf-indicator" class="indicator"></div>
+				<div id="conf-editor"></div>
+            </gs-body>
+        </gs-page>
+    </body>
+</html>

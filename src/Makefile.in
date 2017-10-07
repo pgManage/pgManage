@@ -1,7 +1,7 @@
-BINARY = postage
-CONFIGS = -c config/postage.conf -d config/postage-connections-test.conf -n true -t 300
+BINARY = pgmanage
+CONFIGS = -c config/pgmanage.conf -d config/pgmanage-connections-test.conf -n true -t 300
 WEBROOTS = -r ./web_root
-INSTALL_DEPS = @prefix@/sbin/ @prefix@/etc/$(BINARY)/ @prefix@/etc/postage/postage.conf @prefix@/etc/postage/postage-connections.conf
+INSTALL_DEPS = @prefix@/sbin/ @prefix@/etc/$(BINARY)/ @prefix@/etc/pgmanage/pgmanage.conf @prefix@/etc/pgmanage/pgmanage-connections.conf
 SOCK_DIR_PARAMETER = @sock_dir_parameter@
 
 VERSION = \"$(shell cat ../VERSION)\"
@@ -11,14 +11,14 @@ CFLAGS = -O3 -g \
 LDFLAGS = @LDFLAGS@
 CPPFLAGS = @CPPFLAGS@ \
 	-I../db_framework_pq -I../ -I. -I../dependencies/tre/include -I../dependencies/libev \
-	-DVERSION=$(VERSION) -DPOSTAGE_PREFIX=\"@prefix@\"
+	-DVERSION=$(VERSION) -DPGMANAGE_PREFIX=\"@prefix@\"
 V=0
 
 common_SOURCES = $(filter-out util_getopt.c, $(filter-out util_strptime.c, $(wildcard *.c)))
 db_framework_pq_SOURCES = $(wildcard ../db_framework_pq/*.c)
 
-postage_SOURCES = $(sort $(common_SOURCES) $(db_framework_pq_SOURCES))
-postage_OBJECTS = $(postage_SOURCES:.c=.o)
+pgmanage_SOURCES = $(sort $(common_SOURCES) $(db_framework_pq_SOURCES))
+pgmanage_OBJECTS = $(pgmanage_SOURCES:.c=.o)
 
 
 
@@ -42,19 +42,19 @@ else
 endif
 
 #### BUILDING
-$(BINARY): $(libev_OBJECTS) $(postage_OBJECTS)
+$(BINARY): $(libev_OBJECTS) $(pgmanage_OBJECTS)
 ifeq ($(V), 1)
-	$(CC) $(libev_OBJECTS) $(postage_OBJECTS) $(LDFLAGS) $(CFLAGS) -o ./$(BINARY)
+	$(CC) $(libev_OBJECTS) $(pgmanage_OBJECTS) $(LDFLAGS) $(CFLAGS) -o ./$(BINARY)
 else
 	@echo " CCLD $(BINARY)"
-	@$(CC) $(libev_OBJECTS) $(postage_OBJECTS) $(LDFLAGS) $(CFLAGS) -o ./$(BINARY)
+	@$(CC) $(libev_OBJECTS) $(pgmanage_OBJECTS) $(LDFLAGS) $(CFLAGS) -o ./$(BINARY)
 endif
 
 all-format:
 	cd ..; ./cleanup_format.sh; cd $(BINARY)
 	$(MAKE) all
 
-$(postage_OBJECTS): %.o: %.c
+$(pgmanage_OBJECTS): %.o: %.c
 ifeq ($(V), 1)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -Wall -Wextra -Wconversion $< -c -o $@
 else
@@ -64,7 +64,7 @@ endif
 
 #### CLEAN
 clean:
-	rm -f $(postage_OBJECTS) $(libev_OBJECTS) ../check/*.o $(BINARY)
+	rm -f $(pgmanage_OBJECTS) $(libev_OBJECTS) ../check/*.o $(BINARY)
 	@echo
 	@echo "Clean Successful"
 
@@ -87,7 +87,7 @@ install: $(INSTALL_DEPS)
 	install config/$(BINARY).conf @prefix@/etc/$(BINARY)/$(BINARY).conf.example
 	install config/$(BINARY)-connections.conf @prefix@/etc/$(BINARY)/$(BINARY)-connections.conf.example
 	install $(BINARY) @prefix@/sbin/
-	install man/man1/postage.1 @prefix@/@MANDIR@/man1/postage.1
+	install man/man1/pgmanage.1 @prefix@/@MANDIR@/man1/pgmanage.1
 	@echo
 	@echo "Installation Successful"
 
@@ -103,7 +103,7 @@ destroy:
 	rm -rf @prefix@/etc/$(BINARY)
 	@echo
 	@echo "Destroy Successful"
-	@echo "NOTE: Even though all configuration files have been destroyed, your sql files have been preserved. They should be in you home folder under .postage"
+	@echo "NOTE: Even though all configuration files have been destroyed, your sql files have been preserved. They should be in you home folder under .pgmanage"
 
 
 #### TESTING
@@ -137,41 +137,41 @@ test-common:
 	sleep 3
 
 test: test-common
-	./$(BINARY) $(CONFIGS) $(WEBROOTS) -d config/postage-connections-test.conf -l info || \
+	./$(BINARY) $(CONFIGS) $(WEBROOTS) -d config/pgmanage-connections-test.conf -l info || \
 	{ kill `cat postgres.pid`; rm postgres.pid; rm -rf data_test; exit 1; }
 
 test-ssl: test-common
-	./$(BINARY) $(CONFIGS) $(WEBROOTS) -d config/postage-connections-test.conf -j ../ssl/self.crt -k ../ssl/self.key -l info || \
+	./$(BINARY) $(CONFIGS) $(WEBROOTS) -d config/pgmanage-connections-test.conf -j ../ssl/self.crt -k ../ssl/self.key -l info || \
 	{ kill `cat postgres.pid`; rm postgres.pid; rm -rf data_test; exit 1; }
 
 gdb: test-common
 	echo "run" > temp_gdb_commands
-	gdb -x temp_gdb_commands --args ./$(BINARY) $(CONFIGS) $(WEBROOTS) -d config/postage-connections-test.conf -l info || \
+	gdb -x temp_gdb_commands --args ./$(BINARY) $(CONFIGS) $(WEBROOTS) -d config/pgmanage-connections-test.conf -l info || \
 	{ kill `cat postgres.pid`; rm postgres.pid; rm -rf data_test; exit 1; }
 	rm temp_gdb_commands
 
 gdb-ssl: test-common
 	echo "run" > temp_gdb_commands
-	gdb -x temp_gdb_commands --args ./$(BINARY) $(CONFIGS) $(WEBROOTS) -d config/postage-connections-test.conf -j ../ssl/self.crt -k ../ssl/self.key -l info || \
+	gdb -x temp_gdb_commands --args ./$(BINARY) $(CONFIGS) $(WEBROOTS) -d config/pgmanage-connections-test.conf -j ../ssl/self.crt -k ../ssl/self.key -l info || \
 	{ kill `cat postgres.pid`; rm postgres.pid; rm -rf data_test; exit 1; }
 	rm temp_gdb_commands
 
 lldb: test-common
 	echo "run" > temp_lldb_commands
-	lldb -s temp_lldb_commands -- ./$(BINARY) $(CONFIGS) $(WEBROOTS) -d config/postage-connections-test.conf -l info || \
+	lldb -s temp_lldb_commands -- ./$(BINARY) $(CONFIGS) $(WEBROOTS) -d config/pgmanage-connections-test.conf -l info || \
 	{ kill `cat postgres.pid`; rm postgres.pid; rm -rf data_test; exit 1; }
 	rm temp_lldb_commands
 
 lldb-ssl: test-common
 	echo "run" > temp_lldb_commands
-	lldb -s temp_lldb_commands -- ./$(BINARY) $(CONFIGS) $(WEBROOTS) -d config/postage-connections-test.conf -j ../ssl/self.crt -k ../ssl/self.key -l info || \
+	lldb -s temp_lldb_commands -- ./$(BINARY) $(CONFIGS) $(WEBROOTS) -d config/pgmanage-connections-test.conf -j ../ssl/self.crt -k ../ssl/self.key -l info || \
 	{ kill `cat postgres.pid`; rm postgres.pid; rm -rf data_test; exit 1; }
 	rm temp_lldb_commands
 
 valgrind: test-common
-	valgrind --leak-check=full --track-fds=yes --track-origins=yes --show-reachable=yes --suppressions=../valgrind/mac_suppressions.txt --num-callers=100 ./$(BINARY) $(CONFIGS) $(WEBROOTS) -d config/postage-connections-test.conf -l none || \
+	valgrind --leak-check=full --track-fds=yes --track-origins=yes --show-reachable=yes --suppressions=../valgrind/mac_suppressions.txt --num-callers=100 ./$(BINARY) $(CONFIGS) $(WEBROOTS) -d config/pgmanage-connections-test.conf -l none || \
 	{ kill `cat postgres.pid`; rm postgres.pid; rm -rf data_test; exit 1; }
 
 valgrind-ssl: test-common
-	valgrind --leak-check=full --track-fds=yes --track-origins=yes --show-reachable=yes --suppressions=../valgrind/mac_suppressions.txt --num-callers=100 ./$(BINARY) $(CONFIGS) $(WEBROOTS) -d config/postage-connections-test.conf -j ../ssl/self.crt -k ../ssl/self.key -l none || \
+	valgrind --leak-check=full --track-fds=yes --track-origins=yes --show-reachable=yes --suppressions=../valgrind/mac_suppressions.txt --num-callers=100 ./$(BINARY) $(CONFIGS) $(WEBROOTS) -d config/pgmanage-connections-test.conf -j ../ssl/self.crt -k ../ssl/self.key -l none || \
 	{ kill `cat postgres.pid`; rm postgres.pid; rm -rf data_test; exit 1; }

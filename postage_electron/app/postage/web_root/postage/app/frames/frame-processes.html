@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+
+        <title>Process Manager</title>
+
+        <script src="../../js/greyspots.js" type="text/javascript"></script>
+        <link href="../../css/greyspots.css" type="text/css" rel="stylesheet" />
+
+        <link href="../../css/pgmanage.css" type="text/css" rel="stylesheet" />
+
+        <script src="../resources/ws-get-functions.js" type="text/javascript"></script>
+
+        <!-- right now these scripts are hard coded for postgres 9.2 -->
+        <script src="../resources/pg-9.2-tree-queries.js" type="text/javascript"></script>
+
+        <script src="../../js/page-zoom.js" type="text/javascript"></script>
+        <script>
+var bolCurl = false;
+function dialogShowProcessQuery(target, intRowIndex) {
+    "use strict";
+    var templateElement = document.createElement('template');
+    var internalData;
+    var intColumnIndex;
+    var strQuery;
+
+    internalData = document.getElementById('datasheet-processes').internalData;
+    intColumnIndex = internalData.arrColumnNames.indexOf('query');
+    strQuery = internalData.arrRecords[intRowIndex][intColumnIndex];
+
+    templateElement.setAttribute('data-overlay-close', 'true');
+    templateElement.setAttribute('data-max-width', '1200px');
+    templateElement.setAttribute('data-mode', 'constrained');
+    templateElement.innerHTML = ml(function () {/*
+        <gs-page>
+            <gs-body padded>
+                <pre>{{STRQUERY}}</pre>
+            </gs-body>
+        </gs-page>
+    */}).replace(/\{\{STRQUERY\}\}/gi, strQuery);
+
+    GS.openDialogToElement(target, templateElement, 'down');
+}
+
+// define a seperate socket for the processes dialog if it hasn't been defined already
+if (!GS.pgmanageProcessDialogSocket) {
+	GS.pgmanageProcessDialogSocket = GS.openSocket('env');
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+	var autorefreshCheckbox = document.getElementById('autorefresh');
+	var autorefreshIntervalInput = document.getElementById('autorefresh_interval');
+	var interval = undefined;
+	var orderbyColumn = document.getElementById('orderby_column');
+	var orderbyDirection = document.getElementById('orderby_direction');
+
+	var resetInterval = function () {
+		console.log('resetInterval');
+		if (interval !== undefined) {
+			clearInterval(interval);
+		}
+		if (autorefreshCheckbox.value === 'true') {
+			interval = setInterval(function () {
+				document.getElementById('datasheet-processes').refresh();
+			}, parseFloat(autorefreshIntervalInput.value) * 1000);
+		}
+	};
+	autorefreshCheckbox.addEventListener('change', function () { resetInterval(); });
+	autorefreshIntervalInput.addEventListener('keyup', function () { resetInterval(); });
+	resetInterval();
+
+	var setOrderBy = function () {
+		document.getElementById('datasheet-processes').setAttribute('ord', orderbyColumn.value + ' ' + orderbyDirection.value);
+		document.getElementById('datasheet-processes').refresh();
+	};
+	orderbyColumn.addEventListener('change', function () { setOrderBy(); });
+	orderbyDirection.addEventListener('change', function () { setOrderBy(); });
+});
+
+function cancelProcess(intPID) {
+    GS.msgbox('Are you sure...',
+                'Are you sure you want to cancel this query?',
+                ['No', 'Yes'],
+                function (strAnswer) {
+        if (strAnswer === 'Yes') {
+            GS.addLoader(document.getElementById('process-table-container'), 'Cancelling Process...');
+            GS.requestFromSocket(GS.pgmanageProcessDialogSocket,
+                                'RAW\nSELECT pg_cancel_backend(' + intPID + ');',
+                                function (response, error) {
+                if (!error) {
+                    if (response === 'TRANSACTION COMPLETED') {
+                        document.getElementById('datasheet-processes').refresh();
+                        GS.removeLoader(document.getElementById('process-table-container'));
+                    }
+                } else {
+                    GS.removeLoader(document.getElementById('process-table-container'));
+                    GS.ajaxErrorDialog(response);
+                }
+            });
+        }
+    });
+}
+
+function terminateProcess(intPID) {
+    GS.msgbox('Are you sure...',
+                'Are you sure you want to terminate this process?',
+                ['No', 'Yes'],
+                function (strAnswer) {
+        if (strAnswer === 'Yes') {
+            GS.addLoader(document.getElementById('process-table-container'), 'Terminate Process...');
+            GS.requestFromSocket(GS.pgmanageProcessDialogSocket,
+                                'RAW\nSELECT pg_terminate_backend(' + intPID + ');',
+                                function (response, error) {
+                if (!error) {
+                    if (response === 'TRANSACTION COMPLETED') {
+                        document.getElementById('datasheet-processes').refresh();
+                        GS.removeLoader(document.getElementById('process-table-container'));
+                    }
+                } else {
+                    GS.removeLoader(document.getElementById('process-table-container'));
+                    GS.ajaxErrorDialog(response);
+                }
+            });
+        }
+    });
+}
+        </script>
+
+        <style>
+            #div-column-list-container {
+                display: block;
+                position: relative;
+                height: 100%;
+                overflow: auto;
+            }
+            #div-column-list-container table {
+                border-left: 1px solid #ddd;
+            }
+
+            #div-column-list-container table input {
+                display: block;
+                resize: none;
+                width: 100%;
+                border: 0 none;
+                cursor: text;
+                padding: 0 0.1em;
+
+                -webkit-box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                -ms-box-sizing: border-box;
+                -o-box-sizing: border-box;
+                box-sizing: border-box;
+            }
+
+            #div-column-list-container th, #div-column-list-container td {
+                padding: 0.1em;
+                cursor: pointer;
+
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                -khtml-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                -o-user-select: none;
+                user-select: none;
+            }
+
+            #div-column-list-container td gs-checkbox {
+                padding-top: 0.5em;
+            }
+
+            #div-column-list-container thead th {
+                cursor: s-resize;
+                overflow: hidden;
+            }
+        </style>
+        <script src="../../js/settings.js" type="text/javascript"></script>
+        <script>
+        window.addEventListener('load', function () {
+            document.getElementById('datasheet-processes').addEventListener('after_select', function () {
+                refreshCustomCSS(localStorage.customCSS);
+                /*
+                if (localStorage && localStorage.customCSS && document.getElementById('customCss')) {
+                    document.getElementById('customCss').innerHTML = localStorage.customCSS;
+                }
+                */
+            });
+        });
+        </script>
+        <style id="customCss"></style>
+    </head>
+    <body>
+		<gs-page>
+            <gs-body padded flex-vertical flex-fill>
+                <gs-grid widths="1,1,1,1" reflow-at="945px">
+                    <gs-block>
+                        <label>Autorefresh:</label>
+			        	<gs-checkbox id="autorefresh" value="true" flex-horizontal></gs-checkbox>
+			        </gs-block>
+                    <gs-block>
+                    	<label>Autorefresh Interval:</label>
+				        <gs-text id="autorefresh_interval" value="5"></gs-text>
+                    </gs-block>
+                    <gs-block>    
+			    	    <label>Order by:</label>
+						<gs-select id="orderby_column" value="pid">
+							<option value="datname">Database</option>
+							<option value="pid">Process ID</option>
+							<option value="usename">Username</option>
+							<option value="waiting">Waiting</option>
+							<option value="state">State</option>
+							<option value="query">Query</option>
+							<option value="application_name">Application Name</option>
+							<option value="client_addr">Client Address</option>
+							<option value="client_hostname">Client Host</option>
+							<option value="client_port">Client Port</option>
+							<option value="backend_start">Backend Start</option>
+							<option value="xact_start">Transaction Start</option>
+							<option value="query_start">Query Start</option>
+							<option value="state_change">Last State Change</option>
+						</gs-select>
+                    </gs-block>
+                    <gs-block>
+			    	    <label>Order by direction:</label>
+                        <gs-select id="orderby_direction">
+							<option value="ASC">Ascending</option>
+							<option value="DESC">Descending</option>
+						</gs-select>
+                    </gs-block>
+                </gs-grid>
+				<br />
+				<br />
+				<gs-datasheet flex id="datasheet-processes" src="pg_catalog.pg_stat_activity"
+                            pk="pid" lock="pid" socket="pgmanageProcessDialogSocket" no-filter
+                            ord="pid ASC" where="pid <> pg_backend_pid()">
+                    <template for="table">
+                        <table>
+                            <thead>
+                                <th>#</th>
+                                <th style="width: 6em;"></th>
+                                <th style="width: 5em;"></th>
+                                <th style="width: 8em;">Database</th>
+                                <th style="width: 6em;">Process ID</th>
+                                <th style="width: 12em;">Username</th>
+                                <th style="width: 5em;">Waiting?</th>
+                                <th style="width: 4em;">State</th>
+                                <th style="width: 25em;">Query</th>
+                                <th style="width: 12em;">Application Name</th>
+                                <th style="width: 9em;">Client Address</th>
+                                <th style="width: 12em;">Client Host</th>
+                                <th style="width: 6em;">Client Port</th>
+                                <th style="width: 16em;">Backend Start</th>
+                                <th style="width: 16em;">Transaction Start</th>
+                                <th style="width: 16em;">Query Start</th>
+                                <th style="width: 16em;">Last State Change</th>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th heading="#">{{! row_number }}</th>
+                                    <td heading="" title="Cancel current query for this backend">
+                                        {{? row.state.indexOf('idle') === 0 }}
+                                            <gs-button onclick="cancelProcess({{! row.pid }})" bg-danger disabled
+                                                    style="padding-left: 0; padding-right: 0;">Cancel Query</gs-button>
+                                        {{??}}
+                                            <gs-button onclick="cancelProcess({{! row.pid }})" bg-danger
+                                                    style="padding-left: 0; padding-right: 0;">Cancel Query</gs-button>
+                                        {{?}}
+                                    </td>
+                                    <td heading="" title="Terminate/kill backend">
+                                        <gs-button onclick="terminateProcess({{! row.pid }})" bg-danger
+                                                    style="padding-left: 0; padding-right: 0;">Terminate</gs-button>
+                                    </td>
+                                    <td heading="Database"><label>{{! row.datname }}</label></td>
+                                    <td heading="Proccess ID"><label>{{! row.pid }}</label></td>
+                                    <td heading="Username"><label>{{! row.usename }}</label></td>
+                                    <td heading="Waiting?"><label>{{! row.waiting === 'f' ? 'No' : 'Yes' }}</label></td>
+                                    <td heading="State">
+                                        {{? row.state === 'active' }}
+                                            <label title="active: The backend is executing a query.">{{! row.state }}</label>
+
+                                        {{?? row.state === 'idle' }}
+                                            <label title="idle: The backend is waiting for a new client command.">{{! row.state }}</label>
+
+                                        {{?? row.state === 'idle in transaction' }}
+                                            <label title="idle in transaction: The backend is in a transaction, but is not currently executing a query.">{{! row.state }}</label>
+
+                                        {{?? row.state === 'idle in transaction (aborted)' }}
+                                            <label title="idle in transaction (aborted): This state is similar to idle in transaction, except one of the statements in the transaction caused an error.">{{! row.state }}</label>
+
+                                        {{?? row.state === 'fastpath function call' }}
+                                            <label title="fastpath function call: The backend is executing a fast-path function.">{{! row.state }}</label>
+
+                                        {{?? row.state === 'disabled' }}
+                                            <label title="disabled: This state is reported if track_activities is disabled in this backend.">{{! row.state }}</label>
+                                        {{?}}
+                                    </td>
+                                    <td heading="Query">
+                                        <gs-button onclick="dialogShowProcessQuery(this, {{! row_number - 1 }})"
+                                                    style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
+                                                    title="Show Query..." bg-primary>
+                                            {{! row.query }}
+                                        </gs-button>
+                                    </td>
+                                    <td heading="Application Name"><label>{{! row.application_name }}</label></td>
+                                    <td heading="Client Address"><label>{{! row.client_addr }}</label></td>
+                                    <td heading="Client Host"><label>{{! row.client_hostname }}</label></td>
+                                    <td heading="Client Port"><label>{{! row.client_port }}</label></td>
+                                    <td heading="Backend Start"><label>{{! row.backend_start }}</label></td>
+                                    <td heading="Transaction Start"><label>{{! row.xact_start }}</label></td>
+                                    <td heading="Query Start"><label>{{! row.query_start }}</label></td>
+                                    <td heading="Last State Change"><label>{{! row.state_change }}</label></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </template>
+                </gs-datasheet>
+            </gs-body>
+        </gs-page>
+        
+    </body>
+</html>

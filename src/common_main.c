@@ -86,7 +86,7 @@ void program_exit() {
 		SFREE(str_global_log_level);
 #ifdef _WIN32
 
-		SFREE(POSTAGE_PREFIX);
+		SFREE(PGMANAGE_PREFIX);
 #endif
 
 		for (int_i = 0, int_len = DArray_end(darr_global_connection); int_i < int_len; int_i += 1) {

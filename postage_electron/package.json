@@ -1,9 +1,9 @@
 {
   "build": {
-    "appId": "com.workflowproducts.postage",
+    "appId": "com.workflowproducts.pgmanage",
     "asar": true,
     "extraResources": [
-      "app/postage"
+      "app/pgmanage"
     ],
     "mac": {
       "category": "public.app-category.developer-tools"
@@ -60,19 +60,19 @@
     "electron": "^1.6.2",
     "electron-builder": "^17.10.0"
   },
-  "homepage": "https://github.com/workflowproducts/postage/blob/master/README.md",
+  "homepage": "https://github.com/workflowproducts/pgmanage/blob/master/README.md",
   "keywords": [
-    "Postage",
+    "PgManage",
     "Electron",
     "PostgreSQL"
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/workflowproducts/postage.git"
+    "url": "git+https://github.com/workflowproducts/pgmanage.git"
   },
   "scripts": {
     "start": "electron app",
-    "test": "electron app --postage-test",
+    "test": "electron app --pgmanage-test",
     "debug": "electron app --debug=5858",
     "pack": "build --dir",
     "dist": "build",

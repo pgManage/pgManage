@@ -107,7 +107,7 @@ void http_export_step1(struct sock_ev_client *client) {
 
 	SDEBUG("str_sql: %s", str_sql);
 
-	client_request = create_request(client, NULL, NULL, NULL, NULL, 0, POSTAGE_REQ_STANDARD, NULL);
+	client_request = create_request(client, NULL, NULL, NULL, NULL, 0, PGMANAGE_REQ_STANDARD, NULL);
 	client->cur_request = client_request;
 	SFINISH_CHECK(client_request != NULL, "Could not create request data!");
 

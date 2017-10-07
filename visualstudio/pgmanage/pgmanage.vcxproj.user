@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LocalDebuggerEnvironment>PATH=%PATH%;..\lib\x86</LocalDebuggerEnvironment>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>-n true -l info -o stderr -r ..\..\src\web_root -c ..\..\src\config\pgmanage.conf -d ..\..\src\config\pgmanage-connections-test.conf</LocalDebuggerCommandArguments>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LocalDebuggerEnvironment>PATH=%PATH%;..\lib\x86</LocalDebuggerEnvironment>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>-n true -l info -o stderr -r ..\..\src\web_root -c ..\..\src\config\pgmanage.conf -d ..\..\src\config\pgmanage-connections-test.conf</LocalDebuggerCommandArguments>
+    <RemoteDebuggerServerName>192.168.44.119:4020</RemoteDebuggerServerName>
+    <RemoteDebuggerDebuggerType>NativeOnly</RemoteDebuggerDebuggerType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LocalDebuggerEnvironment>PATH=%PATH%;..\lib\x64</LocalDebuggerEnvironment>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>-l info -o stderr -r ..\..\pgmanage\web_root -c ..\..\pgmanage\config\pgmanage.conf -d ..\..\pgmanage\config\pgmanage-connections.conf</LocalDebuggerCommandArguments>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LocalDebuggerEnvironment>PATH=%PATH%;..\lib\x64</LocalDebuggerEnvironment>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>-l info -o stderr -r ..\..\pgmanage\web_root -c ..\..\pgmanage\config\pgmanage.conf -d ..\..\pgmanage\config\pgmanage-connections.conf</LocalDebuggerCommandArguments>
+  </PropertyGroup>
+</Project>

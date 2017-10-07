@@ -1,41 +1,41 @@
 Changes since 3.2.17:
-Postage:
+PgManage:
 - Fix `super_only` error to be more specific
-- Fix tab folder icon (closes workflowproducts/postage#351)
-- Don't require superuser by default (for workflowproducts/postage#353)
-- Disable timeout by default (for workflowproducts/postage#353)
-- Fixed page curls in postage frames (closes workflowproducts/postage#362)
-- Relabel ACE button to Help (closes workflowproducts/postage#359)
-- Fix table designer issues (closes workflowproducts/postage#364)
-- Add shortcuts to toolbar (closes workflowproducts/postage#358)
-- Fix CTRL-W closing application in electron (closes workflowproducts/postage#356)
-- Fix UNLOGGED, REAL and TEMP (closes workflowproducts/postage#370)
-- Add automatically resizing when you run one record returning query (closes workflowproducts/postage#369)
-- Prevent editor from losing focus (closes workflowproducts/postage#361)
-- Make NULL a placeholder text (closes workflowproducts/postage#368)
-- Fix justification of integers and number columns (closes workflowproducts/postage#31)
-- Add zoom-to-fit to explain graph (for workflowproducts/postage#363)
-- Add horizontal explain graph (for workflowproducts/postage#363)
-- Add EXPLAIN and EXPLAIN ANALYZE to history (closes workflowproducts/postage#360)
-- Add `hostaddr` warning to config editor (closes workflowproducts/postage#367)
-- Fix carriage returns (closes workflowproducts/postage#373)
-- Fix query detection in update rules (working on workflowproducts/postage#372)
-- Autocomplete 'SELECT schema.' now shows functions in that schema (closes workflowproducts/postage#374)
-- Fix multiple cursor query execute (closes workflowproducts/postage#375)
-- Usernames are now qouted (closes workflowproducts/postage#376)
-- Fix schema dump dropping sequences owned by a table (closes workflowproducts/postage#385)
-- Fix schema dump sequences owned by clause (closes workflowproducts/postage#382)
-- Fix schema dump OPERATOR drop statements (closes workflowproducts/postage#381)
-- Fix schema dump dropping indexes (closes workflowproducts/postage#379)
-- Fix schema dump triggers to come after the functions they call (closes workflowproducts/postage#378)
-- Make snippets popup when you complete the first word (closes workflowproducts/postage#377)
-- Fix E'\n's being converted to actual newlines (for workflowproducts/postage#380)
-- Add generation of md5sums for packages (closes workflowproducts/postage#383)
-- Fix beautify with multiple cursors (closes workflowproducts/postage#386)
-- Fixed beautify mangling query (closes workflowproducts/postage#388)
-- Make postage ask for copy options when you copy (closes workflowproducts/postage#390)
-- Fixed beautify extra space (closes workflowproducts/postage#392)
-- Fix clicking on current connection de-focusing password input (closes workflowproducts/postage#387)
+- Fix tab folder icon (closes workflowproducts/pgmanage#351)
+- Don't require superuser by default (for workflowproducts/pgmanage#353)
+- Disable timeout by default (for workflowproducts/pgmanage#353)
+- Fixed page curls in pgmanage frames (closes workflowproducts/pgmanage#362)
+- Relabel ACE button to Help (closes workflowproducts/pgmanage#359)
+- Fix table designer issues (closes workflowproducts/pgmanage#364)
+- Add shortcuts to toolbar (closes workflowproducts/pgmanage#358)
+- Fix CTRL-W closing application in electron (closes workflowproducts/pgmanage#356)
+- Fix UNLOGGED, REAL and TEMP (closes workflowproducts/pgmanage#370)
+- Add automatically resizing when you run one record returning query (closes workflowproducts/pgmanage#369)
+- Prevent editor from losing focus (closes workflowproducts/pgmanage#361)
+- Make NULL a placeholder text (closes workflowproducts/pgmanage#368)
+- Fix justification of integers and number columns (closes workflowproducts/pgmanage#31)
+- Add zoom-to-fit to explain graph (for workflowproducts/pgmanage#363)
+- Add horizontal explain graph (for workflowproducts/pgmanage#363)
+- Add EXPLAIN and EXPLAIN ANALYZE to history (closes workflowproducts/pgmanage#360)
+- Add `hostaddr` warning to config editor (closes workflowproducts/pgmanage#367)
+- Fix carriage returns (closes workflowproducts/pgmanage#373)
+- Fix query detection in update rules (working on workflowproducts/pgmanage#372)
+- Autocomplete 'SELECT schema.' now shows functions in that schema (closes workflowproducts/pgmanage#374)
+- Fix multiple cursor query execute (closes workflowproducts/pgmanage#375)
+- Usernames are now qouted (closes workflowproducts/pgmanage#376)
+- Fix schema dump dropping sequences owned by a table (closes workflowproducts/pgmanage#385)
+- Fix schema dump sequences owned by clause (closes workflowproducts/pgmanage#382)
+- Fix schema dump OPERATOR drop statements (closes workflowproducts/pgmanage#381)
+- Fix schema dump dropping indexes (closes workflowproducts/pgmanage#379)
+- Fix schema dump triggers to come after the functions they call (closes workflowproducts/pgmanage#378)
+- Make snippets popup when you complete the first word (closes workflowproducts/pgmanage#377)
+- Fix E'\n's being converted to actual newlines (for workflowproducts/pgmanage#380)
+- Add generation of md5sums for packages (closes workflowproducts/pgmanage#383)
+- Fix beautify with multiple cursors (closes workflowproducts/pgmanage#386)
+- Fixed beautify mangling query (closes workflowproducts/pgmanage#388)
+- Make pgmanage ask for copy options when you copy (closes workflowproducts/pgmanage#390)
+- Fixed beautify extra space (closes workflowproducts/pgmanage#392)
+- Fix clicking on current connection de-focusing password input (closes workflowproducts/pgmanage#387)
 
 Envelope:
 - Fix auth check for `/env` to instead check for `/env/`
@@ -47,61 +47,61 @@ Both:
 - Fix insert and update for columns with backslashes
 
 Changes since 3.2.16:
-Postage:
-- Make headers visible rather than seeing "####" (PR workflowproducts/postage#328)
-- Fix running postage from a different disk drive (for workflowproducts/postage#339)
-- Fix configure to accept --prefix, fix Makefile to create mandir (closes workflowproducts/postage#343)
-- Disable context data in Postage (closes workflowproducts/postage#336)
-- Fix line indicator when Postgres doesn't supply a line number with an error (closes workflowproducts/postage#329)
-- Add autofit button (closes workflowproducts/postage#345)
-- Fix file save/save as in postage (closes workflowproducts/postage#330)
-- Fix raw not returning NULL properly (closes workflowproducts/postage#332)
-- Changed transaction block errors to include a solution (closes workflowproducts/postage#349)
+PgManage:
+- Make headers visible rather than seeing "####" (PR workflowproducts/pgmanage#328)
+- Fix running pgmanage from a different disk drive (for workflowproducts/pgmanage#339)
+- Fix configure to accept --prefix, fix Makefile to create mandir (closes workflowproducts/pgmanage#343)
+- Disable context data in PgManage (closes workflowproducts/pgmanage#336)
+- Fix line indicator when Postgres doesn't supply a line number with an error (closes workflowproducts/pgmanage#329)
+- Add autofit button (closes workflowproducts/pgmanage#345)
+- Fix file save/save as in pgmanage (closes workflowproducts/pgmanage#330)
+- Fix raw not returning NULL properly (closes workflowproducts/pgmanage#332)
+- Changed transaction block errors to include a solution (closes workflowproducts/pgmanage#349)
 
 Both:
-- Fix openssl on mac linking to static library (closes workflowproducts/postage#343)
-- Fix UPDATE/DELETE hashes (closes workflowproducts/postage#347)
+- Fix openssl on mac linking to static library (closes workflowproducts/pgmanage#343)
+- Fix UPDATE/DELETE hashes (closes workflowproducts/pgmanage#347)
 
 
 Changes since 3.2.15:
-Postage:
-- Rewrite generate script for table designer (closed workflowproducts/postage#307)
-- Fix beautify not working on tables (closed workflowproducts/postage#318)
-- Fix dollar tag syntax highlighting (closed workflowproducts/postage#274)
-- Fix function utility comment script on table functions (closed workflowproducts/postage#319)
-- Fix object browser losing track of replaced view (closed workflowproducts/postage#220)
-- Fix object browser losing track of replaced schema (closed workflowproducts/postage#251)
-- Fix column permissions in table script (closed workflowproducts/postage#316)
+PgManage:
+- Rewrite generate script for table designer (closed workflowproducts/pgmanage#307)
+- Fix beautify not working on tables (closed workflowproducts/pgmanage#318)
+- Fix dollar tag syntax highlighting (closed workflowproducts/pgmanage#274)
+- Fix function utility comment script on table functions (closed workflowproducts/pgmanage#319)
+- Fix object browser losing track of replaced view (closed workflowproducts/pgmanage#220)
+- Fix object browser losing track of replaced schema (closed workflowproducts/pgmanage#251)
+- Fix column permissions in table script (closed workflowproducts/pgmanage#316)
 
 Envelope:
 - Fix GS-Time showing PM at wrong time (closed workflowproducts/envelope#68)
 
 Both:
-- Fix datasheet inserting a record scrolls to the top (closed workflowproducts/postage#309)
-- Fix datasheet column resizing behaviors (closed workflowproducts/envelope#70, workflowproducts/postage#315)
-- Fix datasheet allows cursor while multiple columns are selected (closed workflowproducts/postage#308)
-- Fix datasheet updating selection after changing a cell (closed workflowproducts/postage#311)
+- Fix datasheet inserting a record scrolls to the top (closed workflowproducts/pgmanage#309)
+- Fix datasheet column resizing behaviors (closed workflowproducts/envelope#70, workflowproducts/pgmanage#315)
+- Fix datasheet allows cursor while multiple columns are selected (closed workflowproducts/pgmanage#308)
+- Fix datasheet updating selection after changing a cell (closed workflowproducts/pgmanage#311)
 
 
 Changes since 3.2.14:
-Postage:
-- Fix datasheet preventing scrolling of the results pane (closed workflowproducts/postage#306)
-- Fix returns not scrolling the viewport (closed workflowproducts/postage#279)
-- Fix LOGIN and PASSWORD on same line in CREATE ROLE script (closed workflowproducts/postage#305)
-- Fix Object CREATE scripts (closed workflowproducts/postage#240)
-- Add Javascript error notifications (closed workflowproducts/postage#265)
-- Fix autocomplete not working after a parenthesis (closed workflowproducts/postage#292)
-- Fix materialized view definitions not showing (closed workflowproducts/postage#300)
-- Fix autocomplete not offering snippets when typing a subquery (closed workflowproducts/postage#256)
+PgManage:
+- Fix datasheet preventing scrolling of the results pane (closed workflowproducts/pgmanage#306)
+- Fix returns not scrolling the viewport (closed workflowproducts/pgmanage#279)
+- Fix LOGIN and PASSWORD on same line in CREATE ROLE script (closed workflowproducts/pgmanage#305)
+- Fix Object CREATE scripts (closed workflowproducts/pgmanage#240)
+- Add Javascript error notifications (closed workflowproducts/pgmanage#265)
+- Fix autocomplete not working after a parenthesis (closed workflowproducts/pgmanage#292)
+- Fix materialized view definitions not showing (closed workflowproducts/pgmanage#300)
+- Fix autocomplete not offering snippets when typing a subquery (closed workflowproducts/pgmanage#256)
 
 Both: 
-- Add multi-column updating to datasheet (closed workflowproducts/postage#286)
-- Fix side-scrolling on datasheet (closed workflowproducts/postage#291)
+- Add multi-column updating to datasheet (closed workflowproducts/pgmanage#286)
+- Fix side-scrolling on datasheet (closed workflowproducts/pgmanage#291)
 
 
 Changes since 3.2.13:
-Postage:
-- Fix datasheet not working when a column name has a dash in it (closed workflowproducts/postage#298)
+PgManage:
+- Fix datasheet not working when a column name has a dash in it (closed workflowproducts/pgmanage#298)
 - Datasheet: Allow copy record to use new arrRow column access method
 
 Envelope:
@@ -112,17 +112,17 @@ Both:
 
 
 Changes since 3.2.12:
-Postage:
+PgManage:
 - New autocomplete
-- Fix electron postage to use extraResources instead of disabling asar
-- Fix multiple instances of postage (closed workflowproducts/postage#267)
-- Make Beautify check itself before wrecking itself (closed workflowproducts/postage#262)
-- Fix column headings disappearing after scrolling (closed workflowproducts/postage #40)
-- Make Query Result Columns Only as Wide as Necessary (closed workflowproducts/postage#165)
-- Fix switching tabs during a query execution (closed workflowproducts/postage#227)
-- Fix Beautify not recognizing UNION (closed workflowproducts/postage#260)
-- Fix Beautify mangling VIEW RULES (closed workflowproducts/postage#261)
-- CREATE FUNCTION snippet puts in a single dollar sign instead of a $BODY$ tag (closed workflowproducts/postage#254)
+- Fix electron pgmanage to use extraResources instead of disabling asar
+- Fix multiple instances of pgmanage (closed workflowproducts/pgmanage#267)
+- Make Beautify check itself before wrecking itself (closed workflowproducts/pgmanage#262)
+- Fix column headings disappearing after scrolling (closed workflowproducts/pgmanage #40)
+- Make Query Result Columns Only as Wide as Necessary (closed workflowproducts/pgmanage#165)
+- Fix switching tabs during a query execution (closed workflowproducts/pgmanage#227)
+- Fix Beautify not recognizing UNION (closed workflowproducts/pgmanage#260)
+- Fix Beautify mangling VIEW RULES (closed workflowproducts/pgmanage#261)
+- CREATE FUNCTION snippet puts in a single dollar sign instead of a $BODY$ tag (closed workflowproducts/pgmanage#254)
 
 Envelope:
 - Fix file rename to not overwrite files
@@ -148,29 +148,29 @@ Both:
 
 
 Changes since 3.2.11:
-Postage:
+PgManage:
 - Fix HTML in explain table
-- Stop drop down showing up for SPACE (closes workflowproducts/postage#257)
-- Fix autocomplete with double-quoted entity names (closes workflowproducts/postage#246)
-- Fix tab suddenly not working in code editor (closes workflowproducts/postage#255)
-- Fix CREATE FUNCTION listed twice in autocomplete dropdown (closes workflowproducts/postage#253)
-- Fix duplicate letters when typing (closes workflowproducts/postage#252)
-- Fix CREATE FUNCTION to have a $BODY$ tag (closes workflowproducts/postage#254)
+- Stop drop down showing up for SPACE (closes workflowproducts/pgmanage#257)
+- Fix autocomplete with double-quoted entity names (closes workflowproducts/pgmanage#246)
+- Fix tab suddenly not working in code editor (closes workflowproducts/pgmanage#255)
+- Fix CREATE FUNCTION listed twice in autocomplete dropdown (closes workflowproducts/pgmanage#253)
+- Fix duplicate letters when typing (closes workflowproducts/pgmanage#252)
+- Fix CREATE FUNCTION to have a $BODY$ tag (closes workflowproducts/pgmanage#254)
 
 Both:
 - Remove LibreSSL Source (closes workflowproducts/envelope#59)
 - Update Windows LibreSSL
 
 Changes since 3.2.10:
-Postage:
+PgManage:
 - Fix crash when raw request is pending and socket is closed
-- Find and replace buttons now give feedback (closes workflowproducts/postage#239)
-- Object Browser vertical scroll bar stops working (closes workflowproducts/postage#242)
-- Beautify RULES improvements (closes workflowproducts/postage#241)
-- Beautify remove some extra spacing (closes workflowproducts/postage#249)
-- Fix autocomplete PL/PGSQL variables (closes workflowproducts/postage#247)
-- Fix autocomplete inserts entire word instead of completing word (closes workflowproducts/postage#244)
-- Fix autocomplete not sorting alphabetically (closes workflowproducts/postage#245)
+- Find and replace buttons now give feedback (closes workflowproducts/pgmanage#239)
+- Object Browser vertical scroll bar stops working (closes workflowproducts/pgmanage#242)
+- Beautify RULES improvements (closes workflowproducts/pgmanage#241)
+- Beautify remove some extra spacing (closes workflowproducts/pgmanage#249)
+- Fix autocomplete PL/PGSQL variables (closes workflowproducts/pgmanage#247)
+- Fix autocomplete inserts entire word instead of completing word (closes workflowproducts/pgmanage#244)
+- Fix autocomplete not sorting alphabetically (closes workflowproducts/pgmanage#245)
 
 Envelope:
 - Fix crash when ws_file_free called twice
@@ -180,7 +180,7 @@ Both:
 - Unescape source of SELECT request when it's arbitrary
 
 Changes since 3.2.9:
-Postage:
+PgManage:
 - Fix autocomplete casting popup cutting out a colon when you insert
 - Fix autocomplete not closing when you "wordleft"
 - Fix Beautify handling double single quotes in strings
@@ -194,11 +194,11 @@ Both:
 - Fix file handling on OpenBSD 6.1
 
 Changes since 3.2.8:
-Postage:
+PgManage:
 - Repackage all installers with latest JavaScript
 
 Changes since 3.2.7:
-Postage:
+PgManage:
 - Fixed autocomplete after dot
 - Fix crash when running empty query
 - Fix crash when closing socket while raw is running
@@ -213,16 +213,16 @@ Both:
 - Add user-agent to context info
 
 Changes since 3.2.6:
-Postage:
+PgManage:
 Fix beautify issue
-Fix context menu (close workflowproducts/postage#200)
-Move cursor to error position (close workflowproducts/postage#208)
-Focus editor after clicking RUN button (close workflowproducts/postage#202)
-Split 'Tools' menu into 'Tools' and 'Options' (close workflowproducts/postage#197)
+Fix context menu (close workflowproducts/pgmanage#200)
+Move cursor to error position (close workflowproducts/pgmanage#208)
+Focus editor after clicking RUN button (close workflowproducts/pgmanage#202)
+Split 'Tools' menu into 'Tools' and 'Options' (close workflowproducts/pgmanage#197)
 Set width of history/notify buttons
-Fix object browser line padding (close workflowproducts/postage#210)
-Make clicks in the object browser not affect the focus (close workflowproducts/postage#209)
-Fix 'too many levels of symbolic links error' (close workflowproducts/postage#215)
+Fix object browser line padding (close workflowproducts/pgmanage#210)
+Make clicks in the object browser not affect the focus (close workflowproducts/pgmanage#209)
+Fix 'too many levels of symbolic links error' (close workflowproducts/pgmanage#215)
 Restructured autocomplete
 Fix issue where autocomplete popup would not insert when you clicked it
 
@@ -236,13 +236,13 @@ Fix empty login_group
 Fix makefiles to have all target at the top
 
 Changes since 3.2.5:
-Postage:
+PgManage:
 Fix typing bugs
 
 Changes since 3.2.4:
-Postage:
-Fix constraint query (closed workflowproducts/postage#205)
-Fix header buttons in configuration editor (closed workflowproducts/postage#203)
+PgManage:
+Fix constraint query (closed workflowproducts/pgmanage#205)
+Fix header buttons in configuration editor (closed workflowproducts/pgmanage#203)
 Update windows libpq (9.6.2) and windows libressl (2.5.3)
 Fix memory issues in JS
 
@@ -250,7 +250,7 @@ Both:
 Add arbitrary FROM to ws_select, remove group by from ws_select
 
 Changes since 3.2.3:
-Postage:
+PgManage:
 Fix punctuation in an error
 Fix cursor query split
 Fix proccess manager button layout
@@ -263,26 +263,26 @@ Add horizontal parameters for scroll functions
 
 
 Changes since 3.2.2
-Postage:
-Add depesz based explain (closed workflowproducts/postage#176)
+PgManage:
+Add depesz based explain (closed workflowproducts/pgmanage#176)
 Fix query highlighting
-Fix triangle icons (closed workflowproducts/postage#185)
-Fix tree queries for constraint (closed workflowproducts/postage#187)
-Add second run option to only run the query under the cursor (closed workflowproducts/postage #171)
-Add session user to current user information (closed workflowproducts/postage#180)
-Fix problem with query detection (closed workflowproducts/postage#179)
-Fix escaping for odd names (closed workflowproducts/postage#178)
-Remove lowercasing database and user (closed workflowproducts/postage#178)
-Add declared variables to autocomplete (closed workflowproducts/postage#170)
-Fix ws_raw socket close (related to workflowproducts/postage#174)
-Add a keyboard shortcut editor (closed workflowproducts/postage#167)
-Fix view scripts opening when you click the arrow (closed workflowproducts/postage#169)
+Fix triangle icons (closed workflowproducts/pgmanage#185)
+Fix tree queries for constraint (closed workflowproducts/pgmanage#187)
+Add second run option to only run the query under the cursor (closed workflowproducts/pgmanage #171)
+Add session user to current user information (closed workflowproducts/pgmanage#180)
+Fix problem with query detection (closed workflowproducts/pgmanage#179)
+Fix escaping for odd names (closed workflowproducts/pgmanage#178)
+Remove lowercasing database and user (closed workflowproducts/pgmanage#178)
+Add declared variables to autocomplete (closed workflowproducts/pgmanage#170)
+Fix ws_raw socket close (related to workflowproducts/pgmanage#174)
+Add a keyboard shortcut editor (closed workflowproducts/pgmanage#167)
+Fix view scripts opening when you click the arrow (closed workflowproducts/pgmanage#169)
 Fix windows installation when installer is on a different drive
-Fix arrowing in some autocomplete situations (closed workflowproducts/postage#182)
+Fix arrowing in some autocomplete situations (closed workflowproducts/pgmanage#182)
 Make Ctrl/Cmd+s save shortcut in tab editor
 Add ORDER BY to all INSERT tests with more than one record (prevents a fail that happens sometimes)
 Add alert to tell the tester when the API tests are done
-Fix Beautify to work properly (closed workflowproducts/postage#183)
+Fix Beautify to work properly (closed workflowproducts/pgmanage#183)
 make Beautify run when opening a VIEW script
 
 Envelope:
@@ -295,9 +295,9 @@ Add GROUP BY to websocket SELECT
 
 
 Changes since 3.2.1:
-Postage:
+PgManage:
 Clear Electron cache when opening a window
-Fix database list code to not clear HTML every 10 records (closed workflowproducts/postage#164)
+Fix database list code to not clear HTML every 10 records (closed workflowproducts/pgmanage#164)
 
 Envelope:
 Fix limit property not templating
@@ -311,7 +311,7 @@ Error when an RSV bit is set in a websocket message (closed workflowproducts/env
 
 
 Changes since 3.2.0:
-Postage:
+PgManage:
 Remove "Clear Cache" button in Electron version
 Make "Reload" menu option a hard refresh
 
@@ -320,40 +320,40 @@ Fix caching issues
 
 
 Changes since 3.2.0-beta:
-Postage:
+PgManage:
 Add options dialog
-Fix .deb dependencies (closed workflowproducts/postage#162)
-Added stop button when loading records (closed workflowproducts/postage#96)
-Fix error notifications (closes workflowproducts/postage#156)
-Add localStorage for shown/hidden items (closes workflowproducts/postage#159)
+Fix .deb dependencies (closed workflowproducts/pgmanage#162)
+Added stop button when loading records (closed workflowproducts/pgmanage#96)
+Fix error notifications (closes workflowproducts/pgmanage#156)
+Add localStorage for shown/hidden items (closes workflowproducts/pgmanage#159)
 Add HTML man page to configuration editor
-Added thicker lines to explain graph where the cost is higher (closed workflowproducts/postage#102)
-Fixed autocomplete with multiple cursors (closed workflowproducts/postage#120)
-Fix update to return records if you update the PK column (closed workflowproducts/postage#100)
-Add button to open tab folder (closed workflowproducts/postage#117)
-Stat page: allow to set interval and add a cut of time (closed workflowproducts/postage#152)
-Added CTRL-O shortcut to open a new SQL tab (closed workflowproducts/postage#154)
-Add text explain (closed workflowproducts/postage#137)
-Add SQL beautifier (closed workflowproducts/postage#42)
-Group table/view-specific objects under their parent table/view (closed workflowproducts/postage#146)
-Add prefix/help options to configure (closed workflowproducts/postage#151)
-Add button to open tabs in a new window (closed workflowproducts/postage#150)
-Change process manager to a tab (for workflowproducts/postage#139)
-Add Order By dropdowns to process manager (for workflowproducts/postage#139)
-Add horizontal mode for toolbar (closed workflowproducts/postage#142)
-Fixed index scripts (closed workflowproducts/postage#145)
-Add AUTOCOMMIT to RAW API (closed workflowproducts/postage#124)
-Change autocomplete to popup when you delete a character (closed workflowproducts/postage#147)
+Added thicker lines to explain graph where the cost is higher (closed workflowproducts/pgmanage#102)
+Fixed autocomplete with multiple cursors (closed workflowproducts/pgmanage#120)
+Fix update to return records if you update the PK column (closed workflowproducts/pgmanage#100)
+Add button to open tab folder (closed workflowproducts/pgmanage#117)
+Stat page: allow to set interval and add a cut of time (closed workflowproducts/pgmanage#152)
+Added CTRL-O shortcut to open a new SQL tab (closed workflowproducts/pgmanage#154)
+Add text explain (closed workflowproducts/pgmanage#137)
+Add SQL beautifier (closed workflowproducts/pgmanage#42)
+Group table/view-specific objects under their parent table/view (closed workflowproducts/pgmanage#146)
+Add prefix/help options to configure (closed workflowproducts/pgmanage#151)
+Add button to open tabs in a new window (closed workflowproducts/pgmanage#150)
+Change process manager to a tab (for workflowproducts/pgmanage#139)
+Add Order By dropdowns to process manager (for workflowproducts/pgmanage#139)
+Add horizontal mode for toolbar (closed workflowproducts/pgmanage#142)
+Fixed index scripts (closed workflowproducts/pgmanage#145)
+Add AUTOCOMMIT to RAW API (closed workflowproducts/pgmanage#124)
+Change autocomplete to popup when you delete a character (closed workflowproducts/pgmanage#147)
 Added "All" checkbox to dump schema to script dialog
-Make postage pick new port if needed (closed workflowproducts/postage#141)
+Make pgmanage pick new port if needed (closed workflowproducts/pgmanage#141)
 Splash page will error when it can't be reached
 Notices will appear one to a line
-Schema dump updated to include more objects (closed workflowproducts/postage#144)
-Fixed extra scrollbar on home ace (closed workflowproducts/postage#134)
-Add PGPASS editor (closed workflowproducts/postage#125)
-Make external links open in default browser (closed workflowproducts/postage#128)
-Add keyboard shorcuts for EXPLAIN and EXPLAIN ANALYZE (closed workflowproducts/postage#130)
-Add zoom functionality (closed workflowproducts/postage#126)
+Schema dump updated to include more objects (closed workflowproducts/pgmanage#144)
+Fixed extra scrollbar on home ace (closed workflowproducts/pgmanage#134)
+Add PGPASS editor (closed workflowproducts/pgmanage#125)
+Make external links open in default browser (closed workflowproducts/pgmanage#128)
+Add keyboard shorcuts for EXPLAIN and EXPLAIN ANALYZE (closed workflowproducts/pgmanage#130)
+Add zoom functionality (closed workflowproducts/pgmanage#126)
 
 Envelope:
 Fix gs-page doc page
@@ -363,14 +363,14 @@ Fix search page to not split results from same file (closed workflowproducts/env
 Add "clearable" attribute to the gs-optionbox
 Added attribute to gs-memo to allow tab characters
 GS.setCookie now defaults to thirty days when there is no expiration date supplied (closed workflowproducts/envelope#21)
-Fixed envelope row count not updating (closed workflowproducts/postage#121)
+Fixed envelope row count not updating (closed workflowproducts/pgmanage#121)
 
 Both:
 New testing system
 Add PQflush to allow much larger INSERT and UPDATE requests
 Fix file descriptor checks in ws_tab, ws_file, http_upload
 Add optional ORDER BY to INSERT request and UPDATE request
-Add fallback_application_name to db_framework (closed workflowproducts/postage#133)
+Add fallback_application_name to db_framework (closed workflowproducts/pgmanage#133)
 Upgrade to Windows projects to VS2017
 
 Added column documentation to these elements:
@@ -384,7 +384,7 @@ Added column documentation to these elements:
 
 
 Changes since 3.1.3:
-Postage:
+PgManage:
 - Redesigned autocomplete experience
 - Fix hang when running a query to kill the current backend process
 - Fixed autocomplete not opening correctly when there is an underline in the middle of a word
@@ -483,84 +483,84 @@ Fixed query detection inside of a CREATE FUNCTION statement
 Added a highlight to the first word of the detected query
 Fixed issue with autocomplete where a backslashed character prevented autocomplete from getting the correct prefixes
 made it so that query detection was aware of how parenthesis can end a query
-re-write explain graph (closes workflowproducts/postage#77)
+re-write explain graph (closes workflowproducts/pgmanage#77)
 Fix explain graph clicking
-Fix custom connection bug related to workflowproducts/postage#83
+Fix custom connection bug related to workflowproducts/pgmanage#83
 Add category to Linux packages
 Fix DMG background to not have notice about no code-signing
 added a `gs-interval` element
 Make DB_get_row_lengths return `ssize_t`
 Allow no password when logging in (for PostgresApp/PostgresApp#365)
-Add listen-for-return to default dialog buttons (closes workflowproducts/postage#85)
+Add listen-for-return to default dialog buttons (closes workflowproducts/pgmanage#85)
 
 Changes since 3.1.1 and 2.2.1:
-Fix version number inconsistency (closes workflowproducts/postage#62)
+Fix version number inconsistency (closes workflowproducts/pgmanage#62)
 Fix inconsistency in checkbox type handling
-Error messages had extra slashes (closes workflowproducts/postage#76)
+Error messages had extra slashes (closes workflowproducts/pgmanage#76)
 Added designer attributes for flex, gs-grid padding and gutter, gs-body padded
 Updated template code to work on IE Edge (.children on .content issue)
-Fix activity page (closes workflowproducts/postage#74)
+Fix activity page (closes workflowproducts/pgmanage#74)
 Fix occasional issue where results can't be scrolled even though there is too much to see at once.
-Fix issue where comments on columns break table script generation (closes workflowproducts/postage#81)
+Fix issue where comments on columns break table script generation (closes workflowproducts/pgmanage#81)
 Remove strlen in accept (fixes crash when there is no return from the PostgreSQL function)
-Fix raw errors (closes workflowproducts/postage#79)
+Fix raw errors (closes workflowproducts/pgmanage#79)
 
 Changes since 3.1.0 and 2.2.0:
-Make NSIS installer check for ucrt (closes workflowproducts/postage#67)
-Add column list to tree view (closes workflowproducts/postage#9)
-Clipboard handle container for text (closes workflowproducts/postage#69)
-Add NULL to cells that don't exist (closes workflowproducts/postage#68)
-Fix clip options label (closes workflowproducts/postage#66)
-Fix raw error reporting to not be truncated at 255 chars (for workflowproducts/postage#65)
-Make raw errors more detailed like PGAdmin (closes workflowproducts/postage#65)
-Fixed Postage issue where in certain cases results could not be seen.
-Fixed Postage issue where switching to a tab with results in it: the top portion of the results was chopped off.
+Make NSIS installer check for ucrt (closes workflowproducts/pgmanage#67)
+Add column list to tree view (closes workflowproducts/pgmanage#9)
+Clipboard handle container for text (closes workflowproducts/pgmanage#69)
+Add NULL to cells that don't exist (closes workflowproducts/pgmanage#68)
+Fix clip options label (closes workflowproducts/pgmanage#66)
+Fix raw error reporting to not be truncated at 255 chars (for workflowproducts/pgmanage#65)
+Make raw errors more detailed like PGAdmin (closes workflowproducts/pgmanage#65)
+Fixed PgManage issue where in certain cases results could not be seen.
+Fixed PgManage issue where switching to a tab with results in it: the top portion of the results was chopped off.
 Speed up update on complex views (workflowproducts/envelope#23)
 Remove .trim()s (closes workflowproducts/envelope#64)
-Fix autocomplete scroll (closes workflowproducts/postage#54)
-Add cancel option to login (closes workflowproducts/postage#50)
-Fix mac dmg image to be taller (closes workflowproducts/postage#61)
+Fix autocomplete scroll (closes workflowproducts/pgmanage#54)
+Add cancel option to login (closes workflowproducts/pgmanage#50)
+Fix mac dmg image to be taller (closes workflowproducts/pgmanage#61)
 Fix grep search in envelope
-fix `make install` not creating sbin (closes workflowproducts/postage#58)
-Merge pull request workflowproducts/postage#63 from anthonydb/master (Minor spelling and grammar updates to text)
+fix `make install` not creating sbin (closes workflowproducts/pgmanage#58)
+Merge pull request workflowproducts/pgmanage#63 from anthonydb/master (Minor spelling and grammar updates to text)
 
 Changes since 3.0.0 and 2.1.0:
 Fix http_accept to be able to return long strings
 Fix hang when TLS is enabled
-Envelope now says 'ENVELOPE IS SHUTTING DOWN' instead of 'POSTAGE IS SHUTTING DOWN' (closes workflowproducts/envelope#20)
-Fix * in export force quotes on columns (closes workflowproducts/postage#12)
+Envelope now says 'ENVELOPE IS SHUTTING DOWN' instead of 'PGMANAGE IS SHUTTING DOWN' (closes workflowproducts/envelope#20)
+Fix * in export force quotes on columns (closes workflowproducts/pgmanage#12)
 Add [type] attribute to checkbox
 Add `make destroy`
 Fix connection list not selecting first connection
 Fix gs-checkbox element `inserted` function by changing "this" to "element"
 Make Github links open in browser
-Add some instructions to DMG background (closes workflowproducts/postage#37)
+Add some instructions to DMG background (closes workflowproducts/pgmanage#37)
 Fix search page on Windows to use forward slashes
-Fix saving of localStorage/cookies (closes workflowproducts/postage#47)
-Fix closing window when a tab is not saved (closes workflowproducts/postage#45)
+Fix saving of localStorage/cookies (closes workflowproducts/pgmanage#47)
+Fix closing window when a tab is not saved (closes workflowproducts/pgmanage#45)
 Update LibreSSL to 2.4.3
 Improve pass-through Makefile
 Fix missing decrement_idle
 Fix extra decrement_idle
 Make logout select last connection on login page
-Fix default postage-connections.conf to not use sslmode=allow
+Fix default pgmanage-connections.conf to not use sslmode=allow
 Fix logout crash
 Made record highlight more obvious
-Fix data-grid columns list in Postage
+Fix data-grid columns list in PgManage
 Fix crash when waiting for query and logging out
 Fix raw fail to wait for rollback to finish before moving on to the next request
 Fix some memory leaks
 
 Changes since 3.0.0RC4 and 2.1.0RC7:
-postage login timeout: go back to login screen (closes #10)
+pgmanage login timeout: go back to login screen (closes #10)
 fix `echo -n` in Makefile (there is no -n flag on macOS)
-fix visual representation of NULL in postage (closes #35)
+fix visual representation of NULL in pgmanage (closes #35)
 fix tab/file move change_stamp generation (closes #24)
 fix 100% cpu and remove a UTIL_DEBUG
 fix crash when logging out during a select (closes #20)
 fix TAB WRITE FAIL 1 test (closes #34)
 add electron-context-menu (for workflowproducts/envelope#10)
-remove PostageGUI (closes workflowproducts/envelope#11)
+remove PgManageGUI (closes workflowproducts/envelope#11)
 add windows libpq envelope
 fix re-opening window on macOS
 
@@ -573,7 +573,7 @@ Changes since 2.1.0RC6 and 3.0.0RC2:
 make http_ev work on *nix systems (addresses #20)
 add compiler check to configure (closes #21)
 check if config file exists before installing it (closes #25)
-add ability to open new windows in electron postage (closes workflowproducts/postage#29)
+add ability to open new windows in electron pgmanage (closes workflowproducts/pgmanage#29)
 add libpq as a depenedency for deb/rpm targets
 move 'Edit Configuration' button to electron menubar (closes #18)
 add actionnc_/acceptnc_
@@ -582,8 +582,8 @@ copy save/save as buttons to tab menu
 Changes since 2.1.0RC5:
 Usability: remove old man page that was confusing
 Usability: fix makefiles to use the VERSION file
-Usability: fix man pages to say --postage-port and --envelope-port
-Usability: make postage process manager show all processes (not just active ones)
+Usability: fix man pages to say --pgmanage-port and --envelope-port
+Usability: make pgmanage process manager show all processes (not just active ones)
 Usability: make configure script bash functions external scripts so that dash works on ubuntu
 Usability: make configure scripts reset timestamps for libressl files so that if you clone it doesn't try to run aclocal
 Usability: make tab folder names easier to navigate
@@ -592,14 +592,14 @@ Usability: fix notice code to actually detect notices
 
 Changes since 2.1.0RC4:
 
-Usability: make postage/envelope use full precision for file changestamps
+Usability: make pgmanage/envelope use full precision for file changestamps
 Security: fix check_to_escape to check the middle of the string for quotes
 
 Changes since 2.1.0RC3:
 
 Reliability: Make .html files not cache
-Usability: postage download script
-Usability: postage splash page link in drop down tab
+Usability: pgmanage download script
+Usability: pgmanage splash page link in drop down tab
 Usability: envelope gs-folder design
 Usability: file manager cmd-z clears page
 Usability: fixed ace search dialog buttons

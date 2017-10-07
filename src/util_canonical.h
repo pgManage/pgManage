@@ -19,7 +19,7 @@
 #include <sys/param.h>
 // If you are reading this because you have an OS that uses a different file,
 // then please add the conditional below and initiate a pull request at
-// https://github.com/nunziotocci/postage
+// https://github.com/nunziotocci/pgmanage
 // Also let us know how it works on your system!
 #ifdef __linux__
 // linux limits

@@ -1,14 +1,14 @@
-# Installing Postage (Web Server mode)
+# Installing PgManage (Web Server mode)
 
-## Please note that we put a lot of effort into making sure Postage installs cleanly on every platform. If you have an issue please [report it](https://github.com/workflowproducts/postage/issues) and we'll get it fixed. 
+## Please note that we put a lot of effort into making sure PgManage installs cleanly on every platform. If you have an issue please [report it](https://github.com/workflowproducts/pgmanage/issues) and we'll get it fixed. 
 
 ## Dependencies
 
 #### LIBPQ
-In order for Postage to talk to PostgreSQL you need to have the libpq library installed. If you don't have LibPQ or the Postage compile process can't find it, please consult the file INSTALL_LIBPQ for some OS-specific advice on how to get libpq.
+In order for PgManage to talk to PostgreSQL you need to have the libpq library installed. If you don't have LibPQ or the PgManage compile process can't find it, please consult the file INSTALL_LIBPQ for some OS-specific advice on how to get libpq.
 
 #### SSL
-Postage works with OpenSSL or LibreSSL, if you wish to use OpenSSL:
+PgManage works with OpenSSL or LibreSSL, if you wish to use OpenSSL:
 ```
 sudo apt install libssl-devel # Ubuntu
 sudo dnf install openssl-devel # Fedora
@@ -19,86 +19,86 @@ Or if you choose LibreSSL, make sure its `openssl` is first in the $PATH (On Ope
 
 *\* Apple does not include a good enough version of OpenSSL. We officially support the `brew` versions of OpenSSL. If installing OpenSSL from source (untested) make sure to install static libraries.*
 
-####DOWNLOADING POSTAGE
+####DOWNLOADING PGMANAGE
 
-https://github.com/workflowproducts/postage/releases
+https://github.com/workflowproducts/pgmanage/releases
 
 
-#### NOTICE: INSTALLING POSTAGE SERVER ON WINDOWS IS EXPLAINED IN THE DOCUMENT: INSTALL_WEB_SERVER_MODE_WIN.md
+#### NOTICE: INSTALLING PGMANAGE SERVER ON WINDOWS IS EXPLAINED IN THE DOCUMENT: INSTALL_WEB_SERVER_MODE_WIN.md
 
-#### INSTALLING POSTAGE
+#### INSTALLING PGMANAGE
 
-If you'd like to test Postage before you install, see the section "Testing Postage Before Installing" further down.
+If you'd like to test PgManage before you install, see the section "Testing PgManage Before Installing" further down.
 
-    cd postage
+    cd pgmanage
     ./configure
     make
     sudo make install
 
 If you are on OpenBSD or FreeBSD, use gmake instead.
-Postage will be installed in `/usr/local/sbin`. All other files such as the html, javascript and configuration files will be installed to `/usr/local/etc/postage`.
+PgManage will be installed in `/usr/local/sbin`. All other files such as the html, javascript and configuration files will be installed to `/usr/local/etc/pgmanage`.
 
-#### RUNNING POSTAGE
+#### RUNNING PGMANAGE
 
-To run Postage:
+To run PgManage:
 
-    /usr/local/sbin/postage
+    /usr/local/sbin/pgmanage
 
 Long Version:
 
-    /usr/local/sbin/postage \
-    -c /usr/local/etc/postage/postage.conf \
-    -d /usr/local/etc/postage/postage-connections.conf
+    /usr/local/sbin/pgmanage \
+    -c /usr/local/etc/pgmanage/pgmanage.conf \
+    -d /usr/local/etc/pgmanage/pgmanage-connections.conf
 
-#### Configuring POSTAGE
+#### Configuring PGMANAGE
 
-Before running Postage for the first time you may want to configure some options. All the options are explained in the Postage man file:
+Before running PgManage for the first time you may want to configure some options. All the options are explained in the PgManage man file:
 
-    man postage
+    man pgmanage
 
-Current configuration options allow you to set various paths, various access restrictions, web port and log level. Note that in order to make Postage publish to HTTPS, you need to add paths for a TLS cert and key.
+Current configuration options allow you to set various paths, various access restrictions, web port and log level. Note that in order to make PgManage publish to HTTPS, you need to add paths for a TLS cert and key.
 
-You'll also need to set up a connection string to tell Postage where your PostgreSQL databases are published. The default connection string config file located in /usr/local/etc/postage/. There are examples in the provided postage-connections.conf file and further info is available in the man file.
+You'll also need to set up a connection string to tell PgManage where your PostgreSQL databases are published. The default connection string config file located in /usr/local/etc/pgmanage/. There are examples in the provided pgmanage-connections.conf file and further info is available in the man file.
 
-#### TESTING POSTAGE BEFORE INSTALLING
+#### TESTING PGMANAGE BEFORE INSTALLING
 
-    cd postage
+    cd pgmanage
     ./configure
     make
-    nano config/postage-connections.conf
+    nano config/pgmanage-connections.conf
     make test
 
-If you want to test Postage before you install, edit the `config/postage-connections.conf` file to add a connection string for your Postgres database. Instructions for adding a connection string are included in the Postage man page. To look at the Postage man page before installing Postage:
+If you want to test PgManage before you install, edit the `config/pgmanage-connections.conf` file to add a connection string for your Postgres database. Instructions for adding a connection string are included in the PgManage man page. To look at the PgManage man page before installing PgManage:
 
     ./configure
-    man -M man postage
+    man -M man pgmanage
 
-By default Postage runs on port 8080, so if you need to change that you do it in the `postage.conf` file. You can also set other options like whether to use TLS to connect.
+By default PgManage runs on port 8080, so if you need to change that you do it in the `pgmanage.conf` file. You can also set other options like whether to use TLS to connect.
 
-Once you've added a connection string to the postage-connections.conf file, start the Postage server with:
+Once you've added a connection string to the pgmanage-connections.conf file, start the PgManage server with:
 
     make test
 
-Postage will push a message like:
+PgManage will push a message like:
 
     Open http(s)://<this computer's ip>:8080/ in your web browser
 
-Once you see that message that means Postage is running, open your web browser to the link shown.
+Once you see that message that means PgManage is running, open your web browser to the link shown.
 
-#### UNINSTALLING POSTAGE
+#### UNINSTALLING PGMANAGE
 
 If you still have your original build directory then:
 
-    cd postage
+    cd pgmanage
     ./configure
     make uninstall
     
-Postage saves SQL scripts that you create in Postage to the .postage folder. If you're removing Postage you may want to remove the .postage directory.
+PgManage saves SQL scripts that you create in PgManage to the .pgmanage folder. If you're removing PgManage you may want to remove the .pgmanage directory.
 
-    rm -r ~/.postage/
+    rm -r ~/.pgmanage/
 
 If you don't have your original build directory check the following locations:
 
-    rm -r /usr/local/etc/postage        # you may wish to save your config files first
-    rm /usr/local/sbin/postage          # this removes the binary
-    rm /usr/local/man/man1/postage.1    # this removes the man page
+    rm -r /usr/local/etc/pgmanage        # you may wish to save your config files first
+    rm /usr/local/sbin/pgmanage          # this removes the binary
+    rm /usr/local/man/man1/pgmanage.1    # this removes the man page

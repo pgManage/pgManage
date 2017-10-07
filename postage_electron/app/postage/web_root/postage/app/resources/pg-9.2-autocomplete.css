@@ -1,0 +1,72 @@
+
+#autocomplete-popup {
+    position: fixed;
+    background-color: #FFFFFF;
+    width: 300px;
+    /*max-width: 300px;*/
+    /*height: 150px; <- handled by JS now */
+    border: 1px solid #AAAAAA;
+    z-index: 100;
+    /*overflow-y: scroll;
+    overflow-x: hidden;*/
+    
+    /*-webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;*/
+}
+
+#autocomplete-popup > #autocomplete-popup-ace {
+    height: 100%;
+}
+
+#autocomplete-popup > div > .ace_scroller {
+    cursor: pointer;
+}
+
+#autocomplete-popup > #autocomplete-popup-instruction {
+    text-align: right;
+    font-style: italic;
+    color: #AAA;
+    width: 100%;
+    font-size: 0.65em;
+    position: absolute;
+    /*top: -1.4em;
+    padding-right: 0.2em;*/
+    left: -1px;
+    height: 1.5em;
+    padding-top: 0.2em;
+    background-color: #FFFFFF;
+    border: 1px solid #AAAAAA;
+}
+
+/*
+#autocomplete-popup > div {
+    border-top: 1px solid #AAA;
+    height: 1.3em;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#autocomplete-popup > div:first-child {
+    border-top: 0 none;
+}*/
+
+/*
+#autocomplete-popup > div:after {
+    display: block;
+    position: absolute;
+    height: 1em;
+    width: 3.75em;
+    
+    top: 50%;
+    right: 0.25em;
+    margin-top: -0.7em;
+    
+    content: attr(data-meta) "";
+    color: #AAA;
+    text-align: right;
+}*/

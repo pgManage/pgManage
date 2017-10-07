@@ -46,26 +46,26 @@ void http_file_step1(struct sock_ev_client *client) {
 	}
 
 	client_http_file->bol_download = false;
-	if (isdigit(client_http_file->str_uri[9])) {
+	if (isdigit(client_http_file->str_uri[10])) {
 		str_uri_temp = client_http_file->str_uri;
-		str_temp = strchr(str_uri_temp + 9, '/');
+		str_temp = strchr(str_uri_temp + 10, '/');
 		SFINISH_CHECK(str_temp != NULL, "strchr failed");
 		SFINISH_SNCAT(
 			client_http_file->str_uri, &client_http_file->int_uri_len,
-			"/postage/app", (size_t)12,
+			"/pgmanage/app", (size_t)13,
 			str_temp, client_http_file->int_uri_len - (size_t)(str_temp - str_uri_temp)
 		);
 		SFREE(str_uri_temp);
 	}
 
-	if (strncmp(client_http_file->str_uri, "/postage/app/download", 21) == 0) {
+	if (strncmp(client_http_file->str_uri, "/pgmanage/app/download", 22) == 0) {
 		SFINISH_SNCAT(
 			client_http_file->str_uri_part, &client_http_file->int_uri_part_len,
 			client->str_connname_folder, client->int_connname_folder_len,
 			"/", (size_t)1,
 			client->str_username, client->int_username_len,
-			// we need to go past "/postage/app/download"
-			client_http_file->str_uri + 21, client_http_file->int_uri_len - 21
+			// we need to go past "/pgmanage/app/download"
+			client_http_file->str_uri + 22, client_http_file->int_uri_len - 22
 		);
 		SFREE(client_http_file->str_uri);
 

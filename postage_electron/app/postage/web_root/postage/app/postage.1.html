@@ -1,0 +1,63 @@
+<h1 id="pgmanage-1-postgresql-administration-for-the-web">pgmanage(1) -- PostgreSQL Administration for the web</h1>
+<h2 id="full-path">FULL PATH</h2>
+<p>This instance of pgmanage was installed as <code>@prefix@/sbin/pgmanage</code> (Usually <code>/usr/local/sbin/pgmanage</code>)</p>
+<h2 id="synopsis">SYNOPSIS</h2>
+<pre><code>pgmanage
+       [-h | --help]
+       [-v | --version]
+       [-c &lt;config-file&gt; | --config-file=&lt;config-file&gt;]
+       [-d &lt;connection-file&gt; | --connection-file=&lt;connection-file&gt;]
+       [-s &lt;super-only&gt; | --super-only=&lt;super-only&gt;]
+       [-g &lt;login-group&gt; | --login-group=&lt;login-group&gt;]
+       [-r &lt;web-root&gt; | --web-root=&lt;web-root&gt;]
+       [-a &lt;data-root&gt; | --data-root=&lt;data-root&gt;]
+       [-p &lt;port&gt; | --pgmanage-port=&lt;port&gt;]
+       [-j &lt;tls-cert&gt; | --tls-cert=&lt;tls-cert&gt;]
+       [-k &lt;tls-key&gt; | --tls-key=&lt;tls-key&gt;]
+       [-l &lt;log-level&gt; | --log-level=&lt;log-level&gt;]
+       [-n &lt;allow_custom_connections&gt; | --allow-custom-connections=&lt;allow-custom-connections&gt;]
+       [-t &lt;login-timeout&gt; | --login-timeout=&lt;login-timeout&gt;]
+       [-x &lt;local-only&gt; | --local-only=&lt;local-only&gt;]
+</code></pre><h2 id="description">DESCRIPTION</h2>
+<p>The <code>pgmanage</code> utility is  a tool to make managing your PostgreSQL database fast and easy. It provides web access and can be used on a tablet, or even on a phone.</p>
+<p>All log output is pushed to stderr, if you are pushing that to a file, then you must handle rotating the file yourself or it will get large and slow <code>pgmanage</code> down.</p>
+<h2 id="options">OPTIONS</h2>
+<p><code>-h</code> or <code>--help</code><br>       Print usage and exit</p>
+<p><code>-v</code> or <code>--version</code><br>       Print version information and exit</p>
+<p><code>-c</code> or <code>--config-file=</code><br>       <code>String;</code> defaults to @prefix@/etc/pgmanage/pgmanage.conf<br>       You can use this option to tell PgManage where to look for the configuration file. A sample configuration file is provided in @prefix@/etc/pgmanage. If there is no file specified PgManage will look in the current directory for a config file. If no config file is found PgManage will proceed with default values.</p>
+<p>The following options can be specified on the command line or in the configuration file. In the event a value is specified on the command line and in the config file, PgManage will always use the command line option. Note that if no option is specified then some options will be set to a default value.</p>
+<p><code>[command line short]</code> or <code>[command line long]</code> or <code>[config file]</code></p>
+<p><code>-d</code> or <code>--connection-file=</code> or <code>connection_file=</code><br>       <code>String;</code> defaults to @prefix@/etc/pgmanage/pgmanage-connections.conf<br>       When you install PgManage, the Makefile will generate a path to the sample pgmanage-connections.conf file and put it in the sample config file. Use this option to tell PgManage where your connection list is located.<br>       If not specified, PgManage looks in the same folder as the config file for a file named pgmanage-connections.conf. If PgManage can&#39;t find a connection file, it will error.</p>
+<p><code>-s</code> or <code>--super-only=</code> or <code>super_only=</code><br>       <code>Boolean;</code> defaults to false<br>       This tells PgManage whether or not to only allow super users to login. The recommended value is true and will restrict users who are not super users from logging in to any PostgreSQL instance through PgManage. Note that a connection will be made to PostgreSQL in order to test if the user is a superuser.  </p>
+<p><code>-g</code> or <code>--login-group=</code> or <code>login_group=</code><br>       <code>String;</code> no default<br>       This tells PgManage to only allow users in a certain PostgreSQL group to login to PgManage. Note that a connection will be made to PostgreSQL in order to test if the user is a member of the login group.</p>
+<p><code>-r</code> or <code>--web-root=</code> or <code>web_root=</code><br>       <code>String;</code> Defaults to @prefix@/etc/pgmanage/web_root<br>       This tells PgManage where the HTML files have been installed to.</p>
+<p><code>-a</code> or <code>--data-root=</code> or <code>data_root=</code><br>       <code>String;</code> defaults to ~/.pgmanage/<br>       This tells PgManage where to put the SQL file history. All tabs are saved to this location so that if you get disconnected from PgManage you don&#39;t lose your work.</p>
+<p><code>-p</code> or <code>--pgmanage-port=</code> or <code>pgmanage_port=</code><br>       <code>Integer;</code> defaults to 8080<br>       This tells PgManage what port to listen on for browser requests.</p>
+<p><code>-j</code> or <code>--tls-cert=</code> or <code>tls_cert=</code><br><code>-k</code> or <code>--tls-key=</code> or <code>tls_key=</code><br>       <code>String;</code> no defaults<br>       These options tell PgManage where the TLS Certificate and Key files reside. If you use these options then you&#39;ll only be able to access PgManage through a secure TLS connection.<br>       These options are only necessary if you wish to connect directly to PgManage using a secure TLS connection. As an alternative, you can set up PgManage in a reverse proxy configuration. This allows your web server to terminate the secure connection and pass on the request to PgManage. You can find help to set up this configuration in the INSTALL_NGINX file that came with your distribution.</p>
+<p><code>-n</code> or <code>--allow-custom-connections=</code> or <code>allow_custom_connections=</code><br>       <code>Boolean;</code> defaults to false<br>       This tells PgManage whether or not to allow anyone to use a custom connection from the login screen.</p>
+<p><code>-l</code> or <code>--log-level=</code> or <code>log_level=</code><br>       <code>String;</code> defaults to error<br>       This option regulates the frequency and verbosity of log messages. Possible values are none, error, warn, notice and info.</p>
+<p><code>-t</code> or <code>--login-timeout=</code> or <code>login_timeout=</code><br>       <code>Integer;</code> defaults to 0<br>       This option regulates the login timeout (in seconds) after the last activity on a session.
+       If 0, no timeout is enforced.</p>
+<p><code>-x</code> or <code>--local-only=</code>
+       <code>Boolean;</code> defaults to false<br>       This tells PgManage whether or not to set the listening socket to local addresses only.</p>
+<h2 id="setting-up-a-connection-to-a-postgresql-server">SETTING UP A CONNECTION TO A POSTGRESQL SERVER</h2>
+<p>PgManage requires at least one PostgreSQL server be listed in the pgmanage-connections.conf file. This version of PgManage doesn&#39;t allow you to specify a server from the command line. Enter only one PostgreSQL server per line.</p>
+<p><strong>The format of a connection string is:</strong>  </p>
+<pre><code>[server name]: [standard PostgreSQL connection string]
+</code></pre><p>Detailed information about PostgreSQL connection strings is available at: <a href="http://www.postgresql.org/docs/current/static/libpq-connect.html">http://www.postgresql.org/docs/current/static/libpq-connect.html</a></p>
+<p>Note that you do not enter your user name or password in this file. That information will be entered on the login screen. If you put a username or password in this file, it will be removed by PgManage before attempting to connect to a database.</p>
+<h4 id="example-connection-strings-">EXAMPLE CONNECTION STRINGS:</h4>
+<pre><code>nuc-server: hostaddr=192.168.0.100 port=5432 dbname=postgres
+mini-server: hostaddr=127.0.0.1 port=5432 dbname=postgres sslmode=require
+</code></pre><h2 id="examples">EXAMPLES</h2>
+<p>Run <code>pgmanage</code> (short argument):</p>
+<pre><code>@prefix@/sbin/pgmanage -c @prefix@/etc/pgmanage/pgmanage.conf -d @prefix@/etc/pgmanage/pgmanage-connections.conf
+</code></pre><p>Run <code>pgmanage</code> (long argument):</p>
+<pre><code>@prefix@/sbin/pgmanage --config-file=@prefix@/etc/pgmanage/pgmanage.conf --connection-file @prefix@/etc/pgmanage/pgmanage-connections.conf
+</code></pre><h2 id="troubleshooting">TROUBLESHOOTING</h2>
+<p>Try accessing your database through psql. If you can, double check your connection string parameters. If you can&#39;t connect, you may have a firewall problem.</p>
+<h2 id="author">AUTHOR</h2>
+<p>Copyright (c) 2017 Workflow Products, LLC</p>
+<p>Created by Annunziato Tocci</p>
+<p>Report bugs to <a href="https://github.com/workflowproducts/pgmanage/issues">https://github.com/workflowproducts/pgmanage/issues</a><br>Send us feedback! Current contact information can be found at workflowproducts.com  </p>
+

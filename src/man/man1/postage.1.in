@@ -1,14 +1,14 @@
-.TH "POSTAGE" "1" "August 2017" "" ""
+.TH "PGMANAGE" "1" "August 2017" "" ""
 .SH "NAME"
-\fBpostage\fR \- PostgreSQL Administration for the web
+\fBpgmanage\fR \- PostgreSQL Administration for the web
 .SH FULL PATH
 .P
-This instance of postage was installed as \fB@prefix@/sbin/postage\fP (Usually \fB/usr/local/sbin/postage\fP)
+This instance of pgmanage was installed as \fB@prefix@/sbin/pgmanage\fP (Usually \fB/usr/local/sbin/pgmanage\fP)
 .SH SYNOPSIS
 .P
 .RS 2
 .nf
-postage
+pgmanage
        [\-h | \-\-help]
        [\-v | \-\-version]
        [\-c <config\-file> | \-\-config\-file=<config\-file>]
@@ -17,7 +17,7 @@ postage
        [\-g <login\-group> | \-\-login\-group=<login\-group>]
        [\-r <web\-root> | \-\-web\-root=<web\-root>]
        [\-a <data\-root> | \-\-data\-root=<data\-root>]
-       [\-p <port> | \-\-postage\-port=<port>]
+       [\-p <port> | \-\-pgmanage\-port=<port>]
        [\-j <tls\-cert> | \-\-tls\-cert=<tls\-cert>]
        [\-k <tls\-key> | \-\-tls\-key=<tls\-key>]
        [\-l <log\-level> | \-\-log\-level=<log\-level>]
@@ -28,9 +28,9 @@ postage
 .RE
 .SH DESCRIPTION
 .P
-The \fBpostage\fP utility is  a tool to make managing your PostgreSQL database fast and easy\. It provides web access and can be used on a tablet, or even on a phone\.
+The \fBpgmanage\fP utility is  a tool to make managing your PostgreSQL database fast and easy\. It provides web access and can be used on a tablet, or even on a phone\.
 .P
-All log output is pushed to stderr, if you are pushing that to a file, then you must handle rotating the file yourself or it will get large and slow \fBpostage\fP down\.
+All log output is pushed to stderr, if you are pushing that to a file, then you must handle rotating the file yourself or it will get large and slow \fBpgmanage\fP down\.
 .SH OPTIONS
 .P
 \fB\-h\fP or \fB\-\-help\fP
@@ -43,51 +43,51 @@ All log output is pushed to stderr, if you are pushing that to a file, then you 
 .P
 \fB\-c\fP or \fB\-\-config\-file=\fP
 .br
-       \fBString;\fP defaults to @prefix@/etc/postage/postage\.conf
+       \fBString;\fP defaults to @prefix@/etc/pgmanage/pgmanage\.conf
 .br
-       You can use this option to tell Postage where to look for the configuration file\. A sample configuration file is provided in @prefix@/etc/postage\. If there is no file specified Postage will look in the current directory for a config file\. If no config file is found Postage will proceed with default values\.
+       You can use this option to tell PgManage where to look for the configuration file\. A sample configuration file is provided in @prefix@/etc/pgmanage\. If there is no file specified PgManage will look in the current directory for a config file\. If no config file is found PgManage will proceed with default values\.
 .P
-The following options can be specified on the command line or in the configuration file\. In the event a value is specified on the command line and in the config file, Postage will always use the command line option\. Note that if no option is specified then some options will be set to a default value\.
+The following options can be specified on the command line or in the configuration file\. In the event a value is specified on the command line and in the config file, PgManage will always use the command line option\. Note that if no option is specified then some options will be set to a default value\.
 .P
 \fB[command line short]\fP or \fB[command line long]\fP or \fB[config file]\fP
 .P
 \fB\-d\fP or \fB\-\-connection\-file=\fP or \fBconnection_file=\fP
 .br
-       \fBString;\fP defaults to @prefix@/etc/postage/postage\-connections\.conf
+       \fBString;\fP defaults to @prefix@/etc/pgmanage/pgmanage\-connections\.conf
 .br
-       When you install Postage, the Makefile will generate a path to the sample postage\-connections\.conf file and put it in the sample config file\. Use this option to tell Postage where your connection list is located\.
+       When you install PgManage, the Makefile will generate a path to the sample pgmanage\-connections\.conf file and put it in the sample config file\. Use this option to tell PgManage where your connection list is located\.
 .br
-       If not specified, Postage looks in the same folder as the config file for a file named postage\-connections\.conf\. If Postage can't find a connection file, it will error\.
+       If not specified, PgManage looks in the same folder as the config file for a file named pgmanage\-connections\.conf\. If PgManage can't find a connection file, it will error\.
 .P
 \fB\-s\fP or \fB\-\-super\-only=\fP or \fBsuper_only=\fP
 .br
        \fBBoolean;\fP defaults to false
 .br
-       This tells Postage whether or not to only allow super users to login\. The recommended value is true and will restrict users who are not super users from logging in to any PostgreSQL instance through Postage\. Note that a connection will be made to PostgreSQL in order to test if the user is a superuser\.  
+       This tells PgManage whether or not to only allow super users to login\. The recommended value is true and will restrict users who are not super users from logging in to any PostgreSQL instance through PgManage\. Note that a connection will be made to PostgreSQL in order to test if the user is a superuser\.  
 .P
 \fB\-g\fP or \fB\-\-login\-group=\fP or \fBlogin_group=\fP
 .br
        \fBString;\fP no default
 .br
-       This tells Postage to only allow users in a certain PostgreSQL group to login to Postage\. Note that a connection will be made to PostgreSQL in order to test if the user is a member of the login group\.
+       This tells PgManage to only allow users in a certain PostgreSQL group to login to PgManage\. Note that a connection will be made to PostgreSQL in order to test if the user is a member of the login group\.
 .P
 \fB\-r\fP or \fB\-\-web\-root=\fP or \fBweb_root=\fP
 .br
-       \fBString;\fP Defaults to @prefix@/etc/postage/web_root
+       \fBString;\fP Defaults to @prefix@/etc/pgmanage/web_root
 .br
-       This tells Postage where the HTML files have been installed to\.
+       This tells PgManage where the HTML files have been installed to\.
 .P
 \fB\-a\fP or \fB\-\-data\-root=\fP or \fBdata_root=\fP
 .br
-       \fBString;\fP defaults to ~/\.postage/
+       \fBString;\fP defaults to ~/\.pgmanage/
 .br
-       This tells Postage where to put the SQL file history\. All tabs are saved to this location so that if you get disconnected from Postage you don't lose your work\.
+       This tells PgManage where to put the SQL file history\. All tabs are saved to this location so that if you get disconnected from PgManage you don't lose your work\.
 .P
-\fB\-p\fP or \fB\-\-postage\-port=\fP or \fBpostage_port=\fP
+\fB\-p\fP or \fB\-\-pgmanage\-port=\fP or \fBpgmanage_port=\fP
 .br
        \fBInteger;\fP defaults to 8080
 .br
-       This tells Postage what port to listen on for browser requests\.
+       This tells PgManage what port to listen on for browser requests\.
 .P
 \fB\-j\fP or \fB\-\-tls\-cert=\fP or \fBtls_cert=\fP
 .br
@@ -95,15 +95,15 @@ The following options can be specified on the command line or in the configurati
 .br
        \fBString;\fP no defaults
 .br
-       These options tell Postage where the TLS Certificate and Key files reside\. If you use these options then you'll only be able to access Postage through a secure TLS connection\.
+       These options tell PgManage where the TLS Certificate and Key files reside\. If you use these options then you'll only be able to access PgManage through a secure TLS connection\.
 .br
-       These options are only necessary if you wish to connect directly to Postage using a secure TLS connection\. As an alternative, you can set up Postage in a reverse proxy configuration\. This allows your web server to terminate the secure connection and pass on the request to Postage\. You can find help to set up this configuration in the INSTALL_NGINX file that came with your distribution\.
+       These options are only necessary if you wish to connect directly to PgManage using a secure TLS connection\. As an alternative, you can set up PgManage in a reverse proxy configuration\. This allows your web server to terminate the secure connection and pass on the request to PgManage\. You can find help to set up this configuration in the INSTALL_NGINX file that came with your distribution\.
 .P
 \fB\-n\fP or \fB\-\-allow\-custom\-connections=\fP or \fBallow_custom_connections=\fP
 .br
        \fBBoolean;\fP defaults to false
 .br
-       This tells Postage whether or not to allow anyone to use a custom connection from the login screen\.
+       This tells PgManage whether or not to allow anyone to use a custom connection from the login screen\.
 .P
 \fB\-l\fP or \fB\-\-log\-level=\fP or \fBlog_level=\fP
 .br
@@ -121,10 +121,10 @@ The following options can be specified on the command line or in the configurati
 \fB\-x\fP or \fB\-\-local\-only=\fP
        \fBBoolean;\fP defaults to false
 .br
-       This tells Postage whether or not to set the listening socket to local addresses only\.
+       This tells PgManage whether or not to set the listening socket to local addresses only\.
 .SH SETTING UP A CONNECTION TO A POSTGRESQL SERVER
 .P
-Postage requires at least one PostgreSQL server be listed in the postage\-connections\.conf file\. This version of Postage doesn't allow you to specify a server from the command line\. Enter only one PostgreSQL server per line\.
+PgManage requires at least one PostgreSQL server be listed in the pgmanage\-connections\.conf file\. This version of PgManage doesn't allow you to specify a server from the command line\. Enter only one PostgreSQL server per line\.
 .P
 \fBThe format of a connection string is:\fR  
 .P
@@ -136,7 +136,7 @@ Postage requires at least one PostgreSQL server be listed in the postage\-connec
 .P
 Detailed information about PostgreSQL connection strings is available at: http://www\.postgresql\.org/docs/current/static/libpq\-connect\.html
 .P
-Note that you do not enter your user name or password in this file\. That information will be entered on the login screen\. If you put a username or password in this file, it will be removed by Postage before attempting to connect to a database\.
+Note that you do not enter your user name or password in this file\. That information will be entered on the login screen\. If you put a username or password in this file, it will be removed by PgManage before attempting to connect to a database\.
 .SS EXAMPLE CONNECTION STRINGS:
 .P
 .RS 2
@@ -147,19 +147,19 @@ mini\-server: hostaddr=127\.0\.0\.1 port=5432 dbname=postgres sslmode=require
 .RE
 .SH EXAMPLES
 .P
-Run \fBpostage\fP (short argument):
+Run \fBpgmanage\fP (short argument):
 .P
 .RS 2
 .nf
-@prefix@/sbin/postage \-c @prefix@/etc/postage/postage\.conf \-d @prefix@/etc/postage/postage\-connections\.conf
+@prefix@/sbin/pgmanage \-c @prefix@/etc/pgmanage/pgmanage\.conf \-d @prefix@/etc/pgmanage/pgmanage\-connections\.conf
 .fi
 .RE
 .P
-Run \fBpostage\fP (long argument):
+Run \fBpgmanage\fP (long argument):
 .P
 .RS 2
 .nf
-@prefix@/sbin/postage \-\-config\-file=@prefix@/etc/postage/postage\.conf \-\-connection\-file @prefix@/etc/postage/postage\-connections\.conf
+@prefix@/sbin/pgmanage \-\-config\-file=@prefix@/etc/pgmanage/pgmanage\.conf \-\-connection\-file @prefix@/etc/pgmanage/pgmanage\-connections\.conf
 .fi
 .RE
 .SH TROUBLESHOOTING
@@ -171,7 +171,7 @@ Copyright (c) 2017 Workflow Products, LLC
 .P
 Created by Annunziato Tocci
 .P
-Report bugs to https://github\.com/workflowproducts/postage/issues
+Report bugs to https://github\.com/workflowproducts/pgmanage/issues
 .br
 Send us feedback! Current contact information can be found at workflowproducts\.com  
 

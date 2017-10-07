@@ -287,11 +287,11 @@ bool ws_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, char
 			client_request->str_current_response = NULL;
 			client_request->int_current_response_length = 0;
 
-			if (client_request->int_req_type == POSTAGE_REQ_INSERT) {
+			if (client_request->int_req_type == PGMANAGE_REQ_INSERT) {
 				ws_insert_free(client_request->client_request_data);
-			} else if (client_request->int_req_type == POSTAGE_REQ_UPDATE) {
+			} else if (client_request->int_req_type == PGMANAGE_REQ_UPDATE) {
 				ws_update_free(client_request->client_request_data);
-			} else if (client_request->int_req_type == POSTAGE_REQ_SELECT) {
+			} else if (client_request->int_req_type == PGMANAGE_REQ_SELECT) {
 				ws_select_free(client_request->client_request_data);
 			}
 		}
@@ -380,11 +380,11 @@ bool ws_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, char
 				client_request->str_current_response = NULL;
 				client_request->int_current_response_length = 0;
 
-				if (client_request->int_req_type == POSTAGE_REQ_INSERT) {
+				if (client_request->int_req_type == PGMANAGE_REQ_INSERT) {
 					ws_insert_free(client_request->client_request_data);
-				} else if (client_request->int_req_type == POSTAGE_REQ_UPDATE) {
+				} else if (client_request->int_req_type == PGMANAGE_REQ_UPDATE) {
 					ws_update_free(client_request->client_request_data);
-				} else if (client_request->int_req_type == POSTAGE_REQ_SELECT) {
+				} else if (client_request->int_req_type == PGMANAGE_REQ_SELECT) {
 					ws_select_free(client_request->client_request_data);
 				}
 			}
@@ -439,11 +439,11 @@ bool ws_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, char
 			client_request->str_current_response = NULL;
 			client_request->int_current_response_length = 0;
 
-			if (client_request->int_req_type == POSTAGE_REQ_INSERT) {
+			if (client_request->int_req_type == PGMANAGE_REQ_INSERT) {
 				ws_insert_free(client_request->client_request_data);
-			} else if (client_request->int_req_type == POSTAGE_REQ_UPDATE) {
+			} else if (client_request->int_req_type == PGMANAGE_REQ_UPDATE) {
 				ws_update_free(client_request->client_request_data);
-			} else if (client_request->int_req_type == POSTAGE_REQ_SELECT) {
+			} else if (client_request->int_req_type == PGMANAGE_REQ_SELECT) {
 				ws_select_free(client_request->client_request_data);
 			}
 		}
@@ -475,11 +475,11 @@ finish:
 		DArray_push(client_request->arr_response, str_response);
 		str_response = NULL;
 
-		if (client_request->int_req_type == POSTAGE_REQ_INSERT) {
+		if (client_request->int_req_type == PGMANAGE_REQ_INSERT) {
 			ws_insert_free(client_request->client_request_data);
-		} else if (client_request->int_req_type == POSTAGE_REQ_UPDATE) {
+		} else if (client_request->int_req_type == PGMANAGE_REQ_UPDATE) {
 			ws_update_free(client_request->client_request_data);
-		} else if (client_request->int_req_type == POSTAGE_REQ_SELECT) {
+		} else if (client_request->int_req_type == PGMANAGE_REQ_SELECT) {
 			ws_select_free(client_request->client_request_data);
 		}
 		return false;

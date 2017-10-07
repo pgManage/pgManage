@@ -25,7 +25,7 @@
 
 /*
 This function will:
-1. get the notices from the client struct (see postage_client.c around line 15)
+1. get the notices from the client struct (see pgmanage_client.c around line 15)
 and send them to the client
 2. ask libpq for notify messages and send them to the client
 */

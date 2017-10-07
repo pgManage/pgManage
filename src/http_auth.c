@@ -29,7 +29,7 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 	size_t int_referer_len = 0;
 
 	struct sock_ev_client_request *client_request =
-		create_request(client_auth->parent, NULL, NULL, NULL, NULL, 0, POSTAGE_REQ_AUTH, NULL);
+		create_request(client_auth->parent, NULL, NULL, NULL, NULL, 0, PGMANAGE_REQ_AUTH, NULL);
 	SFINISH_CHECK(client_request != NULL, "Could not create request data!");
 	client_request->client_request_data = (struct sock_ev_client_request_data *)client_auth;
 	client_auth->self.free = http_auth_free;
@@ -186,10 +186,10 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 		str_referer = request_header(client_auth->parent->str_request, client_auth->parent->int_request_len, "referer", &int_referer_len);
 		SFINISH_CHECK(str_referer != NULL, "No Referer header");
 		SDEBUG("str_referer: %s", str_referer);
-		ptr_conn = bstrstr(str_referer, int_referer_len, "/postage/", (size_t)9);
+		ptr_conn = bstrstr(str_referer, int_referer_len, "/pgmanage/", (size_t)10);
 		SDEBUG("ptr_conn: %s", ptr_conn);
 		SFINISH_CHECK(ptr_conn != NULL, "Invalid Referer header");
-		ptr_conn += strlen("/postage/");
+		ptr_conn += strlen("/pgmanage/");
 		SDEBUG("ptr_conn: %s", ptr_conn);
 		ptr_conn_end = bstrstr(ptr_conn, int_referer_len - (size_t)(ptr_conn - str_referer), "/", (size_t)1);
 		SFINISH_CHECK(ptr_conn_end != NULL, "Invalid Referer header");
@@ -197,7 +197,7 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 		SDEBUG("ptr_conn: %s", ptr_conn);
 
 		size_t int_temp = 0;
-		SFINISH_SNCAT(str_cookie_name, &int_temp, "postage_", (size_t)8, ptr_conn, strlen(ptr_conn));
+		SFINISH_SNCAT(str_cookie_name, &int_temp, "pgmanage_", (size_t)8, ptr_conn, strlen(ptr_conn));
 
 		SFREE_PWORD(str_form_data);
 		client_auth->str_cookie_encrypted = str_cookie(client_auth->parent->str_request, client_auth->parent->int_request_len, str_cookie_name, &client_auth->int_cookie_encrypted_len);
@@ -326,10 +326,10 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 		str_referer = request_header(client_auth->parent->str_request, client_auth->parent->int_request_len, "referer", &int_referer_len);
 		SFINISH_CHECK(str_referer != NULL, "No Referer header");
 		SDEBUG("str_referer: %s", str_referer);
-		ptr_conn = bstrstr(str_referer, int_referer_len, "/postage/", (size_t)9);
+		ptr_conn = bstrstr(str_referer, int_referer_len, "/pgmanage/", (size_t)10);
 		SDEBUG("ptr_conn: %s", ptr_conn);
 		SFINISH_CHECK(ptr_conn != NULL, "Invalid Referer header");
-		ptr_conn += strlen("/postage/");
+		ptr_conn += strlen("/pgmanage/");
 		SDEBUG("ptr_conn: %s", ptr_conn);
 		ptr_conn_end = bstrstr(ptr_conn, int_referer_len - (size_t)(ptr_conn - str_referer), "/", (size_t)1);
 		SFINISH_CHECK(ptr_conn_end != NULL, "Invalid Referer header");
@@ -337,7 +337,7 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 		SDEBUG("ptr_conn: %s", ptr_conn);
 
 		size_t int_temp = 0;
-		SFINISH_SNCAT(str_cookie_name, &int_temp, "postage_", (size_t)8, ptr_conn, strlen(ptr_conn));
+		SFINISH_SNCAT(str_cookie_name, &int_temp, "pgmanage_", (size_t)8, ptr_conn, strlen(ptr_conn));
 
 		SFREE_PWORD(str_form_data);
 		client_auth->str_cookie_encrypted = str_cookie(client_auth->parent->str_request, client_auth->parent->int_request_len, str_cookie_name, &client_auth->int_cookie_encrypted_len);
@@ -471,10 +471,10 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 		str_referer = request_header(client_auth->parent->str_request, client_auth->parent->int_request_len, "referer", &int_referer_len);
 		SFINISH_CHECK(str_referer != NULL, "No Referer header");
 		SDEBUG("str_referer: %s", str_referer);
-		ptr_conn = bstrstr(str_referer, int_referer_len, "/postage/", (size_t)9);
+		ptr_conn = bstrstr(str_referer, int_referer_len, "/pgmanage/", (size_t)10);
 		SDEBUG("ptr_conn: %s", ptr_conn);
 		SFINISH_CHECK(ptr_conn != NULL, "Invalid Referer header");
-		ptr_conn += strlen("/postage/");
+		ptr_conn += strlen("/pgmanage/");
 		SDEBUG("ptr_conn: %s", ptr_conn);
 		ptr_conn_end = bstrstr(ptr_conn, int_referer_len - (size_t)(ptr_conn - str_referer), "/", (size_t)1);
 		SFINISH_CHECK(ptr_conn_end != NULL, "Invalid Referer header");
@@ -482,7 +482,7 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 		SDEBUG("ptr_conn: %s", ptr_conn);
 
 		size_t int_temp = 0;
-		SFINISH_SNCAT(str_cookie_name, &int_temp, "postage_", (size_t)8, ptr_conn, strlen(ptr_conn));
+		SFINISH_SNCAT(str_cookie_name, &int_temp, "pgmanage_", (size_t)8, ptr_conn, strlen(ptr_conn));
 
 		client_auth->str_cookie_encrypted = str_cookie(client_auth->parent->str_request, client_auth->parent->int_request_len, str_cookie_name, &client_auth->int_cookie_encrypted_len);
 		if (client_auth->str_cookie_encrypted != NULL) {
@@ -518,12 +518,12 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
 			"Connection: close\015\012"
 			"Content-Length: 0\015\012"
-			"Set-Cookie: postage_";
+			"Set-Cookie: pgmanage_";
 		size_t int_temp1 = strlen(str_temp1);
 		char *str_temp2 =
 			"; path=/; expires=Tue, 01 Jan 1990 00:00:00 GMT"
 			"; HttpOnly\015\012"
-			"Location: /postage/index.html?connection=";
+			"Location: /pgmanage/index.html?connection=";
 		size_t int_temp2 = strlen(str_temp2);
 		size_t i = (size_t)strtol(ptr_conn, NULL, 10);
 		struct struct_connection *current_connection = DArray_get(darr_global_connection, i);
@@ -739,7 +739,7 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 	DB_free_result(res);
 
 	if (bol_global_super_only == true && strncmp(str_rolsuper, "FALSE", 5) == 0) {
-		char *str_temp1 = "{\"stat\": false, \"dat\": \"You must login as a super user to use " SUN_PROGRAM_WORD_NAME ". If you would like to use a non-superuser role, change the `super_only` parameter to false in postage.conf\"}";
+		char *str_temp1 = "{\"stat\": false, \"dat\": \"You must login as a super user to use " SUN_PROGRAM_WORD_NAME ". If you would like to use a non-superuser role, change the `super_only` parameter to false in pgmanage.conf\"}";
 		SFINISH_SNCAT(str_temp, &int_temp, str_temp1, strlen(str_temp1));
 		char str_length[50];
 		snprintf(str_length, 50, "%zu", strlen(str_temp));
@@ -787,7 +787,7 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 	} else {
 		str_expires = str_expire_one_day();
 		SFINISH_SALLOC(str_int_len, 20);
-		snprintf(str_int_len, 20, "%zu", 45 + strlen(client_auth->str_int_connection_index));
+		snprintf(str_int_len, 20, "%zu", 46 + strlen(client_auth->str_int_connection_index));
 
 		size_t int_connection_index_len = strlen(client_auth->str_int_connection_index);
 		char *str_temp1 =
@@ -1108,7 +1108,7 @@ bool http_auth_change_pw_step3(EV_P, void *cb_data, DB_result *res) {
 		"HTTP/1.1 200 OK\015\012"
 		"Server: " SUN_PROGRAM_LOWER_NAME "\015\012Content-Type: application/json; charset=UTF-8\015\012"
 			"Connection: close\015\012"
-		"Set-Cookie: postage_";
+		"Set-Cookie: pgmanage_";
 	char *str_temp2 = "; HttpOnly\015\012\015\012{\"stat\": true, \"dat\": \"OK\"}";
 	SFINISH_SNCAT(str_response, &int_response_len,
 		str_temp1, strlen(str_temp1),
@@ -1209,7 +1209,7 @@ void http_auth_change_database_step2(EV_P, void *cb_data, DB_conn *conn) {
 		"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
 			"Connection: close\015\012"
 		"Content-Type: application/json; charset=UTF-8\015\012"
-		"Set-Cookie: postage_";
+		"Set-Cookie: pgmanage_";
 	char *str_temp3 =
 		"; HttpOnly\015\012"
 		"Content-Length: 27\015\012\015\012"

@@ -29,7 +29,7 @@ char cwd[1024];
 const char *VERSION =
 #include "../VERSION"
 	;
-char *POSTAGE_PREFIX = NULL;
+char *PGMANAGE_PREFIX = NULL;
 #endif
 
 // clang-format off
@@ -40,7 +40,7 @@ char *POSTAGE_PREFIX = NULL;
 // str_global_app_path					app_path						y							app-path
 // str_global_role_path					role_path						z							role-path
 // str_global_web_root					web_root						r							web-root
-// str_global_port						postage_port OR envelope_port	p							postage-port OR envelope-port
+// str_global_port						pgmanage_port OR envelope_port	p							pgmanage-port OR envelope-port
 // str_global_tls_cert					tls_cert						j							tls-cert
 // str_global_tls_key					tls_key							k							tls-key
 // bol_global_local_only				NULL							x							local-only
@@ -376,42 +376,42 @@ bool parse_options(int argc, char *const *argv) {
 
 #ifdef _WIN32
 #ifdef _WIN64
-	SERROR_SNCAT(POSTAGE_PREFIX, &int_prefix_len,
+	SERROR_SNCAT(PGMANAGE_PREFIX, &int_prefix_len,
 		"\\Program Files\\Workflow Products", (size_t)32);
 #else
 	BOOL bolWow64 = FALSE;
 	if (IsWow64Process(GetCurrentProcess(), &bolWow64) != FALSE && bolWow64 != FALSE) {
-		SERROR_SNCAT(POSTAGE_PREFIX, &int_prefix_len,
+		SERROR_SNCAT(PGMANAGE_PREFIX, &int_prefix_len,
 			"\\Program Files (x86)\\Workflow Products", (size_t)38);
 	} else {
-		SERROR_SNCAT(POSTAGE_PREFIX, &int_prefix_len,
+		SERROR_SNCAT(PGMANAGE_PREFIX, &int_prefix_len,
 			"\\Program Files\\Workflow Products", (size_t)32);
 	}
 #endif
 #else
-	int_prefix_len = strlen(POSTAGE_PREFIX);
+	int_prefix_len = strlen(PGMANAGE_PREFIX);
 #endif
 
 #ifdef _WIN32
 	SERROR_SNCAT(
 		str_global_config_file, &int_global_len,
-		POSTAGE_PREFIX, int_prefix_len,
+		PGMANAGE_PREFIX, int_prefix_len,
 		"\\" SUN_PROGRAM_WORD_NAME "\\config\\" SUN_PROGRAM_LOWER_NAME ".conf",
 			strlen("\\" SUN_PROGRAM_WORD_NAME "\\config\\" SUN_PROGRAM_LOWER_NAME ".conf"));
 	SERROR_SNCAT(
 		str_global_connection_file, &int_global_len,
-		POSTAGE_PREFIX, int_prefix_len,
+		PGMANAGE_PREFIX, int_prefix_len,
 		"\\" SUN_PROGRAM_WORD_NAME "\\config\\" SUN_PROGRAM_LOWER_NAME "-connections.conf",
 			strlen("\\" SUN_PROGRAM_WORD_NAME "\\config\\" SUN_PROGRAM_LOWER_NAME "-connections.conf"));
 #else
 	SERROR_SNCAT(
 		str_global_config_file, &int_global_len,
-		POSTAGE_PREFIX, int_prefix_len,
+		PGMANAGE_PREFIX, int_prefix_len,
 		"/etc/" SUN_PROGRAM_LOWER_NAME "/" SUN_PROGRAM_LOWER_NAME ".conf",
 			strlen("/etc/" SUN_PROGRAM_LOWER_NAME "/" SUN_PROGRAM_LOWER_NAME ".conf"));
 	SERROR_SNCAT(
 		str_global_connection_file, &int_global_len,
-		POSTAGE_PREFIX, int_prefix_len,
+		PGMANAGE_PREFIX, int_prefix_len,
 		"/etc/" SUN_PROGRAM_LOWER_NAME "/" SUN_PROGRAM_LOWER_NAME "-connections.conf",
 			strlen("/etc/" SUN_PROGRAM_LOWER_NAME "/" SUN_PROGRAM_LOWER_NAME "-connections.conf"));
 #endif
@@ -545,12 +545,12 @@ bool parse_options(int argc, char *const *argv) {
 	if (str_global_web_root == NULL) {
 #ifdef _WIN32
 		SERROR_SNCAT(str_global_web_root, &int_global_len,
-			POSTAGE_PREFIX, int_prefix_len,
+			PGMANAGE_PREFIX, int_prefix_len,
 			"\\" SUN_PROGRAM_WORD_NAME "\\web_root",
 				strlen("\\" SUN_PROGRAM_WORD_NAME "\\web_root"));
 #else
 		SERROR_SNCAT(str_global_web_root, &int_global_len,
-			POSTAGE_PREFIX, int_prefix_len,
+			PGMANAGE_PREFIX, int_prefix_len,
 			"/etc/" SUN_PROGRAM_LOWER_NAME "/web_root",
 				strlen("/etc/" SUN_PROGRAM_LOWER_NAME "/web_root"));
 #endif //_WIN32
@@ -642,7 +642,7 @@ bool parse_options(int argc, char *const *argv) {
 #ifdef _WIN32
 	if (str_global_logfile == NULL) {
 		SERROR_SNCAT(str_global_logfile, &int_global_logfile_len,
-			POSTAGE_PREFIX, int_prefix_len,
+			PGMANAGE_PREFIX, int_prefix_len,
 			"\\" SUN_PROGRAM_WORD_NAME "\\log\\" SUN_PROGRAM_WORD_NAME ".log",
 				strlen("\\" SUN_PROGRAM_WORD_NAME "\\log\\" SUN_PROGRAM_WORD_NAME ".log"));
 	}

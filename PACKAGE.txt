@@ -5,19 +5,19 @@ TURN ON THE ERROR LOGS!!!!!
 
 
 Mac package:
-cd Repos/postage/
+cd Repos/pgmanage/
 ./package-nix.sh
-This outputs postage_electron/dist/Postage-VERSION.dmg
+This outputs pgmanage_electron/dist/PgManage-VERSION.dmg
 
 
 Mac test:
-Install Postage from DMG
+Install PgManage from DMG
 Open Terminal
-/Applications/Postage.app/Contents/MacOS/Postage
-Go to Postage
+/Applications/PgManage.app/Contents/MacOS/PgManage
+Go to PgManage
 Cmd+Q
 Go back to Terminal
-nano ~/.postage/postage-connections.conf
+nano ~/.pgmanage/pgmanage-connections.conf
 delete and paste:
 
 test: host=<ipaddress> port=5431 dbname=postgres sslmode=disable
@@ -31,14 +31,14 @@ replace <ipaddress> with the ip address of a server running a compatable testing
 
 Win package:
 Use VS2017 x86 Native Tools Prompt
-cd \Users\nunzio\Repos\postage
+cd \Users\nunzio\Repos\pgmanage
 package-windows
-make sure to delete old version and rename wfprod_group/postage/packages/Postage Windows VERSION/
-This outputs postage_electron/dist/Postage Setup VERSION.exe
+make sure to delete old version and rename wfprod_group/pgmanage/packages/PgManage Windows VERSION/
+This outputs pgmanage_electron/dist/PgManage Setup VERSION.exe
 
 
 Win test:
-Install Postage from EXE
+Install PgManage from EXE
 edit connections
 delete and paste:
 
@@ -50,14 +50,14 @@ host example: host=domain_name.com port=5432 dbname=postgres sslmode=require
 
 replace <ipaddress> with the ip address of a server running a compatable testing database on 5431
 
-close postage
+close pgmanage
 go to desktop
 right click on shortcut
 show in folder
 deselect
 shift right-click in empty space
 open command prompt
-postage --postage-test
+pgmanage --pgmanage-test
 
 
 Linux (good to put in a script):

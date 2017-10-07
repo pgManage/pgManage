@@ -23,7 +23,7 @@
 /*
 This function does three things:
 1. parse request
-2. authenticate if in /postage or /download
+2. authenticate if in /pgmanage or /download
 3. delegate work to http_auth/http_export/http_file/http_upload
 */
 void http_main(struct sock_ev_client *client);

@@ -65,7 +65,7 @@ These three functions handle the steps of login after authentication
 
 http_auth_login_step2 will initiate a query to:
 1. check if they are a super user
-2. check if they are a member of the "login_group" group (see postage(1) or envelope(1) for
+2. check if they are a member of the "login_group" group (see pgmanage(1) or envelope(1) for
 details)
 
 http_auth_login_step3 will:

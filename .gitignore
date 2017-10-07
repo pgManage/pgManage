@@ -47,16 +47,16 @@ envelope/web_root
 !envelope/web_root/test.txt
 !envelope/web_root/test/*
 
-/postage/postage
-/postage/check
-/postage/data_test
-/postage/default_config/postage.conf
-/postage/Makefile
-/postage/postgres.pid
-/postage/output.txt
+/pgmanage/pgmanage
+/pgmanage/check
+/pgmanage/data_test
+/pgmanage/default_config/pgmanage.conf
+/pgmanage/Makefile
+/pgmanage/postgres.pid
+/pgmanage/output.txt
 
 envelope.1
-postage.1
+pgmanage.1
 
 Makefile
 *.opendb
@@ -74,23 +74,23 @@ Makefile
 *.Plo
 *.lo
 .deps
-/postage_gui_mac/build/
-/postage_installer_mac/Postage/
-/postage_installer_mac/Postage*.pkg
+/pgmanage_gui_mac/build/
+/pgmanage_installer_mac/PgManage/
+/pgmanage_installer_mac/PgManage*.pkg
 
 /dependencies/libev/CVS/Template
 *.core
 
-visualstudio/postage/PostageGUI/bin/Release/PostageGUI.exe.config
-visualstudio/postage/PostageGUI/obj/Release/App.g.cs
-visualstudio/postage/PostageGUI/obj/Release/MainWindow.baml
-visualstudio/postage/PostageGUI/obj/Release/MainWindow.g.cs
-visualstudio/postage/PostageGUI/obj/Release/PostageGUI.Properties.Resources.resources
-visualstudio/postage/PostageGUI/obj/Release/PostageGUI.csproj.FileListAbsolute.txt
-visualstudio/postage/PostageGUI/obj/Release/PostageGUI.csproj.GenerateResource.Cache
-visualstudio/postage/PostageGUI/obj/Release/PostageGUI.g.resources
-visualstudio/postage/PostageGUI/obj/Release/PostageGUI_MarkupCompile.cache
-visualstudio/postage/PostageGUI/obj/Release/PostageGUI_MarkupCompile.lref
+visualstudio/pgmanage/PgManageGUI/bin/Release/PgManageGUI.exe.config
+visualstudio/pgmanage/PgManageGUI/obj/Release/App.g.cs
+visualstudio/pgmanage/PgManageGUI/obj/Release/MainWindow.baml
+visualstudio/pgmanage/PgManageGUI/obj/Release/MainWindow.g.cs
+visualstudio/pgmanage/PgManageGUI/obj/Release/PgManageGUI.Properties.Resources.resources
+visualstudio/pgmanage/PgManageGUI/obj/Release/PgManageGUI.csproj.FileListAbsolute.txt
+visualstudio/pgmanage/PgManageGUI/obj/Release/PgManageGUI.csproj.GenerateResource.Cache
+visualstudio/pgmanage/PgManageGUI/obj/Release/PgManageGUI.g.resources
+visualstudio/pgmanage/PgManageGUI/obj/Release/PgManageGUI_MarkupCompile.cache
+visualstudio/pgmanage/PgManageGUI/obj/Release/PgManageGUI_MarkupCompile.lref
 
 apps/nc/.libs/nc
 apps/nc/nc
@@ -140,10 +140,10 @@ openssl.pc
 /dependencies/libressl/ssl/libssl.la
 /dependencies/libressl/tls/libtls.la
 
-Postage.app
-PostageMac.dmg
-postage_installer_mac/old
-postage_gui_mac/old
+PgManage.app
+PgManageMac.dmg
+pgmanage_installer_mac/old
+pgmanage_gui_mac/old
 /db_framework_odbc
 README.md
 /envelope_installer_win
@@ -153,9 +153,9 @@ README.md
 /visualstudio/envelope_ss
 /visualstudio/Debug
 /visualstudio/x64
-/visualstudio/postage/Debug
-/visualstudio/postage/x64
-/visualstudio/postage/bin
+/visualstudio/pgmanage/Debug
+/visualstudio/pgmanage/x64
+/visualstudio/pgmanage/bin
 /RELEASE_NOTES.txt
 /dependencies/libressl/apps/nc/netcat.c.orig
 /dependencies/libressl/autom4te.cache/output.0

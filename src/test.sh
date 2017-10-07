@@ -14,37 +14,37 @@ else
 	MAKE=make
 fi
 
-rm -rf postage-master master.zip ~/.mozilla ~/.postage
+rm -rf pgmanage-master master.zip ~/.mozilla ~/.pgmanage
 
-wget https://github.com/workflowproducts/postage/archive/master.zip
+wget https://github.com/workflowproducts/pgmanage/archive/master.zip
 unzip master.zip
-cd postage-master/
+cd pgmanage-master/
 
 ./configure && $MAKE -j32
 $MAKE test-common
 
-./src/postage -c ./src/config/postage.conf -d ./src/config/postage-connections-test.conf -n true -t 300 -r ./src/web_root -l info & export POSTAGEPID="$!"
+./src/pgmanage -c ./src/config/pgmanage.conf -d ./src/config/pgmanage-connections-test.conf -n true -t 300 -r ./src/web_root -l info & export PGMANAGEPID="$!"
 sleep 5
-xdg-open "http://127.0.0.1:8080/postage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true" &
+xdg-open "http://127.0.0.1:8080/pgmanage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true" &
 printf "HTTP/1.1 200 OK\r\n\r\n\r\n" | ncat -l -p 45654
-kill $POSTAGEPID
+kill $PGMANAGEPID
 sleep 2
 
-rm -rf ~/.mozilla ~/.postage
+rm -rf ~/.mozilla ~/.pgmanage
 
 sudo $MAKE install
 
-/usr/local/sbin/postage -d ./src/config/postage-connections-test.conf & export POSTAGEPID="$!"
+/usr/local/sbin/pgmanage -d ./src/config/pgmanage-connections-test.conf & export PGMANAGEPID="$!"
 sleep 5
-xdg-open "http://127.0.0.1:8080/postage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true" &
+xdg-open "http://127.0.0.1:8080/pgmanage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true" &
 printf "HTTP/1.1 200 OK\r\n\r\n\r\n" | ncat -l -p 45654
-kill $POSTAGEPID
+kill $PGMANAGEPID
 sleep 2
 
 sudo $MAKE uninstall
 
-rm -rf ~/.postage
-cd postage_electron
+rm -rf ~/.pgmanage
+cd pgmanage_electron
 rm -rf node_modules app/node_modules
 npm install && cd app && npm install && cd ..
 ./update.sh
@@ -58,23 +58,23 @@ if test $(uname -s) = "Linux"; then
 		sudo yum -y install ./dist/*.rpm
 	}
 
-	mkdir ~/.postage
-	cp ../src/config/postage.conf ~/.postage
-	cp ../src/config/postage-connections-test.conf ~/.postage/postage-connections.conf
+	mkdir ~/.pgmanage
+	cp ../src/config/pgmanage.conf ~/.pgmanage
+	cp ../src/config/pgmanage-connections-test.conf ~/.pgmanage/pgmanage-connections.conf
 
-	/opt/Postage/postage --postage-test & export POSTAGEPID="$!"
+	/opt/PgManage/pgmanage --pgmanage-test & export PGMANAGEPID="$!"
 	printf "HTTP/1.1 200 OK\r\n\r\n\r\n" | ncat -l -p 45654
-	kill $POSTAGEPID
+	kill $PGMANAGEPID
 
 	command -v apt-get >/dev/null 2>&1 && {
-		sudo apt-get -y remove postage
-		cp -f ./dist/*.deb /mnt/Groups/wfprod_group/postage/packages/
-		md5sum ./dist/*.deb >> /mnt/Groups/wfprod_group/postage/packages/md5s.txt
+		sudo apt-get -y remove pgmanage
+		cp -f ./dist/*.deb /mnt/Groups/wfprod_group/pgmanage/packages/
+		md5sum ./dist/*.deb >> /mnt/Groups/wfprod_group/pgmanage/packages/md5s.txt
 	}
 	command -v yum >/dev/null 2>&1 && {
-		sudo yum -y remove Postage
-		cp -f ./dist/*.rpm /mnt/Groups/wfprod_group/postage/packages/
-		md5sum ./dist/*.rpm >> /mnt/Groups/wfprod_group/postage/packages/md5s.txt
+		sudo yum -y remove PgManage
+		cp -f ./dist/*.rpm /mnt/Groups/wfprod_group/pgmanage/packages/
+		md5sum ./dist/*.rpm >> /mnt/Groups/wfprod_group/pgmanage/packages/md5s.txt
 	}
 
 #elif test $(uname -s) = "FreeBSD"; then
@@ -82,8 +82,8 @@ if test $(uname -s) = "Linux"; then
 fi
 cd ..
 
-kill -9 $(cat postage/postgres.pid)
+kill -9 $(cat pgmanage/postgres.pid)
 
 cd ..
 
-rm -rf postage-master master.zip ~/.mozilla ~/.postage
+rm -rf pgmanage-master master.zip ~/.mozilla ~/.pgmanage

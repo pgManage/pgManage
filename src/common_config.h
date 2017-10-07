@@ -16,9 +16,9 @@
 #include "util_error.h"
 #include "util_ini.h"
 
-#define SUN_PROGRAM_LOWER_NAME "postage"
-#define SUN_PROGRAM_WORD_NAME "Postage"
-#define SUN_PROGRAM_UPPER_NAME "POSTAGE"
+#define SUN_PROGRAM_LOWER_NAME "pgmanage"
+#define SUN_PROGRAM_WORD_NAME "PgManage"
+#define SUN_PROGRAM_UPPER_NAME "PGMANAGE"
 
 extern char *str_global_config_file;
 extern char *str_global_connection_file;
@@ -42,7 +42,7 @@ extern uint64_t int_global_session_id;
 extern char cwd[1024];
 #ifdef _WIN32
 extern const char *VERSION;
-extern char *POSTAGE_PREFIX;
+extern char *PGMANAGE_PREFIX;
 #endif
 
 struct struct_connection {

@@ -34,7 +34,7 @@ else
 	echo "no"
 	echo
 	echo "ERROR:"
-	echo "No pg_config found, if you haven't installed postgresql, then you must install it to compile postage"
+	echo "No pg_config found, if you haven't installed postgresql, then you must install it to compile pgmanage"
 	echo "If you have installed postgresql, then you must put pg_config in your PATH"
 	exit
 fi
@@ -42,7 +42,7 @@ fi
 #### OS CHECK
 ## COMPILATION IS A LITTLE DIFFERENT FOR THE OS'S
 libev="no"
-libtre="notused" #NOT FOR POSTAGE
+libtre="notused" #NOT FOR PGMANAGE
 MANDIR="share/man"
 printf "checking for platform..."
 if test $(uname -s) = "Linux"; then
@@ -278,21 +278,21 @@ sed -e "s|@sock_dir_parameter@|$directory_parameter|g" \
 	-e "s|@make@|$MAKE|g" < Makefile.in > Makefile
 
 #### CONFIGURE MAN PAGE
-sed -e "s/@prefix@/\/usr\/local/g" < man/man1/postage.1.in > man/man1/postage.1
+sed -e "s/@prefix@/\/usr\/local/g" < man/man1/pgmanage.1.in > man/man1/pgmanage.1
 
 echo
 echo
 echo "   #############################################################"
 echo "   #                                                           #"
-echo "   #              Thank you for choosing postage!              #"
+echo "   #              Thank you for choosing pgmanage!              #"
 echo "   #                                                           #"
-echo "   #        If you have any trouble installing postage,        #"
+echo "   #        If you have any trouble installing pgmanage,        #"
 echo "   #    don't hesitate to email nunzio@workflowproducts.com    #"
 echo "   #                 or call 817-503-9545 CST                  #"
 echo "   #                     for free support                      #"
 echo "   #      NOTICE: You are about to compile the WEB SERVER      #"
-echo "   #     version of Postage. The desktop version is easier!    #"
+echo "   #     version of PgManage. The desktop version is easier!    #"
 echo "   #                     You can get it at:                    #"
-echo "   #    https://github.com/workflowproducts/postage/releases   #"
+echo "   #    https://github.com/workflowproducts/pgmanage/releases   #"
 echo "   #                                                           #"
 echo "   #############################################################"

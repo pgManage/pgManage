@@ -1,39 +1,39 @@
-# FreeBSD Postage
+# FreeBSD PgManage
 ```
 su -
 pkg install
 pkg install unzip postgresql96-server gmake wget
 exit
-wget https://github.com/workflowproducts/postage/archive/master.zip
+wget https://github.com/workflowproducts/pgmanage/archive/master.zip
 unzip master.zip
-cd postage-master/
+cd pgmanage-master/
 ./configure
 gmake all
 gmake test
 ```
 
 On your desktop computer's browser go to:
-http://\<ip>:8080/postage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
+http://\<ip>:8080/pgmanage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
 
 Back in FreeBSD:
 ```
 gmake test-common
 su -
-cd /home/super/postage-master/
+cd /home/super/pgmanage-master/
 gmake install
 exit
-/usr/local/sbin/postage
+/usr/local/sbin/pgmanage
 ```
 
 On your desktop computer's browser go to:
-http://\<ip>:8080/postage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
+http://\<ip>:8080/pgmanage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
 
 Make sure to kill the PostgreSQL process from `make test-common` before moving on.
 
 Back in FreeBSD:
 ```
 su -
-cd /home/super/postage-master
+cd /home/super/pgmanage-master
 gmake uninstall
 ```
 
@@ -73,41 +73,41 @@ cd /home/super/envelope-master
 gmake uninstall
 ```
 
-# OpenBSD Postage
+# OpenBSD PgManage
 ```
 su -
 pkg_add unzip postgresql-server gmake wget
 exit
-wget https://github.com/workflowproducts/postage/archive/master.zip
+wget https://github.com/workflowproducts/pgmanage/archive/master.zip
 unzip master.zip
-cd postage-master/
+cd pgmanage-master/
 ./configure
 gmake all
 gmake test
 ```
 
 On your desktop computer's browser go to:
-http://\<ip>:8080/postage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
+http://\<ip>:8080/pgmanage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
 
 Back in OpenBSD:
 ```
 gmake test-common
 su -
-cd /home/super/postage-master/
+cd /home/super/pgmanage-master/
 gmake install
 exit
-/usr/local/sbin/postage
+/usr/local/sbin/pgmanage
 ```
 
 On your desktop computer's browser go to:
-http://\<ip>:8080/postage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
+http://\<ip>:8080/pgmanage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
 
 Make sure to kill the PostgreSQL process from `make test-common` before moving on.
 
 Back in OpenBSD:
 ```
 su -
-cd /home/super/postage-master
+cd /home/super/pgmanage-master
 gmake uninstall
 ```
 
@@ -146,40 +146,40 @@ cd /home/super/envelope-master
 gmake uninstall
 ```
 
-# Ubuntu Postage
+# Ubuntu PgManage
 In terminal:
 ```
 sudo apt-get install postgresql-server-dev-9.5 postgresql-9.5
 export PATH="/usr/lib/postgresql/9.5/bin:$PATH"
-wget https://github.com/workflowproducts/postage/archive/master.zip
+wget https://github.com/workflowproducts/pgmanage/archive/master.zip
 unzip master.zip 
-cd postage-master/
+cd pgmanage-master/
 ./configure && make
 make test
 ```
 
 In your browser:
-Go to the Postage testing page: http://127.0.0.1:8080/postage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
+Go to the PgManage testing page: http://127.0.0.1:8080/pgmanage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
 
 Back in Terminal:
 ```
 sudo su -
-cd /home/super/postage-master/
+cd /home/super/pgmanage-master/
 make install
 exit
 make test-common
-/usr/local/sbin/postage
+/usr/local/sbin/pgmanage
 ```
 
 In your browser:
-Go to the Postage testing page: http://127.0.0.1:8080/postage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
+Go to the PgManage testing page: http://127.0.0.1:8080/pgmanage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
 
 Make sure to kill the PostgreSQL process from `make test-common` before moving on.
 
 To uninstall:
 ```
 sudo su -
-cd /home/super/postage-master/
+cd /home/super/pgmanage-master/
 make uninstall
 ```
 
@@ -219,37 +219,37 @@ cd /home/super/envelope-master/
 make uninstall
 ```
 
-# Fedora Postage
+# Fedora PgManage
 In terminal:
 ```
-wget https://github.com/workflowproducts/postage/archive/master.zip
+wget https://github.com/workflowproducts/pgmanage/archive/master.zip
 unzip master.zip 
-cd postage-master/
+cd pgmanage-master/
 ./configure && make
 make test
 ```
 
 In your browser:
-Go to the Postage testing page: http://127.0.0.1:8080/postage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
+Go to the PgManage testing page: http://127.0.0.1:8080/pgmanage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
 
 Back in Terminal:
 ```
 su -
-cd /home/super/postage-master/
+cd /home/super/pgmanage-master/
 make install
 exit
 make test-common
-/usr/local/sbin/postage
+/usr/local/sbin/pgmanage
 ```
 In your browser:
-Go to the Postage testing page: http://127.0.0.1:8080/postage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
+Go to the PgManage testing page: http://127.0.0.1:8080/pgmanage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
 
 Make sure to kill the PostgreSQL process from `make test-common` before moving on.
 
 To uninstall:
 ```
 su -
-cd /home/super/postage-master/
+cd /home/super/pgmanage-master/
 make uninstall
 ```
 
@@ -287,40 +287,40 @@ cd /home/super/envelope-master/
 make uninstall
 ```
 
-# macOS Postage:
+# macOS PgManage:
 Use Google Chrome
 
 In terminal:
 ```
-curl -OL https://github.com/workflowproducts/postage/archive/master.zip
+curl -OL https://github.com/workflowproducts/pgmanage/archive/master.zip
 unzip master.zip 
-cd postage-master/
+cd pgmanage-master/
 ./configure
 make all test
 ```
 
 In your browser:
-Go to the Postage testing page: http://127.0.0.1:8080/postage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
+Go to the PgManage testing page: http://127.0.0.1:8080/pgmanage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
 
 Back in Terminal:
 ```
 sudo su -
-cd /Users/super/postage-master/
+cd /Users/super/pgmanage-master/
 make install
 exit
 make test-common
-/usr/local/sbin/postage
+/usr/local/sbin/pgmanage
 ```
 
 In your browser:
-Go to the Postage testing page: http://127.0.0.1:8080/postage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
+Go to the PgManage testing page: http://127.0.0.1:8080/pgmanage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
 
 Make sure to kill the PostgreSQL process from `make test-common` before moving on.
 
 To uninstall:
 ```
 sudo su -
-cd /Users/super/postage-master/
+cd /Users/super/pgmanage-master/
 make uninstall
 ```
 

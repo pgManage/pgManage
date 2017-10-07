@@ -1,4 +1,4 @@
 node_modules
-app/postage
-/Postage-*
+app/pgmanage
+/PgManage-*
 /dist
