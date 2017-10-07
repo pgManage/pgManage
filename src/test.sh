@@ -14,11 +14,11 @@ else
 	MAKE=make
 fi
 
-rm -rf pgmanage-master master.zip ~/.mozilla ~/.pgmanage
+rm -rf pgManage-master master.zip ~/.mozilla ~/.pgmanage
 
 wget https://github.com/pgManage/pgManage/archive/master.zip
 unzip master.zip
-cd pgmanage-master/
+cd pgManage-master/
 
 ./configure && $MAKE -j32
 $MAKE test-common
@@ -86,4 +86,4 @@ kill -9 $(cat pgmanage/postgres.pid)
 
 cd ..
 
-rm -rf pgmanage-master master.zip ~/.mozilla ~/.pgmanage
+rm -rf pgManage-master master.zip ~/.mozilla ~/.pgmanage
