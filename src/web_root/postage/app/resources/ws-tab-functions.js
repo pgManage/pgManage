@@ -1144,7 +1144,7 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
         //console.log(document.activeElement);
 
         // if the focus isn't in the rename control and isn't the delete button: allow sort
-        if (document.activeElement !== tabElement.innerRenameControl && !event.target.classList.contains('delete-button')) {
+        if (!event.target.classList.contains('rename-control') && !event.target.classList.contains('delete-button')) {
             sortHandler = function (event) {
                 var intMouseLeft = GS.mousePosition(event).left, intLeft = intMouseLeft - intTabBarOffsetLeft,
                     matchedElement, bolMatchedLast, i, len;
