@@ -255,7 +255,7 @@ fi
 ## POSTGRES CHANGED THE NAME OF A CONFIG FILE PARAMETER, WHEN WE TEST WE NEED TO KNOW WHICH ONE TO USE (for `make test`)
 printf "checking for PostgreSQL version >= 9.3.0 (parameter rename)..."
 # check PostgreSQL version
-has_new_sock_directory_parameter_postgres=$(pg_config --version | awk "{split(\$2,a,\".\"); print (a[1] >= 9) && (a[2] >= 3) && (a[3] >= 0)}")
+has_new_sock_directory_parameter_postgres=$(pg_config --version | awk "{split(\$2,a,\".\"); print (a[1] >= 10) || ((a[1] >= 9) && (a[2] >= 3) && (a[3] >= 0))}")
 directory_parameter=""
 if test "x$has_new_sock_directory_parameter_postgres" = "x1"; then
 	has_new_sock_directory_parameter_postgres=yes
