@@ -1,5 +1,3 @@
-pgManage is no longer being maintained.
-
 # pgManage - A fast PostgreSQL admin tool 
 
 A fast replacement for PGAdmin!
