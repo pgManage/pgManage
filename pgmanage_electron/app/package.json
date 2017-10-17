@@ -1,12 +1,6 @@
 {
-  "author": {
-    "name": "Annunziato Tocci",
-    "email": "nunzio@workflowproducts.com",
-    "url": "http://tocci.xyz/"
-  },
   "bugs": {
-    "url": "https://github.com/pgManage/pgManage/issues",
-    "email": "nunzio@workflowproducts.com"
+    "url": "https://github.com/pgManage/pgManage/issues"
   },
   "dependencies": {
     "electron-is-dev": "0.1.2",
@@ -17,8 +11,7 @@
     "tcp-port-used": "0.1.2"
   },
   "description": "pgManage",
-  "email": "nunzio@workflowproducts.com",
-  "license": "Apache-2.0",
+  "license": "PostgreSQL",
   "main": "main.js",
   "name": "pgManage",
   "version": "10.0.0"
