@@ -1680,18 +1680,30 @@ function getContext(strInput, intPosition) {
             }
             if (arrShortQueries.indexOf('schemasAll') > -1
                 || arrShortQueries.indexOf('schemasFunctions') > -1) {
-                arrQueries.push(
-                    autocompleteQuery.funcSnippets
-                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
-                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
-                );
+                if (strSchema) {
+                    arrQueries.push(
+                        autocompleteQuery.funcSnippets
+                            .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$')
+                    );
+                } else {
+                    arrQueries.push(
+                        autocompleteQuery.funcSnippets
+                            .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \')))')
+                    );
+                }
             }
             if (arrShortQueries.indexOf('schemasSetFunctions') > -1) {
+                if (strSchema) {
                 arrQueries.push(
                     autocompleteQuery.funcSnippets
-                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND proretset AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
-                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND proretset AND pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$')
                 );
+                } else {
+                    arrQueries.push(
+                        autocompleteQuery.funcSnippets
+                            .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND proretset AND pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \')))')
+                    );
+                }
             }
             if (arrShortQueries.indexOf('schemasAll') > -1
                 || arrShortQueries.indexOf('schemasSequences') > -1) {
@@ -1934,6 +1946,7 @@ function getContext(strInput, intPosition) {
     for (var i = 0, len = arrQueries.length; i < len; i++) {
         //console.log(arrQueries[i]);
         arrQueries[i] = arrQueries[i].replace((/\{\{searchStr}\}/gi), strContext.toLowerCase() + '%');
+        console.log(arrQueries[i]);
     }
 
     //console.log('check queries', arrQueries.length === 0 && autocompleteGlobals.bolSnippets === false);

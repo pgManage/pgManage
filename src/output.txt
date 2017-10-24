@@ -1,7 +1,7 @@
-LOG:  database system was shut down at 2017-10-23 16:59:38 CDT
+LOG:  database system was shut down at 2017-10-24 16:01:21 CDT
 LOG:  MultiXact member wraparound protections are now enabled
-LOG:  autovacuum launcher started
 LOG:  database system is ready to accept connections
+LOG:  autovacuum launcher started
 LOG:  received fast shutdown request
 LOG:  aborting any active transactions
 LOG:  autovacuum launcher shutting down
