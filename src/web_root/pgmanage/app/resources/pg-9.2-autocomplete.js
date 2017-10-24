@@ -1946,7 +1946,6 @@ function getContext(strInput, intPosition) {
     for (var i = 0, len = arrQueries.length; i < len; i++) {
         //console.log(arrQueries[i]);
         arrQueries[i] = arrQueries[i].replace((/\{\{searchStr}\}/gi), strContext.toLowerCase() + '%');
-        console.log(arrQueries[i]);
     }
 
     //console.log('check queries', arrQueries.length === 0 && autocompleteGlobals.bolSnippets === false);
