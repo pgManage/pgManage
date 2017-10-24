@@ -855,7 +855,7 @@ function getContext(strInput, intPosition) {
 
             strFirst = ' ';
             intContextPosition = i;
-            arrShortQueries = ['schemasTables'];
+            arrShortQueries = ['schemasTables', 'schemasSetFunctions'];
 
             doubleIdentifier(strInput.substr(i));
             //console.log(">USING/FROM/JOIN/ONLY|" + intTabLevel + "<");
@@ -1683,6 +1683,13 @@ function getContext(strInput, intPosition) {
                 arrQueries.push(
                     autocompleteQuery.funcSnippets
                         .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
+                );
+            }
+            if (arrShortQueries.indexOf('schemasSetFunctions') > -1) {
+                arrQueries.push(
+                    autocompleteQuery.funcSnippets
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND proretset AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
                             + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
                 );
             }
