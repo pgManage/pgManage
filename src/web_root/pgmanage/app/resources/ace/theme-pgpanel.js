@@ -118,7 +118,7 @@ var pgPanelCSSText = ml(function () {/*
     .ace-pgpanel .ace_tr,
     .ace-pgpanel .ace_mv,
     .ace-pgpanel .ace_vw {
-        font-size: 0.75em;
+        font-size: 1em;
         font-weight: 900;
     }
 
