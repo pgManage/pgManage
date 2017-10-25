@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+
+        <title>pgManage Connection editor</title>
+
+		<script src="js/greyspots.js" type="text/javascript"></script>
+        <script src="js/ace/ace.js" data-ace-base="js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="js/ace/ext-searchbox.js" type="text/javascript"></script>
+		<link href="css/greyspots.css" rel="stylesheet" type="text/css" />
+        <link href="css/pgmanage.css" rel="stylesheet" type="text/css" />
+
+        <script>
+            /*jslint es6 browser:true*/
+            /*global ml,require,window,GS,process*/
+			const os = require('os');
+			const fs = require('fs');
+			const path = require('path');
+			const electron = require('electron');
+            const ipcRenderer = electron.ipcRenderer;
+            const filePath = os.homedir() + '/.pgmanage/pgmanage-connections.conf';
+            var connEditor;
+
+			function restartpgManage() {
+			    "use strict";
+				ipcRenderer.send('pgmanage', 'restart');
+			}
+
+            function parse(strConn) {
+                var jsnRet = {};
+                var strKey = '';
+                var strValue = '';
+                var strState = 'key';
+                var bolQuote = false;
+                var intSlash = 0;
+                var i = 0;
+                var len = strConn.length;
+
+                while (i < len) {
+                    if (strState === 'key') {
+                            if (/[a-z]/.test(strConn[i])) {
+                            var j = strConn.substring(i).indexOf('=');
+                            strKey = strConn.substring(i, i + j);
+                            strState = 'value';
+                            i += j + 1;
+                        } else {
+                            i += 1;
+                        }
+
+                    } else if (strState === 'value') {
+                        if (strConn[i - 1] === '=' && strConn[i] === '\'') {
+                            bolQuote = true;
+                        } else if ((bolQuote && intSlash === 0 && strConn[i] === '\'') || (!bolQuote && /\s/.test(strConn[i])) || (i + 1) === len) {
+                            if (bolQuote || (i + 1) === len) {
+                                strValue += strConn[i];
+                            }
+                            if (bolQuote) {
+                                try {
+                                    strValue = JSON.parse(strValue);
+                                } catch (e) {
+
+                                }
+                            }
+                            jsnRet[strKey.toLowerCase()] = strValue;
+                            
+                            strState = 'key';
+                            strValue = '';
+                            i += 1;
+                            continue;
+
+                        } else if (strConn[i] === '\\') {
+                            intSlash += 1;
+                        } else {
+                            intSlash = 0;
+                        }
+                        strValue += strConn[i];
+                        i += 1;
+                    }
+                }
+
+                return jsnRet;
+            }
+              
+            
+            document.addEventListener('DOMContentLoaded', function () {
+                'use strict';
+
+                connEditor = document.getElementById('conn-editor');
+
+				fs.readFile(filePath, 'utf8', function readCallback(err, strValue) {
+					if (err) {
+						var templateElement = document.createElement('template');
+						templateElement.innerHTML = ml(function () {/*
+							<gs-page>
+								<gs-header><center><h3>Reading failed!</h3></center></gs-header>
+								<gs-body padded>
+									<center>{{desc}}/center>
+								</gs-body>
+								<gs-footer>
+									<gs-button dialogclose bg-primary tabindex="0">Try Again</gs-button>
+								</gs-footer>
+							</gs-page>
+						*/}).replace(/\{\{desc\}\}/, err.message);
+
+						GS.openDialog(templateElement, function () {}, function (event) {
+							fs.readFile(filePath, 'utf8', readCallback);
+						});
+					} else {
+                        strValue = strValue.replace(/\r/g, '');
+                        var arrLine = strValue.split('\n');
+                        var i = 0;
+                        var len = arrLine.length;
+                        var element;
+                        while (i < len) {
+                            if (arrLine[i][0] === '#' || arrLine[i].indexOf(':') === -1) {
+                                arrLine.splice(i, 1);
+                                i -= 1;
+                                len -= 1;
+                            } else {
+                                arrLine[i] = arrLine[i].split(':');
+                                arrLine[i][1] = parse(arrLine[i][1]);
+                            }
+                            i += 1;
+                        }
+
+                        i = 0;
+                        while (i < len) {
+                            element = document.createElement('tr');
+
+                            element.innerHTML = ml(function () {/*
+                                <td>
+                                    <gs-button mini inline class="delete-button" icononly icon="times"></gs-button>
+                                </td>
+                                <td>
+                                    <gs-text mini column="name" placeholder="name" flex value="{{NAME}}"></gs-text>
+                                </td>
+                                <td>
+                                    <gs-text mini column="host" placeholder="host" value="{{HOST}}" flex></gs-text>
+                                </td>
+                                <td>
+                                    <gs-text mini column="port" placeholder="port" value="{{PORT}}" flex></gs-text>
+                                </td>
+                                <td>
+                                    <gs-text mini column="dbname" placeholder="dbname" value="{{DBNAME}}" flex></gs-text>
+                                </td>
+                                <td>
+                                    <gs-select mini column="sslmode" placeholder="sslmode" value="{{SSLMODE}}" flex>
+                                        <option value="disable">Disable</option>
+                                        <option value="allow">Allow</option>
+                                        <option value="prefer">Prefer</option>
+                                        <option value="require">Require</option>
+                                        <option value="verify-ca">Verify Authority</option>
+                                        <option value="verify-full">Verify Full</option>
+                                    </gs-select>
+                                </td>
+                                <td>
+                                    <gs-button mini inline class="drag-handle" icononly icon="bars" style="user-select: none;"></gs-button>
+                                </td>
+                            */}).replace('{{NAME}}', arrLine[i][0])
+                                .replace('{{HOST}}', arrLine[i][1].host)
+                                .replace('{{PORT}}', arrLine[i][1].port)
+                                .replace('{{DBNAME}}', arrLine[i][1].dbname)
+                                .replace('{{SSLMODE}}', arrLine[i][1].sslmode);
+                            connEditor.appendChild(element);
+                            i += 1;
+                        }
+
+                        document.getElementById('new-button').addEventListener('click', function () {
+                            element = document.createElement('tr');
+
+                            element.innerHTML = ml(function () {/*
+                                <td>
+                                    <gs-button mini inline class="delete-button" icononly icon="times"></gs-button>
+                                </td>
+                                <td>
+                                    <gs-text mini column="name" placeholder="name" flex value=""></gs-text>
+                                </td>
+                                <td>
+                                    <gs-text mini column="host" placeholder="host" value="" flex></gs-text>
+                                </td>
+                                <td>
+                                    <gs-text mini column="port" placeholder="port" value="" flex></gs-text>
+                                </td>
+                                <td>
+                                    <gs-text mini column="dbname" placeholder="dbname" value="" flex></gs-text>
+                                </td>
+                                <td>
+                                    <gs-select mini column="sslmode" placeholder="sslmode" value="prefer" flex>
+                                        <option value="disable">Disable</option>
+                                        <option value="allow">Allow</option>
+                                        <option value="prefer">Prefer</option>
+                                        <option value="require">Require</option>
+                                        <option value="verify-ca">Verify Authority</option>
+                                        <option value="verify-full">Verify Full</option>
+                                    </gs-select>
+                                </td>
+                                <td>
+                                    <gs-button mini inline class="drag-handle" icononly icon="bars" style="user-select: none;"></gs-button>
+                                </td>
+                            */});
+                            connEditor.appendChild(element);
+                        });
+                        
+                        connEditor.addEventListener('click', function (event) {
+                            if (event.target.classList.contains('delete-button')) {
+                                event.target.parentNode.parentNode.parentNode.removeChild(event.target.parentNode.parentNode);
+                            }
+                        });
+
+                        connEditor.addEventListener('mousedown', function (event) {
+                            console.log(event.target);
+                            if (event.target.classList.contains('drag-handle')) {
+                                event.preventDefault();
+                                var row = event.target.parentNode.parentNode;
+                                var highlightedRow = null;
+                                var mouseMoveFunction = function (event) {
+                                    event.preventDefault();
+                                    var self = GS.findParentTag(event.target, 'tr');
+                                    console.log(event.target, self);
+                                    if (self && self !== row && self !== highlightedRow) {
+                                        if (highlightedRow) {
+                                            highlightedRow.style.borderTop = 'none';
+                                        }
+                                        self.style.borderTop = 'solid 0.4em #00FF00';
+                                        highlightedRow = self;
+                                    }
+                                };
+                                
+                                var mouseUpFunction = function (event) {
+                                    if (highlightedRow) {
+                                        highlightedRow.style.borderTop = 'none';
+
+                                        row.parentNode.removeChild(row);
+                                        highlightedRow.parentNode.insertBefore(row, highlightedRow);
+                                    }
+                                    
+                                    window.removeEventListener('mousemove', mouseMoveFunction);
+                                    window.removeEventListener('mouseup', mouseUpFunction);
+                                };
+
+                                window.addEventListener('mousemove', mouseMoveFunction);
+                                window.addEventListener('mouseup', mouseUpFunction);
+                            }
+                        });
+                        
+                        document.getElementById('cancel-button').addEventListener('click', function () {
+                            ipcRenderer.sendToHost('close');
+                        });
+
+                        document.getElementById('save-button').addEventListener('click', function () {
+                            var arrRow = connEditor.querySelectorAll('tr');
+                            var i = 0;
+                            var len = arrRow.length;
+                            var j;
+                            var len2;
+                            var arrColumn;
+                            var strConnection;
+                            var strValue;
+                            var arrConnection = [];
+
+                            while (i < len) {
+                                arrColumn = arrRow[i].querySelectorAll('[column]');
+                                j = 0;
+                                len2 = arrColumn.length;
+                                while (j < len2) {
+                                    if (arrColumn[j].getAttribute('column') === 'name') {
+                                        strConnection = arrColumn[j].value + ':'
+                                    } else {
+                                        strConnection += ' ' + arrColumn[j].getAttribute('column') + '=';
+                                        strValue = arrColumn[j].value;
+                                        if (strValue.search(/\s/) > -1) {
+                                            strValue = strValue.replace(/\\/g, '\\\\');
+                                            strValue = strValue.replace(/'/g, '\\\'');
+                                            strValue = '\'' + strValue + '\'';
+                                        }
+                                        strConnection += strValue;
+                                    }
+
+                                    j += 1;
+                                }
+
+                                arrConnection.push(strConnection);
+                                i += 1;
+                            }
+
+                            console.log(arrConnection);
+
+                            var save = function () {
+                                fs.writeFile(filePath, arrConnection.join('\n'), 'utf8', function (err) {
+                                    if (err) {
+                                        var templateElement = document.createElement('template');
+                                        templateElement.innerHTML = ml(function () {/*
+                                            <gs-page>
+                                                <gs-header><center><h3>Saving failed!</h3></center></gs-header>
+                                                <gs-body padded>
+                                                    <center>{{desc}}/center>
+                                                </gs-body>
+                                                <gs-footer>
+                                                    <gs-button dialogclose bg-primary tabindex="0">Try Again</gs-button>
+                                                </gs-footer>
+                                            </gs-page>
+                                        */}).replace(/\{\{desc\}\}/, err.message);
+
+                                        GS.openDialog(templateElement, function () {}, function (event, strAnswer) {
+                                            save();
+                                        });
+                                    } else {
+                                        restartpgManage();
+                                        ipcRenderer.sendToHost('close');
+                                    }
+                                });
+                            };
+                            save();
+                        });
+					}
+				});
+            });
+
+		</script>
+		<style>
+        </style>
+        <script src="js/settings.js" type="text/javascript"></script>
+        <style id="customCss"></style>
+    </head>
+    <body>
+        <gs-page>
+			<gs-header>
+				<div flex-horizontal>
+					<div id="header-text-container" flex>Connection Editor</div>
+				</div>
+			</gs-header>
+            <gs-body padded>
+                <table>
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Connection Name</th>
+                            <th>Host</th>
+                            <th>Port</th>
+                            <th>DB Name</th>
+                            <th>SSL Mode</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="conn-editor">
+
+                    </tbody>
+                </table>
+                <gs-button id="new-button">New Connection</gs-button>
+            </gs-body>
+            <gs-footer>
+                <gs-grid>
+                    <gs-block>
+                        <gs-button id="cancel-button">Cancel</gs-button>
+                    </gs-block>
+                    <gs-block>
+                        <gs-button id="save-button" bg-primary>Save</gs-button>
+                    </gs-block>
+                </gs-grid>
+            </gs-footer>
+        </gs-page>
+    </body>
+</html>
