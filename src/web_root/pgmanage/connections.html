@@ -29,6 +29,15 @@
 			function restartpgManage() {
 			    "use strict";
 				ipcRenderer.send('pgmanage', 'restart');
+            }
+
+			function getPGPASSLoc() {
+			    "use strict";
+				if (process.platform == 'win32') {
+					return path.normalize(process.env.APPDATA + '/postgresql/pgpass.conf');
+				} else {
+					return os.homedir() + '/.pgpass';
+				}
 			}
 
             function parse(strConn) {
@@ -91,6 +100,85 @@
                 'use strict';
 
                 connEditor = document.getElementById('conn-editor');
+
+                if (fs.existsSync(getPGPASSLoc())) {
+                    document.getElementById('import-button').removeAttribute('hidden');
+                    document.getElementById('import-button').addEventListener('click', function () {
+                        fs.readFile(getPGPASSLoc(), 'utf8', function readCallback(err, strValue) {
+                            if (err) {
+                                var templateElement = document.createElement('template');
+                                templateElement.innerHTML = ml(function () {/*
+                                    <gs-page>
+                                        <gs-header><center><h3>Reading failed!</h3></center></gs-header>
+                                        <gs-body padded>
+                                            <center>{{desc}}/center>
+                                        </gs-body>
+                                        <gs-footer>
+                                            <gs-button dialogclose bg-primary tabindex="0">Try Again</gs-button>
+                                        </gs-footer>
+                                    </gs-page>
+                                */}).replace(/\{\{desc\}\}/, err.message);
+        
+                                GS.openDialog(templateElement, function () {}, function (event) {
+                                    fs.readFile(filePath, 'utf8', readCallback);
+                                });
+                            } else {
+                                strValue = strValue.replace(/\r/g, '');
+                                var arrLine = strValue.split('\n');
+                                var i = 0;
+                                var len = arrLine.length;
+                                var element;
+                                while (i < len) {
+                                    var arrOption = arrLine[i].split(':');
+                                    if (arrLine[i][0] === '#' || arrLine[i] === '' || arrOption[0] === '*' || arrOption[1] === '*' || arrOption[2] === '*') {
+                                        arrLine.splice(i, 1);
+                                        i -= 1;
+                                        len -= 1;
+                                    } else {
+                                        console.log(arrLine[i], arrOption);
+                                        element = document.createElement('tr');
+
+                                        element.innerHTML = ml(function () {/*
+                                            <td>
+                                                <gs-button mini inline class="delete-button" icononly icon="times"></gs-button>
+                                            </td>
+                                            <td>
+                                                <gs-text mini column="name" placeholder="name" flex value="{{NAME}}"></gs-text>
+                                            </td>
+                                            <td>
+                                                <gs-text mini column="host" placeholder="host" value="{{HOST}}" flex></gs-text>
+                                            </td>
+                                            <td>
+                                                <gs-text mini column="port" placeholder="port" value="{{PORT}}" flex></gs-text>
+                                            </td>
+                                            <td>
+                                                <gs-text mini column="dbname" placeholder="dbname" value="{{DBNAME}}" flex></gs-text>
+                                            </td>
+                                            <td>
+                                                <gs-select mini column="sslmode" placeholder="sslmode" value="{{SSLMODE}}" flex>
+                                                    <option value="disable">Disable</option>
+                                                    <option value="allow">Allow</option>
+                                                    <option value="prefer">Prefer</option>
+                                                    <option value="require">Require</option>
+                                                    <option value="verify-ca">Verify Authority</option>
+                                                    <option value="verify-full">Verify Full</option>
+                                                </gs-select>
+                                            </td>
+                                            <td>
+                                                <gs-button mini inline class="drag-handle" icononly icon="bars" style="user-select: none;"></gs-button>
+                                            </td>
+                                        */}).replace('{{NAME}}', 'PGPASS #' + i + ' ' + arrOption[0] + ':' + arrOption[1])
+                                            .replace('{{HOST}}', arrOption[0])
+                                            .replace('{{PORT}}', arrOption[1])
+                                            .replace('{{DBNAME}}', arrOption[2]);
+                                        connEditor.appendChild(element);
+                                    }
+                                    i += 1;
+                                }
+                            }
+                        });
+                    });
+                }
 
 				fs.readFile(filePath, 'utf8', function readCallback(err, strValue) {
 					if (err) {
@@ -352,6 +440,7 @@
                     </tbody>
                 </table>
                 <gs-button id="new-button">New Connection</gs-button>
+                <gs-button id="import-button" hidden>Import .pgpass connections</gs-button>
             </gs-body>
             <gs-footer>
                 <gs-grid>
