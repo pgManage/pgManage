@@ -855,7 +855,7 @@ function getContext(strInput, intPosition) {
 
             strFirst = ' ';
             intContextPosition = i;
-            arrShortQueries = ['schemasTables'];
+            arrShortQueries = ['schemasTables', 'schemasSetFunctions'];
 
             doubleIdentifier(strInput.substr(i));
             //console.log(">USING/FROM/JOIN/ONLY|" + intTabLevel + "<");
@@ -1615,8 +1615,10 @@ function getContext(strInput, intPosition) {
                 || arrShortQueries.indexOf('schemasAggregates') > -1) {
                 arrQueries.push(
                     autocompleteQuery.qualified_aggregates
-                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
-                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND '
+                            + (strSchema ? 'pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                                : 'pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \')))')
+                        )
                 );
             }
 
@@ -1624,8 +1626,10 @@ function getContext(strInput, intPosition) {
                 || arrShortQueries.indexOf('schemasConversions') > -1) {
                 arrQueries.push(
                     autocompleteQuery.qualified_conversions
-                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
-                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND '
+                            + (strSchema ? 'pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                                : 'pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \')))')
+                        )
                 );
             }
 
@@ -1633,8 +1637,10 @@ function getContext(strInput, intPosition) {
                 || arrShortQueries.indexOf('schemasConstraints') > -1) {
                 arrQueries.push(
                     autocompleteQuery.constraints
-                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
-                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND '
+                            + (strSchema ? 'pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                                : 'pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \')))')
+                        )
                 );
             }
 
@@ -1642,8 +1648,10 @@ function getContext(strInput, intPosition) {
                 || arrShortQueries.indexOf('schemasCollations') > -1) {
                 arrQueries.push(
                     autocompleteQuery.collations
-                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
-                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND '
+                            + (strSchema ? 'pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                                : 'pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \')))')
+                        )
                 );
             }
 
@@ -1654,8 +1662,10 @@ function getContext(strInput, intPosition) {
                     autocompleteQuery.tables
                         .replace(/\{\{CATALOG}\}/gi, '-1')
                         .replace(/\{\{TOAST}\}/gi, '-1')
-                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
-                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND '
+                            + (strSchema ? 'pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                                : 'pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \')))')
+                        )
                 );
             }
 
@@ -1666,120 +1676,159 @@ function getContext(strInput, intPosition) {
                     autocompleteQuery.views
                         .replace(/\{\{CATALOG}\}/gi, '-1')
                         .replace(/\{\{TOAST}\}/gi, '-1')
-                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
-                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND '
+                            + (strSchema ? 'pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                                : 'pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \')))')
+                        )
                 );
             }
 
             if (arrShortQueries.indexOf('schemasMaterializedViews') > -1) {
                 arrQueries.push(
                     autocompleteQuery.qualified_materialized_views
-                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
-                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND '
+                            + (strSchema ? 'pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                                : 'pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \')))')
+                        )
                 );
             }
             if (arrShortQueries.indexOf('schemasAll') > -1
                 || arrShortQueries.indexOf('schemasFunctions') > -1) {
                 arrQueries.push(
                     autocompleteQuery.funcSnippets
-                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
-                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND '
+                            + (strSchema ? 'pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                                : 'pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \')))')
+                        )
+                );
+            }
+            if (arrShortQueries.indexOf('schemasSetFunctions') > -1) {
+                arrQueries.push(
+                    autocompleteQuery.funcSnippets
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND proretset AND '
+                            + (strSchema ? 'pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                                 : 'pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \')))')
+                        )
                 );
             }
             if (arrShortQueries.indexOf('schemasAll') > -1
                 || arrShortQueries.indexOf('schemasSequences') > -1) {
                 arrQueries.push(
                     autocompleteQuery.qualified_sequences
-                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
-                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND '
+                            + (strSchema ? 'pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                                : 'pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \')))')
+                        )
                 );
             }
             if (arrShortQueries.indexOf('schemasAll') > -1
                 || arrShortQueries.indexOf('schemasTypes') > -1) {
                 arrQueries.push(
                     autocompleteQuery.qualified_types
-                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
-                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND '
+                            + (strSchema ? 'pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                                : 'pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \')))')
+                        )
                 );
             }
             if (arrShortQueries.indexOf('schemasAll') > -1
                 || arrShortQueries.indexOf('schemasDomains') > -1) {
                 arrQueries.push(
                     autocompleteQuery.qualified_domains
-                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
-                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND '
+                            + (strSchema ? 'pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                                : 'pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \')))')
+                        )
                 );
             }
             if (arrShortQueries.indexOf('schemasAll') > -1
                 || arrShortQueries.indexOf('schemasOperators') > -1) {
                 arrQueries.push(
                     autocompleteQuery.qualified_operators
-                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
-                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND '
+                            + (strSchema ? 'pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                                : 'pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \')))')
+                        )
                 );
             }
             if (arrShortQueries.indexOf('schemasAll') > -1
                 || arrShortQueries.indexOf('schemasForeignTables') > -1) {
                 arrQueries.push(
                     autocompleteQuery.qualified_foreign_tables
-                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
-                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND '
+                            + (strSchema ? 'pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                                : 'pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \')))')
+                        )
                 );
             }
             if (arrShortQueries.indexOf('schemasAll') > -1
                 || arrShortQueries.indexOf('schemasIndexes') > -1) {
                 arrQueries.push(
                     autocompleteQuery.qualified_indexes
-                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
-                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND '
+                            + (strSchema ? 'pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                                : 'pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \')))')
+                        )
                 );
             }
             if (arrShortQueries.indexOf('schemasAll') > -1
                 || arrShortQueries.indexOf('schemasOperatorClasses') > -1) {
                 arrQueries.push(
                     autocompleteQuery.qualified_operator_classes
-                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
-                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND '
+                            + (strSchema ? 'pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                                : 'pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \')))')
+                        )
                 );
             }
             if (arrShortQueries.indexOf('schemasAll') > -1
                 || arrShortQueries.indexOf('schemasOperatorFamilies') > -1) {
                 arrQueries.push(
                     autocompleteQuery.qualified_operator_families
-                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
-                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND '
+                            + (strSchema ? 'pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                                : 'pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \')))')
+                        )
                 );
             }
             if (arrShortQueries.indexOf('schemasAll') > -1
                 || arrShortQueries.indexOf('schemasTextSearchConfigurations') > -1) {
                 arrQueries.push(
                     autocompleteQuery.qualified_text_search_configurations
-                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
-                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND '
+                            + (strSchema ? 'pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                                : 'pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \')))')
+                        )
                 );
             }
             if (arrShortQueries.indexOf('schemasAll') > -1
                 || arrShortQueries.indexOf('schemasTextSearchDictionaries') > -1) {
                 arrQueries.push(
                     autocompleteQuery.qualified_text_search_dictionaries
-                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
-                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND '
+                            + (strSchema ? 'pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                                : 'pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \')))')
+                        )
                 );
             }
             if (arrShortQueries.indexOf('schemasAll') > -1
                 || arrShortQueries.indexOf('schemasTextSearchParsers') > -1) {
                 arrQueries.push(
                     autocompleteQuery.qualified_text_search_parsers
-                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
-                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND '
+                            + (strSchema ? 'pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                                : 'pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \')))')
+                        )
                 );
             }
             if (arrShortQueries.indexOf('schemasAll') > -1
                 || arrShortQueries.indexOf('schemasTextSearchTemplates') > -1) {
                 arrQueries.push(
                     autocompleteQuery.qualified_text_search_templates
-                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
-                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND '
+                            + (strSchema ? 'pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                                : 'pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \')))')
+                        )
                 );
             }
         } else {
