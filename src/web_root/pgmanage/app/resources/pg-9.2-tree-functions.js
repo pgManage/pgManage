@@ -1828,11 +1828,14 @@ function propertyDialog(strQuery, intOid, strNamePartOne, strNamePartTwo) {
                 var arrRowTwo = (arrRecords[2] || []);
 
                 for (col_i = 1, col_len = arrRecords[0].length; col_i < col_len; col_i += 1) {
+                    var strValue = GS.decodeFromTabDelimited(arrRowTwo[col_i] || '');
                     strHTML += (
-                        '<tr>' +
-                            '<th>' + encodeHTML(GS.decodeFromTabDelimited(arrRowOne[col_i] || '')) + '</th>' +
-                            '<td>' + encodeHTML(GS.decodeFromTabDelimited(arrRowTwo[col_i] || '')) + '</td>' +
-                        '</tr>'
+                        '<tr>'
+                            + '<th>' + encodeHTML(GS.decodeFromTabDelimited(arrRowOne[col_i] || '')) + '</th>'
+                            + (strValue === '\\N'
+                               ? '<td style="color: #888888;">NULL</td>'
+                               : '<td>' + encodeHTML(strValue) + '</td>')
+                        + '</tr>'
                     );
                 }
 

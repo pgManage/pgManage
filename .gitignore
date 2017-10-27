@@ -228,3 +228,5 @@ npm-debug.log
 
 
 src/data_test
+src/output.txt
+src/postgres.pid

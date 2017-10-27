@@ -128,6 +128,14 @@
 				        }, 1);
 
 						editor.on('change', function save() {
+							addWarnings(editor);
+						});
+                        
+                        document.getElementById('cancel-button').addEventListener('click', function () {
+                            ipcRenderer.sendToHost('close');
+                        });
+
+                        document.getElementById('save-button').addEventListener('click', function () {
 							indicator.textContent = 'Saving...';
 							fs.writeFile(filePath, editor.getValue(), 'utf8', function (err) {
 								if (err) {
@@ -151,12 +159,11 @@
 		                                save();
 		                            });
 								} else {
-									indicator.textContent = '';
+									restartpgManage();
+									ipcRenderer.sendToHost('close');
 								}
 							});
-							
-							addWarnings(editor);
-						});
+                        });
 					}
 				});
 			});
@@ -195,13 +202,22 @@
 					<div id="header-text-container" flex>Configuration Editor</div>
 					<gs-button inline class="header-button-text" style="width: 15em;" hidden href="https://www.postgresql.org/docs/current/static/libpq-pgpass.html" target="_blank" id="pgpass_docs">PGPASS Documentation</gs-button>
 					<gs-button inline class="header-button-text" style="width: 12em;" href="app/pgmanage.1.html" target="_blank" id="man_page">pgManage Man Page</gs-button>
-					<gs-button inline class="header-button-text" style="width: 10em;" onclick="restartpgManage();">Reload pgManage</gs-button>
 				</div>
 			</gs-header>
             <gs-body>
 				<div id="conf-indicator" class="indicator"></div>
 				<div id="conf-editor"></div>
             </gs-body>
+            <gs-footer>
+                <gs-grid>
+                    <gs-block>
+                        <gs-button id="cancel-button">Cancel</gs-button>
+                    </gs-block>
+                    <gs-block>
+                        <gs-button id="save-button" bg-primary>Save</gs-button>
+                    </gs-block>
+                </gs-grid>
+            </gs-footer>
         </gs-page>
     </body>
 </html>
