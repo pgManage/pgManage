@@ -13,6 +13,7 @@
   "description": "pgManage",
   "license": "PostgreSQL",
   "main": "main.js",
+  "email": "hackers@pgmanage.io",
   "name": "pgManage",
   "version": "10.0.1",
   "author": "PostgreSQL Global Development Group"
