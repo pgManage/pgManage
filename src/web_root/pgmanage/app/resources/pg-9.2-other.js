@@ -49,7 +49,7 @@ function loadContextData(callback) {
     };
 
     //contextData.pgmanageVersion = '1.0.6';
-    contextData.connectionID = window.location.pathname.substring(9).match(/^[0-9]*/)[0];
+    contextData.connectionID = window.location.pathname.substring(10).match(/^[0-9]*/)[0];
 
     // request using raw query
     GS.requestRawFromSocket(GS.envSocket,
@@ -64,7 +64,7 @@ function loadContextData(callback) {
             // if message 0
             if (data.intCallbackNumber === 0) {
                 arrColumns = data.strMessage.split('\t');
-				
+
                 contextData.databaseName = arrColumns[0];
                 contextData.sessionUser = arrColumns[1];
                 contextData.currentUser = arrColumns[2];
@@ -445,6 +445,9 @@ function dialogSplash() {
                     <iframe style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; border: 0 none; z-index: 150; background-color: #FFFFFF;" class="full-iframe" src="/pgmanage/splash.html?version={{PGMANAGE}}&postgres={{POSTGRES}}"></iframe>
                 </div>
             </gs-body>
+			<gs-footer style="z-index: 2000;">
+				<gs-button dialogclose>Close</gs-button>
+			</gs-footer>
         </gs-page>
     */}).replace(/\{\{PGMANAGE\}\}/g, contextData.pgmanageVersion).replace(/\{\{POSTGRES\}\}/g, contextData.versionNumber);
     GS.openDialog(templateElement);
