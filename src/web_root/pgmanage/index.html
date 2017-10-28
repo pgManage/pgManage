@@ -217,6 +217,7 @@ function getPGPASSLoc() {
     if (process.platform == 'win32') {
         return process.env.APPDATA + '/postgresql/pgpass.conf';
     } else {
+        var os = require('os');
         return os.homedir() + '/.pgpass';
     }
 }
