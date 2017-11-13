@@ -91,4 +91,3 @@ If you must install pgManage from source, then you'll need to install a version 
 
 
 
-Copyright 2016 Workflow Products LLC

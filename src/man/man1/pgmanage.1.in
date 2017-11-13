@@ -167,11 +167,7 @@ Run \fBpgmanage\fP (long argument):
 Try accessing your database through psql\. If you can, double check your connection string parameters\. If you can't connect, you may have a firewall problem\.
 .SH AUTHOR
 .P
-Copyright (c) 2017 Workflow Products, LLC
-.P
-Created by Annunziato Tocci
+Copyright (c) 2017 The PostgreSQL Global Development Group
 .P
 Report bugs to https://github\.com/pgManage/pgManage/issues
-.br
-Send us feedback! Current contact information can be found at workflowproducts\.com  
 

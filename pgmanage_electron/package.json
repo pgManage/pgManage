@@ -1,6 +1,6 @@
 {
   "build": {
-    "appId": "com.workflowproducts.pgmanage",
+    "appId": "org.pgmanage.pgmanage",
     "asar": true,
     "extraResources": [
       "app/pgmanage"
@@ -14,7 +14,7 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "menuCategory": "Workflow Products"
+      "menuCategory": "pgManage"
     },
     "linux": {
       "category": "Development",
