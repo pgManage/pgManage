@@ -4749,7 +4749,7 @@ scriptQuery.objectView = ml(function () {/*
         	),'')
         || E'\n\n-- SQL prototypes ' ||
         (
-            SELECT E'\n\n/' || E'*\nSELECT ' || string_agg(quote_ident(attname), ', ') ||
+            SELECT E'\n\n/' || E'*\nSELECT ' || string_agg(quote_ident(attname), ', ' ORDER BY attnum ASC) ||
                 E'\n  FROM ' || (SELECT quote_ident(nspname) || '.' || quote_ident(relname)
                                    FROM pg_class
                               LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
@@ -4763,8 +4763,8 @@ scriptQuery.objectView = ml(function () {/*
                                         FROM pg_class
                                    LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
                                        WHERE pg_class.oid = {{INTOID}} ) ||
-                E'\n            (' || string_agg(quote_ident(attname), ', ') || ')' ||
-                E'\n     VALUES (' || string_agg(quote_ident(attname), ', ') || ');'
+                E'\n            (' || string_agg(quote_ident(attname), ', ' ORDER BY attnum ASC) || ')' ||
+                E'\n     VALUES (' || string_agg(quote_ident(attname), ', ' ORDER BY attnum ASC) || ');'
               FROM pg_catalog.pg_attribute
              WHERE attrelid = {{INTOID}}
                AND attnum >= 0
@@ -4774,7 +4774,7 @@ scriptQuery.objectView = ml(function () {/*
                                    FROM pg_class
                               LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
                                   WHERE pg_class.oid = {{INTOID}} ) ||
-                E'\n   SET ' || string_agg(quote_ident(attname) || ' = new.' || quote_ident(attname), E'\n     , ') || ';'
+                E'\n   SET ' || string_agg(quote_ident(attname) || ' = new.' || quote_ident(attname), E'\n     , ' ORDER BY attnum ASC) || ';'
               FROM pg_catalog.pg_attribute
              WHERE attrelid = {{INTOID}}
                AND attnum >= 0
