@@ -104,7 +104,7 @@
                 // get pk if possible (else use whole column list)
                 strQuery = ml(function () {/*
                     SELECT  (
-                                 SELECT array_to_string(array_agg(attname), ',')
+                                 SELECT array_to_string(array_agg(attname ORDER BY attnum ASC), ',')
                                    FROM pg_constraint con
                               LEFT JOIN pg_attribute att ON att.attnum = con.conkey[1] AND att.attrelid = con.conrelid
                                   WHERE con.contype = 'p' AND con.conrelid = getoid.oid
@@ -112,13 +112,13 @@
                                ORDER BY attnum ASC
                             ),
                             (
-                                 SELECT array_to_string(array_agg(attname), ',')
+                                 SELECT array_to_string(array_agg(attname ORDER BY attnum ASC), ',')
                                    FROM pg_attribute
                                   WHERE pg_attribute.attisdropped IS FALSE AND pg_attribute.attnum > 0 AND attrelid = getoid.oid
                             ),
                             (
-                                SELECT array_to_string(array_agg(default_expression), ',')
-                                  FROM (         SELECT pg_catalog.pg_get_expr(pg_attrdef.adbin, pg_attrdef.adrelid) AS default_expression
+                                SELECT array_to_string(array_agg(default_expression ORDER BY attnum ASC), ',')
+                                  FROM (         SELECT pg_catalog.pg_get_expr(pg_attrdef.adbin, pg_attrdef.adrelid) AS default_expression, att.attnum
                                                    FROM pg_constraint con
                                               LEFT JOIN pg_attribute att ON att.attnum = con.conkey[1] AND att.attrelid = con.conrelid
                                         LEFT OUTER JOIN pg_attrdef ON adrelid = attrelid AND adnum = attnum
@@ -126,7 +126,7 @@
                                                   ORDER BY attnum ASC) em
                             ),
 							(
-							SELECT array_to_string(array_agg(CASE WHEN COALESCE(format_type(atttypid, atttypmod),'') = 'timestamp with time zone' THEN 'timestamptz' WHEN COALESCE(format_type(atttypid, atttypmod),'') ILIKE 'character varying%' THEN 'varchar' || substring(COALESCE(format_type(atttypid, atttypmod)), 18) ELSE COALESCE(format_type(atttypid, atttypmod),'') END), ',')
+							SELECT array_to_string(array_agg(CASE WHEN COALESCE(format_type(atttypid, atttypmod),'') = 'timestamp with time zone' THEN 'timestamptz' WHEN COALESCE(format_type(atttypid, atttypmod),'') ILIKE 'character varying%' THEN 'varchar' || substring(COALESCE(format_type(atttypid, atttypmod)), 18) ELSE COALESCE(format_type(atttypid, atttypmod),'') END ORDER BY attnum ASC), ',')
 							FROM pg_attribute
 							WHERE pg_attribute.attisdropped IS FALSE AND pg_attribute.attnum > 0 AND attrelid = getoid.oid
 							)
