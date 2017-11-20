@@ -109,7 +109,6 @@
                               LEFT JOIN pg_attribute att ON att.attnum = con.conkey[1] AND att.attrelid = con.conrelid
                                   WHERE con.contype = 'p' AND con.conrelid = getoid.oid
                                GROUP BY attnum
-                               ORDER BY attnum ASC
                             ),
                             (
                                  SELECT array_to_string(array_agg(attname ORDER BY attnum ASC), ',')
@@ -122,8 +121,7 @@
                                                    FROM pg_constraint con
                                               LEFT JOIN pg_attribute att ON att.attnum = con.conkey[1] AND att.attrelid = con.conrelid
                                         LEFT OUTER JOIN pg_attrdef ON adrelid = attrelid AND adnum = attnum
-                                                  WHERE attrelid = getoid.oid
-                                                  ORDER BY attnum ASC) em
+                                                  WHERE attrelid = getoid.oid) em
                             ),
 							(
 							SELECT array_to_string(array_agg(CASE WHEN COALESCE(format_type(atttypid, atttypmod),'') = 'timestamp with time zone' THEN 'timestamptz' WHEN COALESCE(format_type(atttypid, atttypmod),'') ILIKE 'character varying%' THEN 'varchar' || substring(COALESCE(format_type(atttypid, atttypmod)), 18) ELSE COALESCE(format_type(atttypid, atttypmod),'') END ORDER BY attnum ASC), ',')
