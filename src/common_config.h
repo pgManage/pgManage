@@ -24,7 +24,6 @@ extern char *str_global_config_file;
 extern char *str_global_connection_file;
 extern char *str_global_login_group;
 extern char *str_global_web_root;
-extern char *str_global_data_root;
 extern char *str_global_tls_cert;
 extern char *str_global_tls_key;
 extern char *str_global_port;

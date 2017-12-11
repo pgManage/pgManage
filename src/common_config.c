@@ -4,7 +4,6 @@ char *str_global_config_file = NULL;
 char *str_global_connection_file = NULL;
 char *str_global_login_group = NULL;
 char *str_global_web_root = NULL;
-char *str_global_data_root = NULL;
 char *str_global_tls_cert = NULL;
 char *str_global_tls_key = NULL;
 char *str_global_port = NULL;
@@ -40,6 +39,7 @@ char *PGMANAGE_PREFIX = NULL;
 // str_global_app_path					app_path						y							app-path
 // str_global_role_path					role_path						z							role-path
 // str_global_web_root					web_root						r							web-root
+// str_global_sql_root					sql_root						a							sql-root
 // str_global_port						pgmanage_port OR envelope_port	p							pgmanage-port OR envelope-port
 // str_global_tls_cert					tls_cert						j							tls-cert
 // str_global_tls_key					tls_key							k							tls-key
@@ -82,9 +82,9 @@ static int handler(void *str_user, const char *str_section, const char *str_name
 		SERROR_SNCAT(str_global_web_root, &int_len,
 			str_value, strlen(str_value));
 
-	} else if (SMATCH("", "data_root")) {
-		SFREE(str_global_data_root);
-		SERROR_SNCAT(str_global_data_root, &int_len,
+	} else if (SMATCH("", "sql_root")) {
+		SFREE(str_global_sql_root);
+		SERROR_SNCAT(str_global_sql_root, &int_len,
 			str_value, strlen(str_value));
 
 	} else if (SMATCH("", "" SUN_PROGRAM_LOWER_NAME "_port")) {
@@ -429,7 +429,7 @@ bool parse_options(int argc, char *const *argv) {
 		{"allow-custom-connections",		required_argument,		NULL,	'n'},
 		{"local-only",						required_argument,		NULL,	'x'},
 		{"web-root",						required_argument,		NULL,	'r'},
-		{"data-root",						required_argument,		NULL,	'a'},
+		{"sql-root",						required_argument,		NULL,	'a'},
 		{""SUN_PROGRAM_LOWER_NAME"-port",	required_argument,		NULL,	'p'},
 		{"tls-cert",						required_argument,		NULL,	'j'},
 		{"tls-key",							required_argument,		NULL,	'k'},
@@ -441,7 +441,7 @@ bool parse_options(int argc, char *const *argv) {
 	};
 // clang-format on
 
-	while ((ch = getopt_long(argc, argv, "hvc:d:g:n:x:r:p:j:k:s:t:l:o:", longopts, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "hvc:d:g:n:x:r:a:p:j:k:s:t:l:o:", longopts, NULL)) != -1) {
 		if (ch == '?') {
 			// getopt_long prints an error in this case
 			goto error;
@@ -465,7 +465,7 @@ bool parse_options(int argc, char *const *argv) {
 	char *str_config_empty = "";
 	ini_parse(str_global_config_file, handler, &str_config_empty);
 
-	while ((ch = getopt_long(argc, argv, "hvc:d:g:n:x:r:p:j:k:s:t:l:o:", longopts, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "hvc:d:g:n:x:r:a:p:j:k:s:t:l:o:", longopts, NULL)) != -1) {
 		if (ch == '?') {
 			// getopt_long prints an error in this case
 			goto error;
@@ -496,8 +496,8 @@ bool parse_options(int argc, char *const *argv) {
 				optarg, strlen(optarg));
 
 		} else if (ch == 'a') {
-			SFREE(str_global_data_root);
-			SERROR_SNCAT(str_global_data_root, &int_global_len,
+			SFREE(str_global_sql_root);
+			SERROR_SNCAT(str_global_sql_root, &int_global_len,
 				optarg, strlen(optarg));
 
 		} else if (ch == 'p') {
@@ -556,14 +556,14 @@ bool parse_options(int argc, char *const *argv) {
 #endif //_WIN32
 	}
 
-	if (str_global_data_root == NULL) {
+	if (str_global_sql_root == NULL) {
 #ifdef _WIN32
 		char *str_app_data = getenv("AppData");
 		SERROR_CHECK(str_app_data != NULL, "getenv for AppData failed!");
 
 		size_t int_app_data_len = strlen(str_app_data);
 		SDEBUG("str_app_data: %s", str_app_data);
-		SERROR_SNCAT(str_global_data_root, &int_global_len,
+		SERROR_SNCAT(str_global_sql_root, &int_global_len,
 			((char *)str_app_data) + 2, int_app_data_len - 2,
 			str_app_data[int_app_data_len - 1] == '\\' ? "\\" SUN_PROGRAM_LOWER_NAME : "\\" SUN_PROGRAM_LOWER_NAME,
 				strlen(str_app_data[int_app_data_len - 1] == '\\' ? "\\" SUN_PROGRAM_LOWER_NAME : "\\" SUN_PROGRAM_LOWER_NAME));
@@ -579,10 +579,11 @@ bool parse_options(int argc, char *const *argv) {
 		SERROR_SALLOC(str_temp, (size_t)bufsize + 1);
 		getpwuid_r(getuid(), pw, str_temp, (size_t)bufsize, &pw);
 
-		SERROR_SNCAT(str_global_data_root, &int_global_len,
+		SERROR_SNCAT(str_global_sql_root, &int_global_len,
 			pw->pw_dir, strlen(pw->pw_dir),
 			pw->pw_dir[strlen(pw->pw_dir) - 1] == '/' ? "." SUN_PROGRAM_LOWER_NAME : "/." SUN_PROGRAM_LOWER_NAME,
-				strlen(pw->pw_dir[strlen(pw->pw_dir) - 1] == '/' ? "." SUN_PROGRAM_LOWER_NAME : "/." SUN_PROGRAM_LOWER_NAME));
+				strlen(pw->pw_dir[strlen(pw->pw_dir) - 1] == '/' ? "." SUN_PROGRAM_LOWER_NAME : "/." SUN_PROGRAM_LOWER_NAME,
+			"/sql", (size_t)4));
 		SFREE(str_temp);
 #endif
 	}
@@ -590,42 +591,18 @@ bool parse_options(int argc, char *const *argv) {
 	// If the directory exists this function will error if given "create_dir"
 	//	 but if the directory exists, we don't want the error
 	//	 so we just ignore it
-	str_temp = canonical("", str_global_data_root, "read_dir");
-	if (str_temp == NULL) {
-		str_temp = canonical("", str_global_data_root, "create_dir");
-	}
-	SFREE(str_temp);
-
-	str_temp = canonical("", str_global_data_root, "read_dir");
-	SERROR_CHECK(str_temp != NULL, "canonical failed!");
-	SFREE(str_temp);
-
-	SDEBUG("str_global_sql_root: %s", str_global_sql_root);
-	if (str_global_sql_root == NULL) {
-		size_t int_global_sql_root_len = strlen(str_global_data_root);
-		SERROR_SNCAT(str_global_sql_root, &int_global_len,
-			str_global_data_root, int_global_sql_root_len,
-			str_global_data_root[int_global_sql_root_len - 1] == '/' ? "sql" : "/sql", str_global_data_root[int_global_sql_root_len - 1] == '/' ? 3 : 4
-		);
-	}
-	SDEBUG("str_global_sql_root: %s", str_global_sql_root);
-
 	str_temp = canonical("", str_global_sql_root, "read_dir");
 	if (str_temp == NULL) {
 		str_temp = canonical("", str_global_sql_root, "create_dir");
 	}
 	SFREE(str_temp);
+
 	str_temp = canonical("", str_global_sql_root, "read_dir");
 	SERROR_CHECK(str_temp != NULL, "canonical failed!");
 	SFREE(str_global_sql_root);
 	str_global_sql_root = str_temp;
 	str_temp = NULL;
 	bol_error_state = false;
-
-	// This is because if there is a symoblic link, we want the resolved path
-	SFREE(str_global_data_root);
-	str_global_data_root = str_temp;
-	str_temp = NULL;
 
 	if (str_global_web_root[0] != '/' && str_global_web_root[0] != '\\' && str_global_web_root[1] != ':') {
 		SERROR_SNCAT(str_temp, &int_temp_len,
