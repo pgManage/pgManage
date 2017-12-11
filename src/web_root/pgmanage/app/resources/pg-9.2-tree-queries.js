@@ -6,8 +6,6 @@ var bolTreeQueriesLoaded = true, listQuery = {}, titleRefreshQuery = {}
   , detailQuery = {}, associatedButtons = {};
 
 function handleQueryVersionDifferences(versionNum) {
-
-
     //console.log(parseFloat(versionNum, 10) >= 9.5);
     //propQuery.prop_role:
     if (parseFloat(versionNum, 10) >= 9.5) {
