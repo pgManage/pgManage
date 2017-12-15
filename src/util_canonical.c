@@ -182,7 +182,7 @@ char *canonical(const char *file_base, char *_path, char *check_type) {
 			SDEBUG("mkpath>%s<", str_temp);
 			mkpath(str_temp);
 #else
-			int limit_mkdir = 4;
+			int limit_mkdir = 20;
 			// DEBUG("test1>%s|%s|%s<", canonical_filename, str_file_base, str);
 			// if (strncmp(canonical_filename, str_file_base, strlen(str_file_base))
 			// !=
