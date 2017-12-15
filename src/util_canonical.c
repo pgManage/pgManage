@@ -195,7 +195,10 @@ char *canonical(const char *file_base, char *_path, char *check_type) {
 				realpath(str, canonical_filename);
 				limit_mkdir -= 1;
 			}
-// SDEBUG("test3");
+			// this one creates the last directory, realpath allows the last element of a path to not exist
+			SERROR_CHECK(
+				mkdir(canonical_filename, S_IRWXU | S_IRWXG) == 0, "%s is a bad path. Directory creation error.\012", path);
+			// SDEBUG("test3");
 //}
 // SDEBUG("test4");
 #endif
