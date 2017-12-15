@@ -233,8 +233,19 @@ char *canonical(const char *file_base, char *_path, char *check_type) {
 		SERROR_CHECK(0 == _mkdir(canonical_filename) || errno == EEXIST, "%s: %s|%s is a bad path. Directory creation error.\012",
 			check_type, str_file_base, path);
 #else
-		SERROR_CHECK(0 == mkdir(canonical_filename, S_IRWXU | S_IRWXG), "%s: %s|%s is a bad path. Directory creation error.\012",
-			check_type, str_file_base, path);
+		int limit_mkdir = 20;
+		// DEBUG("test1>%s|%s|%s<", canonical_filename, str_file_base, str);
+		// if (strncmp(canonical_filename, str_file_base, strlen(str_file_base))
+		// !=
+		// 0) {
+		// DEBUG("test2");
+		while (strncmp(canonical_filename, str, strlen(str)) != 0 && limit_mkdir > 0) {
+			SDEBUG("mkdir>%s|%s<", canonical_filename, str);
+			SERROR_CHECK(
+				mkdir(canonical_filename, S_IRWXU | S_IRWXG) == 0, "%s is a bad path. Directory creation error.\012", path);
+			realpath(str, canonical_filename);
+			limit_mkdir -= 1;
+		}
 #endif
 
 	} else if (strncmp(check_type, "read_dir_or_file", 17) == 0) {
