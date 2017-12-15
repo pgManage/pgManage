@@ -566,7 +566,8 @@ bool parse_options(int argc, char *const *argv) {
 		SERROR_SNCAT(str_global_sql_root, &int_global_len,
 			((char *)str_app_data) + 2, int_app_data_len - 2,
 			str_app_data[int_app_data_len - 1] == '\\' ? "\\" SUN_PROGRAM_LOWER_NAME : "\\" SUN_PROGRAM_LOWER_NAME,
-				strlen(str_app_data[int_app_data_len - 1] == '\\' ? "\\" SUN_PROGRAM_LOWER_NAME : "\\" SUN_PROGRAM_LOWER_NAME));
+				strlen(str_app_data[int_app_data_len - 1] == '\\' ? "\\" SUN_PROGRAM_LOWER_NAME : "\\" SUN_PROGRAM_LOWER_NAME),
+			"/sql", (size_t)4);
 #else
 		// free MUST NOT be called on this struct
 		struct passwd pw_result;
@@ -582,8 +583,8 @@ bool parse_options(int argc, char *const *argv) {
 		SERROR_SNCAT(str_global_sql_root, &int_global_len,
 			pw->pw_dir, strlen(pw->pw_dir),
 			pw->pw_dir[strlen(pw->pw_dir) - 1] == '/' ? "." SUN_PROGRAM_LOWER_NAME : "/." SUN_PROGRAM_LOWER_NAME,
-				strlen(pw->pw_dir[strlen(pw->pw_dir) - 1] == '/' ? "." SUN_PROGRAM_LOWER_NAME : "/." SUN_PROGRAM_LOWER_NAME,
-			"/sql", (size_t)4));
+				strlen(pw->pw_dir[strlen(pw->pw_dir) - 1] == '/' ? "." SUN_PROGRAM_LOWER_NAME : "/." SUN_PROGRAM_LOWER_NAME),
+			"/sql", (size_t)4);
 		SFREE(str_temp);
 #endif
 	}

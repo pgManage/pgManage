@@ -173,14 +173,14 @@ void client_close_immediate(struct sock_ev_client *client);
 These macros makes debugging client_close easier
 */
 #define SERROR_CLIENT_CLOSE_NORESPONSE(C)                                                                                        \
-	SDEBUG("Closing client %p", C);                                                                                              \
+	SINFO("**************************************Closing client %p %s", C, C->str_session_id);                                   \
 	SERROR_CHECK_NORESPONSE(client_close(C), "Error closing Client");                                                            \
 	C = NULL;
 #define SERROR_CLIENT_CLOSE(C)                                                                                                   \
-	SDEBUG("Closing client %p", C);                                                                                              \
+	SINFO("**************************************Closing client %p %s", C, C->str_session_id);                                   \
 	SERROR_CHECK(client_close(C), "Error closing Client");                                                                       \
 	C = NULL;
 #define SFINISH_CLIENT_CLOSE(C)                                                                                                  \
-	SDEBUG("Closing client %p", C);                                                                                              \
+	SINFO("**************************************Closing client %p %s", C, C->str_session_id);                                   \
 	SFINISH_CHECK(client_close(C), "Error closing Client");                                                                      \
 	C = NULL;

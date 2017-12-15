@@ -1057,6 +1057,10 @@ function ml(func) {
     };
 
     WS.requestFromSocket = function (socket, key, strMessage, callback, forceMessageID) {
+        if (key === 'ws_delete' || key === 'ws_select') {
+            console.log(socket, key, strMessage, callback, forceMessageID);
+            console.log(arrWaitingCalls);
+        }
         var oldOnOpen, messageID;
 
         if (!socket || socket.readyState === socket.CLOSED) {
