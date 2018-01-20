@@ -49463,7 +49463,7 @@ if (typeof HTMLTemplateElement === 'undefined') {
           templateElement.innerHTML = ml(function () {/*
   <gs-page class="gs-table-contextmenu">
       <gs-body class="gs-table-contextmenu" padded>
-          <div class="context-menu-header">Paste Format:</div>
+          <div class="context-menu-header">Paste Format (<b>NOT SAVED</b>, go to Options > pgManage Options to change the default clipboard options):</div>
           <table>
               <tbody>
   <tr>
