@@ -325,7 +325,7 @@ bool WS_sendFrame(EV_P, struct sock_ev_client *client, bool bol_fin, int8_t int_
 	SDEBUG("WS_sendFrame");
 	char *str_response = NULL;
 
-	if (client->bol_is_open == false) {
+	if (client->bol_is_open == false || client->bol_socket_is_open == false) {
 		return true;
 	}
 

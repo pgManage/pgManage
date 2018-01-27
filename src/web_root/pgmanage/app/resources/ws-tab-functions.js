@@ -2103,6 +2103,7 @@ function saveScript(tabElement, bolLoader) {
 
 function saveFile(tabElement, strPath, changeStamp, strContent, callbackSuccess, callbackFail) {
     'use strict';
+    console.log('saveFile');
 
     // saveFile is called on datasheet, editor and table designer tabs.
     //      this warning popup code is now only used on an editor tab
@@ -2115,42 +2116,83 @@ function saveFile(tabElement, strPath, changeStamp, strContent, callbackSuccess,
     }
 
     tabElement.saveState = 'saving';
-
-    GS.requestFromSocket(GS.envSocket, 'TAB\tWRITE\t' + GS.encodeForTabDelimited(strPath) + '\t' +
-                                            changeStamp + '\n' + strContent, function (data, error, errorData) {
-        //console.log(data, error, errorData);
-
-        if (!error) {
-            if (data !== 'TRANSACTION COMPLETED') {
-                callbackSuccess(data);
-            }
-            tabElement.saveState = 'saved';
-
-        } else {
-            // saveFile is called on datasheet, editor and table designer tabs.
-            //      this warning popup code is now only used on an editor tab
+    if (tabElement.saveTimeout) {
+        clearTimeout(tabElement.clearTimeout);
+    }
+    tabElement.clearTimeout = setTimeout(function () {
+        if (tabElement.saveState !== 'saved') {
+            tabElement.saveState = 'error';
             if (tabElement.relatedEditor) {
+                tabElement.relatedEditor.setReadOnly(true);
                 var warningElement = document.createElement('div');
-
+    
                 warningElement.classList.add('editor-warning');
                 warningElement.innerHTML = 'CHANGES ARE NOT SAVED<br />CLICK HERE TO TRY AGAIN';
-
+    
                 tabElement.relatedEditor.container.parentNode.appendChild(warningElement);
-
+    
                 warningElement.addEventListener('click', function () {
                     saveFile(tabElement, strPath, changeStamp, strContent, callbackSuccess, callbackFail);
                 });
             }
-
-            if (callbackFail) {
-                callbackFail(errorData);
-            } else {
-                GS.webSocketErrorDialog(errorData);
-            }
-
-            tabElement.saveState = 'error';
         }
-    });
+    }, 30 * 1000);
+
+    console.log(GS.envSocket);
+    if (GS.envSocket.readyState === WebSocket.CLOSED) {
+        tabElement.saveState = 'error';
+        if (tabElement.relatedEditor) {
+            tabElement.relatedEditor.setReadOnly(true);
+            var warningElement = document.createElement('div');
+
+            warningElement.classList.add('editor-warning');
+            warningElement.innerHTML = 'CHANGES ARE NOT SAVED<br />CONNECTION TO SERVER LOST';
+
+            tabElement.relatedEditor.container.parentNode.appendChild(warningElement);
+
+            warningElement.addEventListener('click', function () {
+                saveFile(tabElement, strPath, changeStamp, strContent, callbackSuccess, callbackFail);
+            });
+        }
+    } else {
+        GS.requestFromSocket(GS.envSocket, 'TAB\tWRITE\t' + GS.encodeForTabDelimited(strPath) + '\t' +
+                                                changeStamp + '\n' + strContent, function (data, error, errorData) {
+            //console.log(data, error, errorData);
+
+            if (!error) {
+                if (data !== 'TRANSACTION COMPLETED') {
+                    callbackSuccess(data);
+                }
+                tabElement.saveState = 'saved';
+                tabElement.relatedEditor.setReadOnly(false);
+
+            } else {
+                // saveFile is called on datasheet, editor and table designer tabs.
+                //      this warning popup code is now only used on an editor tab
+                if (tabElement.relatedEditor) {
+                    tabElement.relatedEditor.setReadOnly(true);
+                    var warningElement = document.createElement('div');
+
+                    warningElement.classList.add('editor-warning');
+                    warningElement.innerHTML = 'CHANGES ARE NOT SAVED<br />CLICK HERE TO TRY AGAIN';
+
+                    tabElement.relatedEditor.container.parentNode.appendChild(warningElement);
+
+                    warningElement.addEventListener('click', function () {
+                        saveFile(tabElement, strPath, changeStamp, strContent, callbackSuccess, callbackFail);
+                    });
+                }
+
+                if (callbackFail) {
+                    callbackFail(errorData);
+                } else {
+                    GS.webSocketErrorDialog(errorData);
+                }
+
+                tabElement.saveState = 'error';
+            }
+        });
+    }
 }
 
 function selectedTabButtonToFront() {

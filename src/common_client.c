@@ -1743,11 +1743,15 @@ bool client_close(struct sock_ev_client *client) {
 	}
 	ev_io_stop(global_loop, &client->io);
 
-	if ((client->que_message == NULL || client->que_message->first == NULL) && client->bol_socket_is_open == true) {
-		if (client->que_message != NULL) {
-			Queue_destroy(client->que_message);
-			client->que_message = NULL;
+	if (client->que_message != NULL) {
+		LIST_FOREACH(client->que_message, first, next, item) {
+			struct sock_ev_client_message *client_message = item->value;
+			ev_io_stop(global_loop, &client_message->io);
 		}
+		Queue_destroy(client->que_message);
+		client->que_message = NULL;
+	}
+	if ((client->que_message == NULL || client->que_message->first == NULL) && client->bol_socket_is_open == true) {
 		// This must be done NOW, or else the browser will hang
 		if (bol_tls) {
 			if (SSL_shutdown(client->ssl) != 0) {
