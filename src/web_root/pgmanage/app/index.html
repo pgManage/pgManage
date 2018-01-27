@@ -222,8 +222,10 @@
                     startPanelResize(document.getElementById('left-bar'));
                 }
 
+                var closeWindow;
+
                 // on before unload, make sure no tabs have unsaved changes: popup if there is unsaved changes
-                GS.addBeforeUnloadEvent(function () {
+                window.addEventListener('beforeunload', function (event) {
                     var strMessage = '';
                     var strName;
                     var arrElements = xtag.queryChildren(document.getElementById('tab-bar'), '.tab-button');
@@ -246,7 +248,7 @@
 
                     if (strMessage !== '') {
 						if (window.process && window.process.type === 'renderer') {
-							var remote = require('electron').remote;
+							/*var remote = require('electron').remote;
 							var choice = remote.dialog.showMessageBox(
 									remote.getCurrentWindow(),
 									{
@@ -256,7 +258,27 @@
 										message: strMessage + '\n\nAre you sure you want to quit?'
 									});
 
-							return choice === 0;
+                            return choice === 0;*/
+                            //event.returnValue = confirm('You have unsaved changes!' + strMessage);
+                            if (closeWindow) {
+                                return;
+                            }
+
+                            event.returnValue = false;
+
+                            setTimeout(function () {
+                                var remote = require('electron').remote;
+                                var result = remote.dialog.showMessageBox({
+                                    buttons: ['Yes', 'No'],
+                                    title: 'You have unsaved changes!',
+                                    message: strMessage + '\n\nAre you sure you want to quit?'
+                                });
+
+                                if (result === 0) {
+                                    closeWindow = true;
+                                    remote.getCurrentWindow().close();
+                                }
+                            });
 						} else {
 	                        return 'You have unsaved changes!' + strMessage;
 						}

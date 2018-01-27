@@ -3180,11 +3180,11 @@ if (typeof HTMLTemplateElement === 'undefined') {
   (function () {
       'use strict';
       var arrFunctions = [],
-          unloadFunction = function () {
+          unloadFunction = function (event) {
               var i, len, ret, current;
               
               for (i = 0, len = arrFunctions.length; i < len; i += 1) {
-                  current = arrFunctions[i]();
+                  current = arrFunctions[i](event);
                   
                   if (current && !ret) {
                       ret = current;
