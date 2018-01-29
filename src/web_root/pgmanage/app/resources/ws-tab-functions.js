@@ -1313,7 +1313,6 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
 		}
         frameElement.innerHTML =
             ml(function () {/*
-                <div id="frame-{{TABNUMBER}}-indicator" class="frame-indicator"></div>
                     <div id="script-window-container-{{TABNUMBER}}" class="script-window-container" flex-vertical flex-fill>
                         <div class="ace-toolbar ace-toolbar-{{ELECTRON}} ace-toolbar-{{LABELED}}" style="background-color: #cccccc; width: 100%; padding-top: 1px; padding-bottom: 2px;" id="sql-ace-toolbar-{{TABNUMBER}}">
                             <gs-button icononly inline remove-all icon="external-link" onclick="openInNewWindow()"
@@ -1369,6 +1368,7 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
                         </div>
                         <div id="ace-container-position-container-{{TABNUMBER}}" class="ace-container-position-container" flex>
                             <div class="ace-container">
+                                <div id="frame-{{TABNUMBER}}-indicator" class="frame-indicator"></div>
                                 <div id="sql-ace-area-{{TABNUMBER}}" class="ace-area"></div>
                             </div>
                         </div>
