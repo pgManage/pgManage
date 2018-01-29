@@ -2117,9 +2117,9 @@ function saveFile(tabElement, strPath, changeStamp, strContent, callbackSuccess,
 
     tabElement.saveState = 'saving';
     if (tabElement.saveTimeout) {
-        clearTimeout(tabElement.clearTimeout);
+        clearTimeout(tabElement.saveTimeout);
     }
-    tabElement.clearTimeout = setTimeout(function () {
+    tabElement.saveTimeout = setTimeout(function () {
         if (tabElement.saveState !== 'saved') {
             tabElement.saveState = 'error';
             if (tabElement.relatedEditor) {
@@ -2140,6 +2140,9 @@ function saveFile(tabElement, strPath, changeStamp, strContent, callbackSuccess,
 
     console.log(GS.envSocket);
     if (GS.envSocket.readyState === WebSocket.CLOSED) {
+        if (tabElement.saveTimeout) {
+            clearTimeout(tabElement.saveTimeout);
+        }
         tabElement.saveState = 'error';
         if (tabElement.relatedEditor) {
             tabElement.relatedEditor.setReadOnly(true);
@@ -2160,6 +2163,9 @@ function saveFile(tabElement, strPath, changeStamp, strContent, callbackSuccess,
             //console.log(data, error, errorData);
 
             if (!error) {
+                if (tabElement.saveTimeout) {
+                    clearTimeout(tabElement.saveTimeout);
+                }
                 if (data !== 'TRANSACTION COMPLETED') {
                     callbackSuccess(data);
                 }
@@ -2167,6 +2173,9 @@ function saveFile(tabElement, strPath, changeStamp, strContent, callbackSuccess,
                 tabElement.relatedEditor.setReadOnly(false);
 
             } else {
+                if (tabElement.saveTimeout) {
+                    clearTimeout(tabElement.saveTimeout);
+                }
                 // saveFile is called on datasheet, editor and table designer tabs.
                 //      this warning popup code is now only used on an editor tab
                 if (tabElement.relatedEditor) {
