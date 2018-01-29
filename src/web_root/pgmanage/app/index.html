@@ -247,38 +247,9 @@
                     });
 
                     if (strMessage !== '') {
-						if (window.process && window.process.type === 'renderer') {
-							/*var remote = require('electron').remote;
-							var choice = remote.dialog.showMessageBox(
-									remote.getCurrentWindow(),
-									{
-										type: 'question',
-										buttons: ['No', 'Yes'],
-										title: 'You have unsaved changes!',
-										message: strMessage + '\n\nAre you sure you want to quit?'
-									});
-
-                            return choice === 0;*/
-                            //event.returnValue = confirm('You have unsaved changes!' + strMessage);
-                            if (closeWindow) {
-                                return;
-                            }
-
-                            event.returnValue = false;
-
-                            setTimeout(function () {
-                                var remote = require('electron').remote;
-                                var result = remote.dialog.showMessageBox({
-                                    buttons: ['Yes', 'No'],
-                                    title: 'You have unsaved changes!',
-                                    message: strMessage + '\n\nAre you sure you want to quit?'
-                                });
-
-                                if (result === 0) {
-                                    closeWindow = true;
-                                    remote.getCurrentWindow().close();
-                                }
-                            });
+					    if (window.process && window.process.type === 'renderer') {
+                            // handled in electron side
+							event.returnValue = false;
 						} else {
 	                        return 'You have unsaved changes!' + strMessage;
 						}

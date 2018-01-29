@@ -11,6 +11,7 @@ const isDev = require('electron-is-dev');
 const app = electron.app;
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow;
+const dialog = electron.dialog;
 
 var shouldQuit = app.makeSingleInstance(function (commandLine, workingDirectory) {
 	// Someone tried to run a second instance, we should create a new window
@@ -359,6 +360,21 @@ function openWindow() {
 			(process.argv.indexOf('--pgmanage-test') > -1 ? 'test/' : '') + 'index.html' +
 			(process.argv.indexOf('--pgmanage-test') > -1 ? '?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true' : ''),
 			{ 'extraHeaders': 'pragma: no-cache\n' });
+
+		curWindow.webContents.on('will-prevent-unload', function (event) {
+			let choice = dialog.showMessageBox(curWindow, {
+				type: 'question',
+				buttons: ['Leave', 'Stay'],
+				title: 'Are you sure?',
+				message: 'Changes you made may not be saved.',
+				defaultId: 0,
+				cancelId: 1
+			})
+			let leave = (choice === 0);
+			if (leave) {
+				event.preventDefault();
+			}
+		});
 
 		// Emitted when the window is closed.
 		curWindow.on('closed', function () {
