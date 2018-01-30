@@ -25,7 +25,15 @@
     },
     "rpm": {
       "depends": [
-        "postgresql-libs"
+        "postgresql-libs",
+        "libxscrnsaver",
+        "openssl",
+        "gconf2",
+        "gconf-service",
+        "libnotify",
+        "libappindicator",
+        "libxtst",
+        "libnss"
       ]
     },
     "deb": {
