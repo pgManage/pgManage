@@ -3778,7 +3778,7 @@ function executeScript(bolCursorQuery) {
                     //console.log(intLine, jsnCurrentQuery.start_row, intErrorStartLine);
                     if (data.error_position) {
 						var arrLines = jsnCurrentQuery.strQuery.substring(intErrorStartChar, intErrorStartChar + parseInt(data.error_position, 10)).split('\n');
-						var intErrorCol = parseInt(data.error_position, 10) - 1;
+                        var intErrorCol = parseInt(data.error_position, 10) - 1;
 						var i = 0;
 						var len = intLine - 1;
 					    //console.log(len, intLine, arrLines.length);
@@ -3788,8 +3788,8 @@ function executeScript(bolCursorQuery) {
 						while (i < len) {
 						    //console.log(i, arrLines[i], arrLines[i].length);
 							intErrorCol -= arrLines[i].length + 1;
-							i += 1
-						}
+							i += 1;
+                        }
 
 						editor.getSelection().setSelectionRange({
 							start: {
@@ -3808,22 +3808,31 @@ function executeScript(bolCursorQuery) {
                         ]);
                         editor.scrollToLine((jsnCurrentQuery.start_row + intErrorStartLine + (intLine - 1)), true, true);
 					} else {
+						var arrLines = jsnCurrentQuery.strQuery.substring(intErrorStartChar).split('\n');
+                        var intErrorStartLineOffset = 0;
+					    //console.log(intErrorStartChar);
+					    //console.log(jsnCurrentQuery.strQuery);
+					    //console.log(arrLines);
+						while (arrLines[intErrorStartLineOffset].length === 0) {
+							intErrorStartLineOffset += 1;
+                        }
+                        //console.log(intErrorStartLineOffset);
 					    editor.getSelection().setSelectionRange({
 							start: {
-								row: jsnCurrentQuery.start_row + intErrorStartLine,
+								row: jsnCurrentQuery.start_row + intErrorStartLine + intErrorStartLineOffset,
 								column: intErrorCol || 0
 							},
 							end: {
-								row: jsnCurrentQuery.start_row + intErrorStartLine,
+								row: jsnCurrentQuery.start_row + intErrorStartLine + intErrorStartLineOffset,
 								column: intErrorCol || 0
 							}
 						});
 
                         editor.getSession().setAnnotations([
-                            {'row': jsnCurrentQuery.start_row + intErrorStartLine, 'column': intErrorCol || 0,
+                            {'row': jsnCurrentQuery.start_row + intErrorStartLine + intErrorStartLineOffset, 'column': intErrorCol || 0,
                                 'text': strError, 'type': 'error'}
                         ]);
-                        editor.scrollToLine((jsnCurrentQuery.start_row + intErrorStartLine), true, true);
+                        editor.scrollToLine((jsnCurrentQuery.start_row + intErrorStartLine + intErrorStartLineOffset), true, true);
                     }
 
                     // update the success and error tally
