@@ -246,7 +246,7 @@
     <template for="top-hud">
         <gs-button onclick="document.getElementById('tableElement').deleteSelected();" inline no-focus icononly icon="times">&nbsp;</gs-button>
         <gs-button onclick="document.getElementById('tableElement').refresh();" inline no-focus icononly icon="refresh">&nbsp;</gs-button>
-        <gs-button onclick="document.getElementById('tableElement').openPrefs(this);" inline no-focus icononly icon="sliders">&nbsp;</gs-button>
+        <gs-button onclick="dialogOptions(true, GS.findParentTag(this, 'gs-table'));" inline no-focus icononly icon="sliders">&nbsp;</gs-button>
         <gs-button onclick="document.getElementById('tableElement').toggleFullscreen(this);" inline no-focus icononly icon="expand">&nbsp;</gs-button>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <gs-button onclick="document.getElementById('tableElement').sort('asc');" inline no-focus iconleft icon="sort-alpha-asc">Sort A to Z</gs-button>
