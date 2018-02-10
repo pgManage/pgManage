@@ -26,12 +26,12 @@
     "rpm": {
       "depends": [
         "postgresql-libs",
-        "libxscrnsaver",
+        "libXScrnSaver",
         "openssl",
         "GConf2",
         "libnotify",
         "libappindicator",
-        "libxtst"
+        "libXtst"
       ]
     },
     "deb": {
