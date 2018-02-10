@@ -1,15 +1,36 @@
 #!/bin/sh
 
-usage() { echo "Usage: $0 [ -p <install-prefix> | --prefix <install-prefix>]" 1>&2; exit 1; }
+usage() {
+	echo "usage: ./configure [ options ]" 1>&2;
+	echo "   -p <path>, --prefix <path>		set install prefix (default /usr/local)" 1>&2;
+	echo "   -w <path>, --webroot <path>    set webroot folder (default /usr/local/etc/pgmanage/web_root)" 1>&2;
+}
 
 PREFIX="/usr/local"
+WEBROOT="@prefix@/etc/pgmanage/web_root"
 
-case $1 in
-    -p) PREFIX=$2;;
-    --prefix=*) PREFIX=$(echo $1 | awk '{ print substr($0, 10)}');;
-    "")  break;;
-    *)  usage;;
-esac
+while [[ $# -gt 0 ]]
+do
+	key="$1"
+
+	case $key in
+		-p|--prefix)
+			PREFIX="$2"
+			shift # past argument
+			shift # past value
+		;;
+		-w|--webroot)
+			WEBROOT="$2"
+			shift # past argument
+			shift # past value
+		;;
+		*)
+			echo "Unknown argument: $key" 1>&2;
+			usage
+			exit 1
+		;;
+	esac
+done
 
 printf "checking for compiler..."
 echo "int main() {" > test.c
@@ -270,6 +291,7 @@ echo "$has_new_sock_directory_parameter_postgres"
 sed -e "s|@sock_dir_parameter@|$directory_parameter|g" \
 	-e "s|@LDFLAGS@|$LDFLAGS|g" \
 	-e "s|@CPPFLAGS@|$CPPFLAGS|g" \
+	-e "s|@webroot@|$WEBROOT|g" \
 	-e "s|@prefix@|$PREFIX|g" \
 	-e "s|@MANDIR@|$MANDIR|g" \
 	-e "s|@libev_CPPFLAGS@|$libev_CPPFLAGS|g" \
@@ -278,21 +300,26 @@ sed -e "s|@sock_dir_parameter@|$directory_parameter|g" \
 	-e "s|@make@|$MAKE|g" < Makefile.in > Makefile
 
 #### CONFIGURE MAN PAGE
-sed -e "s/@prefix@/\/usr\/local/g" < man/man1/pgmanage.1.in > man/man1/pgmanage.1
+sed -e "s|@webroot@|$WEBROOT|g" \
+    -e "s|@prefix@|$PREFIX|g" < man/man1/pgmanage.1.in > man/man1/pgmanage.1
+
+#### CONFIGURE CONFIG FILE
+sed -e "s|@webroot@|$WEBROOT|g" \
+    -e "s|@prefix@|$PREFIX|g" < config/pgmanage.conf.in >config/pgmanage.conf
 
 echo
 echo
 echo "   #############################################################"
 echo "   #                                                           #"
-echo "   #              Thank you for choosing pgmanage!              #"
+echo "   #              Thank you for choosing pgmanage!             #"
 echo "   #                                                           #"
-echo "   #        If you have any trouble installing pgmanage,        #"
+echo "   #        If you have any trouble installing pgmanage,       #"
 echo "   #    don't hesitate to email nunzio@workflowproducts.com    #"
 echo "   #                 or call 817-503-9545 CST                  #"
 echo "   #                     for free support                      #"
 echo "   #      NOTICE: You are about to compile the WEB SERVER      #"
-echo "   #     version of pgManage. The desktop version is easier!    #"
+echo "   #     version of pgManage. The desktop version is easier!   #"
 echo "   #                     You can get it at:                    #"
-echo "   #    https://github.com/pgManage/pgManage/releases   #"
+echo "   #    https://github.com/pgManage/pgManage/releases          #"
 echo "   #                                                           #"
 echo "   #############################################################"
