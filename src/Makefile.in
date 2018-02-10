@@ -2,7 +2,7 @@ TEST_CONFIGS = -c config/pgmanage.conf -d config/pgmanage-connections-test.conf 
 TEST_WEBROOTS = -r ./web_root
 DESTDIR = @destdir@
 PREFIX = @prefix@
-WEBROOT = @webroot@
+WEBROOT = $(DESTDIR)/@webroot@
 INSTALL_DEPS = $(DESTDIR)/$(PREFIX)/sbin/ \
 	$(DESTDIR)/$(PREFIX)/etc/pgmanage/ \
 	$(DESTDIR)/$(PREFIX)/etc/pgmanage/pgmanage.conf \
@@ -20,7 +20,7 @@ CPPFLAGS = @CPPFLAGS@ \
 	-I. \
 	-I../dependencies/tre/include \
 	-I../dependencies/libev \
-	-DVERSION=$(VERSION) -DPGMANAGE_PREFIX=\"$(PREFIX)\"
+	-DVERSION=$(VERSION) -DPGMANAGE_PREFIX=\"$(DESTDIR)/$(PREFIX)\"
 V=0
 
 common_SOURCES = $(filter-out util_getopt.c, $(filter-out util_strptime.c, $(wildcard *.c)))
