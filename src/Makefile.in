@@ -1,11 +1,12 @@
 TEST_CONFIGS = -c config/pgmanage.conf -d config/pgmanage-connections-test.conf -n true -t 300
 TEST_WEBROOTS = -r ./web_root
+DESTDIR = @destdir@
 PREFIX = @prefix@
 WEBROOT = @webroot@
-INSTALL_DEPS = $(PREFIX)/sbin/ \
-	$(PREFIX)/etc/pgmanage/ \
-	$(PREFIX)/etc/pgmanage/pgmanage.conf \
-	$(PREFIX)/etc/pgmanage/pgmanage-connections.conf
+INSTALL_DEPS = $(DESTDIR)/$(PREFIX)/sbin/ \
+	$(DESTDIR)/$(PREFIX)/etc/pgmanage/ \
+	$(DESTDIR)/$(PREFIX)/etc/pgmanage/pgmanage.conf \
+	$(DESTDIR)/$(PREFIX)/etc/pgmanage/pgmanage-connections.conf
 SOCK_DIR_PARAMETER = @sock_dir_parameter@
 
 VERSION = \"$(shell cat ../VERSION)\"
@@ -75,38 +76,38 @@ clean:
 	@echo "Clean Successful"
 
 #### INSTALL
-$(PREFIX)/sbin/:
-	mkdir -p $(PREFIX)/sbin/
+$(DESTDIR)/$(PREFIX)/sbin/:
+	mkdir -p $(DESTDIR)/$(PREFIX)/sbin/
 
-$(PREFIX)/etc/pgmanage/:
-	mkdir -p $(PREFIX)/etc/pgmanage/
+$(DESTDIR)/$(PREFIX)/etc/pgmanage/:
+	mkdir -p $(DESTDIR)/$(PREFIX)/etc/pgmanage/
 
-$(PREFIX)/etc/pgmanage/pgmanage.conf: $(PREFIX)/etc/pgmanage/ config/pgmanage.conf
-	test -f $(PREFIX)/etc/pgmanage/pgmanage.conf || install config/pgmanage.conf $(PREFIX)/etc/pgmanage/pgmanage.conf;
+$(DESTDIR)/$(PREFIX)/etc/pgmanage/pgmanage.conf: $(DESTDIR)/$(PREFIX)/etc/pgmanage/ config/pgmanage.conf
+	test -f $(DESTDIR)/$(PREFIX)/etc/pgmanage/pgmanage.conf || install config/pgmanage.conf $(DESTDIR)/$(PREFIX)/etc/pgmanage/pgmanage.conf;
 
-$(PREFIX)/etc/pgmanage/pgmanage-connections.conf: $(PREFIX)/etc/pgmanage/ config/pgmanage-connections.conf
-	test -f $(PREFIX)/etc/pgmanage/pgmanage-connections.conf || install config/pgmanage-connections.conf $(PREFIX)/etc/pgmanage/pgmanage-connections.conf;
+$(DESTDIR)/$(PREFIX)/etc/pgmanage/pgmanage-connections.conf: $(DESTDIR)/$(PREFIX)/etc/pgmanage/ config/pgmanage-connections.conf
+	test -f $(DESTDIR)/$(PREFIX)/etc/pgmanage/pgmanage-connections.conf || install config/pgmanage-connections.conf $(DESTDIR)/$(PREFIX)/etc/pgmanage/pgmanage-connections.conf;
 
 install: $(INSTALL_DEPS)
-	mkdir -p $(WEBROOT)/pgmanage $(PREFIX)/sbin $(PREFIX)/@MANDIR@/man1
+	mkdir -p $(WEBROOT)/pgmanage $(DESTDIR)/$(PREFIX)/sbin $(DESTDIR)/$(PREFIX)/@MANDIR@/man1
 	cp -rf ./web_root/pgmanage/* $(WEBROOT)/pgmanage/
-	install config/pgmanage.conf $(PREFIX)/etc/pgmanage/pgmanage.conf.example
-	install config/pgmanage-connections.conf $(PREFIX)/etc/pgmanage/pgmanage-connections.conf.example
-	install pgmanage $(PREFIX)/sbin/
-	install man/man1/pgmanage.1 $(PREFIX)/@MANDIR@/man1/pgmanage.1
+	install config/pgmanage.conf $(DESTDIR)/$(PREFIX)/etc/pgmanage/pgmanage.conf.example
+	install config/pgmanage-connections.conf $(DESTDIR)/$(PREFIX)/etc/pgmanage/pgmanage-connections.conf.example
+	install pgmanage $(DESTDIR)/$(PREFIX)/sbin/
+	install man/man1/pgmanage.1 $(DESTDIR)/$(PREFIX)/@MANDIR@/man1/pgmanage.1
 	@echo
 	@echo "Installation Successful"
 
 uninstall:
-	rm $(PREFIX)/sbin/pgmanage
+	rm $(DESTDIR)/$(PREFIX)/sbin/pgmanage
 	rm -rf $(WEBROOT)/
-	rm -rf $(PREFIX)/etc/pgmanage/*.example
+	rm -rf $(DESTDIR)/$(PREFIX)/etc/pgmanage/*.example
 	@echo
 	@echo "Uninstall Successful"
 
 destroy:
-	rm $(PREFIX)/sbin/pgmanage
-	rm -rf $(PREFIX)/etc/pgmanage
+	rm $(DESTDIR)/$(PREFIX)/sbin/pgmanage
+	rm -rf $(DESTDIR)/$(PREFIX)/etc/pgmanage
 	@echo
 	@echo "Destroy Successful"
 	@echo "NOTE: Even though all configuration files have been destroyed, your sql files have been preserved. They should be in you home folder under .pgmanage"

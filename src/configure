@@ -2,11 +2,13 @@
 
 usage() {
 	echo "usage: ./configure [ options ]" 1>&2;
+	echo "   -d <path>, --destdir <path>    set destdir folder" 1>&2;
 	echo "   -p <path>, --prefix <path>		set install prefix (default /usr/local)" 1>&2;
 	echo "   -w <path>, --webroot <path>    set webroot folder (default /usr/local/etc/pgmanage/web_root)" 1>&2;
 }
 
-PREFIX="/usr/local"
+DESTDIR=""
+PREFIX="usr/local"
 WEBROOT="@prefix@/etc/pgmanage/web_root"
 
 while [[ $# -gt 0 ]]
@@ -14,6 +16,11 @@ do
 	key="$1"
 
 	case $key in
+		-d|--destdir)
+			DESTDIR="$2"
+			shift # past argument
+			shift # past value
+		;;
 		-p|--prefix)
 			PREFIX="$2"
 			shift # past argument
@@ -291,7 +298,8 @@ echo "$has_new_sock_directory_parameter_postgres"
 sed -e "s|@sock_dir_parameter@|$directory_parameter|g" \
 	-e "s|@LDFLAGS@|$LDFLAGS|g" \
 	-e "s|@CPPFLAGS@|$CPPFLAGS|g" \
-	-e "s|@webroot@|$WEBROOT|g" \
+	-e "s|@destdir@|$DESTDIR|g" \
+    -e "s|@webroot@|$WEBROOT|g" \
 	-e "s|@prefix@|$PREFIX|g" \
 	-e "s|@MANDIR@|$MANDIR|g" \
 	-e "s|@libev_CPPFLAGS@|$libev_CPPFLAGS|g" \
@@ -304,7 +312,8 @@ sed -e "s|@webroot@|$WEBROOT|g" \
     -e "s|@prefix@|$PREFIX|g" < man/man1/pgmanage.1.in > man/man1/pgmanage.1
 
 #### CONFIGURE CONFIG FILE
-sed -e "s|@webroot@|$WEBROOT|g" \
+sed -e "s|@destdir@|$DESTDIR|g" \
+    -e "s|@webroot@|$WEBROOT|g" \
     -e "s|@prefix@|$PREFIX|g" < config/pgmanage.conf.in >config/pgmanage.conf
 
 echo
