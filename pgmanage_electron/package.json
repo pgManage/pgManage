@@ -31,8 +31,7 @@
         "GConf2",
         "libnotify",
         "libappindicator",
-        "libxtst",
-        "libnss"
+        "libxtst"
       ]
     },
     "deb": {
