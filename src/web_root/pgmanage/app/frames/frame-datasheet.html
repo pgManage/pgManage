@@ -104,29 +104,27 @@
                 // get pk if possible (else use whole column list)
                 strQuery = ml(function () {/*
                     SELECT  (
-                                 SELECT array_to_string(array_agg(attname), ',')
+                                 SELECT array_to_string(array_agg(attname ORDER BY attnum ASC), ',')
                                    FROM pg_constraint con
                               LEFT JOIN pg_attribute att ON att.attnum = con.conkey[1] AND att.attrelid = con.conrelid
                                   WHERE con.contype = 'p' AND con.conrelid = getoid.oid
                                GROUP BY attnum
-                               ORDER BY attnum ASC
                             ),
                             (
-                                 SELECT array_to_string(array_agg(attname), ',')
+                                 SELECT array_to_string(array_agg(attname ORDER BY attnum ASC), ',')
                                    FROM pg_attribute
                                   WHERE pg_attribute.attisdropped IS FALSE AND pg_attribute.attnum > 0 AND attrelid = getoid.oid
                             ),
                             (
-                                SELECT array_to_string(array_agg(default_expression), ',')
-                                  FROM (         SELECT pg_catalog.pg_get_expr(pg_attrdef.adbin, pg_attrdef.adrelid) AS default_expression
+                                SELECT array_to_string(array_agg(default_expression ORDER BY attnum ASC), ',')
+                                  FROM (         SELECT pg_catalog.pg_get_expr(pg_attrdef.adbin, pg_attrdef.adrelid) AS default_expression, att.attnum
                                                    FROM pg_constraint con
                                               LEFT JOIN pg_attribute att ON att.attnum = con.conkey[1] AND att.attrelid = con.conrelid
                                         LEFT OUTER JOIN pg_attrdef ON adrelid = attrelid AND adnum = attnum
-                                                  WHERE attrelid = getoid.oid
-                                                  ORDER BY attnum ASC) em
+                                                  WHERE attrelid = getoid.oid) em
                             ),
 							(
-							SELECT array_to_string(array_agg(CASE WHEN COALESCE(format_type(atttypid, atttypmod),'') = 'timestamp with time zone' THEN 'timestamptz' WHEN COALESCE(format_type(atttypid, atttypmod),'') ILIKE 'character varying%' THEN 'varchar' || substring(COALESCE(format_type(atttypid, atttypmod)), 18) ELSE COALESCE(format_type(atttypid, atttypmod),'') END), ',')
+							SELECT array_to_string(array_agg(CASE WHEN COALESCE(format_type(atttypid, atttypmod),'') = 'timestamp with time zone' THEN 'timestamptz' WHEN COALESCE(format_type(atttypid, atttypmod),'') ILIKE 'character varying%' THEN 'varchar' || substring(COALESCE(format_type(atttypid, atttypmod)), 18) ELSE COALESCE(format_type(atttypid, atttypmod),'') END ORDER BY attnum ASC), ',')
 							FROM pg_attribute
 							WHERE pg_attribute.attisdropped IS FALSE AND pg_attribute.attnum > 0 AND attrelid = getoid.oid
 							)
@@ -248,7 +246,7 @@
     <template for="top-hud">
         <gs-button onclick="document.getElementById('tableElement').deleteSelected();" inline no-focus icononly icon="times">&nbsp;</gs-button>
         <gs-button onclick="document.getElementById('tableElement').refresh();" inline no-focus icononly icon="refresh">&nbsp;</gs-button>
-        <gs-button onclick="document.getElementById('tableElement').openPrefs(this);" inline no-focus icononly icon="sliders">&nbsp;</gs-button>
+        <gs-button onclick="dialogOptions(true, GS.findParentTag(this, 'gs-table'));" inline no-focus icononly icon="sliders">&nbsp;</gs-button>
         <gs-button onclick="document.getElementById('tableElement').toggleFullscreen(this);" inline no-focus icononly icon="expand">&nbsp;</gs-button>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <gs-button onclick="document.getElementById('tableElement').sort('asc');" inline no-focus iconleft icon="sort-alpha-asc">Sort A to Z</gs-button>

@@ -3180,11 +3180,11 @@ if (typeof HTMLTemplateElement === 'undefined') {
   (function () {
       'use strict';
       var arrFunctions = [],
-          unloadFunction = function () {
+          unloadFunction = function (event) {
               var i, len, ret, current;
               
               for (i = 0, len = arrFunctions.length; i < len; i += 1) {
-                  current = arrFunctions[i]();
+                  current = arrFunctions[i](event);
                   
                   if (current && !ret) {
                       ret = current;
@@ -49463,7 +49463,7 @@ if (typeof HTMLTemplateElement === 'undefined') {
           templateElement.innerHTML = ml(function () {/*
   <gs-page class="gs-table-contextmenu">
       <gs-body class="gs-table-contextmenu" padded>
-          <div class="context-menu-header">Paste Format:</div>
+          <div class="context-menu-header">Paste Format (<b>NOT SAVED</b>, go to Options > pgManage Options to change the default clipboard options):</div>
           <table>
               <tbody>
   <tr>

@@ -212,6 +212,16 @@ function getUserName() {
     }
 }
 
+function getPGPASSLoc() {
+    "use strict";
+    if (process.platform == 'win32') {
+        return process.env.APPDATA + '/postgresql/pgpass.conf';
+    } else {
+        var os = require('os');
+        return os.homedir() + '/.pgpass';
+    }
+}
+
 window.addEventListener('load', function () {
     var strQueryString = GS.getQueryString(); //, strUnameCookie = GS.getCookie('greyspots_pgmanage_username');
 
@@ -245,16 +255,73 @@ window.addEventListener('load', function () {
 
     //if we are in electron, then add a button to edit the connection file
     if (window.process && window.process.type === 'renderer') {
-        document.getElementById('buttonNewConnections').removeAttribute('hidden');
-        document.getElementById('buttonPGPASS').removeAttribute('hidden');
+        var fs = require('fs');
+        var path = require('path');
 
-        var electron = require('electron');
-        var ipcRenderer = electron.ipcRenderer;
-		document.getElementById('buttonNewConnections').addEventListener('click', function () {
-			ipcRenderer.send('pgmanage', 'edit connections');
+        document.getElementById('buttonConnections').removeAttribute('hidden');
+        document.getElementById('buttonConfig').removeAttribute('hidden');
+        if (fs.existsSync(path.normalize(getPGPASSLoc()))) {
+            document.getElementById('buttonPGPASS').removeAttribute('hidden');
+            document.getElementById('buttonConnections').setAttribute('remove-right', '');
+        }
+
+		document.getElementById('buttonConnections').addEventListener('click', function () {
+            var template = document.createElement('template');
+            template.innerHTML = ml(function () {/*
+                <webview id="config-webview" src="/pgmanage/connections.html" style="height: 80vh;" nodeintegration></iframe>
+            */});
+            template.setAttribute('mode', 'phone');
+            template.setAttribute('data-max-width', '80vw');
+            var configDialog = GS.openDialog(template, function () {
+                document.getElementById('config-webview').addEventListener('ipc-message', function (event) {
+                    if (event.channel === 'close') {
+                        GS.closeDialog(configDialog);
+                    }
+                }, {
+                    once: true
+                });
+            }, function () {}, function () {});
+
+
+			//ipcRenderer.send('pgmanage', 'edit connections');
+		});
+		document.getElementById('buttonConfig').addEventListener('click', function () {
+            var template = document.createElement('template');
+            template.innerHTML = ml(function () {/*
+                <webview id="config-webview" src="/pgmanage/config.html?file=pgmanage.conf" style="height: 80vh;" nodeintegration></iframe>
+            */});
+            template.setAttribute('mode', 'phone');
+            template.setAttribute('data-max-width', '80vw');
+            var configDialog = GS.openDialog(template, function () {
+                document.getElementById('config-webview').addEventListener('ipc-message', function (event) {
+                    if (event.channel === 'close') {
+                        GS.closeDialog(configDialog);
+                    }
+                }, {
+                    once: true
+                });
+            }, function () {}, function () {});
+
+			//ipcRenderer.send('pgmanage', 'edit PGPASS');
 		});
 		document.getElementById('buttonPGPASS').addEventListener('click', function () {
-			ipcRenderer.send('pgmanage', 'edit PGPASS');
+            var template = document.createElement('template');
+            template.innerHTML = ml(function () {/*
+                <webview id="config-webview" src="/pgmanage/config.html?file=PGPASS" style="height: 80vh;" nodeintegration></iframe>
+            */});
+            template.setAttribute('mode', 'phone');
+            template.setAttribute('data-max-width', '80vw');
+            var configDialog = GS.openDialog(template, function () {
+                document.getElementById('config-webview').addEventListener('ipc-message', function (event) {
+                    if (event.channel === 'close') {
+                        GS.closeDialog(configDialog);
+                    }
+                }, {
+                    once: true
+                });
+            }, function () {}, function () {});
+
+			//ipcRenderer.send('pgmanage', 'edit PGPASS');
 		});
     }
 
@@ -344,9 +411,10 @@ window.addEventListener('load', function () {
                             <div class="style-bracket-left"></div>
                             <div class="style-bracket-right"></div>
 
-							<gs-button id="buttonNewConnections" hidden style="float: right;" inline bg-primary remove-bottom remove-left>Edit pgmanage-connections.conf</gs-button>
-							<gs-button id="buttonPGPASS" hidden style="float: right;" inline bg-primary remove-bottom remove-right>Edit PGPASS</gs-button>
-
+							<gs-button id="buttonPGPASS" hidden style="float: right; margin: 0; box-shadow: none;" inline bg-primary remove-bottom remove-left>Edit PGPASS</gs-button>
+							<gs-button id="buttonConnections" hidden style="float: right; margin: 0; box-shadow: none;" inline bg-primary remove-bottom remove-left>Edit Connections</gs-button>
+							<gs-button id="buttonConfig" hidden style="float: right; margin: 0; box-shadow: none;" inline bg-primary remove-bottom remove-right>Edit Configuration</gs-button>
+                            
                             <div id="predefined-option-container" style="clear: both;"></div>
                         </div>
                         <br /><br />

@@ -182,7 +182,7 @@ char *canonical(const char *file_base, char *_path, char *check_type) {
 			SDEBUG("mkpath>%s<", str_temp);
 			mkpath(str_temp);
 #else
-			int limit_mkdir = 4;
+			int limit_mkdir = 20;
 			// DEBUG("test1>%s|%s|%s<", canonical_filename, str_file_base, str);
 			// if (strncmp(canonical_filename, str_file_base, strlen(str_file_base))
 			// !=
@@ -195,7 +195,7 @@ char *canonical(const char *file_base, char *_path, char *check_type) {
 				realpath(str, canonical_filename);
 				limit_mkdir -= 1;
 			}
-// SDEBUG("test3");
+			// SDEBUG("test3");
 //}
 // SDEBUG("test4");
 #endif
@@ -233,8 +233,23 @@ char *canonical(const char *file_base, char *_path, char *check_type) {
 		SERROR_CHECK(0 == _mkdir(canonical_filename) || errno == EEXIST, "%s: %s|%s is a bad path. Directory creation error.\012",
 			check_type, str_file_base, path);
 #else
-		SERROR_CHECK(0 == mkdir(canonical_filename, S_IRWXU | S_IRWXG), "%s: %s|%s is a bad path. Directory creation error.\012",
-			check_type, str_file_base, path);
+		int limit_mkdir = 20;
+		// DEBUG("test1>%s|%s|%s<", canonical_filename, str_file_base, str);
+		// if (strncmp(canonical_filename, str_file_base, strlen(str_file_base))
+		// !=
+		// 0) {
+		// DEBUG("test2");
+		while (strncmp(canonical_filename, str, strlen(str)) != 0 && limit_mkdir > 0) {
+			SDEBUG("mkdir>%s|%s<", canonical_filename, str);
+			SERROR_CHECK(
+				mkdir(canonical_filename, S_IRWXU | S_IRWXG) == 0, "%s is a bad path. Directory creation error.\012", path);
+			realpath(str, canonical_filename);
+			limit_mkdir -= 1;
+		}
+		// this one creates the last directory, realpath allows the last element of a path to not exist
+		SERROR_CHECK(
+			mkdir(canonical_filename, S_IRWXU | S_IRWXG) == 0, "%s is a bad path. Directory creation error.\012", path);
+		realpath(str, canonical_filename);
 #endif
 
 	} else if (strncmp(check_type, "read_dir_or_file", 17) == 0) {

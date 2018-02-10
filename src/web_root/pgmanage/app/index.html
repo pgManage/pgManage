@@ -222,8 +222,10 @@
                     startPanelResize(document.getElementById('left-bar'));
                 }
 
+                var closeWindow;
+
                 // on before unload, make sure no tabs have unsaved changes: popup if there is unsaved changes
-                GS.addBeforeUnloadEvent(function () {
+                window.addEventListener('beforeunload', function (event) {
                     var strMessage = '';
                     var strName;
                     var arrElements = xtag.queryChildren(document.getElementById('tab-bar'), '.tab-button');
@@ -245,18 +247,9 @@
                     });
 
                     if (strMessage !== '') {
-						if (window.process && window.process.type === 'renderer') {
-							var remote = require('electron').remote;
-							var choice = remote.dialog.showMessageBox(
-									remote.getCurrentWindow(),
-									{
-										type: 'question',
-										buttons: ['No', 'Yes'],
-										title: 'You have unsaved changes!',
-										message: strMessage + '\n\nAre you sure you want to quit?'
-									});
-
-							return choice === 0;
+					    if (window.process && window.process.type === 'renderer') {
+                            // handled in electron side
+							event.returnValue = false;
 						} else {
 	                        return 'You have unsaved changes!' + strMessage;
 						}

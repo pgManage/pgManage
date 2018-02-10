@@ -956,8 +956,9 @@ function treePrepareQuery(strQuery, oid, strName, sqlSafeName) {
                 arrNewMoreObjects = [];
                 arrNewRoleObjects = [];
                 arrNewSchemaObjects = [];
-
+				var bolSkipItem = true
                 for (i = 0, len = arrShown.length; i < len; i += 1) {
+					bolSkipItem = false;
                     jsnRow = {
                         'type': 'folder',
                         'name': arrNames[arrAll.indexOf(arrShown[i])],
@@ -1008,7 +1009,9 @@ function treePrepareQuery(strQuery, oid, strName, sqlSafeName) {
 
                     } else if (arrShown[i] === 'N') {
                         jsnRow.query = 'objectPublication';
-
+						if (parseFloat(contextData.versionNumber, 10) < 10) {
+							bolSkipItem = true;
+						}
                     } else {
                         //jsnRow.action = treeLoadSchema;
                         jsnRow.query = 'objectSchema';
@@ -1019,7 +1022,7 @@ function treePrepareQuery(strQuery, oid, strName, sqlSafeName) {
                     }
 
                     // if this object was not checked before
-                    if (treeGlobals.shownItems.indexOf(jsnRow.name) === -1) {
+                    if (treeGlobals.shownItems.indexOf(jsnRow.name) === -1 && !bolSkipItem) {
                         // update shown lists
                         treeGlobals.shownItems.push(jsnRow.name);
                         treeGlobals.shownObjects.push(jsnRow);
@@ -1301,11 +1304,10 @@ function dialogAddSchema(target) {
             strMoreHTML += htmlFunction('checkbox-info-schema', '', 'Information Schema', (treeGlobals.shownItems.indexOf('Information Schema') > -1));
             strMoreHTML += htmlFunction('checkbox-languages', '', 'Languages', (treeGlobals.shownItems.indexOf('Languages') > -1));
 
-			console.log(contextData.versionText.match(/[0-9]+\.[0-9]+\.[0-9]+/));
-			if (contextData.versionText.match(/[0-9]+\.[0-9]+\.[0-9]+/)) {
-	            strMoreHTML += htmlFunction('checkbox-publications', '', 'Publications', (treeGlobals.shownItems.indexOf('Publications') > -1), true);
+			if (parseFloat(contextData.versionNumber, 10) >= 10) {
+	            strMoreHTML += htmlFunction('checkbox-publications', '', 'Publications', (treeGlobals.shownItems.indexOf('Publications') > -1));
 			} else {
-				strMoreHTML += htmlFunction('checkbox-publications', '', 'Publications', (treeGlobals.shownItems.indexOf('Publications') > -1));
+				strMoreHTML += htmlFunction('checkbox-publications', '', 'Publications', (false), true);
 			}
 
             bolAllSchemasVisible = true;
@@ -1684,6 +1686,7 @@ function dependButton(intOid) {
 
 function dependDialog(intOid, bolGraph) {
     'use strict';
+	// console.log(window.location.pathname.substring(9), contextData.connectionID);
 	if (bolGraph) {
 	    var strHTML = '<iframe style="width: 100%; height: 100%;" src="/pgmanage/' + contextData.connectionID + '/dep_viewer.html?oid=' + intOid + '" />'
 
@@ -1825,11 +1828,14 @@ function propertyDialog(strQuery, intOid, strNamePartOne, strNamePartTwo) {
                 var arrRowTwo = (arrRecords[2] || []);
 
                 for (col_i = 1, col_len = arrRecords[0].length; col_i < col_len; col_i += 1) {
+                    var strValue = GS.decodeFromTabDelimited(arrRowTwo[col_i] || '');
                     strHTML += (
-                        '<tr>' +
-                            '<th>' + encodeHTML(GS.decodeFromTabDelimited(arrRowOne[col_i] || '')) + '</th>' +
-                            '<td>' + encodeHTML(GS.decodeFromTabDelimited(arrRowTwo[col_i] || '')) + '</td>' +
-                        '</tr>'
+                        '<tr>'
+                            + '<th>' + encodeHTML(GS.decodeFromTabDelimited(arrRowOne[col_i] || '')) + '</th>'
+                            + (strValue === '\\N'
+                               ? '<td style="color: #888888;">NULL</td>'
+                               : '<td>' + encodeHTML(strValue) + '</td>')
+                        + '</tr>'
                     );
                 }
 

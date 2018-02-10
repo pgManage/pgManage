@@ -49,7 +49,7 @@ function loadContextData(callback) {
     };
 
     //contextData.pgmanageVersion = '1.0.6';
-    contextData.connectionID = window.location.pathname.substring(9).match(/^[0-9]*/)[0];
+    contextData.connectionID = window.location.pathname.substring(10).match(/^[0-9]*/)[0];
 
     // request using raw query
     GS.requestRawFromSocket(GS.envSocket,
@@ -64,7 +64,7 @@ function loadContextData(callback) {
             // if message 0
             if (data.intCallbackNumber === 0) {
                 arrColumns = data.strMessage.split('\t');
-				
+
                 contextData.databaseName = arrColumns[0];
                 contextData.sessionUser = arrColumns[1];
                 contextData.currentUser = arrColumns[2];
@@ -445,6 +445,9 @@ function dialogSplash() {
                     <iframe style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; border: 0 none; z-index: 150; background-color: #FFFFFF;" class="full-iframe" src="/pgmanage/splash.html?version={{PGMANAGE}}&postgres={{POSTGRES}}"></iframe>
                 </div>
             </gs-body>
+			<gs-footer style="z-index: 2000;">
+				<gs-button dialogclose>Close</gs-button>
+			</gs-footer>
         </gs-page>
     */}).replace(/\{\{PGMANAGE\}\}/g, contextData.pgmanageVersion).replace(/\{\{POSTGRES\}\}/g, contextData.versionNumber);
     GS.openDialog(templateElement);
@@ -786,7 +789,7 @@ function dialogSettings() {
 var customCSSText;
 
 // pgManage Options in localStorage
-function dialogOptions() {
+function dialogOptions(bolOnlyClipboard, currentTableElement) {
     'use strict';
     var templateElement = document.createElement('template');
 
@@ -809,293 +812,338 @@ function dialogOptions() {
     if (evt.touchDevice) {
         templateElement.setAttribute('data-mode', 'full');
     }
-    templateElement.innerHTML = ml(function () {/*
-        <gs-page>
-            <gs-header><center><h3>pgManage Options</h3></center></gs-header>
-            <gs-body padded>
-                <gs-grid min-width="all {reflow}; 1200px {1,1};" gutter>
-                    <gs-block>
-                        <h3>General</h3>
-                        <div>
-                            <label for="pgmanage-options-left-panel" style="min-width: 7.25em;">Panel Width:</label>
-                            <gs-text id="pgmanage-options-left-panel"></gs-text>
+    var clipOptions = ml(function () {/*
+        <div flex-horizontal flex-fill class="option-row">
+            <div flex>
+                <gs-select class="pref-copy-headers" mini>
+                    <option value="always">Always</option>
+                    <option value="never">Never</option>
+                    <option value="selected">Only when selected</option>
+                </gs-select>
+            </div>
+            <div style="width: 55em;">Copy Headers</div>
+        </div>
+        <div flex-horizontal flex-fill class="option-row">
+            <div flex>
+                <gs-select class="pref-copy-selectors" mini>
+                    <option value="always">Always</option>
+                    <option value="never">Never</option>
+                    <option value="selected">Only Row Numbers</option>
+                </gs-select>
+            </div>
+            <div style="width: 55em;">Copy Headers</div>
+        </div>
+        <div flex-horizontal flex-fill class="option-row">
+            <div flex>
+                <gs-select class="pref-quote-char" mini>
+                    <option value="\">Backslash (\)</option>
+                    <option value="/">Forward Slash (/)</option>
+                    <option value="|">Pipe (|)</option>
+                    <option value="&quot;">Double Quote (&quot;)</option>
+                    <option value="'">Single Quote (')</option>
+                </gs-select>
+            </div>
+            <div style="width: 55em;">Quote Character</div>
+        </div>
+        <div flex-horizontal flex-fill class="option-row">
+            <div flex>
+                <gs-select class="pref-escape-char" mini>
+                    <option value="\">Backslash (\)</option>
+                    <option value="/">Forward Slash (/)</option>
+                    <option value="|">Pipe (|)</option>
+                    <option value="&quot;">Double Quote (&quot;)</option>
+                    <option value="'">Single Quote (')</option>
+                </gs-select>
+            </div>
+            <div style="width: 55em;">Escape Character</div>
+        </div>
+        <div flex-horizontal flex-fill class="option-row">
+            <div flex>
+                <gs-select class="pref-copy-quote" mini>
+                    <option value="always">Always</option>
+                    <option value="never">Never</option>
+                    <option value="strings">Only on strings</option>
+                    <option value="delimiter-in-content">
+                        Cell contains separator
+                    </option>
+                </gs-select>
+            </div>
+            <div style="width: 55em;">Quote</div>
+        </div>
+        <div flex-horizontal flex-fill class="option-row">
+            <div flex>
+                <gs-select class="pref-delimiter-record" mini>
+                    <option value="{{DOS_RETURN}}">DOS (\r\n)</option>
+                    <option value="{{MAC_RETURN}}">Mac (\r)</option>
+                    <option value="{{UNIX_RETURN}}">UNIX (\n)</option>
+                    <option value="|">Vertical Bar (|)</option>
+                    <option value=",">Comma (,)</option>
+                    <option value="{{TAB}}">Tab</option>
+                </gs-select>
+            </div>
+            <div style="width: 55em;">Record Separator</div>
+        </div>
+        <div flex-horizontal flex-fill class="option-row">
+            <div flex>
+                <gs-select class="pref-delimiter-cell" mini>
+                    <option value="{{DOS_RETURN}}">DOS (\r\n)</option>
+                    <option value="{{MAC_RETURN}}">Mac (\r)</option>
+                    <option value="{{UNIX_RETURN}}">UNIX (\n)</option>
+                    <option value="|">Vertical Bar (|)</option>
+                    <option value=",">Comma (,)</option>
+                    <option value="{{TAB}}">Tab</option>
+                </gs-select>
+            </div>
+            <div style="width: 55em;">Cell Separator</div>
+        </div>
+        <div flex-horizontal flex-fill class="option-row">
+            <div flex>
+                <gs-select class="pref-null-value" mini>
+                    <option value="">(nothing)</option>
+                    <option value="NULL">"NULL"</option>
+                    <option value="null">"null"</option>
+                    <option value="EMPTY">"EMPTY"</option>
+                    <option value="empty">"empty"</option>
+                    <option value="Nothing">"Nothing"</option>
+                </gs-select>
+            </div>
+            <div style="width: 55em;">Empty values</div>
+        </div>
+        <div flex-horizontal flex-fill class="option-row">
+            <div flex>
+                <gs-select class="pref-copy-types" mini>
+                    <option value="text">Text</option>
+                    <option value="html">HTML</option>
+                    <option value="text,html">Both</option>
+                </gs-select>
+            </div>
+            <div style="width: 55em;">Copy types</div>
+        </div>
+        <gs-checkbox flex-horizontal value="true" class="pref-ask">
+            <label flex style="text-align: right;">Always ask me</label>
+        </gs-checkbox>
+    */});
+    if (!bolOnlyClipboard) {
+        templateElement.innerHTML = ml(function () {/*
+            <gs-page>
+                <gs-header><center><h3>pgManage Options</h3></center></gs-header>
+                <gs-body padded>
+                    <gs-grid min-width="all {reflow}; 1200px {1,1};" gutter>
+                        <gs-block>
+                            <h3>General</h3>
+                            <div>
+                                <label for="pgmanage-options-left-panel" style="min-width: 7.25em;">Panel Width:</label>
+                                <gs-text id="pgmanage-options-left-panel"></gs-text>
 
-                            <label for="pgmanage-options-beautify" style="min-width: 7.25em;">Automatic Beautify:</label>
-                            <gs-checkbox id="pgmanage-options-beautify"></gs-checkbox>
+                                <label for="pgmanage-options-beautify" style="min-width: 7.25em;">Automatic Beautify:</label>
+                                <gs-checkbox id="pgmanage-options-beautify"></gs-checkbox>
 
-                            <label for="pgmanage-options-Comma" style="min-width: 7.25em;">Comma First Formatting:</label>
-                            <gs-checkbox id="pgmanage-options-Comma"></gs-checkbox>
+                                <label for="pgmanage-options-Comma" style="min-width: 7.25em;">Comma First Formatting:</label>
+                                <gs-checkbox id="pgmanage-options-Comma"></gs-checkbox>
 
-                            <label>SQL Toolbar Button Style:</label>
-                            <gs-optionbox id="button-options" style="padding: 0 0.25em 0.25em 0.25em;">
-                                <gs-option value="true">Labeled</gs-option>
-                                <gs-option value="false">Unlabeled</gs-option>
-                            </gs-optionbox>
+                                <label>SQL Toolbar Button Style:</label>
+                                <gs-optionbox id="button-options" style="padding: 0 0.25em 0.25em 0.25em;">
+                                    <gs-option value="true">Labeled</gs-option>
+                                    <gs-option value="false">Unlabeled</gs-option>
+                                </gs-optionbox>
 
-                            <label>SQL Explain Graph Style:</label>
-                            <gs-optionbox id="graph-options" style="padding: 0 0.25em 0.25em 0.25em;">
-                                <gs-option value="true">Horizontal</gs-option>
-                                <gs-option value="false">Vertical</gs-option>
-                            </gs-optionbox>
-                        </div>
-                    </gs-block>
+                                <label>SQL Explain Graph Style:</label>
+                                <gs-optionbox id="graph-options" style="padding: 0 0.25em 0.25em 0.25em;">
+                                    <gs-option value="true">Horizontal</gs-option>
+                                    <gs-option value="false">Vertical</gs-option>
+                                </gs-optionbox>
+                            </div>
+                        </gs-block>
 
-                    <gs-block>
-                        <h3>Clip Options</h3>
-                        <div class="clip-options">
-                            <gs-checkbox flex-horizontal value="true" class="pref-copy-headers">
-                                <label flex style="text-align: right;">Copy Headers</label>
-                            </gs-checkbox>
-                            <gs-checkbox flex-horizontal value="true" class="pref-copy-selectors">
-                                <label flex style="text-align: right;">Copy Row Numbers</label>
-                            </gs-checkbox>
-                            <div flex-horizontal flex-fill class="option-row">
-                                <div flex>
-                                    <gs-select class="pref-quote-char" mini>
-                                        <option value="\">Backslash (\)</option>
-                                        <option value="/">Forward Slash (/)</option>
-                                        <option value="|">Pipe (|)</option>
-                                        <option value="&quot;">Double Quote (&quot;)</option>
-                                        <option value="'">Single Quote (')</option>
-                                    </gs-select>
-                                </div>
-                                <div style="width: 55em;">Quote Character</div>
+                        <gs-block>
+                            <h3>Clip Options</h3>
+                            <div class="clip-options">
+                                {{CLIPOPTIONS}}
                             </div>
-                            <div flex-horizontal flex-fill class="option-row">
-                                <div flex>
-                                    <gs-select class="pref-escape-char" mini>
-                                        <option value="\">Backslash (\)</option>
-                                        <option value="/">Forward Slash (/)</option>
-                                        <option value="|">Pipe (|)</option>
-                                        <option value="&quot;">Double Quote (&quot;)</option>
-                                        <option value="'">Single Quote (')</option>
-                                    </gs-select>
-                                </div>
-                                <div style="width: 55em;">Escape Character</div>
-                            </div>
-                            <div flex-horizontal flex-fill class="option-row">
-                                <div flex>
-                                    <gs-select class="pref-copy-quote" mini>
-                                        <option value="always">Always</option>
-                                        <option value="never">Never</option>
-                                        <option value="strings">Only on strings</option>
-                                        <option value="delimiter-in-content">
-                                            Cell contains separator
-                                        </option>
-                                    </gs-select>
-                                </div>
-                                <div style="width: 55em;">Quote</div>
-                            </div>
-                            <div flex-horizontal flex-fill class="option-row">
-                                <div flex>
-                                    <gs-select class="pref-delimiter-record" mini>
-                                        <option value="{{DOS_RETURN}}">DOS (\r\n)</option>
-                                        <option value="{{MAC_RETURN}}">Mac (\r)</option>
-                                        <option value="{{UNIX_RETURN}}">UNIX (\n)</option>
-                                        <option value="|">Vertical Bar (|)</option>
-                                        <option value=",">Comma (,)</option>
-                                        <option value="{{TAB}}">Tab</option>
-                                    </gs-select>
-                                </div>
-                                <div style="width: 55em;">Record Separator</div>
-                            </div>
-                            <div flex-horizontal flex-fill class="option-row">
-                                <div flex>
-                                    <gs-select class="pref-delimiter-cell" mini>
-                                        <option value="{{DOS_RETURN}}">DOS (\r\n)</option>
-                                        <option value="{{MAC_RETURN}}">Mac (\r)</option>
-                                        <option value="{{UNIX_RETURN}}">UNIX (\n)</option>
-                                        <option value="|">Vertical Bar (|)</option>
-                                        <option value=",">Comma (,)</option>
-                                        <option value="{{TAB}}">Tab</option>
-                                    </gs-select>
-                                </div>
-                                <div style="width: 55em;">Cell Separator</div>
-                            </div>
-                            <div flex-horizontal flex-fill class="option-row">
-                                <div flex>
-                                    <gs-select class="pref-null-value" mini>
-                                        <option value="">(nothing)</option>
-                                        <option value="NULL">"NULL"</option>
-                                        <option value="null">"null"</option>
-                                        <option value="EMPTY">"EMPTY"</option>
-                                        <option value="empty">"empty"</option>
-                                        <option value="Nothing">"Nothing"</option>
-                                    </gs-select>
-                                </div>
-                                <div style="width: 55em;">Empty values</div>
-                            </div>
-                            <div flex-horizontal flex-fill class="option-row">
-                                <div flex>
-                                    <gs-select class="pref-copy-types" mini>
-                                        <option value="text">Text</option>
-                                        <option value="html">HTML</option>
-                                        <option value="text,html">Both</option>
-                                    </gs-select>
-                                </div>
-                                <div style="width: 55em;">Copy types</div>
-                            </div>
-                            <gs-checkbox flex-horizontal value="true" class="pref-ask">
-                                <label flex style="text-align: right;">Always ask me</label>
-                            </gs-checkbox>
-                        </div>
-                    </gs-block>
+                        </gs-block>
 
-                    <gs-block>
-                        <h3>Page Zoom Levels</h3>
-                        <div style="width: 35em">
-                            <!--<div id="options-container" style="position: relative; min-height: 10em;">-->
-                            <div id="options-container">
+                        <gs-block>
+                            <h3>Page Zoom Levels</h3>
+                            <div style="width: 35em">
+                                <!--<div id="options-container" style="position: relative; min-height: 10em;">-->
+                                <div id="options-container">
+                                    <table class="simple-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Page</th>
+                                                <th style="width: 10em;">Setting Value</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {{ZOOM}}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </gs-block>
+
+                        <gs-block>
+                            <h3 style="float: left;" id="KeyboardShortCuts">Keyboard Shortcuts</h3>
+                            <div id="shortcuts-options-container">
                                 <table class="simple-table">
                                     <thead>
                                         <tr>
-                                            <th>Page</th>
-                                            <th style="width: 10em;">Setting Value</th>
+                                            <th style="padding: 0.75em;">Meta Key&nbsp;&nbsp;<gs-button id="metaKeyReset" inline>Reset</gs-button></th>
+                                            <th style="padding: 0.75em;">Key&nbsp;&nbsp;<gs-button id="keyReset" inline>Reset</gs-button></th>
+                                            <th style="padding: 0.75em;">Function</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {{ZOOM}}
+                                        <tr>
+
+                                            <td>
+                                                <gs-select id="shortcutMetaKeyNewTab" mini>
+                                                    <option value="Command">Command/Windows Key</option>
+                                                    <option value="Control">Control</option>
+                                                    <option value="Option">Option/Alt</option>
+                                                    <option value="Shift">Shift</option>
+                                                    <option value="None">None</option>
+                                                </gs-select>
+                                            </td>
+                                            <td><gs-text id="ShortcutKeyNewTab" mini></gs-text></td>
+                                            <td><gs-static value="New Tab"></gs-static></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <gs-select id="shortcutMetaKeySaveTab" mini>
+                                                    <option value="Command">Command/Windows Key</option>
+                                                    <option value="Control">Control</option>
+                                                    <option value="Option">Option/Alt</option>
+                                                    <option value="Shift">Shift</option>
+                                                    <option value="None">None</option>
+                                                </gs-select>
+                                            </td>
+                                            <td><gs-text id="ShortcutKeySaveTab" mini></gs-text></td>
+                                            <td><gs-static value="Save Tab"></gs-static></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <gs-select id="shortcutMetaKeyRunQuery" mini>
+                                                    <option value="Command">Command/Windows Key</option>
+                                                    <option value="Control">Control</option>
+                                                    <option value="Option">Option/Alt</option>
+                                                    <option value="Shift">Shift</option>
+                                                    <option value="None">None</option>
+                                                </gs-select>
+                                            </td>
+                                            <td><gs-text id="ShortcutKeyRunQuery" mini></gs-text></td>
+                                            <td><gs-static value="Run Query"></gs-static></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <gs-select id="shortcutMetaKeyRunCursorQuery" mini>
+                                                    <option value="Command">Command/Windows Key</option>
+                                                    <option value="Control">Control</option>
+                                                    <option value="Option">Option/Alt</option>
+                                                    <option value="Shift">Shift</option>
+                                                    <option value="None">None</option>
+                                                </gs-select>
+                                            </td>
+                                            <td><gs-text id="ShortcutKeyRunCursorQuery" mini></gs-text></td>
+                                            <td><gs-static value="Run Query Under Cursor"></gs-static></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <gs-select id="shortcutMetaKeyFindDocumentation" mini>
+                                                    <option value="Command">Command/Windows Key</option>
+                                                    <option value="Control">Control</option>
+                                                    <option value="Option">Option/Alt</option>
+                                                    <option value="Shift">Shift</option>
+                                                    <option value="None">None</option>
+                                                </gs-select>
+                                            </td>
+                                            <td><gs-text id="ShortcutKeyFindDocumentation" mini></gs-text></td>
+                                            <td><gs-static value="Find Documentation"></gs-static></td>
+                                        </tr>
+                                        <tr>
+
+                                            <td>
+                                                <gs-select id="shortcutMetaKeyExplain" mini>
+                                                    <option value="Command">Command/Windows Key</option>
+                                                    <option value="Control">Control</option>
+                                                    <option value="Option">Option/Alt</option>
+                                                    <option value="Shift">Shift</option>
+                                                    <option value="None">None</option>
+                                                </gs-select>
+                                            </td>
+                                            <td><gs-text id="ShortcutKeyExplain" mini></gs-text></td>
+                                            <td><gs-static value="Explain"></gs-static></td>
+                                        </tr>
+                                        <tr>
+
+                                            <td>
+                                                <gs-select id="shortcutMetaKeyExplainAnalyze" mini>
+                                                    <option value="Command">Command/Windows Key</option>
+                                                    <option value="Control">Control</option>
+                                                    <option value="Option">Option/Alt</option>
+                                                    <option value="Shift">Shift</option>
+                                                    <option value="None">None</option>
+                                                </gs-select>
+                                            </td>
+                                            <td><gs-text id="ShortcutKeyExplainAnalyze" mini></gs-text></td>
+                                            <td><gs-static value="Explain Analyze"></gs-static></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <gs-select id="shortcutMetaKeyHome" mini>
+                                                    <option value="Command">Command/Windows Key</option>
+                                                    <option value="Control">Control</option>
+                                                    <option value="Option">Option/Alt</option>
+                                                    <option value="Shift">Shift</option>
+                                                    <option value="None">None</option>
+                                                </gs-select>
+                                            </td>
+                                            <td><gs-text id="ShortcutKeyHome" mini></gs-text></td>
+                                            <td><gs-static value="Home"></gs-static></td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
-                        </div>
-                    </gs-block>
+                        </gs-block>
+                    </gs-grid>
 
-                    <gs-block>
-                        <h3 style="float: left;" id="KeyboardShortCuts">Keyboard Shortcuts</h3>
-                        <div id="shortcuts-options-container">
-                            <table class="simple-table">
-                                <thead>
-                                    <tr>
-                                        <th style="padding: 0.75em;">Meta Key&nbsp;&nbsp;<gs-button id="metaKeyReset" inline>Reset</gs-button></th>
-                                        <th style="padding: 0.75em;">Key&nbsp;&nbsp;<gs-button id="keyReset" inline>Reset</gs-button></th>
-                                        <th style="padding: 0.75em;">Function</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-
-                                        <td>
-                                            <gs-select id="shortcutMetaKeyNewTab" mini>
-                                                <option value="Command">Command/Windows Key</option>
-                                                <option value="Control">Control</option>
-                                                <option value="Option">Option/Alt</option>
-                                                <option value="Shift">Shift</option>
-                                                <option value="None">None</option>
-                                            </gs-select>
-                                        </td>
-                                        <td><gs-text id="ShortcutKeyNewTab" mini></gs-text></td>
-                                        <td><gs-static value="New Tab"></gs-static></td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <gs-select id="shortcutMetaKeySaveTab" mini>
-                                                <option value="Command">Command/Windows Key</option>
-                                                <option value="Control">Control</option>
-                                                <option value="Option">Option/Alt</option>
-                                                <option value="Shift">Shift</option>
-                                                <option value="None">None</option>
-                                            </gs-select>
-                                        </td>
-                                        <td><gs-text id="ShortcutKeySaveTab" mini></gs-text></td>
-                                        <td><gs-static value="Save Tab"></gs-static></td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <gs-select id="shortcutMetaKeyRunQuery" mini>
-                                                <option value="Command">Command/Windows Key</option>
-                                                <option value="Control">Control</option>
-                                                <option value="Option">Option/Alt</option>
-                                                <option value="Shift">Shift</option>
-                                                <option value="None">None</option>
-                                            </gs-select>
-                                        </td>
-                                        <td><gs-text id="ShortcutKeyRunQuery" mini></gs-text></td>
-                                        <td><gs-static value="Run Query"></gs-static></td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <gs-select id="shortcutMetaKeyRunCursorQuery" mini>
-                                                <option value="Command">Command/Windows Key</option>
-                                                <option value="Control">Control</option>
-                                                <option value="Option">Option/Alt</option>
-                                                <option value="Shift">Shift</option>
-                                                <option value="None">None</option>
-                                            </gs-select>
-                                        </td>
-                                        <td><gs-text id="ShortcutKeyRunCursorQuery" mini></gs-text></td>
-                                        <td><gs-static value="Run Query Under Cursor"></gs-static></td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <gs-select id="shortcutMetaKeyFindDocumentation" mini>
-                                                <option value="Command">Command/Windows Key</option>
-                                                <option value="Control">Control</option>
-                                                <option value="Option">Option/Alt</option>
-                                                <option value="Shift">Shift</option>
-                                                <option value="None">None</option>
-                                            </gs-select>
-                                        </td>
-                                        <td><gs-text id="ShortcutKeyFindDocumentation" mini></gs-text></td>
-                                        <td><gs-static value="Find Documentation"></gs-static></td>
-                                    </tr>
-                                    <tr>
-
-                                        <td>
-                                            <gs-select id="shortcutMetaKeyExplain" mini>
-                                                <option value="Command">Command/Windows Key</option>
-                                                <option value="Control">Control</option>
-                                                <option value="Option">Option/Alt</option>
-                                                <option value="Shift">Shift</option>
-                                                <option value="None">None</option>
-                                            </gs-select>
-                                        </td>
-                                        <td><gs-text id="ShortcutKeyExplain" mini></gs-text></td>
-                                        <td><gs-static value="Explain"></gs-static></td>
-                                    </tr>
-                                    <tr>
-
-                                        <td>
-                                            <gs-select id="shortcutMetaKeyExplainAnalyze" mini>
-                                                <option value="Command">Command/Windows Key</option>
-                                                <option value="Control">Control</option>
-                                                <option value="Option">Option/Alt</option>
-                                                <option value="Shift">Shift</option>
-                                                <option value="None">None</option>
-                                            </gs-select>
-                                        </td>
-                                        <td><gs-text id="ShortcutKeyExplainAnalyze" mini></gs-text></td>
-                                        <td><gs-static value="Explain Analyze"></gs-static></td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <gs-select id="shortcutMetaKeyHome" mini>
-                                                <option value="Command">Command/Windows Key</option>
-                                                <option value="Control">Control</option>
-                                                <option value="Option">Option/Alt</option>
-                                                <option value="Shift">Shift</option>
-                                                <option value="None">None</option>
-                                            </gs-select>
-                                        </td>
-                                        <td><gs-text id="ShortcutKeyHome" mini></gs-text></td>
-                                        <td><gs-static value="Home"></gs-static></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </gs-block>
-                </gs-grid>
-
-                <h3>Custom CSS Stylesheet</h3>
-                <div id="customCSSAce"></div>
-                <div><p>This Ace is stored in your local storage. Because this can get emptied it's recommended to save a copy.</p></div>
-            </gs-body>
-            <gs-footer><gs-button dialogclose id="settingsClose">Done</gs-button></gs-footer>
-        </gs-page>
-    */})
-        .replace('{{ZOOM}}', strZoom)
-        .replace(/\{\{UNIX_RETURN\}\}/gi, '\n')
-        .replace(/\{\{TAB\}\}/gi, '\t');
+                    <h3>Custom CSS Stylesheet</h3>
+                    <div id="customCSSAce"></div>
+                    <div><p>This Ace is stored in your local storage. Because this can get emptied it's recommended to save a copy.</p></div>
+                </gs-body>
+                <gs-footer><gs-button dialogclose id="settingsClose">Done</gs-button></gs-footer>
+            </gs-page>
+        */})
+            .replace('{{ZOOM}}', strZoom)
+            .replace(/\{\{UNIX_RETURN\}\}/gi, '\n')
+            .replace(/\{\{CLIPOPTIONS\}\}/gi, clipOptions)
+            .replace(/\{\{TAB\}\}/gi, '\t');
+    } else {
+        templateElement.innerHTML = ml(function () {/*
+            <gs-page>
+                <gs-header><center><h3>Clipboard Options</h3></center></gs-header>
+                <gs-body padded>
+                    <div class="clip-options">
+                        {{CLIPOPTIONS}}
+                    </div>
+                </gs-body>
+                <gs-footer>
+                    <gs-grid widths="1,1,1">
+                        <gs-block>
+                            <gs-button dialogclose>Cancel</gs-button>
+                        </gs-block>
+                        <gs-block>
+                            <gs-button class="save-button" bg-primary>Save</gs-button>
+                        </gs-block>
+                        <gs-block>
+                            <gs-button class="recopy-button">Recopy</gs-button>
+                        </gs-block>
+                    </gs-grid>
+                </gs-footer>
+            </gs-page>
+        */})
+            .replace(/\{\{CLIPOPTIONS\}\}/gi, clipOptions);
+    }
 
     GS.openDialog(templateElement, function () {
         var dialog = this;
@@ -1136,272 +1184,307 @@ function dialogOptions() {
         copySelectorsControl.value = getClipSetting('rowNumbers');
         copyTypesControl.value = getClipSetting('copyTypes');
 
-        function setAllClipSettings() {
+        function setAllClipSettings(event, bolSkipSave) {
             var arrElements, i, len;
 
             // save clip settings
-            setClipSetting('quoteType', copyQuoteWhenControl.value);
-            setClipSetting('quoteChar', copyQuoteCharControl.value);
-            setClipSetting('escapeChar', copyEscapeCharControl.value);
-            setClipSetting('fieldDelimiter', copyCellDelimiterControl.value);
-            setClipSetting('recordDelimiter', copyRecordDelimiterControl.value);
-            setClipSetting('nullValues', copyNullControl.value);
-            setClipSetting('columnNames', copyHeadersControl.value);
-            setClipSetting('rowNumbers', copySelectorsControl.value);
-            setClipSetting('copyTypes', copyTypesControl.value);
+            if (!bolSkipSave) {
+                setClipSetting('quoteType', copyQuoteWhenControl.value);
+                setClipSetting('quoteChar', copyQuoteCharControl.value);
+                setClipSetting('escapeChar', copyEscapeCharControl.value);
+                setClipSetting('fieldDelimiter', copyCellDelimiterControl.value);
+                setClipSetting('recordDelimiter', copyRecordDelimiterControl.value);
+                setClipSetting('nullValues', copyNullControl.value);
+                setClipSetting('columnNames', copyHeadersControl.value);
+                setClipSetting('rowNumbers', copySelectorsControl.value);
+                setClipSetting('copyTypes', copyTypesControl.value);
 
-            // set all the table elements clip setting attributes
-            arrElements = xtag.query(document, 'gs-table.results-table');
-            xtag.query(document, '.tab-frame iframe').forEach(function (cur) {
-                arrElements.push.apply(arrElements, xtag.query(cur.contentWindow.document, 'gs-table'));
-            });
+                // set all the table elements clip setting attributes
+                arrElements = xtag.query(document, 'gs-table.results-table');
+                xtag.query(document, '.tab-frame iframe').forEach(function (cur) {
+                    arrElements.push.apply(arrElements, xtag.query(cur.contentWindow.document, 'gs-table'));
+                });
 
-            for (i = 0, len = arrElements.length; i < len; i += 1) {
-                arrElements[i].setAttribute('copy-quote-when', getClipSetting('quoteType'));
-                arrElements[i].setAttribute('copy-quote-char', getClipSetting('quoteChar'));
-                arrElements[i].setAttribute('copy-escape-char', getClipSetting('escapeChar'));
-                arrElements[i].setAttribute('copy-delimiter-cell', getClipSetting('fieldDelimiter'));
-                arrElements[i].setAttribute('copy-delimiter-record', getClipSetting('recordDelimiter'));
-                arrElements[i].setAttribute('copy-null-cell', getClipSetting('nullValues'));
-                arrElements[i].setAttribute('copy-header', getClipSetting('columnNames'));
-                arrElements[i].setAttribute('copy-selectors', getClipSetting('rowNumbers'));
-                arrElements[i].setAttribute('copy-types', getClipSetting('copyTypes'));
+                for (i = 0, len = arrElements.length; i < len; i += 1) {
+                    arrElements[i].setAttribute('copy-quote-when', copyQuoteWhenControl.value);
+                    arrElements[i].setAttribute('copy-quote-char', copyQuoteCharControl.value);
+                    arrElements[i].setAttribute('copy-escape-char', copyEscapeCharControl.value);
+                    arrElements[i].setAttribute('copy-delimiter-cell', copyCellDelimiterControl.value);
+                    arrElements[i].setAttribute('copy-delimiter-record', copyRecordDelimiterControl.value);
+                    arrElements[i].setAttribute('copy-null-cell', copyNullControl.value);
+                    arrElements[i].setAttribute('copy-header', copyHeadersControl.value);
+                    arrElements[i].setAttribute('copy-selectors', copySelectorsControl.value);
+                    arrElements[i].setAttribute('copy-types', copyTypesControl.value);
+                }
+            } else {
+                currentTableElement.setAttribute('copy-quote-when', copyQuoteWhenControl.value);
+                currentTableElement.setAttribute('copy-quote-char', copyQuoteCharControl.value);
+                currentTableElement.setAttribute('copy-escape-char', copyEscapeCharControl.value);
+                currentTableElement.setAttribute('copy-delimiter-cell', copyCellDelimiterControl.value);
+                currentTableElement.setAttribute('copy-delimiter-record', copyRecordDelimiterControl.value);
+                currentTableElement.setAttribute('copy-null-cell', copyNullControl.value);
+                currentTableElement.setAttribute('copy-header', copyHeadersControl.value);
+                currentTableElement.setAttribute('copy-selectors', copySelectorsControl.value);
+                currentTableElement.setAttribute('copy-types', copyTypesControl.value);
             }
         }
 
-        copyQuoteWhenControl.addEventListener('change', setAllClipSettings);
-        copyQuoteCharControl.addEventListener('change', setAllClipSettings);
-        copyEscapeCharControl.addEventListener('change', setAllClipSettings);
-        copyCellDelimiterControl.addEventListener('change', setAllClipSettings);
-        copyRecordDelimiterControl.addEventListener('change', setAllClipSettings);
-        copyNullControl.addEventListener('change', setAllClipSettings);
-        copyHeadersControl.addEventListener('change', setAllClipSettings);
-        copySelectorsControl.addEventListener('change', setAllClipSettings);
-        copyTypesControl.addEventListener('change', setAllClipSettings);
+        if (!bolOnlyClipboard) {
+            copyQuoteWhenControl.addEventListener('change', setAllClipSettings);
+            copyQuoteCharControl.addEventListener('change', setAllClipSettings);
+            copyEscapeCharControl.addEventListener('change', setAllClipSettings);
+            copyCellDelimiterControl.addEventListener('change', setAllClipSettings);
+            copyRecordDelimiterControl.addEventListener('change', setAllClipSettings);
+            copyNullControl.addEventListener('change', setAllClipSettings);
+            copyHeadersControl.addEventListener('change', setAllClipSettings);
+            copySelectorsControl.addEventListener('change', setAllClipSettings);
+            copyTypesControl.addEventListener('change', setAllClipSettings);
+        } else {
+            xtag.query(dialog, '.save-button')[0].addEventListener('click', function () {
+                GS.closeDialog(dialog);
+                setAllClipSettings();
 
-        document.getElementById('pgmanage-options-beautify').value = localStorage.bolBeautify;
-        document.getElementById('pgmanage-options-beautify').addEventListener('change', function () {
-            localStorage.bolBeautify = document.getElementById('pgmanage-options-beautify').value;
-        });
-
-        document.getElementById('pgmanage-options-Comma').value = localStorage.bolComma;
-        document.getElementById('pgmanage-options-Comma').addEventListener('change', function () {
-            localStorage.bolComma = document.getElementById('pgmanage-options-Comma').value;
-        });
-
-        document.getElementById('pgmanage-options-left-panel').value = localStorage.leftPanelWidth;
-        document.getElementById('pgmanage-options-left-panel').addEventListener('change', function () {
-            localStorage.leftPanelWidth = document.getElementById('pgmanage-options-left-panel').value;
-        });
-
-        var CSSEditor = ace.edit('customCSSAce');
-        glb_CSSEditor = CSSEditor;
-        CSSEditor.setTheme('ace/theme/eclipse');
-        CSSEditor.getSession().setMode('ace/mode/css');
-        CSSEditor.setShowPrintMargin(false);
-        CSSEditor.setDisplayIndentGuides(true);
-        CSSEditor.setShowFoldWidgets(false);
-        CSSEditor.session.setUseWrapMode('free');
-        CSSEditor.setBehavioursEnabled(false);
-        CSSEditor.$blockScrolling = Infinity; // <== blocks a warning
-
-        CSSEditor.setOptions({
-            'enableBasicAutocompletion': true,
-            'enableSnippets'           : true,
-            'enableLiveAutocompletion' : true
-        });
-
-        // if we're on a touch device: make the ace grow with it's content
-        if (evt.touchDevice) {
-            CSSEditor.setOptions({
-                maxLines: Infinity
+                currentTableElement.internalEvents.forceCopy = true;
+                currentTableElement.elems.hiddenFocusControl.focus();
+                document.execCommand('copy');
             });
-            document.getElementById('customCSSAce').classList.add('childrenneedsclick');
-            document.getElementById('customCSSAce').style.borderBottom = '1px solid #AAAAAA';
+            xtag.query(dialog, '.recopy-button')[0].addEventListener('click', function () {
+                GS.closeDialog(dialog);
+                setAllClipSettings(null, true);
 
-        // else: full height
-        } else {
-            document.getElementById('customCSSAce').style.height = '30em';
+                currentTableElement.internalEvents.forceCopy = true;
+                currentTableElement.elems.hiddenFocusControl.focus();
+                document.execCommand('copy');
+            });
         }
 
+        if (!bolOnlyClipboard) {
+            document.getElementById('pgmanage-options-beautify').value = localStorage.bolBeautify;
+            document.getElementById('pgmanage-options-beautify').addEventListener('change', function () {
+                localStorage.bolBeautify = document.getElementById('pgmanage-options-beautify').value;
+            });
 
-        CSSEditor.setValue(localStorage.customCSS);
-        CSSEditor.focus();
-        CSSEditor.selection.setSelectionRange(new Range(0, 0, 0, 0));
-        GS.triggerEvent(document.getElementById('customCSSAce'), 'resize');
+            document.getElementById('pgmanage-options-Comma').value = localStorage.bolComma;
+            document.getElementById('pgmanage-options-Comma').addEventListener('change', function () {
+                localStorage.bolComma = document.getElementById('pgmanage-options-Comma').value;
+            });
+
+            document.getElementById('pgmanage-options-left-panel').value = localStorage.leftPanelWidth;
+            document.getElementById('pgmanage-options-left-panel').addEventListener('change', function () {
+                localStorage.leftPanelWidth = document.getElementById('pgmanage-options-left-panel').value;
+            });
+
+            var CSSEditor = ace.edit('customCSSAce');
+            glb_CSSEditor = CSSEditor;
+            CSSEditor.setTheme('ace/theme/eclipse');
+            CSSEditor.getSession().setMode('ace/mode/css');
+            CSSEditor.setShowPrintMargin(false);
+            CSSEditor.setDisplayIndentGuides(true);
+            CSSEditor.setShowFoldWidgets(false);
+            CSSEditor.session.setUseWrapMode('free');
+            CSSEditor.setBehavioursEnabled(false);
+            CSSEditor.$blockScrolling = Infinity; // <== blocks a warning
+
+            CSSEditor.setOptions({
+                'enableBasicAutocompletion': true,
+                'enableSnippets'           : true,
+                'enableLiveAutocompletion' : true
+            });
+
+            // if we're on a touch device: make the ace grow with it's content
+            if (evt.touchDevice) {
+                CSSEditor.setOptions({
+                    maxLines: Infinity
+                });
+                document.getElementById('customCSSAce').classList.add('childrenneedsclick');
+                document.getElementById('customCSSAce').style.borderBottom = '1px solid #AAAAAA';
+
+            // else: full height
+            } else {
+                document.getElementById('customCSSAce').style.height = '30em';
+            }
 
 
-        // set control values
-        document.getElementById('button-options').value = localStorage.labeledButtons;
-        document.getElementById('graph-options').value = localStorage.horizontalGraph;
-
-        document.getElementById('button-options').addEventListener('change', function () {
-            refreshButtons(document.getElementById('button-options').value);
-            //console.log(document.getElementById('button-options').value);
-        });
-        document.getElementById('graph-options').addEventListener('change', function () {
-            localStorage.horizontalGraph = document.getElementById('graph-options').value;
-        });
-        CSSEditor.addEventListener('change', function () {
-            customCSSText = CSSEditor.getValue();
-        });
-
-        if (window.navigator.userAgent.toLowerCase().indexOf('macintosh') !== -1) {
-            var CTRLCMD = 'Command';
-        } else {
-            var CTRLCMD = 'Control';
-        }
-        localStorage.ShortcutRunCursorQuery = (localStorage.ShortcutRunCursorQuery || [CTRLCMD,     'Enter',   'ShortcutRunCursorQuery']);
-        document.getElementById('ShortcutKeyNewTab').value = localStorage.ShortcutNewTab.split(',')[1];
-        document.getElementById('ShortcutKeySaveTab').value = localStorage.ShortcutSave.split(',')[1];
-        document.getElementById('ShortcutKeyRunQuery').value = localStorage.ShortcutRunQuery.split(',')[1];
-        document.getElementById('ShortcutKeyRunCursorQuery').value = localStorage.ShortcutRunCursorQuery.split(',')[1];
-        document.getElementById('ShortcutKeyFindDocumentation').value = localStorage.ShortcutDocs.split(',')[1];
-        document.getElementById('ShortcutKeyExplain').value = localStorage.ShortcutExplain.split(',')[1];
-        document.getElementById('ShortcutKeyExplainAnalyze').value = localStorage.ShortcutExplainAnalyze.split(',')[1];
-        document.getElementById('ShortcutKeyHome').value = localStorage.ShortcutHome.split(',')[1];
-
-        document.getElementById('shortcutMetaKeyNewTab').value = (localStorage.ShortcutNewTab.split(',')[0] || 'None');
-        document.getElementById('shortcutMetaKeySaveTab').value = (localStorage.ShortcutSave.split(',')[0] || 'None');
-        document.getElementById('shortcutMetaKeyRunQuery').value = (localStorage.ShortcutRunQuery.split(',')[0] || 'None');
-        document.getElementById('shortcutMetaKeyRunCursorQuery').value = (localStorage.ShortcutRunCursorQuery.split(',')[0] || 'None');
-        document.getElementById('shortcutMetaKeyFindDocumentation').value = (localStorage.ShortcutDocs.split(',')[0] || 'None');
-        document.getElementById('shortcutMetaKeyExplain').value = (localStorage.ShortcutExplain.split(',')[0] || 'None');
-        document.getElementById('shortcutMetaKeyExplainAnalyze').value = (localStorage.ShortcutExplainAnalyze.split(',')[0] || 'None');
-        document.getElementById('shortcutMetaKeyHome').value = (localStorage.ShortcutHome.split(',')[0] || 'None');
+            CSSEditor.setValue(localStorage.customCSS);
+            CSSEditor.focus();
+            CSSEditor.selection.setSelectionRange(new Range(0, 0, 0, 0));
+            GS.triggerEvent(document.getElementById('customCSSAce'), 'resize');
 
 
+            // set control values
+            document.getElementById('button-options').value = localStorage.labeledButtons;
+            document.getElementById('graph-options').value = localStorage.horizontalGraph;
 
-        document.getElementById('metaKeyReset').addEventListener('click', function (event) {
+            document.getElementById('button-options').addEventListener('change', function () {
+                refreshButtons(document.getElementById('button-options').value);
+                //console.log(document.getElementById('button-options').value);
+            });
+            document.getElementById('graph-options').addEventListener('change', function () {
+                localStorage.horizontalGraph = document.getElementById('graph-options').value;
+            });
+            CSSEditor.addEventListener('change', function () {
+                customCSSText = CSSEditor.getValue();
+            });
+
             if (window.navigator.userAgent.toLowerCase().indexOf('macintosh') !== -1) {
                 var CTRLCMD = 'Command';
             } else {
                 var CTRLCMD = 'Control';
             }
-            document.getElementById('shortcutMetaKeyNewTab').value = CTRLCMD;
-            document.getElementById('shortcutMetaKeySaveTab').value = CTRLCMD;
-            document.getElementById('shortcutMetaKeyRunQuery').value = 'None';
-            document.getElementById('shortcutMetaKeyRunCursorQuery').value = CTRLCMD;
-            document.getElementById('shortcutMetaKeyFindDocumentation').value = CTRLCMD;
-            document.getElementById('shortcutMetaKeyExplain').value = 'None';
-            document.getElementById('shortcutMetaKeyExplainAnalyze').value = 'Shift';
-            document.getElementById('shortcutMetaKeyHome').value = 'None';
-        });
-        document.getElementById('keyReset').addEventListener('click', function (event) {
-            document.getElementById('ShortcutKeyNewTab').value = 'o'
-            document.getElementById('ShortcutKeySaveTab').value = 's'
-            document.getElementById('ShortcutKeyRunQuery').value = 'F5'
-            document.getElementById('ShortcutKeyRunCursorQuery').value = 'Enter'
-            document.getElementById('ShortcutKeyFindDocumentation').value = '.'
-            document.getElementById('ShortcutKeyExplain').value = 'F7'
-            document.getElementById('ShortcutKeyExplainAnalyze').value = 'F7'
-            document.getElementById('ShortcutKeyHome').value = 'Escape'
-        });
+            localStorage.ShortcutRunCursorQuery = (localStorage.ShortcutRunCursorQuery || [CTRLCMD,     'Enter',   'ShortcutRunCursorQuery']);
+            document.getElementById('ShortcutKeyNewTab').value = localStorage.ShortcutNewTab.split(',')[1];
+            document.getElementById('ShortcutKeySaveTab').value = localStorage.ShortcutSave.split(',')[1];
+            document.getElementById('ShortcutKeyRunQuery').value = localStorage.ShortcutRunQuery.split(',')[1];
+            document.getElementById('ShortcutKeyRunCursorQuery').value = localStorage.ShortcutRunCursorQuery.split(',')[1];
+            document.getElementById('ShortcutKeyFindDocumentation').value = localStorage.ShortcutDocs.split(',')[1];
+            document.getElementById('ShortcutKeyExplain').value = localStorage.ShortcutExplain.split(',')[1];
+            document.getElementById('ShortcutKeyExplainAnalyze').value = localStorage.ShortcutExplainAnalyze.split(',')[1];
+            document.getElementById('ShortcutKeyHome').value = localStorage.ShortcutHome.split(',')[1];
 
-        document.getElementById('ShortcutKeyNewTab').addEventListener('keydown', function (event) {
-            event.preventDefault();
-            event.stopPropagation();
-            document.getElementById('ShortcutKeyNewTab').value = event.key;
-        });
-        document.getElementById('ShortcutKeySaveTab').addEventListener('keydown', function (event) {
-            event.preventDefault();
-            event.stopPropagation();
-            document.getElementById('ShortcutKeySaveTab').value = event.key;
-        });
-        document.getElementById('ShortcutKeyRunQuery').addEventListener('keydown', function (event) {
-            event.preventDefault();
-            event.stopPropagation();
-            document.getElementById('ShortcutKeyRunQuery').value = event.key;
-        });
-        document.getElementById('ShortcutKeyRunCursorQuery').addEventListener('keydown', function (event) {
-            event.preventDefault();
-            event.stopPropagation();
-            document.getElementById('ShortcutKeyRunCursorQuery').value = event.key;
-        });
-        document.getElementById('ShortcutKeyFindDocumentation').addEventListener('keydown', function (event) {
-            event.preventDefault();
-            event.stopPropagation();
-            document.getElementById('ShortcutKeyFindDocumentation').value = event.key;
-        });
-        document.getElementById('ShortcutKeyExplain').addEventListener('keydown', function (event) {
-            event.preventDefault();
-            event.stopPropagation();
-            document.getElementById('ShortcutKeyExplain').value = event.key;
-        });
-        document.getElementById('ShortcutKeyExplainAnalyze').addEventListener('keydown', function (event) {
-            event.preventDefault();
-            event.stopPropagation();
-            document.getElementById('ShortcutKeyExplainAnalyze').value = event.key;
-        });
-        document.getElementById('ShortcutKeyHome').addEventListener('keydown', function (event) {
-            event.preventDefault();
-            event.stopPropagation();
-            document.getElementById('ShortcutKeyHome').value = event.key;
-        });
+            document.getElementById('shortcutMetaKeyNewTab').value = (localStorage.ShortcutNewTab.split(',')[0] || 'None');
+            document.getElementById('shortcutMetaKeySaveTab').value = (localStorage.ShortcutSave.split(',')[0] || 'None');
+            document.getElementById('shortcutMetaKeyRunQuery').value = (localStorage.ShortcutRunQuery.split(',')[0] || 'None');
+            document.getElementById('shortcutMetaKeyRunCursorQuery').value = (localStorage.ShortcutRunCursorQuery.split(',')[0] || 'None');
+            document.getElementById('shortcutMetaKeyFindDocumentation').value = (localStorage.ShortcutDocs.split(',')[0] || 'None');
+            document.getElementById('shortcutMetaKeyExplain').value = (localStorage.ShortcutExplain.split(',')[0] || 'None');
+            document.getElementById('shortcutMetaKeyExplainAnalyze').value = (localStorage.ShortcutExplainAnalyze.split(',')[0] || 'None');
+            document.getElementById('shortcutMetaKeyHome').value = (localStorage.ShortcutHome.split(',')[0] || 'None');
 
 
-        var i, len;
-        for (i=0,len=localStorage.length;i < len;i++) {
-            var strProp = localStorage.key(i);
-            //console.log(strProp);
-            if (/^pgmanageZoom/.test(strProp)) {
-                var strLink = strProp.toString().replace(/^pgmanageZoom/,'');
-                console.log('strLink:' + strLink);
-                var objZoom = document.getElementById('pgmanage-options-left-panel-' + strLink);
-                console.log('objZoom', objZoom);
+
+            document.getElementById('metaKeyReset').addEventListener('click', function (event) {
+                if (window.navigator.userAgent.toLowerCase().indexOf('macintosh') !== -1) {
+                    var CTRLCMD = 'Command';
+                } else {
+                    var CTRLCMD = 'Control';
+                }
+                document.getElementById('shortcutMetaKeyNewTab').value = CTRLCMD;
+                document.getElementById('shortcutMetaKeySaveTab').value = CTRLCMD;
+                document.getElementById('shortcutMetaKeyRunQuery').value = 'None';
+                document.getElementById('shortcutMetaKeyRunCursorQuery').value = CTRLCMD;
+                document.getElementById('shortcutMetaKeyFindDocumentation').value = CTRLCMD;
+                document.getElementById('shortcutMetaKeyExplain').value = 'None';
+                document.getElementById('shortcutMetaKeyExplainAnalyze').value = 'Shift';
+                document.getElementById('shortcutMetaKeyHome').value = 'None';
+            });
+            document.getElementById('keyReset').addEventListener('click', function (event) {
+                document.getElementById('ShortcutKeyNewTab').value = 'o'
+                document.getElementById('ShortcutKeySaveTab').value = 's'
+                document.getElementById('ShortcutKeyRunQuery').value = 'F5'
+                document.getElementById('ShortcutKeyRunCursorQuery').value = 'Enter'
+                document.getElementById('ShortcutKeyFindDocumentation').value = '.'
+                document.getElementById('ShortcutKeyExplain').value = 'F7'
+                document.getElementById('ShortcutKeyExplainAnalyze').value = 'F7'
+                document.getElementById('ShortcutKeyHome').value = 'Escape'
+            });
+
+            document.getElementById('ShortcutKeyNewTab').addEventListener('keydown', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                document.getElementById('ShortcutKeyNewTab').value = event.key;
+            });
+            document.getElementById('ShortcutKeySaveTab').addEventListener('keydown', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                document.getElementById('ShortcutKeySaveTab').value = event.key;
+            });
+            document.getElementById('ShortcutKeyRunQuery').addEventListener('keydown', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                document.getElementById('ShortcutKeyRunQuery').value = event.key;
+            });
+            document.getElementById('ShortcutKeyRunCursorQuery').addEventListener('keydown', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                document.getElementById('ShortcutKeyRunCursorQuery').value = event.key;
+            });
+            document.getElementById('ShortcutKeyFindDocumentation').addEventListener('keydown', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                document.getElementById('ShortcutKeyFindDocumentation').value = event.key;
+            });
+            document.getElementById('ShortcutKeyExplain').addEventListener('keydown', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                document.getElementById('ShortcutKeyExplain').value = event.key;
+            });
+            document.getElementById('ShortcutKeyExplainAnalyze').addEventListener('keydown', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                document.getElementById('ShortcutKeyExplainAnalyze').value = event.key;
+            });
+            document.getElementById('ShortcutKeyHome').addEventListener('keydown', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                document.getElementById('ShortcutKeyHome').value = event.key;
+            });
 
 
-                objZoom.value = localStorage[strProp];
+            var i, len;
+            for (i=0,len=localStorage.length;i < len;i++) {
+                var strProp = localStorage.key(i);
+                //console.log(strProp);
+                if (/^pgmanageZoom/.test(strProp)) {
+                    var strLink = strProp.toString().replace(/^pgmanageZoom/,'');
+                    console.log('strLink:' + strLink);
+                    var objZoom = document.getElementById('pgmanage-options-left-panel-' + strLink);
+                    console.log('objZoom', objZoom);
 
-                objZoom.addEventListener('change', function (event) {
-                    localStorage['pgmanageZoom' + event.target.getAttribute('id').replace(/^pgmanage\-options\-left\-panel\-/,'')] =
-                        event.target.value;
-                });
+
+                    objZoom.value = localStorage[strProp];
+
+                    objZoom.addEventListener('change', function (event) {
+                        localStorage['pgmanageZoom' + event.target.getAttribute('id').replace(/^pgmanage\-options\-left\-panel\-/,'')] =
+                            event.target.value;
+                    });
+                }
             }
         }
     }, function () {
-        var ValKeyNewTab = document.getElementById('ShortcutKeyNewTab').value;
-        var ValKeySaveTab = document.getElementById('ShortcutKeySaveTab').value;
-        var ValKeyRunQuery = document.getElementById('ShortcutKeyRunQuery').value;
-        var ValKeyRunCursorQuery = document.getElementById('ShortcutKeyRunCursorQuery').value;
-        var ValKeyFindDocumentation = document.getElementById('ShortcutKeyFindDocumentation').value;
-        var ValKeyExplain = document.getElementById('ShortcutKeyExplain').value;
-        var ValKeyExplainAnalyze = document.getElementById('ShortcutKeyExplainAnalyze').value;
-        var ValKeyHome = document.getElementById('ShortcutKeyHome').value;
-        var ValMetaKeyNewTab = document.getElementById('shortcutMetaKeyNewTab').value;
-        var ValMetaKeySaveTab = document.getElementById('shortcutMetaKeySaveTab').value;
-        var ValMetaKeyRunQuery = document.getElementById('shortcutMetaKeyRunQuery').value;
-        var ValMetaKeyRunCursorQuery = document.getElementById('shortcutMetaKeyRunCursorQuery').value;
-        var ValMetaKeyFindDocumentation = document.getElementById('shortcutMetaKeyFindDocumentation').value;
-        var ValMetaKeyExplain = document.getElementById('shortcutMetaKeyExplain').value;
-        var ValMetaKeyExplainAnalyze = document.getElementById('shortcutMetaKeyExplainAnalyze').value;
-        var ValMetaKeyHome = document.getElementById('shortcutMetaKeyHome').value;
+        if(!bolOnlyClipboard) {
+            var ValKeyNewTab = document.getElementById('ShortcutKeyNewTab').value;
+            var ValKeySaveTab = document.getElementById('ShortcutKeySaveTab').value;
+            var ValKeyRunQuery = document.getElementById('ShortcutKeyRunQuery').value;
+            var ValKeyRunCursorQuery = document.getElementById('ShortcutKeyRunCursorQuery').value;
+            var ValKeyFindDocumentation = document.getElementById('ShortcutKeyFindDocumentation').value;
+            var ValKeyExplain = document.getElementById('ShortcutKeyExplain').value;
+            var ValKeyExplainAnalyze = document.getElementById('ShortcutKeyExplainAnalyze').value;
+            var ValKeyHome = document.getElementById('ShortcutKeyHome').value;
+            var ValMetaKeyNewTab = document.getElementById('shortcutMetaKeyNewTab').value;
+            var ValMetaKeySaveTab = document.getElementById('shortcutMetaKeySaveTab').value;
+            var ValMetaKeyRunQuery = document.getElementById('shortcutMetaKeyRunQuery').value;
+            var ValMetaKeyRunCursorQuery = document.getElementById('shortcutMetaKeyRunCursorQuery').value;
+            var ValMetaKeyFindDocumentation = document.getElementById('shortcutMetaKeyFindDocumentation').value;
+            var ValMetaKeyExplain = document.getElementById('shortcutMetaKeyExplain').value;
+            var ValMetaKeyExplainAnalyze = document.getElementById('shortcutMetaKeyExplainAnalyze').value;
+            var ValMetaKeyHome = document.getElementById('shortcutMetaKeyHome').value;
 
-        ValMetaKeyNewTab = ((ValMetaKeyNewTab === 'None') ? '' : ValMetaKeyNewTab);
-        ValMetaKeySaveTab = ((ValMetaKeySaveTab === 'None') ? '' : ValMetaKeySaveTab);
-        ValMetaKeyRunQuery = ((ValMetaKeyRunQuery === 'None') ? '' : ValMetaKeyRunQuery);
-        ValMetaKeyFindDocumentation = ((ValMetaKeyFindDocumentation === 'None') ? '' : ValMetaKeyFindDocumentation);
-        ValMetaKeyExplain = ((ValMetaKeyExplain === 'None') ? '' : ValMetaKeyExplain);
-        ValMetaKeyExplainAnalyze = ((ValMetaKeyExplainAnalyze === 'None') ? '' : ValMetaKeyExplainAnalyze);
-        ValMetaKeyHome = ((ValMetaKeyHome === 'None') ? '' : ValMetaKeyHome);
+            ValMetaKeyNewTab = ((ValMetaKeyNewTab === 'None') ? '' : ValMetaKeyNewTab);
+            ValMetaKeySaveTab = ((ValMetaKeySaveTab === 'None') ? '' : ValMetaKeySaveTab);
+            ValMetaKeyRunQuery = ((ValMetaKeyRunQuery === 'None') ? '' : ValMetaKeyRunQuery);
+            ValMetaKeyFindDocumentation = ((ValMetaKeyFindDocumentation === 'None') ? '' : ValMetaKeyFindDocumentation);
+            ValMetaKeyExplain = ((ValMetaKeyExplain === 'None') ? '' : ValMetaKeyExplain);
+            ValMetaKeyExplainAnalyze = ((ValMetaKeyExplainAnalyze === 'None') ? '' : ValMetaKeyExplainAnalyze);
+            ValMetaKeyHome = ((ValMetaKeyHome === 'None') ? '' : ValMetaKeyHome);
 
-        var ShortcutKeysText = [
-              [ValMetaKeyNewTab              ,     ValKeyNewTab,             'ShortcutNewTab']
-            , [ValMetaKeyExplain             ,     ValKeyExplain,            'ShortcutExplain']
-            , [ValMetaKeyExplainAnalyze      ,     ValKeyExplainAnalyze,     'ShortcutExplainAnalyze']
-            , [ValMetaKeyRunQuery            ,     ValKeyRunQuery,           'ShortcutRunQuery']
-            , [ValMetaKeySaveTab             ,     ValKeySaveTab,            'ShortcutSave']
-            , [ValMetaKeyFindDocumentation   ,     ValKeyFindDocumentation,  'ShortcutDocs']
-            , [ValMetaKeyHome                ,     ValKeyHome,               'ShortcutHome']
-            , [ValMetaKeyRunCursorQuery      ,     ValKeyRunCursorQuery,     'ShortcutRunCursorQuery']
-        ];
+            var ShortcutKeysText = [
+                [ValMetaKeyNewTab              ,     ValKeyNewTab,             'ShortcutNewTab']
+                , [ValMetaKeyExplain             ,     ValKeyExplain,            'ShortcutExplain']
+                , [ValMetaKeyExplainAnalyze      ,     ValKeyExplainAnalyze,     'ShortcutExplainAnalyze']
+                , [ValMetaKeyRunQuery            ,     ValKeyRunQuery,           'ShortcutRunQuery']
+                , [ValMetaKeySaveTab             ,     ValKeySaveTab,            'ShortcutSave']
+                , [ValMetaKeyFindDocumentation   ,     ValKeyFindDocumentation,  'ShortcutDocs']
+                , [ValMetaKeyHome                ,     ValKeyHome,               'ShortcutHome']
+                , [ValMetaKeyRunCursorQuery      ,     ValKeyRunCursorQuery,     'ShortcutRunCursorQuery']
+            ];
 
 
-        refreshCustomCSS(customCSSText);
-        refreshShortcutKeys(ShortcutKeysText);
-        var currentTab = document.getElementsByClassName('current-tab')[0];
-		if (currentTab.relatedEditor) {
-            currentTab.relatedEditor.focus();
+            refreshCustomCSS(customCSSText);
+            refreshShortcutKeys(ShortcutKeysText);
+            var currentTab = document.getElementsByClassName('current-tab')[0];
+            if (currentTab.relatedEditor) {
+                currentTab.relatedEditor.focus();
+            }
         }
     });
 }
@@ -3452,7 +3535,7 @@ function executeScript(bolCursorQuery) {
                                 // generate hud templates
                                 strHTML = ml(function () {/*
                                     <template for="top-hud">
-                                        <gs-button onclick="document.getElementById('{{TABLEID}}').openPrefs(this)" inline no-focus icononly icon="sliders">&nbsp;</gs-button>
+                                        <gs-button onclick="dialogOptions(true, GS.findParentTag(this, 'gs-table'));" inline no-focus icononly icon="sliders">&nbsp;</gs-button>
                                         <gs-button onclick="document.getElementById('{{TABLEID}}').toggleFullscreen(this)" inline id="toggleFullscreen-{{IDNUM}}" no-focus icononly icon="arrows-alt">&nbsp;</gs-button>
                                         <gs-button id="toggle{{TABLEID}}" onclick="hideOtherTables({{IDNUM}}, '{{TABLEID}}'); document.getElementById('{{TABLEID}}').toggleFullContainer('sql-results-area-{{IDNUM}}', this)" inline no-focus icononly icon="expand">&nbsp;</gs-button>
                                         <gs-button onclick="document.getElementById('{{TABLEID}}').resizeAllColumns()"
@@ -3775,7 +3858,7 @@ function executeScript(bolCursorQuery) {
                     //console.log(intLine, jsnCurrentQuery.start_row, intErrorStartLine);
                     if (data.error_position) {
 						var arrLines = jsnCurrentQuery.strQuery.substring(intErrorStartChar, intErrorStartChar + parseInt(data.error_position, 10)).split('\n');
-						var intErrorCol = parseInt(data.error_position, 10) - 1;
+                        var intErrorCol = parseInt(data.error_position, 10) - 1;
 						var i = 0;
 						var len = intLine - 1;
 					    //console.log(len, intLine, arrLines.length);
@@ -3785,8 +3868,8 @@ function executeScript(bolCursorQuery) {
 						while (i < len) {
 						    //console.log(i, arrLines[i], arrLines[i].length);
 							intErrorCol -= arrLines[i].length + 1;
-							i += 1
-						}
+							i += 1;
+                        }
 
 						editor.getSelection().setSelectionRange({
 							start: {
@@ -3805,22 +3888,31 @@ function executeScript(bolCursorQuery) {
                         ]);
                         editor.scrollToLine((jsnCurrentQuery.start_row + intErrorStartLine + (intLine - 1)), true, true);
 					} else {
+						var arrLines = jsnCurrentQuery.strQuery.substring(intErrorStartChar).split('\n');
+                        var intErrorStartLineOffset = 0;
+					    //console.log(intErrorStartChar);
+					    //console.log(jsnCurrentQuery.strQuery);
+					    //console.log(arrLines);
+						while (arrLines[intErrorStartLineOffset].length === 0) {
+							intErrorStartLineOffset += 1;
+                        }
+                        //console.log(intErrorStartLineOffset);
 					    editor.getSelection().setSelectionRange({
 							start: {
-								row: jsnCurrentQuery.start_row + intErrorStartLine,
+								row: jsnCurrentQuery.start_row + intErrorStartLine + intErrorStartLineOffset,
 								column: intErrorCol || 0
 							},
 							end: {
-								row: jsnCurrentQuery.start_row + intErrorStartLine,
+								row: jsnCurrentQuery.start_row + intErrorStartLine + intErrorStartLineOffset,
 								column: intErrorCol || 0
 							}
 						});
 
                         editor.getSession().setAnnotations([
-                            {'row': jsnCurrentQuery.start_row + intErrorStartLine, 'column': intErrorCol || 0,
+                            {'row': jsnCurrentQuery.start_row + intErrorStartLine + intErrorStartLineOffset, 'column': intErrorCol || 0,
                                 'text': strError, 'type': 'error'}
                         ]);
-                        editor.scrollToLine((jsnCurrentQuery.start_row + intErrorStartLine), true, true);
+                        editor.scrollToLine((jsnCurrentQuery.start_row + intErrorStartLine + intErrorStartLineOffset), true, true);
                     }
 
                     // update the success and error tally

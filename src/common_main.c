@@ -80,7 +80,6 @@ void program_exit() {
 		SFREE(str_global_login_group);
 		SFREE(str_global_sql_root);
 		SFREE(str_global_web_root);
-		SFREE(str_global_data_root);
 		SFREE(str_global_tls_cert);
 		SFREE(str_global_tls_key);
 		SFREE(str_global_log_level);

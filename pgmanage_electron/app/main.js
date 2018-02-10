@@ -11,6 +11,7 @@ const isDev = require('electron-is-dev');
 const app = electron.app;
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow;
+const dialog = electron.dialog;
 
 var shouldQuit = app.makeSingleInstance(function (commandLine, workingDirectory) {
 	// Someone tried to run a second instance, we should create a new window
@@ -33,13 +34,7 @@ if (strResourcesPath.indexOf('pgmanage/pgmanage_electron/node_modules/electron/d
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindows = [];
-let configWindow = null;
-let connectionWindow = null;
-let pgpassWindow = null;
 let mainWindowState = null;
-let configWindowState = null;
-let connectionWindowState = null;
-let pgpassWindowState = null;
 let bolpgManageIsReady = false;
 
 try {
@@ -192,26 +187,6 @@ ipcMain.on('pgmanage', function (event, arg) {
 		mainWindows.forEach(function (curWindow) {
 			curWindow.webContents.executeJavaScript('window.location.reload();');
 		});
-	} else if (arg === 'edit connections') {
-		connectionWindow = new BrowserWindow({
-			'x': connectionWindowState.x,
-			'y': connectionWindowState.y,
-			'width': connectionWindowState.width,
-			'height': connectionWindowState.height
-		});
-		connectionWindowState.manage(connectionWindow);
-		connectionWindow.loadURL('http://127.0.0.1:' + int_pgmanage_port + '/pgmanage/config.html?file=pgmanage-connections.conf',  { 'extraHeaders': 'pragma: no-cache\n' });
-	} else if (arg === 'edit PGPASS') {
-		pgpassWindow = new BrowserWindow({
-			'x': pgpassWindowState.x,
-			'y': pgpassWindowState.y,
-			'width': pgpassWindowState.width,
-			'height': pgpassWindowState.height
-		});
-		pgpassWindowState.manage(pgpassWindow);
-		pgpassWindow.loadURL('http://127.0.0.1:' + int_pgmanage_port + '/pgmanage/config.html?file=PGPASS',  { 'extraHeaders': 'pragma: no-cache\n' });
-		pgpassWindow.webContents.on('will-navigate', handleRedirect);
-		pgpassWindow.webContents.on('new-window', handleRedirect);
 	}
 })
 
@@ -233,47 +208,6 @@ function setMenu() {
 					label: 'New Window',
 					accelerator: 'CmdOrCtrl+N',
 					click: openWindow
-				},
-				{
-					label: 'Edit pgmanage.conf',
-					click: function () {
-						configWindow = new BrowserWindow({
-							'x': configWindowState.x,
-							'y': configWindowState.y,
-							'width': configWindowState.width,
-							'height': configWindowState.height
-						});
-						configWindowState.manage(configWindow);
-						configWindow.loadURL('http://127.0.0.1:' + int_pgmanage_port + '/pgmanage/config.html?file=pgmanage.conf',  { 'extraHeaders': 'pragma: no-cache\n' });
-					}
-				},
-				{
-					label: 'Edit pgmanage-connections.conf',
-					click: function () {
-						connectionWindow = new BrowserWindow({
-							'x': connectionWindowState.x,
-							'y': connectionWindowState.y,
-							'width': connectionWindowState.width,
-							'height': connectionWindowState.height
-						});
-						connectionWindowState.manage(connectionWindow);
-						connectionWindow.loadURL('http://127.0.0.1:' + int_pgmanage_port + '/pgmanage/config.html?file=pgmanage-connections.conf',  { 'extraHeaders': 'pragma: no-cache\n' });
-					}
-				},
-				{
-					label: 'Edit PGPASS',
-					click: function () {
-						pgpassWindow = new BrowserWindow({
-							'x': pgpassWindowState.x,
-							'y': pgpassWindowState.y,
-							'width': pgpassWindowState.width,
-							'height': pgpassWindowState.height
-						});
-						pgpassWindowState.manage(pgpassWindow);
-						pgpassWindow.loadURL('http://127.0.0.1:' + int_pgmanage_port + '/pgmanage/config.html?file=PGPASS',  { 'extraHeaders': 'pragma: no-cache\n' });
-						pgpassWindow.webContents.on('will-navigate', handleRedirect);
-						pgpassWindow.webContents.on('new-window', handleRedirect);
-					}
 				},
 				{
 					role: 'quit'
@@ -427,6 +361,21 @@ function openWindow() {
 			(process.argv.indexOf('--pgmanage-test') > -1 ? '?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true' : ''),
 			{ 'extraHeaders': 'pragma: no-cache\n' });
 
+		curWindow.webContents.on('will-prevent-unload', function (event) {
+			let choice = dialog.showMessageBox(curWindow, {
+				type: 'question',
+				buttons: ['Leave', 'Stay'],
+				title: 'Are you sure?',
+				message: 'Changes you made may not be saved.',
+				defaultId: 0,
+				cancelId: 1
+			})
+			let leave = (choice === 0);
+			if (leave) {
+				event.preventDefault();
+			}
+		});
+
 		// Emitted when the window is closed.
 		curWindow.on('closed', function () {
 			mainWindows.splice(mainWindows.indexOf(curWindow), 1);
@@ -492,26 +441,6 @@ function appStart() {
 		file: 'main-window-state.json'
 	});
 
-	configWindowState = windowStateKeeper({
-		defaultWidth: 1024,
-		defaultHeight: 768,
-		path: os.homedir() + '/.pgmanage/',
-		file: 'config-window-state.json'
-	});
-
-	connectionWindowState = windowStateKeeper({
-		defaultWidth: 1024,
-		defaultHeight: 768,
-		path: os.homedir() + '/.pgmanage/',
-		file: 'connection-window-state.json'
-	});
-
-	pgpassWindowState = windowStateKeeper({
-		defaultWidth: 1024,
-		defaultHeight: 768,
-		path: os.homedir() + '/.pgmanage/',
-		file: 'pgpass-window-state.json'
-	});
 	if (bolpgManageIsReady) {
 		openWindow();
 	}

@@ -6,8 +6,6 @@ var bolTreeQueriesLoaded = true, listQuery = {}, titleRefreshQuery = {}
   , detailQuery = {}, associatedButtons = {};
 
 function handleQueryVersionDifferences(versionNum) {
-
-
     //console.log(parseFloat(versionNum, 10) >= 9.5);
     //propQuery.prop_role:
     if (parseFloat(versionNum, 10) >= 9.5) {
@@ -92,6 +90,176 @@ function handleQueryVersionDifferences(versionNum) {
     }
 
     if (parseFloat(versionNum, 10) >= 10) {
+        scriptQuery.objectSequence = ml(function () {/*
+                SELECT (SELECT '-- DROP SEQUENCE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || E';\n\n' ||
+        
+                       '-- Last value taken from this sequence: ' || (SELECT last_value FROM {{STRSQLSAFENAME}})::text || E'\n' ||
+                      E'-- To set the value of the sequence:\n/' || E'*\n' ||
+                      E'     -- restart sequence at desired value:\n' ||
+                      E'     ALTER SEQUENCE {{STRSQLSAFENAME}} RESTART WITH ' || (SELECT last_value FROM {{STRSQLSAFENAME}})::text || E';\n' ||
+                      E'     -- advance sequence to clear out it''s cache:\n' ||
+                       '     SELECT nextval(''{{STRSQLSAFENAME}}'') FROM generate_series(1, ' || seq.seqcache::text || E');\n' ||
+                       '*' || E'/\n\n' ||
+        
+                      'CREATE SEQUENCE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || E'\n' ||
+                      '  INCREMENT ' || s.increment || E'\n' ||
+                      '  MINVALUE '  || s.minimum_value || E'\n' ||
+                      '  MAXVALUE '  || s.maximum_value || E'\n' ||
+                      '  START '     || {{STRSQLSAFENAME}}.last_value || E'\n' ||
+                      '  CACHE '     || seq.seqcache || E'\n' ||
+                      '  ' || (CASE WHEN (SELECT seq.seqcycle FROM {{STRSQLSAFENAME}}) THEN '' ELSE 'NO ' END) || E'CYCLE' ||
+                      COALESCE((SELECT E'\n  OWNED BY ' || pg_depend.refobjid::regclass || '.' || pg_attribute.attname
+                                   FROM pg_depend
+                                   JOIN pg_attribute ON pg_attribute.attrelid = pg_depend.refobjid
+                                                    AND pg_attribute.attnum = pg_depend.refobjsubid
+                                  WHERE pg_depend.objid = '{{STRSQLSAFENAME}}'::regclass
+                                    AND pg_depend.refobjsubid > 0)::text, '') || E';\n\n' ||
+                      'ALTER SEQUENCE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || ' OWNER TO ' || pg_roles.rolname || E';\n\n' ||
+                      '-- ALTER SEQUENCE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || E' RESTART;\n\n' ||
+                      COALESCE('COMMENT ON SEQUENCE
+                                    ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) ||
+                                    ' IS ' || quote_literal(pg_description.description) || E';\n\n', '')
+        
+                FROM {{STRSQLSAFENAME}}, pg_class c
+                LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
+                LEFT JOIN pg_sequence seq ON c.oid = seq.seqrelid
+                LEFT JOIN pg_roles ON pg_roles.oid = c.relowner
+                LEFT JOIN pg_description ON pg_description.objoid = c.oid
+                LEFT JOIN information_schema.sequences s ON s.sequence_schema = n.nspname
+                                                     AND s.sequence_name = c.relname
+                WHERE c.relkind = 'S'::char AND (c.oid = {{INTOID}} OR n.nspname || '.' || c.relname = '{{STRSQLSAFENAME}}'))
+        
+        
+        
+                || COALESCE((SELECT array_to_string(array_agg(
+                    (SELECT array_to_string((SELECT array_agg('GRANT ' || ok) FROM
+                        (SELECT array_to_string((SELECT array_agg(perms ORDER BY srt)
+                        FROM (  SELECT 1 as srt, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'r($|[^*])' THEN 'SELECT' END as perms
+                            UNION SELECT 2, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'w($|[^*])' THEN 'UPDATE' END
+                            UNION SELECT 3, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'U($|[^*])' THEN 'USAGE' END) em
+                            WHERE perms is not null),',') ||
+                    ' ON TABLE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || ' TO ' ||
+                          CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public'
+                        ELSE (regexp_split_to_array(unnest::text,'[=/]'))[1] END || E';\n' as ok
+        
+                    FROM unnest(c.relacl)
+                    WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|U)($|[^*])') as em),'')
+                    )
+                    ),'')
+                FROM pg_class c
+                LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
+                LEFT JOIN pg_roles ON pg_roles.oid = c.relowner
+                LEFT JOIN pg_description ON pg_description.objoid = c.oid
+                LEFT JOIN information_schema.sequences s ON s.sequence_schema = n.nspname
+                                                     AND s.sequence_name = c.relname
+                WHERE c.relkind = 'S'::char AND (c.oid = {{INTOID}} OR n.nspname || '.' || c.relname = '{{STRSQLSAFENAME}}')),'')
+        
+                || COALESCE((SELECT array_to_string(array_agg(
+                    (SELECT array_to_string((SELECT array_agg('GRANT ' || ok) FROM
+                        (SELECT array_to_string((SELECT array_agg(perms ORDER BY srt)
+                        FROM (  SELECT 1 as srt, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'r\*' THEN 'SELECT' END as perms
+                            UNION SELECT 2, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'w\*' THEN 'UPDATE' END
+                            UNION SELECT 3, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'U\*' THEN 'USAGE' END) em
+                            WHERE perms is not null),',') ||
+                    ' ON TABLE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || ' TO ' ||
+                          CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public'
+                        ELSE (regexp_split_to_array(unnest::text,'[=/]'))[1] END || E' WITH GRANT OPTION;\n' as ok
+        
+                    FROM unnest(c.relacl)
+                    WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|U)\*') as em),'')
+                    )
+                    ),'')
+                FROM pg_class c
+                LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
+                LEFT JOIN pg_roles ON pg_roles.oid = c.relowner
+                LEFT JOIN pg_description ON pg_description.objoid = c.oid
+                LEFT JOIN information_schema.sequences s ON s.sequence_schema = n.nspname
+                                                     AND s.sequence_name = c.relname
+                WHERE c.relkind = 'S'::char AND (c.oid = {{INTOID}} OR n.nspname || '.' || c.relname = '{{STRSQLSAFENAME}}')),'');
+            */});
+
+            scriptQuery.objectSequenceDump = ml(function () {/*
+                SELECT (SELECT '-- DROP SEQUENCE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || E';\n\n' ||
+
+                    '-- Last value taken from this sequence: ' || (SELECT last_value FROM {{STRSQLSAFENAME}})::text || E'\n' ||
+                    E'-- To set the value of the sequence:\n/' || E'*\n' ||
+                    E'     -- restart sequence at desired value:\n' ||
+                    E'     ALTER SEQUENCE {{STRSQLSAFENAME}} RESTART WITH ' || (SELECT last_value FROM {{STRSQLSAFENAME}})::text || E';\n' ||
+                    E'     -- advance sequence to clear out it''s cache:\n' ||
+                    '     SELECT nextval(''{{STRSQLSAFENAME}}'') FROM generate_series(1, ' || seq.seqcache::text || E');\n' ||
+                    '*' || E'/\n\n' ||
+
+                    'CREATE SEQUENCE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || E'\n' ||
+                    '  INCREMENT ' || s.increment || E'\n' ||
+                    '  MINVALUE '  || s.minimum_value || E'\n' ||
+                    '  MAXVALUE '  || s.maximum_value || E'\n' ||
+                    '  START '     || {{STRSQLSAFENAME}}.last_value || E'\n' ||
+                    '  CACHE '     || seq.seqcache || E'\n' ||
+                    '  ' || (CASE WHEN (SELECT seq.seqcycle FROM {{STRSQLSAFENAME}}) THEN '' ELSE 'NO ' END) || E'CYCLE' ||
+                    E';\n\nALTER SEQUENCE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || ' OWNER TO ' || pg_roles.rolname || E';\n\n' ||
+                    '-- ALTER SEQUENCE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || E' RESTART;\n\n' ||
+                    COALESCE('COMMENT ON SEQUENCE
+                                    ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) ||
+                                    ' IS ' || quote_literal(pg_description.description) || E';\n\n', '')
+
+                FROM {{STRSQLSAFENAME}}, pg_class c
+                LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
+                LEFT JOIN pg_sequence seq ON c.oid = seq.seqrelid
+                LEFT JOIN pg_roles ON pg_roles.oid = c.relowner
+                LEFT JOIN pg_description ON pg_description.objoid = c.oid
+                LEFT JOIN information_schema.sequences s ON s.sequence_schema = n.nspname
+                                                    AND s.sequence_name = c.relname
+                WHERE c.relkind = 'S'::char AND (c.oid = {{INTOID}} OR n.nspname || '.' || c.relname = '{{STRSQLSAFENAME}}'))
+
+
+
+                || COALESCE((SELECT array_to_string(array_agg(
+                    (SELECT array_to_string((SELECT array_agg('GRANT ' || ok) FROM
+                        (SELECT array_to_string((SELECT array_agg(perms ORDER BY srt)
+                        FROM (  SELECT 1 as srt, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'r($|[^*])' THEN 'SELECT' END as perms
+                            UNION SELECT 2, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'w($|[^*])' THEN 'UPDATE' END
+                            UNION SELECT 3, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'U($|[^*])' THEN 'USAGE' END) em
+                            WHERE perms is not null),',') ||
+                    ' ON TABLE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || ' TO ' ||
+                        CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public'
+                        ELSE (regexp_split_to_array(unnest::text,'[=/]'))[1] END || E';\n' as ok
+
+                    FROM unnest(c.relacl)
+                    WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|U)($|[^*])') as em),'')
+                    )
+                    ),'')
+                FROM pg_class c
+                LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
+                LEFT JOIN pg_roles ON pg_roles.oid = c.relowner
+                LEFT JOIN pg_description ON pg_description.objoid = c.oid
+                LEFT JOIN information_schema.sequences s ON s.sequence_schema = n.nspname
+                                                    AND s.sequence_name = c.relname
+                WHERE c.relkind = 'S'::char AND (c.oid = {{INTOID}} OR n.nspname || '.' || c.relname = '{{STRSQLSAFENAME}}')),'')
+
+                || COALESCE((SELECT array_to_string(array_agg(
+                    (SELECT array_to_string((SELECT array_agg('GRANT ' || ok) FROM
+                        (SELECT array_to_string((SELECT array_agg(perms ORDER BY srt)
+                        FROM (  SELECT 1 as srt, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'r\*' THEN 'SELECT' END as perms
+                            UNION SELECT 2, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'w\*' THEN 'UPDATE' END
+                            UNION SELECT 3, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'U\*' THEN 'USAGE' END) em
+                            WHERE perms is not null),',') ||
+                    ' ON TABLE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || ' TO ' ||
+                        CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public'
+                        ELSE (regexp_split_to_array(unnest::text,'[=/]'))[1] END || E' WITH GRANT OPTION;\n' as ok
+
+                    FROM unnest(c.relacl)
+                    WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|U)\*') as em),'')
+                    )
+                    ),'')
+                FROM pg_class c
+                LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
+                LEFT JOIN pg_roles ON pg_roles.oid = c.relowner
+                LEFT JOIN pg_description ON pg_description.objoid = c.oid
+                LEFT JOIN information_schema.sequences s ON s.sequence_schema = n.nspname
+                                                    AND s.sequence_name = c.relname
+                WHERE c.relkind = 'S'::char AND (c.oid = {{INTOID}} OR n.nspname || '.' || c.relname = '{{STRSQLSAFENAME}}')),'');
+            */});
+
         propQuery.prop_sequence = propQuery.objectSequence = ml(function () {/*
             SELECT 1 AS sort,
                    'Name',
@@ -518,6 +686,22 @@ function handleQueryVersionDifferences(versionNum) {
                 WHERE (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}') AND pg_trigger.tgisinternal != TRUE
                 )ok),'')), '')
 
+                -- Displays DISABLE/ENABLE TRIGGERs
+                || COALESCE((SELECT E'\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (
+                SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' DISABLE TRIGGER ' || pg_trigger.tgname as perms
+                FROM pg_class
+                JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
+                JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+                WHERE (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}') AND pg_trigger.tgisinternal != TRUE
+                )ok),'')), '')
+                || COALESCE((SELECT E'\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (
+                SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' ENABLE TRIGGER ' || pg_trigger.tgname as perms
+                FROM pg_class
+                JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
+                JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+                WHERE (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}') AND pg_trigger.tgisinternal != TRUE
+                )ok),'')), '')
+
                 -- Returns INDEXes
                 || COALESCE((SELECT E'\n\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (
                 SELECT E'-- Index: ' || quote_ident(nsp.nspname) || '.' || quote_ident(clidx.relname) ||
@@ -955,6 +1139,22 @@ function handleQueryVersionDifferences(versionNum) {
                 WHERE (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}') AND pg_trigger.tgisinternal != TRUE
                 )ok),'')), '')
 
+                -- Displays DISABLE/ENABLE TRIGGERs
+                || COALESCE((SELECT E'\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (
+                SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' DISABLE TRIGGER ' || pg_trigger.tgname as perms
+                FROM pg_class
+                JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
+                JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+                WHERE (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}') AND pg_trigger.tgisinternal != TRUE
+                )ok),'')), '')
+                || COALESCE((SELECT E'\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (
+                SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' ENABLE TRIGGER ' || pg_trigger.tgname as perms
+                FROM pg_class
+                JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
+                JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+                WHERE (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}') AND pg_trigger.tgisinternal != TRUE
+                )ok),'')), '')
+
                 -- Returns INDEXes
                 || COALESCE((SELECT E'\n\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (
                 SELECT E'-- Index: ' || quote_ident(nsp.nspname) || '.' || quote_ident(clidx.relname) ||
@@ -1347,6 +1547,22 @@ function handleQueryVersionDifferences(versionNum) {
                     JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
                     WHERE (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}') AND pg_trigger.tgisinternal != TRUE
                     )ok),'')), '')
+
+                    -- Displays DISABLE/ENABLE TRIGGERs
+                    || COALESCE((SELECT E'\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (
+                    SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' DISABLE TRIGGER ' || pg_trigger.tgname as perms
+                    FROM pg_class
+                    JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
+                    JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+                    WHERE (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}') AND pg_trigger.tgisinternal != TRUE
+                    )ok),'')), '')
+                    || COALESCE((SELECT E'\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (
+                    SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' ENABLE TRIGGER ' || pg_trigger.tgname as perms
+                    FROM pg_class
+                    JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
+                    JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+                    WHERE (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}') AND pg_trigger.tgisinternal != TRUE
+                    )ok),'')), '')
             
                     -- Returns INDEXes
                     || COALESCE((SELECT E'\n\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (
@@ -1364,6 +1580,180 @@ function handleQueryVersionDifferences(versionNum) {
                     )ok),'')), ''));
         */});
     } else {
+        scriptQuery.objectSequence = ml(function () {/*
+                SELECT (SELECT '-- DROP SEQUENCE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || E';\n\n' ||
+        
+                       '-- Last value taken from this sequence: ' || (SELECT last_value FROM {{STRSQLSAFENAME}})::text || E'\n' ||
+                      E'-- To set the value of the sequence:\n/' || E'*\n' ||
+                      E'     -- restart sequence at desired value:\n' ||
+                      E'     ALTER SEQUENCE {{STRSQLSAFENAME}} RESTART WITH ' || (SELECT last_value FROM {{STRSQLSAFENAME}})::text || E';\n' ||
+                      E'     -- advance sequence to clear out it''s cache:\n' ||
+                       '     SELECT nextval(''{{STRSQLSAFENAME}}'') FROM generate_series(1, ' || (SELECT cache_value FROM {{STRSQLSAFENAME}})::text || E');\n' ||
+                       '*' || E'/\n\n' ||
+        
+                      'CREATE SEQUENCE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || E'\n' ||
+                      '  INCREMENT ' || s.increment || E'\n' ||
+                      '  MINVALUE '  || s.minimum_value || E'\n' ||
+                      '  MAXVALUE '  || s.maximum_value || E'\n' ||
+                      '  START '     || {{STRSQLSAFENAME}}.last_value || E'\n' ||
+                      '  CACHE '     || (SELECT cache_value FROM {{STRSQLSAFENAME}})::text || E'\n' ||
+                      '  ' || (CASE WHEN (SELECT is_cycled FROM {{STRSQLSAFENAME}}) THEN '' ELSE 'NO ' END) || E'CYCLE' ||
+                      COALESCE((SELECT E'\n  OWNED BY ' || pg_depend.refobjid::regclass || '.' || pg_attribute.attname
+                                   FROM pg_depend
+                                   JOIN pg_attribute ON pg_attribute.attrelid = pg_depend.refobjid
+                                                    AND pg_attribute.attnum = pg_depend.refobjsubid
+                                  WHERE pg_depend.objid = '{{STRSQLSAFENAME}}'::regclass
+                                    AND pg_depend.refobjsubid > 0)::text, '') || E';\n\n' ||
+                      'ALTER SEQUENCE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || ' OWNER TO ' || pg_roles.rolname || E';\n\n' ||
+                      '-- ALTER SEQUENCE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || E' RESTART;\n\n' ||
+                      COALESCE('COMMENT ON SEQUENCE
+                                    ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) ||
+                                    ' IS ' || quote_literal(pg_description.description) || E';\n\n', '')
+        
+                FROM {{STRSQLSAFENAME}}, pg_class c
+                LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
+                LEFT JOIN pg_roles ON pg_roles.oid = c.relowner
+                LEFT JOIN pg_description ON pg_description.objoid = c.oid
+                LEFT JOIN information_schema.sequences s ON s.sequence_schema = n.nspname
+                                                     AND s.sequence_name = c.relname
+                WHERE c.relkind = 'S'::char AND (c.oid = {{INTOID}} OR n.nspname || '.' || c.relname = '{{STRSQLSAFENAME}}'))
+        
+        
+        
+                || COALESCE((SELECT array_to_string(array_agg(
+                    (SELECT array_to_string((SELECT array_agg('GRANT ' || ok) FROM
+                        (SELECT array_to_string((SELECT array_agg(perms ORDER BY srt)
+                        FROM (  SELECT 1 as srt, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'r($|[^*])' THEN 'SELECT' END as perms
+                            UNION SELECT 2, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'w($|[^*])' THEN 'UPDATE' END
+                            UNION SELECT 3, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'U($|[^*])' THEN 'USAGE' END) em
+                            WHERE perms is not null),',') ||
+                    ' ON TABLE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || ' TO ' ||
+                          CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public'
+                        ELSE (regexp_split_to_array(unnest::text,'[=/]'))[1] END || E';\n' as ok
+        
+                    FROM unnest(c.relacl)
+                    WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|U)($|[^*])') as em),'')
+                    )
+                    ),'')
+                FROM pg_class c
+                LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
+                LEFT JOIN pg_roles ON pg_roles.oid = c.relowner
+                LEFT JOIN pg_description ON pg_description.objoid = c.oid
+                LEFT JOIN information_schema.sequences s ON s.sequence_schema = n.nspname
+                                                     AND s.sequence_name = c.relname
+                WHERE c.relkind = 'S'::char AND (c.oid = {{INTOID}} OR n.nspname || '.' || c.relname = '{{STRSQLSAFENAME}}')),'')
+        
+                || COALESCE((SELECT array_to_string(array_agg(
+                    (SELECT array_to_string((SELECT array_agg('GRANT ' || ok) FROM
+                        (SELECT array_to_string((SELECT array_agg(perms ORDER BY srt)
+                        FROM (  SELECT 1 as srt, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'r\*' THEN 'SELECT' END as perms
+                            UNION SELECT 2, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'w\*' THEN 'UPDATE' END
+                            UNION SELECT 3, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'U\*' THEN 'USAGE' END) em
+                            WHERE perms is not null),',') ||
+                    ' ON TABLE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || ' TO ' ||
+                          CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public'
+                        ELSE (regexp_split_to_array(unnest::text,'[=/]'))[1] END || E' WITH GRANT OPTION;\n' as ok
+        
+                    FROM unnest(c.relacl)
+                    WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|U)\*') as em),'')
+                    )
+                    ),'')
+                FROM pg_class c
+                LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
+                LEFT JOIN pg_roles ON pg_roles.oid = c.relowner
+                LEFT JOIN pg_description ON pg_description.objoid = c.oid
+                LEFT JOIN information_schema.sequences s ON s.sequence_schema = n.nspname
+                                                     AND s.sequence_name = c.relname
+                WHERE c.relkind = 'S'::char AND (c.oid = {{INTOID}} OR n.nspname || '.' || c.relname = '{{STRSQLSAFENAME}}')),'');
+            */});
+
+            scriptQuery.objectSequenceDump = ml(function () {/*
+                SELECT (SELECT '-- DROP SEQUENCE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || E';\n\n' ||
+        
+                       '-- Last value taken from this sequence: ' || (SELECT last_value FROM {{STRSQLSAFENAME}})::text || E'\n' ||
+                      E'-- To set the value of the sequence:\n/' || E'*\n' ||
+                      E'     -- restart sequence at desired value:\n' ||
+                      E'     ALTER SEQUENCE {{STRSQLSAFENAME}} RESTART WITH ' || (SELECT last_value FROM {{STRSQLSAFENAME}})::text || E';\n' ||
+                      E'     -- advance sequence to clear out it''s cache:\n' ||
+                       '     SELECT nextval(''{{STRSQLSAFENAME}}'') FROM generate_series(1, ' || (SELECT cache_value FROM {{STRSQLSAFENAME}})::text || E');\n' ||
+                       '*' || E'/\n\n' ||
+        
+                      'CREATE SEQUENCE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || E'\n' ||
+                      '  INCREMENT ' || s.increment || E'\n' ||
+                      '  MINVALUE '  || s.minimum_value || E'\n' ||
+                      '  MAXVALUE '  || s.maximum_value || E'\n' ||
+                      '  START '     || {{STRSQLSAFENAME}}.last_value || E'\n' ||
+                      '  CACHE '     || (SELECT cache_value FROM {{STRSQLSAFENAME}})::text || E'\n' ||
+                      '  ' || (CASE WHEN (SELECT is_cycled FROM {{STRSQLSAFENAME}}) THEN '' ELSE 'NO ' END) || E'CYCLE' ||
+                      COALESCE((SELECT E'\n  OWNED BY ' || pg_depend.refobjid::regclass || '.' || pg_attribute.attname
+                                   FROM pg_depend
+                                   JOIN pg_attribute ON pg_attribute.attrelid = pg_depend.refobjid
+                                                    AND pg_attribute.attnum = pg_depend.refobjsubid
+                                  WHERE pg_depend.objid = '{{STRSQLSAFENAME}}'::regclass
+                                    AND pg_depend.refobjsubid > 0)::text, '') || E';\n\n' ||
+                      'ALTER SEQUENCE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || ' OWNER TO ' || pg_roles.rolname || E';\n\n' ||
+                      '-- ALTER SEQUENCE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || E' RESTART;\n\n' ||
+                      COALESCE('COMMENT ON SEQUENCE
+                                    ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) ||
+                                    ' IS ' || quote_literal(pg_description.description) || E';\n\n', '')
+        
+                FROM {{STRSQLSAFENAME}}, pg_class c
+                LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
+                LEFT JOIN pg_roles ON pg_roles.oid = c.relowner
+                LEFT JOIN pg_description ON pg_description.objoid = c.oid
+                LEFT JOIN information_schema.sequences s ON s.sequence_schema = n.nspname
+                                                     AND s.sequence_name = c.relname
+                WHERE c.relkind = 'S'::char AND (c.oid = {{INTOID}} OR n.nspname || '.' || c.relname = '{{STRSQLSAFENAME}}'))
+
+
+
+                || COALESCE((SELECT array_to_string(array_agg(
+                    (SELECT array_to_string((SELECT array_agg('GRANT ' || ok) FROM
+                        (SELECT array_to_string((SELECT array_agg(perms ORDER BY srt)
+                        FROM (  SELECT 1 as srt, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'r($|[^*])' THEN 'SELECT' END as perms
+                            UNION SELECT 2, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'w($|[^*])' THEN 'UPDATE' END
+                            UNION SELECT 3, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'U($|[^*])' THEN 'USAGE' END) em
+                            WHERE perms is not null),',') ||
+                    ' ON TABLE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || ' TO ' ||
+                        CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public'
+                        ELSE (regexp_split_to_array(unnest::text,'[=/]'))[1] END || E';\n' as ok
+
+                    FROM unnest(c.relacl)
+                    WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|U)($|[^*])') as em),'')
+                    )
+                    ),'')
+                FROM pg_class c
+                LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
+                LEFT JOIN pg_roles ON pg_roles.oid = c.relowner
+                LEFT JOIN pg_description ON pg_description.objoid = c.oid
+                LEFT JOIN information_schema.sequences s ON s.sequence_schema = n.nspname
+                                                    AND s.sequence_name = c.relname
+                WHERE c.relkind = 'S'::char AND (c.oid = {{INTOID}} OR n.nspname || '.' || c.relname = '{{STRSQLSAFENAME}}')),'')
+
+                || COALESCE((SELECT array_to_string(array_agg(
+                    (SELECT array_to_string((SELECT array_agg('GRANT ' || ok) FROM
+                        (SELECT array_to_string((SELECT array_agg(perms ORDER BY srt)
+                        FROM (  SELECT 1 as srt, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'r\*' THEN 'SELECT' END as perms
+                            UNION SELECT 2, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'w\*' THEN 'UPDATE' END
+                            UNION SELECT 3, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'U\*' THEN 'USAGE' END) em
+                            WHERE perms is not null),',') ||
+                    ' ON TABLE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || ' TO ' ||
+                        CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public'
+                        ELSE (regexp_split_to_array(unnest::text,'[=/]'))[1] END || E' WITH GRANT OPTION;\n' as ok
+
+                    FROM unnest(c.relacl)
+                    WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|U)\*') as em),'')
+                    )
+                    ),'')
+                FROM pg_class c
+                LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
+                LEFT JOIN pg_roles ON pg_roles.oid = c.relowner
+                LEFT JOIN pg_description ON pg_description.objoid = c.oid
+                LEFT JOIN information_schema.sequences s ON s.sequence_schema = n.nspname
+                                                    AND s.sequence_name = c.relname
+                WHERE c.relkind = 'S'::char AND (c.oid = {{INTOID}} OR n.nspname || '.' || c.relname = '{{STRSQLSAFENAME}}')),'');
+            */});
+            
         propQuery.prop_sequence = propQuery.objectSequence = ml(function () {/*
             SELECT 1 AS sort,
                    'Name',
@@ -1753,6 +2143,21 @@ function handleQueryVersionDifferences(versionNum) {
                     '-- DROP TRIGGER ' || quote_ident(pg_trigger.tgname) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname) || E';\n' ||
                     regexp_replace(regexp_replace(regexp_replace(regexp_replace(pg_get_triggerdef(pg_trigger.oid, true),
                     ' BEFORE ', E'\n   BEFORE '), ' ON ', E'\n   ON '), ' FOR ', E'\n   FOR '), ' EXECUTE ', E'\n   EXECUTE ') || E';\n\n' as perms
+                FROM pg_class
+                JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
+                JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+                WHERE (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}') AND pg_trigger.tgisinternal != TRUE
+                )ok),'')), '')
+                -- Displays DISABLE/ENABLE TRIGGERs
+                || COALESCE((SELECT E'\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (
+                SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' DISABLE TRIGGER ' || pg_trigger.tgname as perms
+                FROM pg_class
+                JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
+                JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+                WHERE (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}') AND pg_trigger.tgisinternal != TRUE
+                )ok),'')), '')
+                || COALESCE((SELECT E'\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (
+                SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' ENABLE TRIGGER ' || pg_trigger.tgname as perms
                 FROM pg_class
                 JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
                 JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
@@ -2156,6 +2561,21 @@ function handleQueryVersionDifferences(versionNum) {
                 JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
                 WHERE (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}') AND pg_trigger.tgisinternal != TRUE
                 )ok),'')), '')
+                -- Displays DISABLE/ENABLE TRIGGERs
+                || COALESCE((SELECT E'\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (
+                SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' DISABLE TRIGGER ' || pg_trigger.tgname as perms
+                FROM pg_class
+                JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
+                JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+                WHERE (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}') AND pg_trigger.tgisinternal != TRUE
+                )ok),'')), '')
+                || COALESCE((SELECT E'\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (
+                SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' ENABLE TRIGGER ' || pg_trigger.tgname as perms
+                FROM pg_class
+                JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
+                JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+                WHERE (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}') AND pg_trigger.tgisinternal != TRUE
+                )ok),'')), '')
                 -- Returns INDEXes
                 || COALESCE((SELECT E'\n\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (
                 SELECT E'-- Index: ' || quote_ident(nsp.nspname) || '.' || quote_ident(clidx.relname) ||
@@ -2509,6 +2929,21 @@ function handleQueryVersionDifferences(versionNum) {
                     '-- DROP TRIGGER ' || quote_ident(pg_trigger.tgname) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname) || E';\n' ||
                     regexp_replace(regexp_replace(regexp_replace(regexp_replace(pg_get_triggerdef(pg_trigger.oid, true),
                     ' BEFORE ', E'\n   BEFORE '), ' ON ', E'\n   ON '), ' FOR ', E'\n   FOR '), ' EXECUTE ', E'\n   EXECUTE ') || E';\n\n' as perms
+                FROM pg_class
+                JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
+                JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+                WHERE (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}') AND pg_trigger.tgisinternal != TRUE
+                )ok),'')), '')
+                -- Displays DISABLE/ENABLE TRIGGERs
+                || COALESCE((SELECT E'\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (
+                SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' DISABLE TRIGGER ' || pg_trigger.tgname as perms
+                FROM pg_class
+                JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
+                JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+                WHERE (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}') AND pg_trigger.tgisinternal != TRUE
+                )ok),'')), '')
+                || COALESCE((SELECT E'\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (
+                SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' ENABLE TRIGGER ' || pg_trigger.tgname as perms
                 FROM pg_class
                 JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
                 JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
@@ -4152,175 +4587,6 @@ scriptQuery.objectOperator = ml(function () {/*
 
 
 associatedButtons.objectSequence = ['propertyButton', 'dependButton', 'statButton'];
-scriptQuery.objectSequence = ml(function () {/*
-        SELECT (SELECT '-- DROP SEQUENCE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || E';\n\n' ||
-
-               '-- Last value taken from this sequence: ' || (SELECT last_value FROM {{STRSQLSAFENAME}})::text || E'\n' ||
-              E'-- To set the value of the sequence:\n/' || E'*\n' ||
-              E'     -- restart sequence at desired value:\n' ||
-              E'     ALTER SEQUENCE {{STRSQLSAFENAME}} RESTART WITH ' || (SELECT last_value FROM {{STRSQLSAFENAME}})::text || E';\n' ||
-              E'     -- advance sequence to clear out it''s cache:\n' ||
-               '     SELECT nextval(''{{STRSQLSAFENAME}}'') FROM generate_series(1, ' || seq.seqcache::text || E');\n' ||
-               '*' || E'/\n\n' ||
-
-              'CREATE SEQUENCE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || E'\n' ||
-              '  INCREMENT ' || s.increment || E'\n' ||
-              '  MINVALUE '  || s.minimum_value || E'\n' ||
-              '  MAXVALUE '  || s.maximum_value || E'\n' ||
-              '  START '     || {{STRSQLSAFENAME}}.last_value || E'\n' ||
-              '  CACHE '     || seq.seqcache || E'\n' ||
-              '  ' || (CASE WHEN (SELECT seq.seqcycle FROM {{STRSQLSAFENAME}}) THEN '' ELSE 'NO ' END) || E'CYCLE' ||
-              COALESCE((SELECT E'\n  OWNED BY ' || pg_depend.refobjid::regclass || '.' || pg_attribute.attname
-                           FROM pg_depend
-                           JOIN pg_attribute ON pg_attribute.attrelid = pg_depend.refobjid
-                                            AND pg_attribute.attnum = pg_depend.refobjsubid
-                          WHERE pg_depend.objid = '{{STRSQLSAFENAME}}'::regclass
-                            AND pg_depend.refobjsubid > 0)::text, '') || E';\n\n' ||
-              'ALTER SEQUENCE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || ' OWNER TO ' || pg_roles.rolname || E';\n\n' ||
-              '-- ALTER SEQUENCE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || E' RESTART;\n\n' ||
-              COALESCE('COMMENT ON SEQUENCE
-                            ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) ||
-                            ' IS ' || quote_literal(pg_description.description) || E';\n\n', '')
-
-        FROM {{STRSQLSAFENAME}}, pg_class c
-        LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
-        LEFT JOIN pg_sequence seq ON c.oid = seq.seqrelid
-        LEFT JOIN pg_roles ON pg_roles.oid = c.relowner
-        LEFT JOIN pg_description ON pg_description.objoid = c.oid
-        LEFT JOIN information_schema.sequences s ON s.sequence_schema = n.nspname
-                                             AND s.sequence_name = c.relname
-        WHERE c.relkind = 'S'::char AND (c.oid = {{INTOID}} OR n.nspname || '.' || c.relname = '{{STRSQLSAFENAME}}'))
-
-
-
-        || COALESCE((SELECT array_to_string(array_agg(
-        	(SELECT array_to_string((SELECT array_agg('GRANT ' || ok) FROM
-        	    (SELECT array_to_string((SELECT array_agg(perms ORDER BY srt)
-        		FROM (  SELECT 1 as srt, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'r($|[^*])' THEN 'SELECT' END as perms
-        			UNION SELECT 2, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'w($|[^*])' THEN 'UPDATE' END
-        			UNION SELECT 3, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'U($|[^*])' THEN 'USAGE' END) em
-        			WHERE perms is not null),',') ||
-        	' ON TABLE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || ' TO ' ||
-              	CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public'
-        		ELSE (regexp_split_to_array(unnest::text,'[=/]'))[1] END || E';\n' as ok
-
-        	FROM unnest(c.relacl)
-        	WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|U)($|[^*])') as em),'')
-        	)
-        	),'')
-        FROM pg_class c
-        LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
-        LEFT JOIN pg_roles ON pg_roles.oid = c.relowner
-        LEFT JOIN pg_description ON pg_description.objoid = c.oid
-        LEFT JOIN information_schema.sequences s ON s.sequence_schema = n.nspname
-                                             AND s.sequence_name = c.relname
-        WHERE c.relkind = 'S'::char AND (c.oid = {{INTOID}} OR n.nspname || '.' || c.relname = '{{STRSQLSAFENAME}}')),'')
-
-        || COALESCE((SELECT array_to_string(array_agg(
-        	(SELECT array_to_string((SELECT array_agg('GRANT ' || ok) FROM
-        	    (SELECT array_to_string((SELECT array_agg(perms ORDER BY srt)
-        		FROM (  SELECT 1 as srt, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'r\*' THEN 'SELECT' END as perms
-        			UNION SELECT 2, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'w\*' THEN 'UPDATE' END
-        			UNION SELECT 3, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'U\*' THEN 'USAGE' END) em
-        			WHERE perms is not null),',') ||
-        	' ON TABLE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || ' TO ' ||
-              	CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public'
-        		ELSE (regexp_split_to_array(unnest::text,'[=/]'))[1] END || E' WITH GRANT OPTION;\n' as ok
-
-        	FROM unnest(c.relacl)
-        	WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|U)\*') as em),'')
-        	)
-        	),'')
-        FROM pg_class c
-        LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
-        LEFT JOIN pg_roles ON pg_roles.oid = c.relowner
-        LEFT JOIN pg_description ON pg_description.objoid = c.oid
-        LEFT JOIN information_schema.sequences s ON s.sequence_schema = n.nspname
-                                             AND s.sequence_name = c.relname
-        WHERE c.relkind = 'S'::char AND (c.oid = {{INTOID}} OR n.nspname || '.' || c.relname = '{{STRSQLSAFENAME}}')),'');
-    */});
-
-scriptQuery.objectSequenceDump = ml(function () {/*
-        SELECT (SELECT '-- DROP SEQUENCE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || E';\n\n' ||
-
-               '-- Last value taken from this sequence: ' || (SELECT last_value FROM {{STRSQLSAFENAME}})::text || E'\n' ||
-              E'-- To set the value of the sequence:\n/' || E'*\n' ||
-              E'     -- restart sequence at desired value:\n' ||
-              E'     ALTER SEQUENCE {{STRSQLSAFENAME}} RESTART WITH ' || (SELECT last_value FROM {{STRSQLSAFENAME}})::text || E';\n' ||
-              E'     -- advance sequence to clear out it''s cache:\n' ||
-               '     SELECT nextval(''{{STRSQLSAFENAME}}'') FROM generate_series(1, ' || seq.seqcache::text || E');\n' ||
-               '*' || E'/\n\n' ||
-
-              'CREATE SEQUENCE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || E'\n' ||
-              '  INCREMENT ' || s.increment || E'\n' ||
-              '  MINVALUE '  || s.minimum_value || E'\n' ||
-              '  MAXVALUE '  || s.maximum_value || E'\n' ||
-              '  START '     || {{STRSQLSAFENAME}}.last_value || E'\n' ||
-              '  CACHE '     || seq.seqcache || E'\n' ||
-              '  ' || (CASE WHEN (SELECT seq.seqcycle FROM {{STRSQLSAFENAME}}) THEN '' ELSE 'NO ' END) || E'CYCLE' ||
-              E';\n\nALTER SEQUENCE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || ' OWNER TO ' || pg_roles.rolname || E';\n\n' ||
-              '-- ALTER SEQUENCE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || E' RESTART;\n\n' ||
-              COALESCE('COMMENT ON SEQUENCE
-                            ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) ||
-                            ' IS ' || quote_literal(pg_description.description) || E';\n\n', '')
-
-        FROM {{STRSQLSAFENAME}}, pg_class c
-        LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
-        LEFT JOIN pg_sequence seq ON c.oid = seq.seqrelid
-        LEFT JOIN pg_roles ON pg_roles.oid = c.relowner
-        LEFT JOIN pg_description ON pg_description.objoid = c.oid
-        LEFT JOIN information_schema.sequences s ON s.sequence_schema = n.nspname
-                                             AND s.sequence_name = c.relname
-        WHERE c.relkind = 'S'::char AND (c.oid = {{INTOID}} OR n.nspname || '.' || c.relname = '{{STRSQLSAFENAME}}'))
-
-
-
-        || COALESCE((SELECT array_to_string(array_agg(
-        	(SELECT array_to_string((SELECT array_agg('GRANT ' || ok) FROM
-        	    (SELECT array_to_string((SELECT array_agg(perms ORDER BY srt)
-        		FROM (  SELECT 1 as srt, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'r($|[^*])' THEN 'SELECT' END as perms
-        			UNION SELECT 2, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'w($|[^*])' THEN 'UPDATE' END
-        			UNION SELECT 3, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'U($|[^*])' THEN 'USAGE' END) em
-        			WHERE perms is not null),',') ||
-        	' ON TABLE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || ' TO ' ||
-              	CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public'
-        		ELSE (regexp_split_to_array(unnest::text,'[=/]'))[1] END || E';\n' as ok
-
-        	FROM unnest(c.relacl)
-        	WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|U)($|[^*])') as em),'')
-        	)
-        	),'')
-        FROM pg_class c
-        LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
-        LEFT JOIN pg_roles ON pg_roles.oid = c.relowner
-        LEFT JOIN pg_description ON pg_description.objoid = c.oid
-        LEFT JOIN information_schema.sequences s ON s.sequence_schema = n.nspname
-                                             AND s.sequence_name = c.relname
-        WHERE c.relkind = 'S'::char AND (c.oid = {{INTOID}} OR n.nspname || '.' || c.relname = '{{STRSQLSAFENAME}}')),'')
-
-        || COALESCE((SELECT array_to_string(array_agg(
-        	(SELECT array_to_string((SELECT array_agg('GRANT ' || ok) FROM
-        	    (SELECT array_to_string((SELECT array_agg(perms ORDER BY srt)
-        		FROM (  SELECT 1 as srt, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'r\*' THEN 'SELECT' END as perms
-        			UNION SELECT 2, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'w\*' THEN 'UPDATE' END
-        			UNION SELECT 3, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'U\*' THEN 'USAGE' END) em
-        			WHERE perms is not null),',') ||
-        	' ON TABLE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || ' TO ' ||
-              	CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public'
-        		ELSE (regexp_split_to_array(unnest::text,'[=/]'))[1] END || E' WITH GRANT OPTION;\n' as ok
-
-        	FROM unnest(c.relacl)
-        	WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|U)\*') as em),'')
-        	)
-        	),'')
-        FROM pg_class c
-        LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
-        LEFT JOIN pg_roles ON pg_roles.oid = c.relowner
-        LEFT JOIN pg_description ON pg_description.objoid = c.oid
-        LEFT JOIN information_schema.sequences s ON s.sequence_schema = n.nspname
-                                             AND s.sequence_name = c.relname
-        WHERE c.relkind = 'S'::char AND (c.oid = {{INTOID}} OR n.nspname || '.' || c.relname = '{{STRSQLSAFENAME}}')),'');
-    */});
 
 scriptQuery.objectSequencesOwned = ml(function () {/*
     SELECT string_agg(E'ALTER SEQUENCE ' || objid::regclass || ' OWNED BY ' || pg_depend.refobjid::regclass || '.' || quote_ident(pg_attribute.attname) || ';', E'\n\n')
@@ -4661,7 +4927,7 @@ scriptQuery.objectView = ml(function () {/*
         	),'')
         || E'\n\n-- SQL prototypes ' ||
         (
-            SELECT E'\n\n/' || E'*\nSELECT ' || string_agg(quote_ident(attname), ', ') ||
+            SELECT E'\n\n/' || E'*\nSELECT ' || string_agg(quote_ident(attname), ', ' ORDER BY attnum ASC) ||
                 E'\n  FROM ' || (SELECT quote_ident(nspname) || '.' || quote_ident(relname)
                                    FROM pg_class
                               LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
@@ -4675,8 +4941,8 @@ scriptQuery.objectView = ml(function () {/*
                                         FROM pg_class
                                    LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
                                        WHERE pg_class.oid = {{INTOID}} ) ||
-                E'\n            (' || string_agg(quote_ident(attname), ', ') || ')' ||
-                E'\n     VALUES (' || string_agg(quote_ident(attname), ', ') || ');'
+                E'\n            (' || string_agg(quote_ident(attname), ', ' ORDER BY attnum ASC) || ')' ||
+                E'\n     VALUES (' || string_agg(quote_ident(attname), ', ' ORDER BY attnum ASC) || ');'
               FROM pg_catalog.pg_attribute
              WHERE attrelid = {{INTOID}}
                AND attnum >= 0
@@ -4686,7 +4952,7 @@ scriptQuery.objectView = ml(function () {/*
                                    FROM pg_class
                               LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
                                   WHERE pg_class.oid = {{INTOID}} ) ||
-                E'\n   SET ' || string_agg(quote_ident(attname) || ' = new.' || quote_ident(attname), E'\n     , ') || ';'
+                E'\n   SET ' || string_agg(quote_ident(attname) || ' = new.' || quote_ident(attname), E'\n     , ' ORDER BY attnum ASC) || ';'
               FROM pg_catalog.pg_attribute
              WHERE attrelid = {{INTOID}}
                AND attnum >= 0
