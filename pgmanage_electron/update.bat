@@ -6,3 +6,4 @@ xcopy ..\visualstudio\Release\pgmanage.exe app\pgmanage\
 xcopy ..\visualstudio\lib\x86\* app\pgmanage\
 xcopy ..\src\web_root app\pgmanage\web_root /E
 xcopy ..\src\config app\pgmanage\config /E
+rename app\pgmanage\config\pgmanage.conf.win32 pgmanage.conf
