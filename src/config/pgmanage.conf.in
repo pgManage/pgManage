@@ -3,7 +3,7 @@
 #	man pgmanage
 
 # Link to file with list of connections.
-connection_file = /usr/local/etc/pgmanage/pgmanage-connections.conf
+connection_file = @destdir@/@prefix@/etc/pgmanage/pgmanage-connections.conf
 
 # When set to true, allow users to connect to a custom connection string from the login screen.
 # allow_custom_connections = false
@@ -21,7 +21,7 @@ connection_file = /usr/local/etc/pgmanage/pgmanage-connections.conf
 # login_timeout = 0
 
 # Location of the web_root where the pgManage pages are.
-web_root = /usr/local/etc/pgmanage/web_root
+web_root = @destdir@/@webroot@
 
 # Where the the sql tabs are stored.
 # sql_root = ~/.pgmanage/sql

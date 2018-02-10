@@ -116,7 +116,7 @@ void WS_readFrame_step2(EV_P, ev_io *w, int revents) {
 			if (int_avail < WEBSOCKET_HEADER_LENGTH) {
 				bol_error_state = false;
 				SFREE(buf);
-				client_message->int_ioctl_count += 1;
+				client_message->int_ioctl_count += (uint8_t)1;
 				if (client_message->int_ioctl_count > 100) {
 					goto error;
 				}
