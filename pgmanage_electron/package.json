@@ -72,6 +72,7 @@
     "Electron",
     "PostgreSQL"
   ],
+  "name": "pgManage",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/pgManage/pgManage.git"
@@ -83,5 +84,6 @@
     "pack": "build --dir",
     "dist": "build",
     "dist-win": "build --ia32"
-  }
+  },
+  "version": "10.1.1"
 }
