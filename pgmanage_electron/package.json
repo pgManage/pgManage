@@ -81,7 +81,7 @@
     "start": "electron app",
     "test": "electron app --pgmanage-test",
     "debug": "electron app --debug=5858",
-    "pack": "build --dir",
+    "build-dir": "build --dir",
     "dist": "build",
     "dist-win": "build --ia32"
   },
