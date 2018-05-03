@@ -3,13 +3,15 @@
 usage() {
 	echo "usage: ./configure [ options ]" 1>&2;
 	echo "   -d <path>, --destdir <path>    set destdir folder" 1>&2;
-	echo "   -p <path>, --prefix <path>		set install prefix (default /usr/local)" 1>&2;
+	echo "   -p <path>, --prefix <path>     set install prefix (default /usr/local)" 1>&2;
 	echo "   -w <path>, --webroot <path>    set webroot folder (default /usr/local/etc/pgmanage/web_root)" 1>&2;
+	echo "   -c <path>, --configdir <path>  set config folder (default /usr/local/etc/pgmanage/)" 1>&2;
 }
 
 DESTDIR=""
 PREFIX="usr/local"
 WEBROOT="@prefix@/etc/pgmanage/web_root"
+CONFIGDIR="@prefix@/etc/pgmanage"
 
 while [ $# -gt 0 ]
 do
@@ -28,6 +30,11 @@ do
 		;;
 		-w|--webroot)
 			WEBROOT="$2"
+			shift # past argument
+			shift # past value
+		;;
+		-c|--configdir)
+			CONFIGDIR="$2"
 			shift # past argument
 			shift # past value
 		;;
@@ -300,6 +307,7 @@ sed -e "s|@sock_dir_parameter@|$directory_parameter|g" \
 	-e "s|@CPPFLAGS@|$CPPFLAGS|g" \
 	-e "s|@destdir@|$DESTDIR|g" \
     -e "s|@webroot@|$WEBROOT|g" \
+    -e "s|@configdir@|$CONFIGDIR|g" \
 	-e "s|@prefix@|$PREFIX|g" \
 	-e "s|@MANDIR@|$MANDIR|g" \
 	-e "s|@libev_CPPFLAGS@|$libev_CPPFLAGS|g" \
@@ -308,12 +316,15 @@ sed -e "s|@sock_dir_parameter@|$directory_parameter|g" \
 	-e "s|@make@|$MAKE|g" < Makefile.in > Makefile
 
 #### CONFIGURE MAN PAGE
-sed -e "s|@webroot@|$WEBROOT|g" \
+sed -e "s|@destdir@|$DESTDIR|g" \
+    -e "s|@webroot@|$WEBROOT|g" \
+    -e "s|@configdir@|$CONFIGDIR|g" \
     -e "s|@prefix@|$PREFIX|g" < man/man1/pgmanage.1.in > man/man1/pgmanage.1
 
 #### CONFIGURE CONFIG FILE
 sed -e "s|@destdir@|$DESTDIR|g" \
     -e "s|@webroot@|$WEBROOT|g" \
+    -e "s|@configdir@|$CONFIGDIR|g" \
     -e "s|@prefix@|$PREFIX|g" < config/pgmanage.conf.in >config/pgmanage.conf
 
 echo

@@ -3,7 +3,7 @@
 #	man pgmanage
 
 # Link to file with list of connections.
-connection_file = @destdir@/@prefix@/etc/pgmanage/pgmanage-connections.conf
+connection_file = @destdir@/@configdir@/pgmanage-connections.conf
 
 # When set to true, allow users to connect to a custom connection string from the login screen.
 # allow_custom_connections = false

@@ -390,6 +390,7 @@ bool parse_options(int argc, char *const *argv) {
 #endif
 #else
 	int_prefix_len = strlen(PGMANAGE_PREFIX);
+	size_t int_configdir_len = strlen(PGMANAGE_CONFIGDIR);
 #endif
 
 #ifdef _WIN32
@@ -406,14 +407,14 @@ bool parse_options(int argc, char *const *argv) {
 #else
 	SERROR_SNCAT(
 		str_global_config_file, &int_global_len,
-		PGMANAGE_PREFIX, int_prefix_len,
-		"/etc/" SUN_PROGRAM_LOWER_NAME "/" SUN_PROGRAM_LOWER_NAME ".conf",
-			strlen("/etc/" SUN_PROGRAM_LOWER_NAME "/" SUN_PROGRAM_LOWER_NAME ".conf"));
+		PGMANAGE_CONFIGDIR, int_configdir_len,
+		"/" SUN_PROGRAM_LOWER_NAME ".conf",
+			strlen("/" SUN_PROGRAM_LOWER_NAME ".conf"));
 	SERROR_SNCAT(
 		str_global_connection_file, &int_global_len,
-		PGMANAGE_PREFIX, int_prefix_len,
-		"/etc/" SUN_PROGRAM_LOWER_NAME "/" SUN_PROGRAM_LOWER_NAME "-connections.conf",
-			strlen("/etc/" SUN_PROGRAM_LOWER_NAME "/" SUN_PROGRAM_LOWER_NAME "-connections.conf"));
+		PGMANAGE_CONFIGDIR, int_configdir_len,
+		"/" SUN_PROGRAM_LOWER_NAME "-connections.conf",
+			strlen("/" SUN_PROGRAM_LOWER_NAME "-connections.conf"));
 #endif
 	SERROR_SNCAT(str_global_port, &int_global_len,
 		"8080", (size_t)4);
