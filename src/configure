@@ -11,7 +11,7 @@ DESTDIR=""
 PREFIX="usr/local"
 WEBROOT="@prefix@/etc/pgmanage/web_root"
 
-while [[ $# -gt 0 ]]
+while [ $# -gt 0 ]
 do
 	key="$1"
 
