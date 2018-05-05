@@ -688,14 +688,14 @@ function handleQueryVersionDifferences(versionNum) {
 
                 -- Displays DISABLE/ENABLE TRIGGERs
                 || COALESCE((SELECT E'\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (
-                SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' DISABLE TRIGGER ' || pg_trigger.tgname as perms
+                SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' DISABLE TRIGGER ' || pg_trigger.tgname || ';' as perms
                 FROM pg_class
                 JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
                 JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
                 WHERE (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}') AND pg_trigger.tgisinternal != TRUE
                 )ok),'')), '')
                 || COALESCE((SELECT E'\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (
-                SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' ENABLE TRIGGER ' || pg_trigger.tgname as perms
+                SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' ENABLE TRIGGER ' || pg_trigger.tgname || ';' as perms
                 FROM pg_class
                 JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
                 JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
@@ -1141,14 +1141,14 @@ function handleQueryVersionDifferences(versionNum) {
 
                 -- Displays DISABLE/ENABLE TRIGGERs
                 || COALESCE((SELECT E'\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (
-                SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' DISABLE TRIGGER ' || pg_trigger.tgname as perms
+                SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' DISABLE TRIGGER ' || pg_trigger.tgname || ';' as perms
                 FROM pg_class
                 JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
                 JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
                 WHERE (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}') AND pg_trigger.tgisinternal != TRUE
                 )ok),'')), '')
                 || COALESCE((SELECT E'\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (
-                SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' ENABLE TRIGGER ' || pg_trigger.tgname as perms
+                SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' ENABLE TRIGGER ' || pg_trigger.tgname || ';' as perms
                 FROM pg_class
                 JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
                 JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
@@ -1550,14 +1550,14 @@ function handleQueryVersionDifferences(versionNum) {
 
                     -- Displays DISABLE/ENABLE TRIGGERs
                     || COALESCE((SELECT E'\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (
-                    SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' DISABLE TRIGGER ' || pg_trigger.tgname as perms
+                    SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' DISABLE TRIGGER ' || pg_trigger.tgname || ';' as perms
                     FROM pg_class
                     JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
                     JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
                     WHERE (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}') AND pg_trigger.tgisinternal != TRUE
                     )ok),'')), '')
                     || COALESCE((SELECT E'\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (
-                    SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' ENABLE TRIGGER ' || pg_trigger.tgname as perms
+                    SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' ENABLE TRIGGER ' || pg_trigger.tgname || ';' as perms
                     FROM pg_class
                     JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
                     JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
@@ -2150,14 +2150,14 @@ function handleQueryVersionDifferences(versionNum) {
                 )ok),'')), '')
                 -- Displays DISABLE/ENABLE TRIGGERs
                 || COALESCE((SELECT E'\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (
-                SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' DISABLE TRIGGER ' || pg_trigger.tgname as perms
+                SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' DISABLE TRIGGER ' || pg_trigger.tgname || ';' as perms
                 FROM pg_class
                 JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
                 JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
                 WHERE (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}') AND pg_trigger.tgisinternal != TRUE
                 )ok),'')), '')
                 || COALESCE((SELECT E'\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (
-                SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' ENABLE TRIGGER ' || pg_trigger.tgname as perms
+                SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' ENABLE TRIGGER ' || pg_trigger.tgname || ';' as perms
                 FROM pg_class
                 JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
                 JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
@@ -2563,14 +2563,14 @@ function handleQueryVersionDifferences(versionNum) {
                 )ok),'')), '')
                 -- Displays DISABLE/ENABLE TRIGGERs
                 || COALESCE((SELECT E'\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (
-                SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' DISABLE TRIGGER ' || pg_trigger.tgname as perms
+                SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' DISABLE TRIGGER ' || pg_trigger.tgname || ';' as perms
                 FROM pg_class
                 JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
                 JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
                 WHERE (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}') AND pg_trigger.tgisinternal != TRUE
                 )ok),'')), '')
                 || COALESCE((SELECT E'\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (
-                SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' ENABLE TRIGGER ' || pg_trigger.tgname as perms
+                SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' ENABLE TRIGGER ' || pg_trigger.tgname || ';' as perms
                 FROM pg_class
                 JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
                 JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
@@ -2936,14 +2936,14 @@ function handleQueryVersionDifferences(versionNum) {
                 )ok),'')), '')
                 -- Displays DISABLE/ENABLE TRIGGERs
                 || COALESCE((SELECT E'\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (
-                SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' DISABLE TRIGGER ' || pg_trigger.tgname as perms
+                SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' DISABLE TRIGGER ' || pg_trigger.tgname || ';' as perms
                 FROM pg_class
                 JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
                 JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
                 WHERE (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}') AND pg_trigger.tgisinternal != TRUE
                 )ok),'')), '')
                 || COALESCE((SELECT E'\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (
-                SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' ENABLE TRIGGER ' || pg_trigger.tgname as perms
+                SELECT '-- ALTER TABLE ' || pg_namespace.nspname || '.' || pg_class.relname || ' ENABLE TRIGGER ' || pg_trigger.tgname || ';' as perms
                 FROM pg_class
                 JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
                 JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace

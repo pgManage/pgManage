@@ -361,6 +361,44 @@
 
                             document.getElementById('tableElement').addEventListener('after_select', function () {
                                 checkDisableds();
+                                if (!window.answered) {
+                                    window.answered = true;
+                                    var templateElement = document.createElement('template');
+                                    templateElement.setAttribute('data-max-width', '90em');
+                                    templateElement.setAttribute('data-overlay-close', 'true');
+                                    if (evt.touchDevice) {
+                                        templateElement.setAttribute('data-mode', 'full');
+                                    }
+                                    console.log(document.getElementById('tableElement'));
+                                    templateElement.innerHTML = ml(function () {/*
+                                        <gs-page>
+                                            <gs-header><center><h3>Record count is limited to 10.</h3></center></gs-header>
+                                            <gs-body padded>
+                                                <div>
+                                                    Would you like to show all records?
+                                                </div>
+                                            </gs-body>
+                                            <gs-footer>
+                                                <gs-grid widths="1,1">
+                                                    <gs-block>
+                                                        <gs-button dialogclose>Show the First 10</gs-button>
+                                                    </gs-block>
+                                                    <gs-block>
+                                                        <gs-button dialogclose autofocus>Show all</gs-button>
+                                                    </gs-block>
+                                                </gs-grid>
+                                            </gs-footer>
+                                        </gs-page>
+                                    */});
+
+                                    GS.openDialog(templateElement, '', function (event, strAnswer) {
+                                        if (strAnswer !== 'Show the First 10') {
+                                            document.getElementById('tableElement').removeAttribute('limit');
+                                            document.getElementById('tableElement').refresh();
+                                            document.getElementById('text-limit').value = '';
+                                        }
+                                    });
+                                }
                             });
 
                             document.getElementById('tableElement').addEventListener('selection_change', function () {

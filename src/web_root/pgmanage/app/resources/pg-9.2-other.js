@@ -831,7 +831,7 @@ function dialogOptions(bolOnlyClipboard, currentTableElement) {
                     <option value="selected">Only Row Numbers</option>
                 </gs-select>
             </div>
-            <div style="width: 55em;">Copy Headers</div>
+            <div style="width: 55em;">Copy Selectors</div>
         </div>
         <div flex-horizontal flex-fill class="option-row">
             <div flex>
