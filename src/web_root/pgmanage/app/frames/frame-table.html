@@ -26,7 +26,7 @@
             var versionNum = GS.qryGetVal(GS.getQueryString(), 'versionNum');
             handleQueryVersionDifferences(versionNum);
             var bolCurl = false;
-            var strTableName, strSchemaName, strHasOids, strConstraints, arrConstraint, strGrantsEtc, arrColumn = [], strRelOptions, dependency_script, strOwner, arrConstraint = [];
+            var strTableName, strSchemaName, strHasOids, strConstraints, strGrantsEtc, arrColumn = [], strRelOptions, dependency_script, strOwner, arrConstraint = [];
             var strDumpQuery = ''
             // scriptQuery.ruleSql = ml(function () {/*
             //       SELECT   E'-- DROP RULE ' || quote_ident(pg_rewrite.rulename) || ' ON ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || E';\n' ||
@@ -165,6 +165,7 @@
                 } else {
                     var query = 'DROP TABLE ' + schema_name + '.' + table_name + ';\nROLLBACK;';
                 }
+                //console.log(query);
                 var dropPart, error;
                 GS.requestRawFromSocket(GS.envSocket, query, function (data) {
                     //console.log(data);
@@ -188,15 +189,23 @@
                         }
                     }
                     if (error) {
+                        console.log(error);
                         dropPart = error.substring(0, error.toLowerCase().indexOf('depends on'));
                         if (dropPart.trim().substring(0, 10).toLowerCase() === 'constraint') {
                             arrConstraint.push(dropPart);
                             dropPart = '';
 
-                        } else if (dependency_text) {
-                            dropPart = 'DROP ' + dropPart.trim() + ';\n' + dependency_text + '';
                         } else {
-                            dropPart = 'DROP ' + dropPart.trim() + ';';
+                            if (dependency_text) {
+                                console.log('DROP ' + dropPart.trim() + ';\n', dependency_text.indexOf('DROP ' + dropPart.trim() + ';\n'));
+                                if (dependency_text.indexOf('DROP ' + dropPart.trim() + ';\n') > -1) {
+                                    dependency_text = dependency_text.replace('DROP ' + dropPart.trim() + ';\n', '');
+                                }
+
+                                dropPart = 'DROP ' + dropPart.trim() + ';\n' + dependency_text + '';
+                            } else {
+                                dropPart = 'DROP ' + dropPart.trim() + ';';
+                            }
                         }
                         UseError(table_name, schema_name, callback, dropPart);
                     } else if (data.bolLastMessage) {

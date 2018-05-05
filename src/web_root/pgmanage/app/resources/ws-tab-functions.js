@@ -2170,7 +2170,9 @@ function saveFile(tabElement, strPath, changeStamp, strContent, callbackSuccess,
                     callbackSuccess(data);
                 }
                 tabElement.saveState = 'saved';
-                tabElement.relatedEditor.setReadOnly(false);
+                if (tabElement.relatedEditor) {
+                    tabElement.relatedEditor.setReadOnly(true);
+                }
 
             } else {
                 if (tabElement.saveTimeout) {
