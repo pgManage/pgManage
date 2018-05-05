@@ -2,11 +2,12 @@ TEST_CONFIGS = -c config/pgmanage.conf -d config/pgmanage-connections-test.conf 
 TEST_WEBROOTS = -r ./web_root
 DESTDIR = @destdir@
 PREFIX = @prefix@
-WEBROOT = $(DESTDIR)/@webroot@
+WEBROOT = @webroot@
+CONFIGDIR = @configdir@
 INSTALL_DEPS = $(DESTDIR)/$(PREFIX)/sbin/ \
 	$(DESTDIR)/$(PREFIX)/etc/pgmanage/ \
-	$(DESTDIR)/$(PREFIX)/etc/pgmanage/pgmanage.conf \
-	$(DESTDIR)/$(PREFIX)/etc/pgmanage/pgmanage-connections.conf
+	$(DESTDIR)/$(CONFIGDIR)/pgmanage.conf \
+	$(DESTDIR)/$(CONFIGDIR)/pgmanage-connections.conf
 SOCK_DIR_PARAMETER = @sock_dir_parameter@
 
 VERSION = \"$(shell cat ../VERSION)\"
@@ -20,7 +21,9 @@ CPPFLAGS = @CPPFLAGS@ \
 	-I. \
 	-I../dependencies/tre/include \
 	-I../dependencies/libev \
-	-DVERSION=$(VERSION) -DPGMANAGE_PREFIX=\"$(DESTDIR)/$(PREFIX)\"
+	-DVERSION=$(VERSION) \
+	-DPGMANAGE_PREFIX=\"$(DESTDIR)/$(PREFIX)\" \
+	-DPGMANAGE_CONFIGDIR=\"$(DESTDIR)/$(CONFIGDIR)\"
 V=0
 
 common_SOURCES = $(filter-out util_getopt.c, $(filter-out util_strptime.c, $(wildcard *.c)))
@@ -82,17 +85,20 @@ $(DESTDIR)/$(PREFIX)/sbin/:
 $(DESTDIR)/$(PREFIX)/etc/pgmanage/:
 	mkdir -p $(DESTDIR)/$(PREFIX)/etc/pgmanage/
 
-$(DESTDIR)/$(PREFIX)/etc/pgmanage/pgmanage.conf: $(DESTDIR)/$(PREFIX)/etc/pgmanage/ config/pgmanage.conf
-	test -f $(DESTDIR)/$(PREFIX)/etc/pgmanage/pgmanage.conf || install config/pgmanage.conf $(DESTDIR)/$(PREFIX)/etc/pgmanage/pgmanage.conf;
+$(DESTDIR)/$(CONFIGDIR):
+	mkdir -p $(DESTDIR)/$(CONFIGDIR)
 
-$(DESTDIR)/$(PREFIX)/etc/pgmanage/pgmanage-connections.conf: $(DESTDIR)/$(PREFIX)/etc/pgmanage/ config/pgmanage-connections.conf
-	test -f $(DESTDIR)/$(PREFIX)/etc/pgmanage/pgmanage-connections.conf || install config/pgmanage-connections.conf $(DESTDIR)/$(PREFIX)/etc/pgmanage/pgmanage-connections.conf;
+$(DESTDIR)/$(CONFIGDIR)/pgmanage.conf: $(DESTDIR)/$(CONFIGDIR) config/pgmanage.conf
+	test -f $(DESTDIR)/$(CONFIGDIR)/pgmanage.conf || install config/pgmanage.conf $(DESTDIR)/$(CONFIGDIR)/pgmanage.conf;
+
+$(DESTDIR)/$(CONFIGDIR)/pgmanage-connections.conf: $(DESTDIR)/$(CONFIGDIR) config/pgmanage-connections.conf
+	test -f $(DESTDIR)/$(CONFIGDIR)/pgmanage-connections.conf || install config/pgmanage-connections.conf $(DESTDIR)/$(CONFIGDIR)/pgmanage-connections.conf;
 
 install: $(INSTALL_DEPS)
-	mkdir -p $(WEBROOT)/pgmanage $(DESTDIR)/$(PREFIX)/sbin $(DESTDIR)/$(PREFIX)/@MANDIR@/man1
-	cp -rf ./web_root/pgmanage/* $(WEBROOT)/pgmanage/
-	install config/pgmanage.conf $(DESTDIR)/$(PREFIX)/etc/pgmanage/pgmanage.conf.example
-	install config/pgmanage-connections.conf $(DESTDIR)/$(PREFIX)/etc/pgmanage/pgmanage-connections.conf.example
+	mkdir -p $(DESTDIR)/$(WEBROOT)/pgmanage $(DESTDIR)/$(PREFIX)/sbin $(DESTDIR)/$(PREFIX)/@MANDIR@/man1
+	cp -rf ./web_root/pgmanage/* $(DESTDIR)/$(WEBROOT)/pgmanage/
+	install config/pgmanage.conf $(DESTDIR)/$(CONFIGDIR)/pgmanage.conf.example
+	install config/pgmanage-connections.conf $(DESTDIR)/$(CONFIGDIR)/pgmanage-connections.conf.example
 	install pgmanage $(DESTDIR)/$(PREFIX)/sbin/
 	install man/man1/pgmanage.1 $(DESTDIR)/$(PREFIX)/@MANDIR@/man1/pgmanage.1
 	@echo
@@ -100,13 +106,18 @@ install: $(INSTALL_DEPS)
 
 uninstall:
 	rm $(DESTDIR)/$(PREFIX)/sbin/pgmanage
-	rm -rf $(WEBROOT)/
-	rm -rf $(DESTDIR)/$(PREFIX)/etc/pgmanage/*.example
+	rm -rf $(DESTDIR)/$(WEBROOT)/
+	rm $(DESTDIR)/$(CONFIGDIR)/pgmanage.conf.example
+	rm $(DESTDIR)/$(CONFIGDIR)/pgmanage-connections.conf.example
 	@echo
 	@echo "Uninstall Successful"
 
 destroy:
 	rm $(DESTDIR)/$(PREFIX)/sbin/pgmanage
+	rm $(DESTDIR)/$(CONFIGDIR)/pgmanage.conf
+	rm $(DESTDIR)/$(CONFIGDIR)/pgmanage-connections.conf
+	rm $(DESTDIR)/$(CONFIGDIR)/pgmanage.conf.example
+	rm $(DESTDIR)/$(CONFIGDIR)/pgmanage-connections.conf.example
 	rm -rf $(DESTDIR)/$(PREFIX)/etc/pgmanage
 	@echo
 	@echo "Destroy Successful"
