@@ -20,19 +20,6 @@
         <script>
             //jslint white:true multivar:true
             var bolPropertyPanelOpen = false, bolCurl = false;
-            
-            var deviceIsWindowsPhone = navigator.userAgent.indexOf("Windows Phone") >= 0;
-            var deviceIsAndroid = navigator.userAgent.indexOf('Android') > 0 && !deviceIsWindowsPhone;
-            var deviceIsIOS = /iP(ad|hone|od)/.test(navigator.userAgent) && !deviceIsWindowsPhone;
-
-            if (!(deviceIsWindowsPhone || deviceIsAndroid || deviceIsIOS)) {
-                evt.touchDevice = false;
-                evt.mousedown = 'mousedown';
-                evt.mousemove = 'mousemove';
-                evt.mouseout = 'mouseout';
-                evt.mouseover = 'mouseover';
-                evt.mouseup = 'mouseup';
-            }
 
             window.addEventListener('DOMContentLoaded', function () {
                 'use strict';
@@ -664,6 +651,20 @@
         </gs-panel>
 
         <script src="../js/greyspots.js" type="text/javascript"></script>
+        <script>
+            var deviceIsWindowsPhone = navigator.userAgent.indexOf("Windows Phone") >= 0;
+            var deviceIsAndroid = navigator.userAgent.indexOf('Android') > 0 && !deviceIsWindowsPhone;
+            var deviceIsIOS = /iP(ad|hone|od)/.test(navigator.userAgent) && !deviceIsWindowsPhone;
+
+            if (!(deviceIsWindowsPhone || deviceIsAndroid || deviceIsIOS)) {
+                evt.touchDevice = false;
+                evt.mousedown = 'mousedown';
+                evt.mousemove = 'mousemove';
+                evt.mouseout = 'mouseout';
+                evt.mouseover = 'mouseover';
+                evt.mouseup = 'mouseup';
+            }
+        </script>
         <script src="resources/error.js" type="text/javascript"></script>
         <link href="../css/greyspots.css" type="text/css" rel="stylesheet" />
 

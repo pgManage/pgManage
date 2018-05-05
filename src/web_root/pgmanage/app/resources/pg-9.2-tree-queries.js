@@ -4656,7 +4656,7 @@ SELECT '-- Constraint: ' || conname || E';\n\n' ||
                         LIMIT 1;
 */});
 
-scriptQuery.objectSchemaTriggers = ml(function () {/*
+scriptQuery.objectSchemaTableTriggers = ml(function () {/*
     SELECT string_agg(E'\n\n' || '-- Trigger: ' || quote_ident(pg_trigger.tgname) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname) || E';\n' ||
     	'-- DROP TRIGGER ' || quote_ident(pg_trigger.tgname) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname) || E';\n' ||
     	regexp_replace(regexp_replace(regexp_replace(regexp_replace(pg_get_triggerdef(pg_trigger.oid, true),
@@ -4664,7 +4664,18 @@ scriptQuery.objectSchemaTriggers = ml(function () {/*
     FROM pg_class
     JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
     JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
-    WHERE (pg_namespace.nspname = '{{SCHEMA}}') AND pg_trigger.tgisinternal != TRUE;
+    WHERE (pg_namespace.nspname = '{{SCHEMA}}') AND pg_trigger.tgisinternal != TRUE AND pg_class.relkind = 'r';
+*/});
+
+scriptQuery.objectSchemaViewTriggers = ml(function () {/*
+    SELECT string_agg(E'\n\n' || '-- Trigger: ' || quote_ident(pg_trigger.tgname) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname) || E';\n' ||
+    	'-- DROP TRIGGER ' || quote_ident(pg_trigger.tgname) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname) || E';\n' ||
+    	regexp_replace(regexp_replace(regexp_replace(regexp_replace(pg_get_triggerdef(pg_trigger.oid, true),
+    	' BEFORE ', E'\n   BEFORE '), ' ON ', E'\n   ON '), ' FOR ', E'\n   FOR '), ' EXECUTE ', E'\n   EXECUTE ') || E';\n\n', E'\n')
+    FROM pg_class
+    JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
+    JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+    WHERE (pg_namespace.nspname = '{{SCHEMA}}') AND pg_trigger.tgisinternal != TRUE AND pg_class.relkind = 'v';
 */});
 
 

@@ -697,8 +697,8 @@ function treeInsertSingleLine(index, intLevel, jsnRow) {
         strLineText += treeGlobals.folderPlus + ' ';
     } else if (jsnRow.type.indexOf('script') !== -1) {
         strLineText += treeGlobals.scriptMarker + ' ';
-    } else if (jsnRow.type.indexOf('note') !== -1) {
-    } else if (jsnRow.type.indexOf('button') !== -1) { }
+    }// else if (jsnRow.type.indexOf('note') !== -1) {
+    //} else if (jsnRow.type.indexOf('button') !== -1) { }
 
     strLineText += jsnRow.name;
 
@@ -1305,7 +1305,7 @@ function dialogAddSchema(target) {
             strMoreHTML += htmlFunction('checkbox-languages', '', 'Languages', (treeGlobals.shownItems.indexOf('Languages') > -1));
 
 			if (parseFloat(contextData.versionNumber, 10) >= 10) {
-	            strMoreHTML += htmlFunction('checkbox-publications', '', 'Publications', (treeGlobals.shownItems.indexOf('Publications') > -1));
+                strMoreHTML += htmlFunction('checkbox-publications', '', 'Publications', (treeGlobals.shownItems.indexOf('Publications') > -1));
 			} else {
 				strMoreHTML += htmlFunction('checkbox-publications', '', 'Publications', (false), true);
 			}
@@ -1627,7 +1627,7 @@ function treeLoad(data, index, intColumn) {
         }
     }
 
-    if (data.bullet == 'CL' && data.name !== '' && data.name.indexOf(' ') !== -1) {
+    if (data.bullet === 'CL' && data.name !== '' && data.name.indexOf(' ') !== -1) {
         data.name = data.name.substring(0, data.name.indexOf(' '));
     }
     //console.log(data);
@@ -1686,15 +1686,16 @@ function dependButton(intOid) {
 
 function dependDialog(intOid, bolGraph) {
     'use strict';
+    var strHTML;
 	// console.log(window.location.pathname.substring(9), contextData.connectionID);
 	if (bolGraph) {
-	    var strHTML = '<iframe style="width: 100%; height: 100%;" src="/pgmanage/' + contextData.connectionID + '/dep_viewer.html?oid=' + intOid + '" />'
+        strHTML = '<iframe style="width: 100%; height: 100%;" src="/pgmanage/' + contextData.connectionID + '/dep_viewer.html?oid=' + intOid + '" />'
 
-	    setObjectDetailValue(strHTML, function () {
+        setObjectDetailValue(strHTML, function () {
 
 		});
 	} else {
-	    var strHTML = ml(function () {/*
+        strHTML = ml(function () {/*
 	        <gs-container padded>
 	            <label for="dependencies-container">Dependencies:</label>
 	            <div id="dependencies-container" style="min-height: 2em;"></div><br />
@@ -1704,63 +1705,63 @@ function dependDialog(intOid, bolGraph) {
 	        </gs-container>
 	    */});
 
-	    setObjectDetailValue(strHTML, function () {
-	        getListData(infoQuery.dependencies.replace(/\{\{INTOID\}\}/g, intOid),
-	                    document.getElementById('dependencies-container'),
-	                    function (arrRecords) {
-	            var i, len, strHTML = '';
+        setObjectDetailValue(strHTML, function () {
+            getListData(infoQuery.dependencies.replace(/\{\{INTOID\}\}/g, intOid),
+                        document.getElementById('dependencies-container'),
+                        function (arrRecords) {
+            var i, len, strHTML = '';
 
-	            for (i = 1, len = arrRecords.length; i < len; i += 1) {
-	                strHTML +=  '<tr>' +
-	                                '<td>' + encodeHTML(GS.decodeFromTabDelimited(arrRecords[i][3])) + '</td>' +
-	                                '<td>' + encodeHTML(GS.decodeFromTabDelimited(arrRecords[i][4])) + '</td>' +
-	                                '<td>' + encodeHTML(GS.decodeFromTabDelimited(arrRecords[i][6])) + '</td>' +
-	                                //'<td>' + encodeHTML(GS.decodeFromTabDelimited(arrRecords[i][5])) + '</td>' +
-	                            '</tr>';
-	            }
+                for (i = 1, len = arrRecords.length; i < len; i += 1) {
+                    strHTML +=  '<tr>' +
+                                    '<td>' + encodeHTML(GS.decodeFromTabDelimited(arrRecords[i][3])) + '</td>' +
+                                    '<td>' + encodeHTML(GS.decodeFromTabDelimited(arrRecords[i][4])) + '</td>' +
+                                    '<td>' + encodeHTML(GS.decodeFromTabDelimited(arrRecords[i][6])) + '</td>' +
+                                    //'<td>' + encodeHTML(GS.decodeFromTabDelimited(arrRecords[i][5])) + '</td>' +
+                                '</tr>';
+                }
 
-	            document.getElementById('dependencies-container').innerHTML =
-	                '<table class="table-dep">' +
-	                    '<thead>' +
-	                        '<tr>' +
-	                            '<th>Object Type</th>' +
-	                            '<th>Object Name</th>' +
-	                            '<th>Dependence Type</th>' +
-	                            //'<th>OID</th>' +
-	                        '</tr>' +
-	                    '</thead>' +
-	                    strHTML +
-	                '</table>';
-	        });
+                document.getElementById('dependencies-container').innerHTML =
+                    '<table class="table-dep">' +
+                        '<thead>' +
+                            '<tr>' +
+                                '<th>Object Type</th>' +
+                                '<th>Object Name</th>' +
+                                '<th>Dependence Type</th>' +
+                                //'<th>OID</th>' +
+                            '</tr>' +
+                        '</thead>' +
+                        strHTML +
+                    '</table>';
+            });
 
-	        getListData(infoQuery.dependents.replace(/\{\{INTOID\}\}/g, intOid),
-	                    document.getElementById('dependents-container'),
-	                    function (arrRecords) {
-	            var i, len, strHTML = '';
+            getListData(infoQuery.dependents.replace(/\{\{INTOID\}\}/g, intOid),
+                        document.getElementById('dependents-container'),
+                        function (arrRecords) {
+                var i, len, strHTML = '';
 
-	            for (i = 1, len = arrRecords.length; i < len; i += 1) {
-	                strHTML +=  '<tr>' +
-	                                '<td>' + encodeHTML(GS.decodeFromTabDelimited(arrRecords[i][0])) + '</td>' +
-	                                '<td>' + encodeHTML(GS.decodeFromTabDelimited(arrRecords[i][1])) + '</td>' +
-	                                '<td>' + encodeHTML(GS.decodeFromTabDelimited(arrRecords[i][6])) + '</td>' +
-	                                //'<td>' + encodeHTML(GS.decodeFromTabDelimited(arrRecords[i][2])) + '</td>' +
-	                            '</tr>';
-	            }
+                for (i = 1, len = arrRecords.length; i < len; i += 1) {
+                    strHTML +=  '<tr>' +
+                                    '<td>' + encodeHTML(GS.decodeFromTabDelimited(arrRecords[i][0])) + '</td>' +
+                                    '<td>' + encodeHTML(GS.decodeFromTabDelimited(arrRecords[i][1])) + '</td>' +
+                                    '<td>' + encodeHTML(GS.decodeFromTabDelimited(arrRecords[i][6])) + '</td>' +
+                                    //'<td>' + encodeHTML(GS.decodeFromTabDelimited(arrRecords[i][2])) + '</td>' +
+                                '</tr>';
+                }
 
-	            document.getElementById('dependents-container').innerHTML =
-	                '<table class="table-dep">' +
-	                    '<thead>' +
-	                        '<tr>' +
-	                            '<th>Object Type</th>' +
-	                            '<th>Object Name</th>' +
-	                            '<th>Dependence Type</th>' +
-	                            //'<th>OID</th>' +
-	                        '</tr>' +
-	                    '</thead>' +
-	                    strHTML +
-	                '</table>';
-	        });
-	    });
+                document.getElementById('dependents-container').innerHTML =
+                    '<table class="table-dep">' +
+                        '<thead>' +
+                            '<tr>' +
+                                '<th>Object Type</th>' +
+                                '<th>Object Name</th>' +
+                                '<th>Dependence Type</th>' +
+                                //'<th>OID</th>' +
+                            '</tr>' +
+                        '</thead>' +
+                        strHTML +
+                    '</table>';
+            });
+        });
 	}
 }
 
@@ -2211,7 +2212,7 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
             }
             // function to handle the query results
             handleListResults = function (arrResult) {
-                var strDumpQuery = '', strDropIndexes = '', strDropTGFunctions = '', strQuery, i, len, tempFunction, handleScriptResults, bolTriggers = false, bolSequenceOwned = false;
+                var strDumpQuery = '', strDropIndexes = '', strDropTGFunctions = '', strQuery, i, len, tempFunction, handleScriptResults, bolTableTriggers = false, bolViewTriggers = false, bolSequenceOwned = false;
 
                 // drop statements (reverse order of schema then listed objects)
                 if (bolDropStatments) {
@@ -2273,11 +2274,19 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
 
                 for (i = 0, len = arrResult.length; i <= len; i += 1) {
                     if (i === len) {
-                        if (bolTriggers) {
+                        if (bolTableTriggers) {
                             len1 += 1;
                             strQuery += '\n\n' +
                                 (
-                                    scriptQuery['objectSchemaTriggers']
+                                    scriptQuery['objectSchemaTableTriggers']
+                                )
+                                .replace(/\{\{SCHEMA\}\}/gim, strSchemaName);
+                        }
+                        if (bolViewTriggers) {
+                            len1 += 1;
+                            strQuery += '\n\n' +
+                                (
+                                    scriptQuery['objectSchemaViewTriggers']
                                 )
                                 .replace(/\{\{SCHEMA\}\}/gim, strSchemaName);
                         }
@@ -2297,13 +2306,14 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
                         resName = arrResult[i][1];
                     }
                     if (GS.strToTitle(arrResult[i][3]).toLowerCase() === 'view' || GS.strToTitle(arrResult[i][3]).toLowerCase() === 'table') {
-                    bolTriggers = true
-                    strQuery += '\n\n' +
-                        (
-                            scriptQuery['object' + GS.strToTitle(arrResult[i][3]) + 'Dump']
-                        )
-                        .replace(/\{\{INTOID\}\}/gim, arrResult[i][0])
-                        .replace(/\{\{STRSQLSAFENAME\}\}/gim, quote_ident(strSchemaName) + '.' + resName);
+                        bolTableTriggers = GS.strToTitle(arrResult[i][3]).toLowerCase() === 'table';
+                        bolViewTriggers = GS.strToTitle(arrResult[i][3]).toLowerCase() === 'view';
+                        strQuery += '\n\n' +
+                            (
+                                scriptQuery['object' + GS.strToTitle(arrResult[i][3]) + 'Dump']
+                            )
+                            .replace(/\{\{INTOID\}\}/gim, arrResult[i][0])
+                            .replace(/\{\{STRSQLSAFENAME\}\}/gim, quote_ident(strSchemaName) + '.' + resName);
                     } else if (GS.strToTitle(arrResult[i][3]).toLowerCase() === 'sequence') {
                         //bolSequenceOwned = true;
                         strQuery += '\n\n' +
