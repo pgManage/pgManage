@@ -284,6 +284,7 @@ error:
 		}
 	}
 
+
 	if (int_request_len < 0 && errno != EAGAIN) {
 		SERROR_NORESPONSE("disconnect");
 		SFREE(str_global_error);
@@ -298,7 +299,14 @@ error:
 		bol_error_state = false;
 		errno = 0;
 
-	} else if (int_request_len == 0) {
+	} else if (errno == EAGAIN) {
+		SERROR_NORESPONSE("Reached EAGAIN, waiting for more data");
+		SERROR_NORESPONSE("should never get to EAGAIN with libev");
+		SFREE(str_global_error);
+		bol_error_state = false;
+		errno = 0;
+
+	} else if (int_request_len == 0 && (errno != 0 || client_message->int_ioctl_count > 100)) {
 		SERROR_NORESPONSE("int_request_len == 0?");//" disconnecting");
 		SFREE(str_global_error);
 
@@ -312,12 +320,7 @@ error:
 		bol_error_state = false;
 		errno = 0;
 
-
-	} else if (errno == EAGAIN) {
-		SERROR_NORESPONSE("should never get to EAGAIN with libev");
-		SFREE(str_global_error);
-		bol_error_state = false;
-		errno = 0;
+		
 	}
 }
 

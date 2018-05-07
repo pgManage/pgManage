@@ -1,2 +1,0 @@
-LOG:  redirecting log output to logging collector process
-HINT:  Future log output will appear in directory "pg_log".

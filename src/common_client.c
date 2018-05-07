@@ -498,7 +498,7 @@ void client_cb(EV_P, ev_io *w, int revents) {
 						((unsigned char)(client->str_request[int_i]) > 126 &&
 							(unsigned char)(client->str_request[int_i]) < 160))) {
 					char str_int_code[4] = {0};
-					snprintf(str_int_code, 3, "%d", (unsigned char)(client->str_request[int_i]));
+					snprintf(str_int_code, 4, "%d", (unsigned char)(client->str_request[int_i]));
 					SERROR_SNCAT(str_response, &int_response_len,
 						"HTTP/1.1 400 Bad Request\015\012Connection: close\015\012\015\012An invalid character with the code '", (size_t)83,
 						str_int_code, strlen(str_int_code),
@@ -1743,15 +1743,11 @@ bool client_close(struct sock_ev_client *client) {
 	}
 	ev_io_stop(global_loop, &client->io);
 
-	if (client->que_message != NULL) {
-		LIST_FOREACH(client->que_message, first, next, item) {
-			struct sock_ev_client_message *client_message = item->value;
-			ev_io_stop(global_loop, &client_message->io);
-		}
-		Queue_destroy(client->que_message);
-		client->que_message = NULL;
-	}
 	if ((client->que_message == NULL || client->que_message->first == NULL) && client->bol_socket_is_open == true) {
+		if (client->que_message != NULL) {
+			Queue_destroy(client->que_message);
+			client->que_message = NULL;
+		}
 		// This must be done NOW, or else the browser will hang
 		if (bol_tls) {
 			if (SSL_shutdown(client->ssl) != 0) {
