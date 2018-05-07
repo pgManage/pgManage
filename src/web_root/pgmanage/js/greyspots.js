@@ -57033,6 +57033,12 @@ if (typeof HTMLTemplateElement === 'undefined') {
               'render': function () {
                   renderScrollDimensions(this);
               },
+              'renderHUD': function () {
+                  renderHUD(this);
+              },
+              'renderLocationFull': function () {
+                  renderLocationFull(this);
+              },
               'toggleFullContainer': function (container, target) {
                   var element = this;
                   var containerElement;
