@@ -6,7 +6,6 @@
         <meta name="apple-mobile-web-app-status-bar-style" content="black" />
         <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui, shrink-to-fit=no, user-scalable=no" />
         <meta name="HandheldFriendly" content="true" />
-
         <style>
             html {
                 -webkit-text-size-adjust: none
@@ -20,7 +19,15 @@
         <script>
             //jslint white:true multivar:true
             var bolPropertyPanelOpen = false, bolCurl = false;
+            window.addEventListener('load', function () {
+                'use strict';
+                var library = {
+                    "beep":{"Volume":{"Master":0.15,"Punch":0,"Decay":1.351,"Attack":0.001,"Sustain":0},"Frequency":{"Start":182,"Min":30,"Max":1800,"Slide":-0.04},"Vibrato":{"Depth":0.56,"DepthSlide":-0.19,"Frequency":0.01},"Phaser":{"Offset":-0.02},"Generator":{"Func":"sine"}}
+                };
+                console.log('use');
+                window.sfx = jsfx.Sounds(library);
 
+            });
             window.addEventListener('DOMContentLoaded', function () {
                 'use strict';
                 var link1 = GS.stringToElement('<link href="resources/ws-tab-functions.css" type="text/css" rel="stylesheet" />'),
@@ -687,6 +694,7 @@
         <script src="resources/pg-9.2-autocomplete-logic.js" type="text/javascript"></script>
         <script src="resources/pg-9.2-processes.js" type="text/javascript"></script>
         <script src="resources/pg-9.2-other.js" type="text/javascript"></script>
+        <script src="resources/jsfx.js" type="text/javascript"></script>
         <script src="resources/pg-9.2-query-selection.js" type="text/javascript"></script>
         <script src="resources/pg-9.2-explain.js" type="text/javascript"></script>
         <script src="../js/page-zoom.js" type="text/javascript"></script>

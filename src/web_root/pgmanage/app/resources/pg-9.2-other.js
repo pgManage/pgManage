@@ -2976,9 +2976,10 @@ function executeHelperEndLoading(currentTab) {
     }
     // if totalTime is greater then ten seconds
     if (totalTime > 10) {
-        GS.pushMessage('Query Finished', 1500);
+        // push notif
+        window.sfx.beep();
+        GS.pushMessage('Query Finished.', 1500);
     }
-    // push notif
     console.log('fire!');
     console.log(totalTime);
 }
