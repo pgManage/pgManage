@@ -2123,6 +2123,7 @@ function saveFile(tabElement, strPath, changeStamp, strContent, callbackSuccess,
         if (tabElement.saveState !== 'saved') {
             tabElement.saveState = 'error';
             if (tabElement.relatedEditor) {
+                console.log('setting readonly');
                 tabElement.relatedEditor.setReadOnly(true);
                 var warningElement = document.createElement('div');
     
@@ -2145,6 +2146,7 @@ function saveFile(tabElement, strPath, changeStamp, strContent, callbackSuccess,
         }
         tabElement.saveState = 'error';
         if (tabElement.relatedEditor) {
+            console.log('setting readonly');
             tabElement.relatedEditor.setReadOnly(true);
             var warningElement = document.createElement('div');
 
@@ -2171,7 +2173,8 @@ function saveFile(tabElement, strPath, changeStamp, strContent, callbackSuccess,
                 }
                 tabElement.saveState = 'saved';
                 if (tabElement.relatedEditor) {
-                    tabElement.relatedEditor.setReadOnly(true);
+                    console.log('unsetting readonly');
+                    tabElement.relatedEditor.setReadOnly(false);
                 }
 
             } else {
@@ -2181,6 +2184,7 @@ function saveFile(tabElement, strPath, changeStamp, strContent, callbackSuccess,
                 // saveFile is called on datasheet, editor and table designer tabs.
                 //      this warning popup code is now only used on an editor tab
                 if (tabElement.relatedEditor) {
+                    console.log('setting readonly');
                     tabElement.relatedEditor.setReadOnly(true);
                     var warningElement = document.createElement('div');
 
@@ -2330,6 +2334,20 @@ function setFrame(tabElement, frameElement, bolBringToFirst) {
             if (tabElement.bolAutoOpenPropertyList === true || tabElement.bolPropertyPanelOpen === true) {
                 tabElement.relatedEditor.selectionChangeHandler();
             }
+        }
+    }
+
+    // This is for when you switch away from a tab while a query is running
+    if (tabElement.bolReRenderTables) {
+        var arrElement = tabElement.relatedResultsArea.querySelectorAll('gs-table');
+        for (var i = 0, len = arrElement.length; i < len; i += 1) {
+            for (var j = 0, len2 = arrElement[i].internalDisplay.columnWidths.length; j < len2; j += 1) {
+                arrElement[i].internalDisplay.columnWidths[j] = 100;
+            }
+            arrElement[i].renderLocationFull();
+            arrElement[i].renderHUD();
+            arrElement[i].resizeAllColumns();
+            console.log(arrElement[i].clientHeight, arrElement[i].clientWidth);
         }
     }
 }

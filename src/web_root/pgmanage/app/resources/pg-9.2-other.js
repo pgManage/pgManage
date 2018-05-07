@@ -2914,7 +2914,7 @@ function removeMarkerHighlighted() {
 
 // this function is run when we send the queries through the websocket,
 //      it adds a loader, disables the "Clear" button and shows/binds the "Stop Execution" button
-function executeHelperStartExecute() {
+function executeHelperStartExecute(currentTab) {
     if (dataLoadTest) {
         console.time('query-load');
     }
@@ -2936,7 +2936,7 @@ function executeHelperStartExecute() {
 
 // this function is run when we encounter an error or we've recieved the last transmission,
 //      it enables the "Clear" button and hides/unbinds the "Stop Loading" button
-function executeHelperEndLoading() {
+function executeHelperEndLoading(currentTab) {
     GS.log(bolDebug, currentTab);
     var editor = currentTab.relatedEditor;
 
@@ -2970,7 +2970,7 @@ function executeHelperCancelSignalHandler() {
 
 // this function is run when the user clicks "Show Query",
 //      it opens a dialog with the query in it
-function executeHelperBindShowQueryButton(element, strQuery) {
+function executeHelperBindShowQueryButton(currentTab, element, strQuery) {
     element.addEventListener('click', function () {
         var templateElement = document.createElement('template');
 
@@ -2991,28 +2991,31 @@ function executeHelperBindShowQueryButton(element, strQuery) {
 //      it sets the "bolIgnoreMessages" variable to true, meaning the callback for the query execution will not do anything
 //      it also changes the results pane header (the tally results portion) to "(Loading Stopped)"
 //      it also runs the "executeHelperEndExecute" and "executeHelperEndLoading" functions
-function executeHelperStopLoadingHandler() {
+function executeHelperStopLoadingHandler(currentTab) {
     GS.log(bolDebug, currentTab);
     currentTab.bolIgnoreMessages = true;
     currentTab.relatedResultsTallyElement.innerHTML = ' (Loading Stopped)';
-    executeHelperEndExecute();
-    executeHelperEndLoading();
+    executeHelperEndExecute(currentTab);
+    executeHelperEndLoading(currentTab);
 }
 
 // this function is run when we get our first callback,
 //      it removes the loader, hides/unbinds the "Stop Execution" button
-function executeHelperEndExecute() {
+function executeHelperEndExecute(currentTab) {
     GS.log(bolDebug, currentTab);
     var editor = currentTab.relatedEditor;
 
     GS.removeLoader(editor.container.parentNode.parentNode);
 
+    if (!currentTab.classList.contains('current-tab')) {
+        currentTab.bolReRenderTables = true;
+    }
     currentTab.relatedStopButton.setAttribute('hidden', '');
     currentTab.relatedStopButton.removeEventListener('click', executeHelperCancelSignalHandler);
 }
 
 // This function updates the results header Success/Error tally
-function executeHelperUpdateTally(resultsTallyElement, intQuery, intError) {
+function executeHelperUpdateTally(currentTab, resultsTallyElement, intQuery, intError) {
     GS.log(bolDebug, currentTab);
 
     resultsTallyElement.innerHTML = (
@@ -3022,20 +3025,18 @@ function executeHelperUpdateTally(resultsTallyElement, intQuery, intError) {
 
 // this function is run when we get our first callback,
 //      it shows and binds the "Stop Loading" button
-function executeHelperStartLoading() {
+function executeHelperStartLoading(currentTab) {
     GS.log(bolDebug, currentTab);
 
     currentTab.relatedClearButton.setAttribute('hidden', '');
     currentTab.relatedStopSocketButton.removeAttribute('hidden');
-    //currentTab.relatedStopLoadingButton.removeAttribute('hidden');
-    //currentTab.relatedStopLoadingButton.addEventListener('click', executeHelperStopLoadingHandler);
 }
 
 function executeHelperStopSocket() {
     GS.log(bolDebug, currentTab);
 
     GS.requestFromSocket(GS.websockets[currentTab.relatedSocket], 'CANCEL', '', currentTab.currentMessageID);
-    executeHelperStopLoadingHandler();
+    executeHelperStopLoadingHandler(currentTab);
     currentTab.bolIgnoreMessages = true;
 }
 
@@ -3045,7 +3046,8 @@ var arrExecuteHistory = [];
 var dataLoadTest = false;
 function executeScript(bolCursorQuery) {
     'use strict';
-    currentTab = document.getElementsByClassName('current-tab')[0];
+    // shadowing on purpose, so that if we switch tabs in the middle of execution, everything is fine
+    var currentTab = document.getElementsByClassName('current-tab')[0];
     var editor = currentTab.relatedEditor;
     var resultsContainer = currentTab.relatedResultsArea;
     var resultsTallyElement = currentTab.relatedResultsTallyElement;
@@ -3068,7 +3070,7 @@ function executeScript(bolCursorQuery) {
 
     document.getElementById('sql-results-area-' + currentTab.intTabNumber + '').style.overflow = 'auto';
 
-    executeHelperUpdateTally(resultsTallyElement, 0, 0);
+    executeHelperUpdateTally(currentTab, resultsTallyElement, 0, 0);
 
     // if we found an editor to get the query from and the current tab is not already running a query
     if (editor && currentTab.handlingQuery !== true) {
@@ -3121,7 +3123,7 @@ function executeScript(bolCursorQuery) {
         // begin
 
         //console.log('test');
-        executeHelperStartExecute();
+        executeHelperStartExecute(currentTab);
 
         var bolResized;
         var arrData = [];
@@ -3129,6 +3131,7 @@ function executeScript(bolCursorQuery) {
         var intRecords;
         var countElement;
         currentTab.currentMessageID = GS.requestRawFromSocket(GS.websockets[currentTab.relatedSocket], jsnCurrentQuery.strQuery, function (data, error) {
+            console.log(data);
             var scrollElement;
             var trElement;
             var arrRecords;
@@ -3170,8 +3173,8 @@ function executeScript(bolCursorQuery) {
 
                 if (!error) {
                     if (data.intCallbackNumber === 0) {
-                        executeHelperEndExecute();
-                        executeHelperStartLoading();
+                        executeHelperEndExecute(currentTab);
+                        executeHelperStartLoading(currentTab);
                     }
 
 
@@ -3315,7 +3318,8 @@ function executeScript(bolCursorQuery) {
                     }
 
                     if (data.bolLastMessage) {
-                        executeHelperEndLoading();
+                        executeHelperEndLoading(currentTab);
+                        console.log('executeHelperEndLoading');
 						if (data.bolTransactionOpen) {
 							if (currentTab.relatedCommitButton) {
 							    currentTab.relatedCommitButton.removeAttribute('disabled');
@@ -3387,11 +3391,11 @@ function executeScript(bolCursorQuery) {
                             divElement.innerHTML = strHTML + '<pre>' + intRows + ' Row' + (intRows === 1 ? '' : 's') + ' Affected</pre><br />';
 
                             resultsContainer.appendChild(divElement);
-                            executeHelperBindShowQueryButton(xtag.query(divElement, '.button-show-query')[0], data.strQuery);
+                            executeHelperBindShowQueryButton(currentTab, xtag.query(divElement, '.button-show-query')[0], data.strQuery);
                             intQuery += 1;
 
                             // update the success and error tally
-                            executeHelperUpdateTally(resultsTallyElement, intQuery, intError);
+                            executeHelperUpdateTally(currentTab, resultsTallyElement, intQuery, intError);
 
                         // else if empty
                         } else if (data.strMessage === 'EMPTY') {
@@ -3429,11 +3433,11 @@ function executeScript(bolCursorQuery) {
                             divElement.innerHTML = strHTML + '<pre>Empty Query</pre><br />';
 
                             resultsContainer.appendChild(divElement);
-                            executeHelperBindShowQueryButton(xtag.query(divElement, '.button-show-query')[0], data.strQuery);
+                            executeHelperBindShowQueryButton(currentTab, xtag.query(divElement, '.button-show-query')[0], data.strQuery);
                             intQuery += 1;
 
                             // update the success and error tally
-                            executeHelperUpdateTally(resultsTallyElement, intQuery, intError);
+                            executeHelperUpdateTally(currentTab, resultsTallyElement, intQuery, intError);
 
                         // else if result query
                         } else if (data.arrColumnNames.length > 0) {
@@ -3524,6 +3528,7 @@ function executeScript(bolCursorQuery) {
 
                                 // we want the "Show Query" buttons to work
                                 executeHelperBindShowQueryButton(
+                                    currentTab,
                                     xtag.query(divElement, '.button-show-query')[0],
                                     data.strQuery
                                 );
@@ -3725,7 +3730,7 @@ function executeScript(bolCursorQuery) {
                                 countElement = document.getElementById('loaded-row-count-' + data.intQueryNumber);
                                 intRecords = 0;
                                 intQuery += 1;
-                                executeHelperUpdateTally(resultsTallyElement, intQuery, intError);
+                                executeHelperUpdateTally(currentTab, resultsTallyElement, intQuery, intError);
                             }
 
                             if (data.strMessage === '\\.') {
@@ -3808,8 +3813,8 @@ function executeScript(bolCursorQuery) {
 						}
 					}
                 } else {
-                    executeHelperEndExecute();
-                    executeHelperEndLoading();
+                    executeHelperEndExecute(currentTab);
+                    executeHelperEndLoading(currentTab);
 
                     arrExecuteHistory.push({
                         'strQuery': jsnCurrentQuery.strQuery,
@@ -3916,7 +3921,7 @@ function executeScript(bolCursorQuery) {
                     }
 
                     // update the success and error tally
-                    executeHelperUpdateTally(resultsTallyElement, intQuery, intError);
+                    executeHelperUpdateTally(currentTab, resultsTallyElement, intQuery, intError);
 
                     //editor.gotoLine(
                     //    (jsnCurrentQuery.start_row + intLine),
