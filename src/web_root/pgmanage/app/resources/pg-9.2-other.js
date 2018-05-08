@@ -70,10 +70,10 @@ function loadContextData(callback) {
                 contextData.currentUser = arrColumns[2];
                 contextData.versionText = arrColumns[3];
 
-				if (contextData.versionText.match(/[0-9]+\.[0-9]+\.[0-9]+/)) {
-                	contextData.versionNumber = contextData.versionText.match(/[0-9]+\.[0-9]+\.[0-9]+/)[0];
+				if (contextData.versionText.match(/PostgreSQL [0-9]+\.[0-9]+\.[0-9]+/)) {
+                	contextData.versionNumber = contextData.versionText.match(/PostgreSQL [0-9]+\.[0-9]+\.[0-9]+/)[0].substring('PostgreSQL '.length);
 				} else {
-					contextData.versionNumber = contextData.versionText.match(/[0-9]+\.[0-9]+/)[0];
+					contextData.versionNumber = contextData.versionText.match(/PostgreSQL [0-9]+\.[0-9]+/)[0].substring('PostgreSQL '.length);
 				}
 
                 // get minor version
