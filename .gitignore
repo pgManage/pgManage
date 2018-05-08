@@ -1,3 +1,6 @@
+output.txt
+*.pid
+
 *.dSYM
 
 *.a
