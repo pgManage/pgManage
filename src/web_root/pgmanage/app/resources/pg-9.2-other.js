@@ -2640,7 +2640,7 @@ function beforeTableCopyFunction(event) {
     var tableElement = this;
     var template;
 
-    if (!tableElement.forceCopy && localStorage.askCopySettings !== 'false') {
+    if (!tableElement.forceCopy && localStorage.askCopySettings !== 'false' && (tableElement.internalSelection.rows.length > 1 || tableElement.internalSelection.columns.length > 1)) {
         event.preventDefault();
 
         template = document.createElement('template');
