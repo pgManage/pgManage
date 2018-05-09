@@ -794,6 +794,25 @@ function dialogClosedTabs() {
                         strTime = arrFiles[i].substring(intDate + 1, intTime).substring(0, 5);
                         strFileName = arrFiles[i].substring(intTime + 1, intFileExtension);
                         strFileExtension = arrFiles[i].substring(intFileExtension + 1);
+                        arrFiles[i] = {
+                            strDate: strDate,
+                            date: new Date(strDate + ' ' + strTime),
+                            strTime: strTime,
+                            strFileName: strFileName,
+                            strFileExtension: strFileExtension
+                        };
+                    }
+
+                    arrFiles.sort(function (a, b) {
+                        return b.date.getTime() - a.date.getTime();
+                    });
+
+                    for (i = 0, len = arrFiles.length, strHTML = ''; i < len; i += 1) {
+                        console.log(arrFiles[i].strDate, arrFiles[i].strTime, arrFiles[i].date, arrFiles[i].date.getTime());
+                        strDate = arrFiles[i].strDate;
+                        strTime = arrFiles[i].strTime;
+                        strFileName = arrFiles[i].strFileName;
+                        strFileExtension = arrFiles[i].strFileExtension;
 
                         if (strFileExtension === 'sql') {
                             strType = 'SQL Script';
