@@ -22,15 +22,9 @@
 
 #ifdef _WIN32
 #pragma comment(lib, "Ws2_32.lib")
-#ifdef _WIN64
-#pragma comment(lib, "../lib/x64/libpq.lib")
-#pragma comment(lib, "../lib/x64/libssl-43.lib")
-#pragma comment(lib, "../lib/x64/libcrypto-41.lib")
-#else
 #pragma comment(lib, "../lib/x86/libpq.lib")
-#pragma comment(lib, "../lib/x86/libssl-43.lib")
-#pragma comment(lib, "../lib/x86/libcrypto-41.lib")
-#endif
+#pragma comment(lib, "../lib/x86/ssl-45.lib")
+#pragma comment(lib, "../lib/x86/crypto-43.lib")
 #endif
 
 SOCKET int_sock = INVALID_SOCKET;
