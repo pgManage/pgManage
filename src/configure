@@ -233,7 +233,7 @@ if test $HAVE_FUNCTION = 1; then
 			echo "no"
 			echo "WARNING: It seems that the linker reports clock_gettime is present, but at runtime it isn't."
 			echo "It is possible to encounter this on OS X 10.11 (El Capitan) if you have the macOS 10.12 (Sierra) SDK installed."
-			echo "This is an unsupported configuration and you should wither upgrade to 10.12, or downgrade your SDK."
+			echo "This is an unsupported configuration and you should either upgrade to 10.12, or downgrade your SDK."
 			echo "Press [ENTER] to continue anyway."
 			read
 		fi
