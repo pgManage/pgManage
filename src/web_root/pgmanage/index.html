@@ -340,6 +340,31 @@ window.addEventListener('load', function () {
     // get connection list
     getConnections();
 });
+window.addEventListener('load', function () {
+    'use strict';
+    if (functionality.HTMLTemplateElement) {
+        //template element works
+    } else {
+        //error
+        console.log('test');
+        var templateElement = document.createElement('template');
+        templateElement.innerHTML = ml(function () {/*
+            <gs-page>
+                <gs-header><center><h3>Your browser is not supported.</h3></center></gs-header>
+                <gs-body bg-danger padded>
+                    <center>Please use the latest version of the desktop client or install chrome.</center>
+                </gs-body>
+            </gs-page>
+        */});
+        
+        GS.openDialog(templateElement, function () {
+            
+        }, function (event, strAnswer) {
+            
+        });
+    }
+    console.log(functionality, functionality.HTMLTemplateElement);
+});
         </script>
         <style>
             #predefined-option-container gs-option:not(:last-child) {

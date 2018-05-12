@@ -2970,7 +2970,7 @@ function executeHelperEndLoading(currentTab) {
             iTime = timeElements[i].innerHTML.substring(timeElements[i].innerHTML.indexOf(' ') + 1, timeElements[i].innerHTML.lastIndexOf(' '));
             totalTime = totalTime + parseFloat(iTime);
         }
-    } else {
+    } else if (timeElements.length > 0) {
     // else just use the one
         totalTime = parseFloat(timeElements[0].innerHTML.substring(timeElements[0].innerHTML.indexOf(' ') + 1, timeElements[0].innerHTML.lastIndexOf(' ')));
     }
@@ -2980,8 +2980,6 @@ function executeHelperEndLoading(currentTab) {
         window.sfx.beep();
         GS.pushMessage('Query Finished.', 1500);
     }
-    console.log('fire!');
-    console.log(totalTime);
 }
 
 // this function is going to be bound to the "Stop Execution" button,

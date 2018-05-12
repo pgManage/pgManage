@@ -31,8 +31,7 @@ function loadHome() {
                 </div>
     			<div style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; border: 0 none; z-index: 200; background-color: #FFFFFF; overflow: auto;" id="object-details-container" hidden></div>
             </div>
-        */}).replace(/\{\{PGMANAGE\}\}/g, contextData.pgmanageVersion).replace(/\{\{POSTGRES\}\}/g, contextData.versionNumber);
-    
+        */}).replace(/\{\{PGMANAGE\}\}/g, contextData.pgmanageVersion).replace(/\{\{POSTGRES\}\}/g, contextData.versionNumber);//'10.3');
         // create ace
         homeEditor = ace.edit('sql-ace-area-home');
         homeEditor.setTheme('ace/theme/eclipse');

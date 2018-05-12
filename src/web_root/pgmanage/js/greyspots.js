@@ -35935,6 +35935,55 @@ if (typeof HTMLTemplateElement === 'undefined') {
   });//global GS, xtag, document, window, ml, evt, doT, Worker
   //jslint browser:true, maxlen:80, white:false, this:true
   
+  // # CODE INDEX:
+  //          (use "find" (CTRL-f or CMD-f) to skip to a section)
+  //          ("PRE-RENDER" refers to a section of functions that do not depend
+  //                  on the viewport being rendered AND dont use any render
+  //                  functions)
+  //          ("POST-RENDER" refers to a section of functions that either depend
+  //                  on the viewport being rendered OR use render functions)
+  //      # TOP  (this just brings you back this index)
+  //      # SNIPPET/DESIGN
+  //      # ELEMENT CONFIG
+  //      # GLOBAL <STYLE></STYLE> ELEMENT SETUP
+  //      # SCROLLBAR WIDTH
+  //      # CELL DIMENSION DETECTOR
+  //      # EXTERIOR LIBRARIES
+  //          # GETPLAINTEXT
+  //      # PRE-RENDER UTILITY FUNCTIONS
+  //      # ELEMENT FUNCTIONS
+  //      # RENDER FUNCTIONS
+  //      # POST-RENDER UTILITY FUNCTIONS
+  //      # LOADER FUNCTIONS
+  //      # DATA FUNCTIONS
+  //      # COPY FUNCTIONS
+  //      # PASTE FUNCTIONS
+  //      # BUTTON FUNCTIONS
+  //      # EVENT FUNCTIONS
+  //          # QS EVENTS
+  //          # FOCUS EVENTS
+  //          # SCROLL EVENTS
+  //          # SELECTION EVENTS
+  //          # COLUMN/ROW RESIZE EVENTS
+  //          # COLUMN REORDER EVENTS
+  //          # UPDATE EVENTS
+  //          # INSERT EVENTS
+  //          # HUD EVENTS
+  //          # KEY EVENTS
+  //          # COPY EVENTS
+  //          # PASTE EVENTS
+  //          # CUT EVENTS
+  //          # CONTEXTMENU EVENTS
+  //          # COLUMN DROPDOWN EVENTS
+  //          # DEVELOPER EVENTS
+  //          # HIGH LEVEL BINDING
+  //      # XTAG DEFINITION
+  //      # ELEMENT LIFECYCLE
+  //      # ELEMENT ACCESSORS
+  //      # ELEMENT METHODS
+  
+  // for sections of code that need to be completed:
+  //      # NEED CODING
   
   /*
   new datasheet
@@ -35998,6 +36047,7 @@ if (typeof HTMLTemplateElement === 'undefined') {
       scroll-past-bottom
           (allows you to scroll until only the bottom record is seen)
       scroll-to-bottom (scrolls all the way down on initial load)
+      no-insert-scroll (disables scrolling all the way down after insert)
       expand-to-content
   
       no-hudpaginate
@@ -36020,8 +36070,6 @@ if (typeof HTMLTemplateElement === 'undefined') {
   
       default-record-height (pixels, defaults if not present)
       default-column-width (pixels, defaults if not present)
-      column-border-width (pixels, defaults if not present)
-      record-border-height (pixels, defaults if not present)
   
       socket (name of a property stored on the GS object, needs to be a socket)
   
@@ -36217,60 +36265,553 @@ if (typeof HTMLTemplateElement === 'undefined') {
       during load: enable element loader
   */
   
+  // ############################################################################
+  // ############################## SNIPPET/DESIGN ##############################
+  // ############################################################################
   
+  window.addEventListener('design-register-element', function (event) {
+      'use strict';
   
+      registerDesignSnippet(
+          '<gs-table>',
+          '<gs-table>',
+          ml(function () {/*gs-table
+      id="${1:tableid}"
+      src="test.rtime_copy_datasheet"
+      pk="id"
+      lock="change_stamp"
+      ord="id ASC"
+      focus-on-load
+      style="width: 100%; height: 100%;"
+  >
+      <template for="top-hud">
+          <gs-button onclick="document.getElementById('${1:tableid}').deleteSelected()" inline no-focus icononly icon="times">&nbsp;</gs-button>
+          <gs-button onclick="document.getElementById('${1:tableid}').openInsertDialog()" inline no-focus icononly icon="plus">&nbsp;</gs-button>
+          <gs-button onclick="document.getElementById('${1:tableid}').refresh()" inline no-focus icononly icon="refresh">&nbsp;</gs-button>
+          <gs-button onclick="document.getElementById('${1:tableid}').openPrefs(this)" inline no-focus icononly icon="sliders">&nbsp;</gs-button>
+          <gs-button onclick="document.getElementById('${1:tableid}').toFullscreen(this)" inline no-focus icononly icon="expand">&nbsp;</gs-button>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <gs-button onclick="document.getElementById('${1:tableid}').sort('asc')" inline no-focus iconleft icon="sort-alpha-asc">Sort A to Z</gs-button>
+          <gs-button onclick="document.getElementById('${1:tableid}').sort('desc')" inline no-focus iconleft icon="sort-alpha-desc">Sort Z to A</gs-button>
+          <gs-button onclick="document.getElementById('${1:tableid}').sort('clear')" inline no-focus iconleft icon="trash">Clear Sort</gs-button>
+          <gs-button onclick="document.getElementById('${1:tableid}').clearFilter()" inline no-focus iconleft icon="trash">Clear Filter</gs-button>
+      </template>
+      <template for="bottom-hud">
+          <gs-button inline no-focus icononly onclick="document.getElementById('${1:tableid}').goToLine('first')" icon="step-backward">&nbsp;</gs-button>
+          <gs-button inline no-focus icononly onclick="document.getElementById('${1:tableid}').goToLine('previous')" icon="caret-left">&nbsp;</gs-button>
+          <gs-current-record inline for="${1:tableid}"></gs-current-record>
+          <gs-button inline no-focus icononly onclick="document.getElementById('${1:tableid}').goToLine('next')" icon="caret-right">&nbsp;</gs-button>
+          <gs-button inline no-focus icononly onclick="document.getElementById('${1:tableid}').goToLine('last')" icon="step-forward">&nbsp;</gs-button>
+          <gs-button inline no-focus icononly onclick="document.getElementById('${1:tableid}').goToLine('insert')" icon="plus"></gs-button>
+      </template>
+      <template for="header-record">
+          <gs-cell>${2}</gs-cell>
+      </template>
+      <template for="data-record">
+          <gs-cell header="${2}">${3}</gs-cell>
+      </template>
+      <template for="copy">
+          <gs-cell header="${2}">${3}</gs-cell>
+      </template>
+      <template for="insert-record">
+          <gs-cell header="${2}"><input column="${3}" /></gs-cell>
+      </template>
+  </gs-table>*/})
+      );
   
+      designRegisterElement(
+          'gs-table',
+          '/env/app/developer_g/greyspots-' + GS.version() +
+                  '/documentation/doc-elem-table.html'
+      );
   
+      window.designElementProperty_GSTABLE = function (selectedElement) {
+          addProp(
+              'Socket',
+              true,
+              '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('socket') || '') + '" mini></gs-text>',
+              function () {
+              return setOrRemoveTextAttribute(
+                  selectedElement,
+                  'socket',
+                  encodeURIComponent(this.value)
+              );
+          });
   
+          addProp(
+              'Source',
+              true,
+              '<gs-memo class="target" autoresize rows="1" value="' +
+                  encodeHTML(
+                      decodeURIComponent(
+                          selectedElement.getAttribute('src') ||
+                          selectedElement.getAttribute('source') ||
+                          ''
+                      )
+                  ) + '" mini></gs-memo>',
+              function () {
+              return setOrRemoveTextAttribute(
+                  selectedElement,
+                  'src',
+                  encodeURIComponent(this.value)
+              );
+          });
   
-  // # CODE INDEX:
-  //          (use "find" (CTRL-f or CMD-f) to skip to a section)
-  //          ("PRE-RENDER" refers to a section of functions that do not depend
-  //                  on the viewport being rendered AND dont use any render
-  //                  functions)
-  //          ("POST-RENDER" refers to a section of functions that either depend
-  //                  on the viewport being rendered OR use render functions)
-  //      # TOP  (this just brings you back this index)
-  //      # ELEMENT CONFIG
-  //      # GLOBAL <STYLE></STYLE> ELEMENT SETUP
-  //      # SCROLLBAR WIDTH
-  //      # CELL DIMENSION DETECTOR
-  //      # EXTERIOR LIBRARIES
-  //          # GETPLAINTEXT
-  //      # PRE-RENDER UTILITY FUNCTIONS
-  //      # ELEMENT FUNCTIONS
-  //      # RENDER FUNCTIONS
-  //      # POST-RENDER UTILITY FUNCTIONS
-  //      # LOADER FUNCTIONS
-  //      # DATA FUNCTIONS
-  //      # COPY FUNCTIONS
-  //      # PASTE FUNCTIONS
-  //      # BUTTON FUNCTIONS
-  //      # EVENT FUNCTIONS
-  //          # FOCUS EVENTS
-  //          # SCROLL EVENTS
-  //          # SELECTION EVENTS
-  //          # COLUMN/ROW RESIZE EVENTS
-  //          # COLUMN REORDER EVENTS
-  //          # UPDATE EVENTS
-  //          # INSERT EVENTS
-  //          # HUD EVENTS
-  //          # KEY EVENTS
-  //          # COPY EVENTS
-  //          # PASTE EVENTS
-  //          # CUT EVENTS
-  //          # CONTEXTMENU EVENTS
-  //          # COLUMN DROPDOWN EVENTS
-  //          # DEVELOPER EVENTS
-  //          # HIGH LEVEL BINDING
-  //      # XTAG DEFINITION
-  //      # ELEMENT LIFECYCLE
-  //      # ELEMENT ACCESSORS
-  //      # ELEMENT METHODS
+          addProp(
+              'Columns',
+              true,
+              '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('columns') || '') + '" mini></gs-text>',
+              function () {
+                  return setOrRemoveTextAttribute(
+                      selectedElement,
+                      'columns',
+                      this.value
+                  );
+              }
+          );
   
-  // for sections of code that need to be completed:
-  //      # NEED CODING
+          addProp(
+              'Where',
+              true,
+              '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('where') || '') + '" mini></gs-text>',
+              function () {
+                  return setOrRemoveTextAttribute(
+                      selectedElement,
+                      'where',
+                      this.value
+                  );
+              }
+          );
   
+          addProp(
+              'Session Filter',
+              true,
+              '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('session-filter') || '') + '" mini></gs-text>',
+              function () {
+                  return setOrRemoveTextAttribute(
+                      selectedElement,
+                      'session-filter',
+                      this.value
+                  );
+              }
+          );
+  
+          addProp(
+              'Order By',
+              true,
+              '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('ord') || '') + '" mini></gs-text>',
+              function () {
+                  return setOrRemoveTextAttribute(
+                      selectedElement,
+                      'ord',
+                      this.value
+                  );
+              }
+          );
+  
+          addProp(
+              'Limit',
+              true,
+              '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('limit') || '') + '" mini></gs-text>',
+              function () {
+                  return setOrRemoveTextAttribute(
+                      selectedElement,
+                      'limit',
+                      this.value
+                  );
+              }
+          );
+  
+          addProp(
+              'Offset',
+              true,
+              '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('offset') || '') + '" mini></gs-text>',
+              function () {
+                  return setOrRemoveTextAttribute(
+                      selectedElement,
+                      'offset',
+                      this.value
+                  );
+              }
+          );
+  
+          addProp(
+              'Column In Querystring',
+              true,
+              '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('qs') || '') + '" mini></gs-text>',
+              function () {
+                  return setOrRemoveTextAttribute(
+                      selectedElement,
+                      'qs', this.valu
+                      , false
+                  );
+              }
+          );
+  
+          addProp(
+              'Parent&nbsp;Column',
+              true,
+              '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>',
+              function () {
+                  return setOrRemoveTextAttribute(
+                      selectedElement,
+                      'column',
+                      this.value
+                  );
+              }
+          );
+  
+          addProp(
+              'Line Column',
+              true,
+              '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('child-column') || '') + '" mini></gs-text>',
+              function () {
+                  return setOrRemoveTextAttribute(
+                      selectedElement,
+                      'child-column',
+                      this.value
+                  );
+              }
+          );
+  
+          addProp(
+              'Primary Keys',
+              true,
+              '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('pk') || '') + '" mini></gs-text>',
+              function () {
+                  return setOrRemoveTextAttribute(
+                      selectedElement,
+                      'pk',
+                      this.value
+                  );
+              }
+          );
+  
+          addProp(
+              'Lock Columns',
+              true,
+              '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('lock') || '') + '" mini></gs-text>',
+              function () {
+                  return setOrRemoveTextAttribute(
+                      selectedElement,
+                      'lock',
+                      this.value
+                  );
+              }
+          );
+  
+          addProp(
+              'Sequences',
+              true,
+              '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('seq') || '') + '" mini></gs-text>',
+              function () {
+                  return setOrRemoveTextAttribute(
+                      selectedElement,
+                      'seq',
+                      this.value
+                  );
+              }
+          );
+  
+          addProp(
+              'Null String', true,
+              '<g-text class="target" value="' + encodeHTML(selectedElement.getAttribute('null-string') || '') + '" mini></gs-text>',
+              function () {
+                  return setOrRemoveTextAttribute(
+                      selectedElement,
+                      'null-string',
+                      this.value
+                  );
+              }
+          );
+  
+          addProp(
+              'Null Set String',
+              true,
+              '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('null-set-string') || '') + '" mini></gs-text>',
+              function () {
+                  return setOrRemoveTextAttribute(
+                      selectedElement,
+                      'null-set-string',
+                      this.value
+                  );
+              }
+          );
+  
+          addProp('No Record Selector', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('no-record-selector')) + '" mini></gs-checkbox>', function () {
+              this.removeAttribute('no-record-selector');
+              return setOrRemoveBooleanAttribute(
+                  selectedElement,
+                  'no-record-selector',
+                  this.value === 'true',
+                  true
+              );
+          });
+  
+          addProp('No Resize Record', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('no-resize-record')) + '" mini></gs-checkbox>', function () {
+              this.removeAttribute('no-resize-record');
+              return setOrRemoveBooleanAttribute(
+                  selectedElement,
+                  'no-resize-record',
+                  this.value === 'true',
+                  true
+              );
+          });
+  
+          addProp('No Resize Column', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('no-resize-column')) + '" mini></gs-checkbox>', function () {
+              this.removeAttribute('no-resize-column');
+              return setOrRemoveBooleanAttribute(
+                  selectedElement,
+                  'no-resize-column',
+                  this.value === 'true',
+                  true
+              );
+          });
+  
+          addProp('No After Insert Scroll', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('no-insert-scroll')) + '" mini></gs-checkbox>', function () {
+              this.removeAttribute('no-insert-scroll');
+              return setOrRemoveBooleanAttribute(
+                  selectedElement,
+                  'no-insert-scroll',
+                  this.value === 'true',
+                  true
+              );
+          });
+  
+          addProp(
+              'Default Record Height',
+              true,
+              '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('default-record-height') || '') + '" mini></gs-text>', function () {
+                  return setOrRemoveTextAttribute(
+                      selectedElement,
+                      'default-record-height',
+                      this.value
+                  );
+              }
+          );
+          addProp(
+              'Default Column Width',
+              true,
+              '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('default-column-width') || '') + '" mini></gs-text>',
+              function () {
+                  return setOrRemoveTextAttribute(
+                      selectedElement,
+                      'default-column-width',
+                      this.value
+                  );
+              }
+          );
+  
+          // TITLE attribute
+          addProp('Title',
+              true,
+              '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>',
+              function () {
+                  return setOrRemoveTextAttribute(
+                      selectedElement,
+                      'title',
+                      this.value
+                  );
+              }
+          );
+          
+          addProp('Copy Header',
+              true,
+              '<gs-select class="target" value="' + encodeHTML(selectedElement.getAttribute('copy-header') || '') + '" mini>' +
+                  '<option value=""></option>' +
+                  '<option value="never">Never</option>' +
+                  '<option value="always">Always</option>' +
+                  '<option value="selected">If Selected</option>' +
+              '</gs-select>',
+              function () {
+                  return setOrRemoveTextAttribute(
+                      selectedElement,
+                      'copy-header',
+                      this.value
+                  );
+              }
+          );
+          addProp('Copy Selectors',
+              true,
+              '<gs-select class="target" value="' + encodeHTML(selectedElement.getAttribute('copy-selectors') || '') + '" mini>' +
+                  '<option value=""></option>' +
+                  '<option value="never">Never</option>' +
+                  '<option value="always">Always</option>' +
+                  '<option value="selected">If Selected</option>' +
+              '</gs-select>',
+              function () {
+                  return setOrRemoveTextAttribute(
+                      selectedElement,
+                      'copy-selectors',
+                      this.value
+                  );
+              }
+          );
+          addProp('Copy Quote Character',
+              true,
+              '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('copy-') || '') + '" mini></gs-text>',
+              function () {
+                  return setOrRemoveTextAttribute(
+                      selectedElement,
+                      'copy-',
+                      this.value
+                  );
+              }
+          );
+          addProp('Copy Escape Character',
+              true,
+              '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('copy-') || '') + '" mini></gs-text>',
+              function () {
+                  return setOrRemoveTextAttribute(
+                      selectedElement,
+                      'copy-',
+                      this.value
+                  );
+              }
+          );
+          addProp('Copy Quote When',
+              true,
+              '<gs-select class="target" value="' + encodeHTML(selectedElement.getAttribute('copy-quote-when') || '') + '" mini>' +
+                  '<option value=""></option>' +
+                  '<option value="never">Never</option>' +
+                  '<option value="strings">Strings</option>' +
+                  '<option value="always">Always</option>' +
+                  '<option value="delimiter-in-content">Delimiter in Content</option>' +
+              '</gs-select>',
+              function () {
+                  return setOrRemoveTextAttribute(
+                      selectedElement,
+                      'copy-quote-when',
+                      this.value
+                  );
+              }
+          );
+          addProp('Copy Record Delimiter',
+              true,
+              '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('copy-') || '') + '" mini></gs-text>',
+              function () {
+                  return setOrRemoveTextAttribute(
+                      selectedElement,
+                      'copy-',
+                      this.value
+                  );
+              }
+          );
+          addProp('Copy Cell Delimiter',
+              true,
+              '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('copy-') || '') + '" mini></gs-text>',
+              function () {
+                  return setOrRemoveTextAttribute(
+                      selectedElement,
+                      'copy-',
+                      this.value
+                  );
+              }
+          );
+          addProp('Copy Null Cell',
+              true,
+              '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('copy-') || '') + '" mini></gs-text>',
+              function () {
+                  return setOrRemoveTextAttribute(
+                      selectedElement,
+                      'copy-',
+                      this.value
+                  );
+              }
+          );
+  
+          // visibility attributes
+          var strVisibilityAttribute = '';
+          if (selectedElement.hasAttribute('hidden'))         {strVisibilityAttribute = 'hidden';}
+          if (selectedElement.hasAttribute('hide-on-desktop')){strVisibilityAttribute = 'hide-on-desktop';}
+          if (selectedElement.hasAttribute('hide-on-tablet')) {strVisibilityAttribute = 'hide-on-tablet';}
+          if (selectedElement.hasAttribute('hide-on-phone'))  {strVisibilityAttribute = 'hide-on-phone';}
+          if (selectedElement.hasAttribute('show-on-desktop')){strVisibilityAttribute = 'show-on-desktop';}
+          if (selectedElement.hasAttribute('show-on-tablet')) {strVisibilityAttribute = 'show-on-tablet';}
+          if (selectedElement.hasAttribute('show-on-phone'))  {strVisibilityAttribute = 'show-on-phone';}
+  
+          addProp(
+              'Visibility',
+              true,
+              '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
+                  '<option value="">Visible</option>' +
+                  '<option value="hidden">Invisible</option>' +
+                  '<option value="hide-on-desktop">Invisible at desktop size</option>' +
+                  '<option value="hide-on-tablet">Invisible at tablet size</option>' +
+                  '<option value="hide-on-phone">Invisible at phone size</option>' +
+                  '<option value="show-on-desktop">Visible at desktop size</option>' +
+                  '<option value="show-on-tablet">Visible at tablet size</option>' +
+                  '<option value="show-on-phone">Visible at phone size</option>' +
+              '</gs-select>',
+              function () {
+                  selectedElement.removeAttribute('hidden');
+                  selectedElement.removeAttribute('hide-on-desktop');
+                  selectedElement.removeAttribute('hide-on-tablet');
+                  selectedElement.removeAttribute('hide-on-phone');
+                  selectedElement.removeAttribute('show-on-desktop');
+                  selectedElement.removeAttribute('show-on-tablet');
+                  selectedElement.removeAttribute('show-on-phone');
+  
+                  if (this.value) {
+                      selectedElement.setAttribute(this.value, '');
+                  }
+  
+                  return selectedElement;
+              }
+          );
+  
+          addProp(
+              'Refresh On Querystring Columns',
+              true,
+              '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('refresh-on-querystring-values') || '') + '" mini></gs-text>',
+              function () {
+                  this.removeAttribute('refresh-on-querystring-change');
+                  return setOrRemoveTextAttribute(
+                      selectedElement,
+                      'refresh-on-querystring-values',
+                      this.value
+                  );
+              }
+          );
+  
+          addProp(
+              'Refresh On Querystring Change',
+              true,
+              '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('refresh-on-querystring-change')) + '" mini></gs-checkbox>',
+              function () {
+                  this.removeAttribute('refresh-on-querystring-values');
+                  return setOrRemoveBooleanAttribute(
+                      selectedElement,
+                      'refresh-on-querystring-change',
+                      this.value === 'true',
+                      true
+                  );
+              }
+          );
+  
+          // SUSPEND-INSERTED attribute
+          addProp(
+              'suspend-inserted',
+              true,
+              '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>',
+              function () {
+                  return setOrRemoveBooleanAttribute(
+                      selectedElement,
+                      'suspend-inserted',
+                      this.value === 'true',
+                      true
+                  );
+              }
+          );
+      };
+  });
+  
+  window.addEventListener('load', function () {
+      var tables = document.getElementsByTagName('gs-table');
+      for (var i = 0, len = tables.length; i < len; i++) {
+          tables[i].render();
+      }
+  });
   
   document.addEventListener('DOMContentLoaded', function () {
       'use strict';
@@ -36954,6 +37495,25 @@ if (typeof HTMLTemplateElement === 'undefined') {
   
           while (i < len) {
               if (arrColumnWidths[i] > 0) {
+                  // who left this?
+                  // Next time say what was wrong and sign your name.
+                  // ~Michael
+  
+                  //// no worky
+                  //if (
+                  //    (
+                  //        arrCell[i].style.width.indexOf('em') !== -1
+                  //            ? GS.emToPx(document.body, arrCell[i].style.width)
+                  //            : arrCell[i].style.width
+                  //    ) > arrColumnWidths[i]
+                  //) {
+                  //    element.internalDisplay.columnWidths[i] = (
+                  //        arrCell[i].style.width.indexOf('em') !== -1
+                  //            ? GS.emToPx(document.body, arrCell[i].style.width)
+                  //            : arrCell[i].style.width
+                  //    );
+                  //}
+  
                   strCells += arrCell[i].outerHTML;
               }
               i += 1;
@@ -38396,7 +38956,8 @@ if (typeof HTMLTemplateElement === 'undefined') {
               "columnTypes": [],
               "insertRecord": {},
               "insertRecordRetainedColumns": [],
-              "bolFirstLoadFinished": false
+              "bolFirstLoadFinished": false,
+              "bolInserting": false
           };
   
           // we need to be able to make room for fixed objects when scrolling
@@ -38851,7 +39412,6 @@ if (typeof HTMLTemplateElement === 'undefined') {
                       parseInt(arrColumnElements[i].style.width, 10) ||
                       intColumnWidth
                   );
-  
                   // we need to be able to restore the column widths after the
                   //      user resizes them, so this array contains the column
                   //      widths and cannot be updated by column resizing
@@ -39195,7 +39755,6 @@ if (typeof HTMLTemplateElement === 'undefined') {
                   headerRecordTemplate.content,
                   'gs-cell'
               );
-  
               i = 0;
               len = arrColumnElements.length;
               while (i < len) {
@@ -39222,10 +39781,22 @@ if (typeof HTMLTemplateElement === 'undefined') {
                       // for some reason, a few pixels are missing
                       3
                   );
+                  if (element.elems.testHeader.offsetWidth === 0) {
+                      intColumnWidth = (
+                          7 + GS.getTextWidth(
+                              element.elems.testHeader,
+                              arrColumnElements[i].textContent,
+                              true // preserve whitespace
+                          ) + 7 +
+                          // for some reason, a few pixels are missing
+                          3
+                      );
   
+                      element.elems.testHeader.style.width = (
+                          intColumnWidth + 'px'
+                      );
+                  }
                   element.elems.testHeader.innerHTML = '';
-  
-                  //console.log(arrColumnElements[i].textContent);
   
                   // if there is a data column associated, we need to
                   //      add the width of the header button
@@ -39236,16 +39807,10 @@ if (typeof HTMLTemplateElement === 'undefined') {
                       );
                   }
   
-                  //console.log(intColumnWidth);
-  
                   element.internalDisplay.minColumnWidths.push(
                       intColumnWidth
                   );
   
-                  //console.log(
-                  //    intColumnWidth,
-                  //    element.internalDisplay.columnWidths[i]
-                  //);
                   if (
                       intColumnWidth >
                           element.internalDisplay.columnWidths[i]
@@ -39508,16 +40073,14 @@ if (typeof HTMLTemplateElement === 'undefined') {
               recordDelimiter =
                       element.getAttribute('copy-delimiter-record')
                   .replace(/\{\{DOS_RETURN\}\}/gi, '\r\n')
-                  .replace(/\{\{MAC_RETURN\}\}/gi, '\r')
-                  .replace(/\{\{UNIX_RETURN\}\}/gi, '\n');
+                  .replace(/\{\{MAC_RETURN\}\}/gi, '\r');
           } else {
               recordDelimiter = '\n';
           }
           if (element.getAttribute('copy-delimiter-cell')) {
               cellDelimiter = element.getAttribute('copy-delimiter-cell')
                   .replace(/\{\{DOS_RETURN\}\}/gi, '\r\n')
-                  .replace(/\{\{MAC_RETURN\}\}/gi, '\r')
-                  .replace(/\{\{UNIX_RETURN\}\}/gi, '\n');
+                  .replace(/\{\{MAC_RETURN\}\}/gi, '\r');
           } else {
               cellDelimiter = '\t';
           }
@@ -40320,17 +40883,6 @@ if (typeof HTMLTemplateElement === 'undefined') {
           var statusElement;
           var intOriginRecord;
   
-          // I don't know who put this here but it wasn't commented. If you put
-          //      this here: explain yourself. This is the HUD button status
-          //      updating function, this has nothing to do with selection.
-          //      I suppose this function is called after a selection so someone
-          //      thought they were being clever and decided that this was the
-          //      place to trigger such an event. But, I should remind you that
-          //      we have a selection render function that may have worked the
-          //      same but would have been more consistent and clear.
-          //  ~Michael
-          GS.triggerEvent(element, 'selection_change');
-  
           // disable/enable hud sorting buttons
           sortASCButton = findHudElement(element, 'button-sort-asc');
           sortDESCButton = findHudElement(element, 'button-sort-desc');
@@ -40417,6 +40969,8 @@ if (typeof HTMLTemplateElement === 'undefined') {
           var arrSelectionCols;
           var pushValue;
   
+  
+          // GS.triggerEvent(element, 'selection_change');
           //console.time('selection total');
   
           // first, we should gather some helper variables.
@@ -40472,6 +41026,14 @@ if (typeof HTMLTemplateElement === 'undefined') {
                   }
                   col_i += 1;
               }
+  
+              //if (
+              //    arrSelection &&
+              //    arrSelection[0] &&
+              //    arrSelection[0][0] !== 'G'
+              //) {
+              //    console.trace(arrSelection);
+              //}
   
           } else {
               element.internalSelection.rangeCache = strCompareString;
@@ -40891,10 +41453,10 @@ if (typeof HTMLTemplateElement === 'undefined') {
                       cell.setAttribute('selected', '');
                       //console.log(
                       //    strRecord,
+                      //    bolHeaders,
+                      //    bolSelectors,
                       //    intCol,
                       //    intRow,
-                      //    cell.getAttribute('data-col-number'),
-                      //    cell.getAttribute('data-row-number'),
                       //    cell
                       //);
   
@@ -41146,7 +41708,7 @@ if (typeof HTMLTemplateElement === 'undefined') {
           // we want the null string to be configurable, so we'll read the
           //      "null-string" attribute to get the null string
           strNullString = element.getAttribute('null-string');
-          //snapback
+  
           // get visible range
           jsnRange = element.internalDisplay.currentRange;
           //intCellOriginLeft = jsnRange.originLeft;
@@ -41339,7 +41901,10 @@ if (typeof HTMLTemplateElement === 'undefined') {
           //      with a random token and storing the token-template relationship)
           //      them, we have to "show" them (by replacing the token with the
           //      original template strings) at this step
-          GS.templateShowSubTemplates(strHTML, element.internalTemplates.record);
+          strHTML = GS.templateShowSubTemplates(
+              strHTML,
+              element.internalTemplates.record
+          );
   
           //// we need to use the dimensions of the header, record selectors and
           ////      the insert record, so we'll stick them in these variables for
@@ -41403,7 +41968,10 @@ if (typeof HTMLTemplateElement === 'undefined') {
           //      with a random token and storing the token-template relationship)
           //      them, we have to "show" them (by replacing the token with the
           //      original template strings) at this step
-          GS.templateShowSubTemplates(strHTML, element.internalTemplates.record);
+          strHTML = GS.templateShowSubTemplates(
+              strHTML,
+              element.internalTemplates.record
+          );
   
           // if there's a insert record: build it and append to HTML
           if (strInsertTemplate) {
@@ -42694,6 +43262,24 @@ if (typeof HTMLTemplateElement === 'undefined') {
               element.elems.dataViewport.clientHeight
           );
   
+          element.internalDisplay.focus.selectionRange = null;
+          if (GS.findParentElement(document.activeElement, element) === element) {
+              // we want to save the text selection of the current
+              //      control before we do the render
+              if (
+                  element.internalDisplay.focus.latest &&
+                  (
+                      document.activeElement.nodeName === 'INPUT' ||
+                      document.activeElement.nodeName === 'TEXTAREA'
+                  )
+              ) {
+                  element.internalDisplay.focus.selectionRange = (
+                      GS.getInputSelection(document.activeElement)
+                  );
+              }
+          }
+          console.log(element.internalDisplay.focus.selectionRange);
+  
           // we want to either do a full re-render or a partial re-render
           if (intViewportHeight < 3 || intViewportWidth < 3) {
               //console.log('Empty');
@@ -43493,7 +44079,7 @@ if (typeof HTMLTemplateElement === 'undefined') {
               );
   
               // save new HUD height to a variable for clarity
-              newTopHUDHeight = element.elems.topHudContainer.offsetHeight;
+              newTopHUDHeight = (element.elems.topHudContainer.offsetHeight);
   
               // update padding to make room for the hud
               element.elems.root.style.paddingTop = newTopHUDHeight + 'px';
@@ -43571,6 +44157,7 @@ if (typeof HTMLTemplateElement === 'undefined') {
       }
   
       function resizeColumnsToContent(element, arrColumnIndexes) {
+          //console.trace('resizeColumnsToContent', element, arrColumnIndexes);
           var i;
           var len;
           var elem_i;
@@ -43669,6 +44256,8 @@ if (typeof HTMLTemplateElement === 'undefined') {
                           controlText,
                           true // preserve whitespace
                       );
+                      //console.log(controlText);
+                      //console.log(intTextWidth);
   
                       // there may be some padding between the scope element
                       //      and the cell element. so, we want to account for
@@ -43706,7 +44295,6 @@ if (typeof HTMLTemplateElement === 'undefined') {
   
                       // add padding to text width
                       intTextWidth += (intColumnWidth - intScopeElementWidth);
-  
                       // add an arbituary amount to deal with small imperfections
                       intTextWidth += 10;
   
@@ -43975,6 +44563,7 @@ if (typeof HTMLTemplateElement === 'undefined') {
           GS.triggerEvent(element, 'after_select');
       }
       function dataINSERTcallback(element) {
+          element.internalData.bolInserting = false;
           // re-render scroll location because adding records changes scroll
           //      heights, and so that we can show the new data
           element.internalDisplay.fullRenderRequired = true;
@@ -43991,7 +44580,9 @@ if (typeof HTMLTemplateElement === 'undefined') {
           //         )
           //     )
           // );
-          element.goToLine('last');
+          if (!element.hasAttribute('no-insert-scroll')) {
+              element.goToLine('last');
+          }
   
           // re-render scroll location because we changed the scrollTop
           renderScrollLocation(element);
@@ -44033,6 +44624,10 @@ if (typeof HTMLTemplateElement === 'undefined') {
           var arrOldColumnListFilters;
   
           var strWhere;
+          // Code related to strWhereAddendum was added because the moron
+          //      who wrote this code wasn't appending to strWhere, 
+          //      they were replacing it
+          var strWhereAddendum;
           var strUserWhere;
           var strWhereColumn;
   
@@ -44044,12 +44639,16 @@ if (typeof HTMLTemplateElement === 'undefined') {
   
           // add in user filters, if any
           if (element.getAttribute('session-filter')) {
-              strWhere = '(' + element.getAttribute('session-filter') + ')';
-              strWhere += (
-                  strWhere
-                      ? ' AND ' + strWhere
-                      : ''
-              );
+              // strWhere = '(' + element.getAttribute('session-filter') + ')';
+              strWhereAddendum = '(' + element.getAttribute('session-filter') + ')';
+              if (strWhereAddendum) {
+                  strWhere += (
+                      strWhere
+                          ? ' AND ' + strWhereAddendum
+                          : '' + strWhereAddendum
+                  );
+                  strWhereAddendum = '';
+              }
           }
   
           // add in a column or qs where, if any
@@ -44073,7 +44672,7 @@ if (typeof HTMLTemplateElement === 'undefined') {
               // if the value is not a number, we need to do a string
               //      comparison in the where clause.
               if (isNaN(element.value)) {
-                  strWhere = (
+                  strWhereAddendum = (
                       'CAST(' +
                       strWhereColumn + ' AS ' +
                       GS.database.type.text +
@@ -44083,20 +44682,25 @@ if (typeof HTMLTemplateElement === 'undefined') {
                       GS.database.type.text +
                       ')'
                   );
-                  strWhere += (
-                      strWhere !== ''
-                          ? ' AND (' + strWhere + ')'
-                          : ''
-                  );
+                  if (strWhereAddendum) {
+                      strWhere += (
+                          strWhere !== ''
+                              ? ' AND (' + strWhereAddendum + ')'
+                              : '' + strWhereAddendum
+                      );
+                  }
   
               // if the value is a number, we can do simpler, number comparison
               } else {
-                  strWhere = strWhereColumn + '=' + (element.value);
-                  strWhere += (
-                      strWhere !== ''
-                          ? ' AND (' + strWhere + ')'
-                          : ''
-                  );
+                  // strWhere = strWhereColumn + '=' + (element.value);
+                  strWhereAddendum = strWhereColumn + '=' + (element.value);
+                  if (strWhereAddendum) {
+                      strWhere += (
+                          strWhere !== ''
+                              ? ' AND (' + strWhereAddendum + ')'
+                              : '' + strWhereAddendum
+                      );
+                  }
               }
           }
   
@@ -44727,7 +45331,9 @@ if (typeof HTMLTemplateElement === 'undefined') {
                       ? '\t'
                       : ''
               );
-              strReturn += element.internalData.columnNames[col_i].replace(/(\\)/g, '\\\\');
+              strReturn += (
+                  element.internalData.columnNames[col_i].replace(/(\\)/g, '\\\\')
+              );
               col_i += 1;
           }
   
@@ -44796,7 +45402,9 @@ if (typeof HTMLTemplateElement === 'undefined') {
               col_i = 0;
               col_len = jsnInsert.data.columns.length;
               while (col_i < col_len) {
-                  strColumn = jsnInsert.data.columns[col_i].replace(/(\\)/g, '\\\\');
+                  strColumn = (
+                      jsnInsert.data.columns[col_i].replace(/(\\)/g, '\\\\')
+                  );
   
                   strInsertColumns += (
                       strInsertColumns
@@ -44855,14 +45463,16 @@ if (typeof HTMLTemplateElement === 'undefined') {
                       rec_i += 1;
                   }
               }
-              console.log(jsnInsert.data.columns, jsnInsert.data.addin);
+              //console.log(jsnInsert.data.columns, jsnInsert.data.addin);
   
               // build up insert column list
               strInsertColumns = '';
               col_i = 0;
               col_len = jsnInsert.data.columns.length;
               while (col_i < col_len) {
-                  strColumn = jsnInsert.data.columns[col_i].replace(/(\\)/g, '\\\\');
+                  strColumn = (
+                      jsnInsert.data.columns[col_i].replace(/(\\)/g, '\\\\')
+                  );
   
                   strInsertColumns += (
                       strInsertColumns
@@ -45121,7 +45731,6 @@ if (typeof HTMLTemplateElement === 'undefined') {
           }
       }
       function databaseWSUPDATE(element, strMode, jsnUpdate) {
-          console.trace('databaseWSUPDATE');
           var i;
           var len;
           var pk_i;
@@ -45182,7 +45791,9 @@ if (typeof HTMLTemplateElement === 'undefined') {
                       ? '\t'
                       : ''
               );
-              strReturn += element.internalData.columnNames[col_i].replace(/(\\)/g, '\\\\');
+              strReturn += (
+                  element.internalData.columnNames[col_i].replace(/(\\)/g, '\\\\')
+              );
               col_i += 1;
           }
   
@@ -45193,7 +45804,9 @@ if (typeof HTMLTemplateElement === 'undefined') {
           //      one record
           if (strMode === 'single-cell') {
               jsnCurrentData = {
-                  "columnName": jsnUpdate.data.columnName.replace(/(\\)/g, '\\\\'),
+                  "columnName": (
+                      jsnUpdate.data.columnName.replace(/(\\)/g, '\\\\')
+                  ),
                   "recordNumber": jsnUpdate.data.recordNumber,
                   "oldValue": ""
               };
@@ -45479,7 +46092,9 @@ if (typeof HTMLTemplateElement === 'undefined') {
                           ? '\t'
                           : ''
                   );
-                  strColumns += jsnUpdate.data.columns[i].replace(/(\\)/g, '\\\\');
+                  strColumns += (
+                      jsnUpdate.data.columns[i].replace(/(\\)/g, '\\\\')
+                  );
                   i += 1;
               }
   
@@ -46005,7 +46620,7 @@ if (typeof HTMLTemplateElement === 'undefined') {
                           ? ""
                           : strTemp
                   );
-                  console.log(strTemp, strRecordToHash);
+                  //console.log(strTemp, strRecordToHash);
   
                   col_i += 1;
               }
@@ -46116,7 +46731,7 @@ if (typeof HTMLTemplateElement === 'undefined') {
                               //      That, young grasshopper, is because through
                               //      my travels I've found .splice() to be
                               //      significantly slower than simply rebuilding
-                              //      the array. This is what I do in pgManage's
+                              //      the array. This is what I do in Postage's
                               //      tree code.
                               arrRecords = [];
                               arrRecordHeights = [];
@@ -46911,7 +47526,7 @@ if (typeof HTMLTemplateElement === 'undefined') {
               //      That, young grasshopper, is because through
               //      my travels I've found .splice() to be
               //      significantly slower than simply rebuilding
-              //      the array. This is what I do in pgManage's
+              //      the array. This is what I do in Postage's
               //      tree code.
               arrRecords = [];
               arrRecordHeights = [];
@@ -47405,6 +48020,7 @@ if (typeof HTMLTemplateElement === 'undefined') {
           }
       }
       function dataINSERT(element, strMode, jsnInsert) {
+          element.internalData.bolInserting = true;
           if (element.hasAttribute("src")) {
               databaseWSINSERT(element, strMode, jsnInsert);
           } else {
@@ -47413,20 +48029,21 @@ if (typeof HTMLTemplateElement === 'undefined') {
       }
       function dataUPDATE(element, strMode, jsnUpdate) {
           if (!element.hasAttribute('no-update')) {
-              // we want to save the text selection of the current
-              //      control before we do the update
-              element.internalDisplay.focus.selectionRange = null;
-              if (
-                  element.internalDisplay.focus.latest &&
-                  (
-                      document.activeElement.nodeName === 'INPUT' ||
-                      document.activeElement.nodeName === 'TEXTAREA'
-                  )
-              ) {
-                  element.internalDisplay.focus.selectionRange = (
-                      GS.getInputSelection(document.activeElement)
-                  );
-              }
+              // because updates take time, we need to do this right before re-render - Nunzio on 2017-03-28
+              // // we want to save the text selection of the current
+              // //      control before we do the update
+              // element.internalDisplay.focus.selectionRange = null;
+              // if (
+              //     element.internalDisplay.focus.latest &&
+              //     (
+              //         document.activeElement.nodeName === 'INPUT' ||
+              //         document.activeElement.nodeName === 'TEXTAREA'
+              //     )
+              // ) {
+              //     element.internalDisplay.focus.selectionRange = (
+              //         GS.getInputSelection(document.activeElement)
+              //     );
+              // }
   
               if (element.hasAttribute("src")) {
                   databaseWSUPDATE(element, strMode, jsnUpdate);
@@ -47446,6 +48063,36 @@ if (typeof HTMLTemplateElement === 'undefined') {
   // #############################################################################
   // ####################### POST-RENDER UTILITY FUNCTIONS #######################
   // #############################################################################
+      function triggerRecordInsert(element) {
+          dataINSERT(element, 'single-record', {
+              "data": {
+                  "values": (
+                      element
+                          .internalData
+                          .insertRecord
+                  ),
+                  "columns": (
+                      element
+                          .internalData
+                          .insertRecordRetainedColumns
+                  ),
+                  "addin": getInsertAddin(element)
+              },
+              "insertConfirmed": true
+          });
+  
+          // we clear the retained values and columns here because
+          //      if the user decides to override the insert with
+          //      their own thing, we don't want to still be showing
+          //      the old values.
+          element.internalData.insertRecord = {};
+          element.internalData.insertRecordRetainedColumns = [];
+  
+          // re-render so that the insert controls clear out in the DOM
+          element.internalDisplay.fullRenderRequired = true;
+          renderLocation(element);
+          //element.goToLine('last');
+      }
   
       // sometimes you need to know what records are selected, this function
       //      returns the selected record numbers
@@ -47533,6 +48180,7 @@ if (typeof HTMLTemplateElement === 'undefined') {
                           '[data-col-number="' + column + '"]'
               )[0];
           }
+          //console.log(record, column);
   
           // if the cell was not found:
           //      warn
@@ -47581,7 +48229,7 @@ if (typeof HTMLTemplateElement === 'undefined') {
               cellElement,
               'input, textarea, select, [tabindex]'
           )[0];
-  
+          //console.log(focusElement, cellElement);
           // if a focus element was found: focus into it
           if (focusElement) {
               focusElement.focus();
@@ -47901,6 +48549,7 @@ if (typeof HTMLTemplateElement === 'undefined') {
           jsnRange = element.internalSelection.ranges[
               element.internalSelection.ranges.length - 1
           ];
+          //console.log(jsnRange);
   
           // if more than one selection: warn and move selection to endpoint of
           //      latest selection
@@ -47943,7 +48592,6 @@ if (typeof HTMLTemplateElement === 'undefined') {
                       ' execution of "focusIntoSelectedCell".');
   
               focusHiddenControl(element);
-  
               return;
           }
   
@@ -48271,13 +48919,19 @@ if (typeof HTMLTemplateElement === 'undefined') {
   // #############################################################################
   // ############################## PASTE FUNCTIONS ##############################
   // #############################################################################
-  
       // when you paste for an insert, only some columns might be selected, this
       //      function takes the normalized paste data and trims out anything that
       //      would have been applied to an unseleted cell. after that, this
       //      function turns control over to the internal insert function
       function insertPasteString(element, arrPaste, intMaxPasteColumn) {
           var templateElement;
+          var search_div;
+          var enc_i
+          var enc_len;
+          var enc_elems;
+          var arr_encrypted_columns;
+          var bol_encrypt = false;
+          var encrypted_vars;
           var strSelection;
           var strOldRecord;
           var strNewRecord;
@@ -48340,6 +48994,43 @@ if (typeof HTMLTemplateElement === 'undefined') {
           // use the selected column list to filter the data of the paste
           i = 0;
           len = arrPaste.length;
+          search_div = document.createElement('div');
+          search_div.innerHTML = templateExtractVisibleCellRange(
+              element,
+              element.internalTemplates.insertRecord,
+              intStart,
+              (intEnd + 1)
+              // the plus one is because the template extract function
+              //      expects 0/1 to get the first column, not 0/0
+          );
+          if (search_div.innerHTML.indexOf('encrypted=') !== -1) {
+              if (xtag.query(search_div, 'gs-cell[encrypted]')) {
+                  enc_elems = xtag.query(search_div, 'gs-cell[encrypted]');
+                  enc_i = 0;
+                  enc_len = enc_elems.length;
+                  arr_encrypted_columns = [];
+                  encrypted_vars = [];
+                  while (enc_i < enc_len) {
+                      arr_encrypted_columns.push(
+                          enc_elems[enc_i].getAttribute('data-col-number')
+                      );
+                      encrypted_vars.push(
+                          enc_elems[enc_i].getAttribute('encrypted')
+                      );
+                      if (!window[encrypted_vars[enc_i]]) {
+                          console.error(
+                              'the encrypted password variable is not filled, ' +
+                              'if a user pastes it will paste UNENCRYPTED ' +
+                              'DATA. Please ensure all your variables are full ' +
+                              'before allowing users to paste'
+                          );
+                          return;
+                      }
+                      enc_i++;
+                  }
+                  bol_encrypt = true;
+              }
+          }
           while (i < len) {
               strOldRecord = arrPaste[i];
   
@@ -48375,7 +49066,29 @@ if (typeof HTMLTemplateElement === 'undefined') {
   
                           // if this column is selected: add cell to paste record
                           if (strSelection[intPastedColumn + intStart] === 'F') {
-                              strNewRecord += strCell;
+                              // strNewRecord += strCell;
+                              if (bol_encrypt) {
+                                  if (arr_encrypted_columns.indexOf(
+                                      (intPastedColumn + intStart).toString()
+                                  ) !== -1) {
+                                      strNewRecord += CryptoJS.AES.encrypt(
+                                          strCell
+                                          , window[
+                                              encrypted_vars[
+                                                  arr_encrypted_columns.indexOf(
+                                          (intPastedColumn + intStart).toString()
+                                                  )
+                                              ]
+                                          ]
+                                      );
+                                  } else {
+                                      strNewRecord += strCell;
+                                  }
+                              } else {
+                                  strNewRecord += strCell;
+                              }
+                              console.log(strCell);
+                              console.log(intPastedColumn + intStart);
   
                           // else, replace the current cell with NULL
                           } else {
@@ -48427,7 +49140,6 @@ if (typeof HTMLTemplateElement === 'undefined') {
               // the plus one is because the template extract function
               //      expects 0/1 to get the first column, not 0/0
           );
-  
           arrColumnElements = xtag.query(
               templateElement.content,
               'gs-cell [column]'
@@ -48503,7 +49215,9 @@ if (typeof HTMLTemplateElement === 'undefined') {
   
           // save selection cache so that we can check if a particular cell is
           //      selected
-          arrSelection = element.internalSelection.resolvedSelection;
+          // take a copy of the resolved selction
+          //      (fixes workflowproducts/postage#395)
+          arrSelection = element.internalSelection.resolvedSelection.slice(0);
   
           // you can't paste into the header
           if (element.internalDisplay.headerVisible) {
@@ -48756,7 +49470,7 @@ if (typeof HTMLTemplateElement === 'undefined') {
       //      insert or update paste functions
       function usePasteString(element, strUnnormalizedPasteString) {
           var elementMaker = document.createElement('template');
-  
+          //console.log('paste', strUnnormalizedPasteString);
           var tableElement;
           var tbodyElement;
           var arrRecord;
@@ -48777,6 +49491,16 @@ if (typeof HTMLTemplateElement === 'undefined') {
           // because pasting a large amount of data takes time, add a
           //      loader to let the user know we've started, just in case
           addLoader(element, 'paste-parse', 'Parsing Pasted Data...');
+  
+          // sometimes there's a whole page that contains the table HTML inside it
+          //strUnnormalizedPasteString =
+          if (strUnnormalizedPasteString.substring(0, 6) === '<HTML>') {
+              var extractorDiv = document.createElement('div');
+              extractorDiv.innerHTML = strUnnormalizedPasteString;
+              strUnnormalizedPasteString = (
+                  xtag.query(extractorDiv, 'table')[0].outerHTML
+              );
+          }
   
           // if no HTML or no valid HTML: build HTML using plain text
           if (
@@ -48954,7 +49678,7 @@ if (typeof HTMLTemplateElement === 'undefined') {
               //console.log('############### PLAIN TEXT ###############');
               //console.log('##########################################');
               //console.log('|' + pastePlain + '|');
-  
+              //console.log(pasteHTML || pastePlain);
               // send paste string to be utilized
               usePasteString(
                   element,
@@ -49463,7 +50187,7 @@ if (typeof HTMLTemplateElement === 'undefined') {
           templateElement.innerHTML = ml(function () {/*
   <gs-page class="gs-table-contextmenu">
       <gs-body class="gs-table-contextmenu" padded>
-          <div class="context-menu-header">Paste Format (<b>NOT SAVED</b>, go to Options > pgManage Options to change the default clipboard options):</div>
+          <div class="context-menu-header">Paste Format:</div>
           <table>
               <tbody>
   <tr>
@@ -49587,6 +50311,7 @@ if (typeof HTMLTemplateElement === 'undefined') {
   </gs-page>
               */
           })
+              .replace(/\{\{UNIX_RETURN\}\}/gi, '\n')
               .replace(/\{\{TAB\}\}/gi, '\t');
   
           // the control elements are found in the "after open" callback.
@@ -49801,6 +50526,154 @@ if (typeof HTMLTemplateElement === 'undefined') {
   // ############################## EVENT FUNCTIONS ##############################
   // #############################################################################
   
+      // ############# QS EVENTS #############
+      
+      function saveDefaultAttributes(element) {
+          var i;
+          var len;
+          var arrAttr;
+          var jsnAttr;
+  
+          // we need a place to store the attributes
+          element.internalData.defaultAttributes = {};
+  
+          // loop through attributes and store them in the internal defaultAttributes object
+          i = 0;
+          len = element.attributes.length;
+          arrAttr = element.attributes;
+          while (i < len) {
+              jsnAttr = element.attributes[i];
+  
+              element.internalData.defaultAttributes[jsnAttr.nodeName] = (jsnAttr.value || '');
+  
+              i += 1;
+          }
+      }
+      
+      function pushReplacePopHandler(element) {
+          var i;
+          var len;
+          var strQS = GS.getQueryString();
+          var strQSCol = element.getAttribute('qs');
+          var strQSValue;
+          var strQSAttr;
+          var arrQSParts;
+          var arrAttrParts;
+          var arrPopKeys;
+          var currentValue;
+          var bolRefresh;
+          var strOperator;
+  
+          if (strQSCol) {
+              if (strQSCol.indexOf('=') !== -1) {
+                  arrAttrParts = strQSCol.split(',');
+                  i = 0;
+                  len = arrAttrParts.length;
+                  while (i < len) {
+                      strQSCol = arrAttrParts[i];
+  
+                      if (strQSCol.indexOf('!=') !== -1) {
+                          strOperator = '!=';
+                          arrQSParts = strQSCol.split('!=');
+                      } else {
+                          strOperator = '=';
+                          arrQSParts = strQSCol.split('=');
+                      }
+  
+                      strQSCol = arrQSParts[0];
+                      strQSAttr = arrQSParts[1] || arrQSParts[0];
+  
+                      // if the key is not present or we've got the negator: go to the attribute's default or remove it
+                      if (strOperator === '!=') {
+                          // if the key is not present: add the attribute
+                          if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                              element.setAttribute(strQSAttr, '');
+                          // else: remove the attribute
+                          } else {
+                              element.removeAttribute(strQSAttr);
+                          }
+                      } else {
+                          // if the key is not present: go to the attribute's default or remove it
+                          if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                              if (element.internalData.defaultAttributes[strQSAttr] !== undefined) {
+                                  element.setAttribute(strQSAttr, (element.internalData.defaultAttributes[strQSAttr] || ''));
+                              } else {
+                                  element.removeAttribute(strQSAttr);
+                              }
+                          // else: set attribute to exact text from QS
+                          } else {
+                              element.setAttribute(strQSAttr, (
+                                  GS.qryGetVal(strQS, strQSCol) ||
+                                  element.internalData.defaultAttributes[strQSAttr] ||
+                                  ''
+                              ));
+                          }
+                      }
+                      i += 1;
+                  }
+              } else if (GS.qryGetKeys(strQS).indexOf(strQSCol) > -1) {
+                  strQSValue = GS.qryGetVal(strQS, strQSCol);
+  
+                  if (element.internalData.bolQSFirstRun !== true) {
+                      if (strQSValue !== '' || !element.getAttribute('value')) {
+                          element.setAttribute('value', strQSValue);
+                      }
+                  } else {
+                      element.value = strQSValue;
+                  }
+              }
+          }
+  
+          // handle "refresh-on-querystring-values" and "refresh-on-querystring-change" attributes
+          if (element.internalData.bolQSFirstRun === true) {
+              if (element.hasAttribute('refresh-on-querystring-values')) {
+                  arrPopKeys = element.getAttribute('refresh-on-querystring-values').split(/\s*,\s*/gim);
+  
+                  for (i = 0, len = arrPopKeys.length; i < len; i += 1) {
+                      currentValue = GS.qryGetVal(strQS, arrPopKeys[i]);
+  
+                      if (element.popValues[arrPopKeys[i]] !== currentValue) {
+                          bolRefresh = true;
+                      }
+  
+                      element.popValues[arrPopKeys[i]] = currentValue;
+                  }
+              } else if (element.hasAttribute('refresh-on-querystring-change')) {
+                  bolRefresh = true;
+              }
+  
+              if (bolRefresh && element.hasAttribute('src')) {
+                  console.log('pushReplacePopHandler: refresh', element);
+                  element.refresh();
+              } else if (bolRefresh && !element.hasAttribute('src')) {
+                  console.warn('gs-table Warning: element has "refresh-on-querystring-values" or "refresh-on-querystring-change", but no "src".', element);
+              }
+          } else {
+              if (element.hasAttribute('refresh-on-querystring-values')) {
+                  arrPopKeys = element.getAttribute('refresh-on-querystring-values').split(/\s*,\s*/gim);
+  
+                  for (i = 0, len = arrPopKeys.length; i < len; i += 1) {
+                      element.popValues[arrPopKeys[i]] = GS.qryGetVal(strQS, arrPopKeys[i]);
+                  }
+              }
+          }
+  
+          element.internalData.bolQSFirstRun = true;
+      }
+      
+      function bindQuerystringEvents(element) {
+          if (element.getAttribute('qs') ||
+                  element.getAttribute('refresh-on-querystring-values') ||
+                  element.hasAttribute('refresh-on-querystring-change')) {
+              element.popValues = {};
+  
+              pushReplacePopHandler(element);
+              window.addEventListener('pushstate',    function () { pushReplacePopHandler(element); });
+              window.addEventListener('replacestate', function () { pushReplacePopHandler(element); });
+              window.addEventListener('popstate',     function () { pushReplacePopHandler(element); });
+          }
+      }
+      
       // ############# FOCUS EVENTS #############
       function unbindFocus(element) {
           element.removeEventListener(
@@ -49836,7 +50709,6 @@ if (typeof HTMLTemplateElement === 'undefined') {
               var blurEventFunction;
               var target = event.target;
               var parentCell;
-  
               // when you put a control into a label, if you click on the label:
               //      it focuses the control. sometimes, people use a label
               //      element simply for the padding. we don't want this focus
@@ -49856,8 +50728,6 @@ if (typeof HTMLTemplateElement === 'undefined') {
   
               // if no focusable control was moused on: focus
               //      hiddenFocusControl
-              //console.log(document.activeElement);
-              //console.log(event.target);
               if (!GS.isElementFocusable(target) && !evt.touchDevice) {
                   focusHiddenControl(element);
   
@@ -49901,8 +50771,34 @@ if (typeof HTMLTemplateElement === 'undefined') {
               if (parentCell && parentCell.nodeName === 'GS-CELL') {
                   // if the GS-CELL is not selected
                   if (!parentCell.hasAttribute('selected')) {
-                      // focus hidden control
-                      focusHiddenControl(element);
+                      // // focus hidden control
+                      // focusHiddenControl(element);
+                      // select the cell
+                      var parentTable = GS.findParentTag(active, 'gs-table');
+                      if (parentTable && parentTable.nodeName === 'GS-TABLE') {
+                          var cell_row = parentCell.getAttribute('data-row-number');
+                          var cell_col = parentCell.getAttribute('data-col-number');
+                          if (cell_row === 'insert') {
+                              cell_row = tableElem.internalData.records.length;
+                          } else {
+                              cell_row = parseInt(cell_row, 10);
+                          }
+                          var jsnRange = {
+                              "start": {
+                                  "row": cell_row,
+                                  "column": cell_col
+                              },
+                              "end": {
+                                  "row": cell_row,
+                                  "column": cell_col
+                              },
+                              "negator": false
+                          };
+                          parentTable.internalSelection.ranges = [jsnRange];
+                          renderSelection(parentTable);
+                          active = document.activeElement;
+                          active.focus
+                      }
                   }
               }
           };
@@ -50068,7 +50964,6 @@ if (typeof HTMLTemplateElement === 'undefined') {
               var topPlay = 10;
               element.internalEvents.scrollDragMoveFunction = function (event) {
                   var jsnMousePos;
-  
                   if (event.which === 0 && !evt.touchDevice) {
                       event.preventDefault();
                       event.stopPropagation();
@@ -50709,6 +51604,7 @@ if (typeof HTMLTemplateElement === 'undefined') {
                   //console.log(!cell.hasAttribute('selected'));
   
                   if (
+                      cell &&
                       // if we found a cell
                       cell.nodeName === 'GS-CELL' &&
                       // and we're not resizing a cell or record right now
@@ -50845,18 +51741,18 @@ if (typeof HTMLTemplateElement === 'undefined') {
                       if (!event.shiftKey && !event.metaKey && !event.ctrlKey) {
                           // clear all the old ranges and add the new range
                           element.internalSelection.ranges = [newRange];
-  
+                          // GS.triggerEvent(element, 'selection_change');
                           // because our new selection is the first in the list,
                           //      the current selection index is 0
                           intCurrentSelectionIndex = 0;
                       } else {
+                          //console.log('OVER HERE');
                           // if the shift key is down (and the previous selection
                           //      was not negator selection), we need override the
                           //      previous selection's endpoint, so we'll just set
                           //      the intCurrentSelectionIndex to the index of the
                           //      latest selection
                           if (event.shiftKey) {
-                              //console.log('OVER HERE');
                               intCurrentSelectionIndex = (
                                   element.internalSelection.ranges.length - 1
                               );
@@ -50933,6 +51829,8 @@ if (typeof HTMLTemplateElement === 'undefined') {
                       // we re-render the selection because it has just been
                       //      changed
                       renderSelection(element);
+                      GS.triggerEvent(element, 'selection_change');
+                      console.log('changed');
   
                       //console.log(element.internalSelection.ranges);
   
@@ -50972,6 +51870,10 @@ if (typeof HTMLTemplateElement === 'undefined') {
                   var intOldEndRow;
                   var intOldEndColumn;
                   var currentRange;
+                  var jsnCurrentSelection;
+  
+                  jsnCurrentSelection =
+                      GS.getInputSelection(document.activeElement);
   
                   getCellFromMouseEvent(element, event);
   
@@ -50979,6 +51881,12 @@ if (typeof HTMLTemplateElement === 'undefined') {
                   //      selection, unbind selectDragMove and unbind
                   //      selectDragEnd
                   if (event.which === 0 && !evt.touchDevice) {
+                      element.internalEvents.selectDragEnd();
+  
+                  // if selecting text, prevent selection
+                  } else if (
+                      (jsnCurrentSelection.end - jsnCurrentSelection.start) !== 0
+                  ) {
                       element.internalEvents.selectDragEnd();
   
                   } else {
@@ -51120,6 +52028,8 @@ if (typeof HTMLTemplateElement === 'undefined') {
                           currentRange.end.column !== intOldEndColumn
                       ) {
                           renderSelection(element);
+                          GS.triggerEvent(element, 'selection_change');
+                          //console.log('changed');
                       }
                   }
               };
@@ -54089,9 +54999,14 @@ if (typeof HTMLTemplateElement === 'undefined') {
                           10
                       );
   
-                      //console.log('strColumn:', strColumn);
+  
+                      console.log('columnElement.value:',  columnElement.value);
+                      console.log('target.value:',  target.value);
+                      console.log('columnElement.checked:',  columnElement.checked);
+                      console.log('target.checked:',  target.checked);
+                      console.log('strColumn:', strColumn);
                       //console.log('intRecord:', intRecord);
-                      //console.log('newValue:', newValue);
+                      console.log('newValue:', newValue);
   
                       // call the update function
                       dataUPDATE(element, 'single-cell', {
@@ -54116,6 +55031,7 @@ if (typeof HTMLTemplateElement === 'undefined') {
           //      focused way, with more room. so, we open the update dialog
           //      when an update dialog button is clicked.
           element.internalEvents.updateDialog = function (event) {
+              console.log(event);
               var target = event.target;
               var arrCol;
               var intRow;
@@ -54340,7 +55256,8 @@ if (typeof HTMLTemplateElement === 'undefined') {
           );
           element.elems.dataViewport.removeEventListener(
               'change',
-              element.internalEvents.insertRecordValueRetain
+              element.internalEvents.insertRecordValueRetain,
+              true
           );
           element.elems.dataViewport.removeEventListener(
               'keyup',
@@ -54359,34 +55276,7 @@ if (typeof HTMLTemplateElement === 'undefined') {
                   parentCell.classList.contains('table-insert') &&
                   keyCode === 13
               ) {
-                  dataINSERT(element, 'single-record', {
-                      "data": {
-                          "values": (
-                              element
-                                  .internalData
-                                  .insertRecord
-                          ),
-                          "columns": (
-                              element
-                                  .internalData
-                                  .insertRecordRetainedColumns
-                          ),
-                          "addin": getInsertAddin(element)
-                      },
-                      "insertConfirmed": true
-                  });
-  
-                  // we clear the retained values and columns here because
-                  //      if the user decides to override the insert with
-                  //      their own thing, we don't want to still be showing
-                  //      the old values.
-                  element.internalData.insertRecord = {};
-                  element.internalData.insertRecordRetainedColumns = [];
-  
-                  // re-render so that the insert controls clear out in the DOM
-                  element.internalDisplay.fullRenderRequired = true;
-                  renderLocation(element);
-                  //element.goToLine('last');
+                  triggerRecordInsert(element);
               }
           };
   
@@ -54401,12 +55291,22 @@ if (typeof HTMLTemplateElement === 'undefined') {
           //      when we re-template the insert record on scroll, we can get
           //      the values back
           element.internalEvents.insertRecordValueRetain = function (event) {
+              console.log(event);
+              if (event.type === 'keyup' && event.keyCode == 13) {
+                  console.log('exit');
+                  return;
+                  console.log(event.type);
+              }
               var target = event.target;
               var parentCell = GS.findParentTag(target, 'gs-cell');
               var parentColumn = GS.findParentElement(target, '[column]');
               var strColumn = parentColumn.getAttribute('column');
-              var strValue = target.value;
-  
+              // this was commented out because it was grabbing the value
+              // of the input wich means that for encrypted texts the
+              // insert value was unencrypted. replacement below
+              // var strValue = target.value;
+              var strValue = parentColumn.value;
+              //console.log(strValue, parentCell);
               // we only want to retain the values of insert cells, so only do so
               //      if the parent cell has the insert cell class and has a
               //      [column=""] defined
@@ -54457,11 +55357,13 @@ if (typeof HTMLTemplateElement === 'undefined') {
                   }
               }
           };
-  
-          element.elems.dataViewport.addEventListener(
-              'change',
-              element.internalEvents.insertRecordValueRetain
-          );
+          // this was getting run every time you inserted causing it
+          // to save the last edited value
+          // element.elems.dataViewport.addEventListener(
+          //     'change',
+          //     element.internalEvents.insertRecordValueRetain,
+          //     true
+          // );
           element.elems.dataViewport.addEventListener(
               'keyup',
               element.internalEvents.insertRecordValueRetain
@@ -55185,7 +56087,6 @@ if (typeof HTMLTemplateElement === 'undefined') {
                       //      hiddenFocusControl so that we can always listen for
                       //      keypresses
                       focusHiddenControl(element);
-  
                       // sometimes we want to move the selected endpoint to the
                       //      top of the viewport, if that's what we want, send
                       //      the 'top' mode into the scrollSelectionIntoView
@@ -56885,9 +57786,16 @@ if (typeof HTMLTemplateElement === 'undefined') {
   
                   resolveElementAttributes(element);
                   prepareElement(element);
+                  saveDefaultAttributes(element);
+                  bindQuerystringEvents(element);
                   siphonElement(element);
                   renderHUD(element);
                   bindElement(element);
+                  GS.addBeforeUnloadEvent(function () {
+                      if (element.internalData.insertRecordRetainedColumns && element.internalData.insertRecordRetainedColumns.length > 0) {
+                          return 'There is data in the insert record.';
+                      }
+                  });
                   createWebWorker(element);
                   //dataSELECT(element);
                   GS.triggerEvent(element, 'initialized');
@@ -57018,26 +57926,26 @@ if (typeof HTMLTemplateElement === 'undefined') {
               'refresh': function () {
                   dataSELECT(this);
               },
+              'triggerRecordInsert': function () {
+                  triggerRecordInsert(this);
+              },
               'selectData': function () {
                   dataSELECT(this);
               },
-              'insertData': function (jsnInsert) {
-                  dataINSERT(this, jsnInsert);
+              'insertData': function (strMode, jsnInsert) {
+                  dataINSERT(this, strMode, jsnInsert);
               },
-              'updateData': function (jsnUpdate) {
-                  dataUPDATE(this, jsnUpdate);
+              'updateData': function (strMode, jsnUpdate) {
+                  dataUPDATE(this, strMode, jsnUpdate);
               },
               'deleteData': function (jsnDeleteData) {
                   dataDELETE(this, jsnDeleteData);
               },
               'render': function () {
-                  renderScrollDimensions(this);
-              },
-              'renderHUD': function () {
-                  renderHUD(this);
-              },
-              'renderLocationFull': function () {
-                  renderLocationFull(this);
+                  if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
+                      renderScrollDimensions(this);
+                      renderHUD(this);
+                  }
               },
               'toggleFullContainer': function (container, target) {
                   var element = this;
@@ -57284,6 +58192,11 @@ if (typeof HTMLTemplateElement === 'undefined') {
                   // re-render selection
                   renderSelection(element);
               },
+              'renderSelection': function () {
+                  var element = this;
+                  // re-render selection
+                  renderSelection(element);
+              },
               'addSelectionRange': function (
                   fromRow,
                   fromColumn,
@@ -57319,6 +58232,9 @@ if (typeof HTMLTemplateElement === 'undefined') {
               },
               'getCopyStrings': function () {
                   return getCopyStrings(this);
+              },
+              'updateDialog': function (event) {
+                  this.internalEvents.updateDialog(event)
               },
               'paste': function (strPasteString) {
                   usePasteString(this, strPasteString);
@@ -57534,6 +58450,7 @@ if (typeof HTMLTemplateElement === 'undefined') {
           }
       });
   });
+  
   //global GS, window, document, registerDesignSnippet, designRegisterElement, addProp, encodeHTML, setOrRemoveTextAttribute, setOrRemoveBooleanAttribute, addFlexProps
   
   window.addEventListener('design-register-element', function () {
