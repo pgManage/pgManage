@@ -814,6 +814,7 @@ function dialogOptions(bolOnlyClipboard, currentTableElement) {
     }
     var clipOptions = ml(function () {/*
         <div flex-horizontal flex-fill class="option-row">
+            <div style="width: 25em; text-align: left;">Copy Headers</div>
             <div flex>
                 <gs-select class="pref-copy-headers" mini>
                     <option value="always">Always</option>
@@ -821,9 +822,9 @@ function dialogOptions(bolOnlyClipboard, currentTableElement) {
                     <option value="selected">Only when selected</option>
                 </gs-select>
             </div>
-            <div style="width: 55em;">Copy Headers</div>
         </div>
         <div flex-horizontal flex-fill class="option-row">
+            <div style="width: 25em; text-align: left;">Copy Selectors</div>
             <div flex>
                 <gs-select class="pref-copy-selectors" mini>
                     <option value="always">Always</option>
@@ -831,9 +832,9 @@ function dialogOptions(bolOnlyClipboard, currentTableElement) {
                     <option value="selected">Only Row Numbers</option>
                 </gs-select>
             </div>
-            <div style="width: 55em;">Copy Selectors</div>
         </div>
         <div flex-horizontal flex-fill class="option-row">
+            <div style="width: 25em; text-align: left;">Quote Character</div>
             <div flex>
                 <gs-select class="pref-quote-char" mini>
                     <option value="\">Backslash (\)</option>
@@ -843,9 +844,9 @@ function dialogOptions(bolOnlyClipboard, currentTableElement) {
                     <option value="'">Single Quote (')</option>
                 </gs-select>
             </div>
-            <div style="width: 55em;">Quote Character</div>
         </div>
         <div flex-horizontal flex-fill class="option-row">
+            <div style="width: 25em; text-align: left;">Escape Character</div>
             <div flex>
                 <gs-select class="pref-escape-char" mini>
                     <option value="\">Backslash (\)</option>
@@ -855,9 +856,9 @@ function dialogOptions(bolOnlyClipboard, currentTableElement) {
                     <option value="'">Single Quote (')</option>
                 </gs-select>
             </div>
-            <div style="width: 55em;">Escape Character</div>
         </div>
         <div flex-horizontal flex-fill class="option-row">
+            <div style="width: 25em; text-align: left;">Quote</div>
             <div flex>
                 <gs-select class="pref-copy-quote" mini>
                     <option value="always">Always</option>
@@ -868,9 +869,9 @@ function dialogOptions(bolOnlyClipboard, currentTableElement) {
                     </option>
                 </gs-select>
             </div>
-            <div style="width: 55em;">Quote</div>
         </div>
         <div flex-horizontal flex-fill class="option-row">
+            <div style="width: 25em; text-align: left;">Record Separator</div>
             <div flex>
                 <gs-select class="pref-delimiter-record" mini>
                     <option value="{{DOS_RETURN}}">DOS (\r\n)</option>
@@ -881,9 +882,9 @@ function dialogOptions(bolOnlyClipboard, currentTableElement) {
                     <option value="{{TAB}}">Tab</option>
                 </gs-select>
             </div>
-            <div style="width: 55em;">Record Separator</div>
         </div>
         <div flex-horizontal flex-fill class="option-row">
+            <div style="width: 25em; text-align: left;">Cell Separator</div>
             <div flex>
                 <gs-select class="pref-delimiter-cell" mini>
                     <option value="{{DOS_RETURN}}">DOS (\r\n)</option>
@@ -894,9 +895,9 @@ function dialogOptions(bolOnlyClipboard, currentTableElement) {
                     <option value="{{TAB}}">Tab</option>
                 </gs-select>
             </div>
-            <div style="width: 55em;">Cell Separator</div>
         </div>
         <div flex-horizontal flex-fill class="option-row">
+            <div style="width: 25em; text-align: left;">Empty values</div>
             <div flex>
                 <gs-select class="pref-null-value" mini>
                     <option value="">(nothing)</option>
@@ -907,9 +908,9 @@ function dialogOptions(bolOnlyClipboard, currentTableElement) {
                     <option value="Nothing">"Nothing"</option>
                 </gs-select>
             </div>
-            <div style="width: 55em;">Empty values</div>
         </div>
         <div flex-horizontal flex-fill class="option-row">
+            <div style="width: 25em; text-align: left;">Copy types</div>
             <div flex>
                 <gs-select class="pref-copy-types" mini>
                     <option value="text">Text</option>
@@ -917,10 +918,9 @@ function dialogOptions(bolOnlyClipboard, currentTableElement) {
                     <option value="text,html">Both</option>
                 </gs-select>
             </div>
-            <div style="width: 55em;">Copy types</div>
         </div>
         <gs-checkbox flex-horizontal value="true" class="pref-ask">
-            <label flex style="text-align: right;">Always ask me</label>
+            <label flex style="text-align: left;">Always ask me</label>
         </gs-checkbox>
     */});
     if (!bolOnlyClipboard) {
@@ -1115,8 +1115,8 @@ function dialogOptions(bolOnlyClipboard, currentTableElement) {
             </gs-page>
         */})
             .replace('{{ZOOM}}', strZoom)
-            .replace(/\{\{UNIX_RETURN\}\}/gi, '\n')
             .replace(/\{\{CLIPOPTIONS\}\}/gi, clipOptions)
+            .replace(/\{\{UNIX_RETURN\}\}/gi, '\n')
             .replace(/\{\{TAB\}\}/gi, '\t');
     } else {
         templateElement.innerHTML = ml(function () {/*
@@ -1188,6 +1188,7 @@ function dialogOptions(bolOnlyClipboard, currentTableElement) {
             var arrElements, i, len;
 
             // save clip settings
+            console.log(bolSkipSave);
             if (!bolSkipSave) {
                 setClipSetting('quoteType', copyQuoteWhenControl.value);
                 setClipSetting('quoteChar', copyQuoteCharControl.value);
@@ -1198,6 +1199,7 @@ function dialogOptions(bolOnlyClipboard, currentTableElement) {
                 setClipSetting('columnNames', copyHeadersControl.value);
                 setClipSetting('rowNumbers', copySelectorsControl.value);
                 setClipSetting('copyTypes', copyTypesControl.value);
+                console.log(JSON.parse(localStorage.clip_settings || '{}'));
 
                 // set all the table elements clip setting attributes
                 arrElements = xtag.query(document, 'gs-table.results-table');
@@ -1229,6 +1231,7 @@ function dialogOptions(bolOnlyClipboard, currentTableElement) {
             }
         }
 
+        console.log(bolOnlyClipboard);
         if (!bolOnlyClipboard) {
             copyQuoteWhenControl.addEventListener('change', setAllClipSettings);
             copyQuoteCharControl.addEventListener('change', setAllClipSettings);
@@ -1482,7 +1485,7 @@ function dialogOptions(bolOnlyClipboard, currentTableElement) {
             refreshCustomCSS(customCSSText);
             refreshShortcutKeys(ShortcutKeysText);
             var currentTab = document.getElementsByClassName('current-tab')[0];
-            if (currentTab.relatedEditor) {
+            if (currentTab && currentTab.relatedEditor) {
                 currentTab.relatedEditor.focus();
             }
         }
@@ -2569,15 +2572,15 @@ function getClipSetting(propertyName) {
     var savedSettings = JSON.parse(localStorage.clip_settings || '{}');
 
     savedSettings = {
-        "quoteType":      (savedSettings.quoteType || "strings"),
-        "quoteChar":      (savedSettings.quoteChar || "'"),
-        "escapeChar":      (savedSettings.escapeChar || "\\"),
-        "fieldDelimiter": (savedSettings.fieldDelimiter || "\t"),
-        "recordDelimiter":    (savedSettings.recordDelimiter || "\n"),
-        "nullValues":     (savedSettings.nullValues || "NULL"),
-        "columnNames":    (savedSettings.columnNames || "never"),
-        "rowNumbers":    (savedSettings.rowNumbers || "never"),
-        "copyTypes":    (savedSettings.copyTypes || "text")
+        "quoteType":      (savedSettings.quoteType              !== undefined ? savedSettings.quoteType             : "strings"),
+        "quoteChar":      (savedSettings.quoteChar              !== undefined ? savedSettings.quoteChar             : "'"),
+        "escapeChar":      (savedSettings.escapeChar            !== undefined ? savedSettings.escapeChar            : "\\"),
+        "fieldDelimiter": (savedSettings.fieldDelimiter         !== undefined ? savedSettings.fieldDelimiter        : "\t"),
+        "recordDelimiter":    (savedSettings.recordDelimiter    !== undefined ? savedSettings.recordDelimiter       : "\n"),
+        "nullValues":     (savedSettings.nullValues             !== undefined ? savedSettings.nullValues            : "NULL"),
+        "columnNames":    (savedSettings.columnNames            !== undefined ? savedSettings.columnNames           : "never"),
+        "rowNumbers":    (savedSettings.rowNumbers              !== undefined ? savedSettings.rowNumbers            : "never"),
+        "copyTypes":    (savedSettings.copyTypes                !== undefined ? savedSettings.copyTypes             : "text")
     };
 
     return savedSettings[propertyName];
@@ -2652,12 +2655,13 @@ function beforeTableCopyFunction(event) {
                 </gs-header>
                 <gs-body padded>
                     <gs-checkbox flex-horizontal value="true" class="pref-copy-headers">
-                        <label flex style="text-align: right;">Copy Headers</label>
+                        <label flex style="text-align: left;">Copy Headers</label>
                     </gs-checkbox>
                     <gs-checkbox flex-horizontal value="true" class="pref-copy-selectors">
-                        <label flex style="text-align: right;">Copy Row Numbers</label>
+                        <label flex style="text-align: left;">Copy Row Numbers</label>
                     </gs-checkbox>
                     <div flex-horizontal flex-fill class="option-row">
+                        <div style="width: 16em; text-align: left;">Quote Character</div>
                         <div flex>
                             <gs-select class="pref-quote-char" mini>
                                 <option value="\">Backslash (\)</option>
@@ -2667,9 +2671,9 @@ function beforeTableCopyFunction(event) {
                                 <option value="'">Single Quote (')</option>
                             </gs-select>
                         </div>
-                        <div style="width: 16em;">Quote Character</div>
                     </div>
                     <div flex-horizontal flex-fill class="option-row">
+                        <div style="width: 16em; text-align: left;">Escape Character</div>
                         <div flex>
                             <gs-select class="pref-escape-char" mini>
                                 <option value="\">Backslash (\)</option>
@@ -2679,9 +2683,9 @@ function beforeTableCopyFunction(event) {
                                 <option value="'">Single Quote (')</option>
                             </gs-select>
                         </div>
-                        <div style="width: 16em;">Escape Character</div>
                     </div>
                     <div flex-horizontal flex-fill class="option-row">
+                        <div style="width: 16em; text-align: left;">Quote</div>
                         <div flex>
                             <gs-select class="pref-copy-quote" mini>
                                 <option value="always">Always</option>
@@ -2692,9 +2696,9 @@ function beforeTableCopyFunction(event) {
                                 </option>
                             </gs-select>
                         </div>
-                        <div style="width: 16em;">Quote</div>
                     </div>
                     <div flex-horizontal flex-fill class="option-row">
+                        <div style="width: 16em; text-align: left;">Record Separator</div>
                         <div flex>
                             <gs-select class="pref-delimiter-record" mini>
                                 <option value="{{DOS_RETURN}}">DOS (\r\n)</option>
@@ -2705,9 +2709,9 @@ function beforeTableCopyFunction(event) {
                                 <option value="{{TAB}}">Tab</option>
                             </gs-select>
                         </div>
-                        <div style="width: 16em;">Record Separator</div>
                     </div>
                     <div flex-horizontal flex-fill class="option-row">
+                        <div style="width: 16em; text-align: left;">Cell Separator</div>
                         <div flex>
                             <gs-select class="pref-delimiter-cell" mini>
                                 <option value="{{DOS_RETURN}}">DOS (\r\n)</option>
@@ -2718,9 +2722,9 @@ function beforeTableCopyFunction(event) {
                                 <option value="{{TAB}}">Tab</option>
                             </gs-select>
                         </div>
-                        <div style="width: 16em;">Cell Separator</div>
                     </div>
                     <div flex-horizontal flex-fill class="option-row">
+                        <div style="width: 16em; text-align: left;">Empty values</div>
                         <div flex>
                             <gs-select class="pref-null-value" mini>
                                 <option value="">(nothing)</option>
@@ -2731,9 +2735,9 @@ function beforeTableCopyFunction(event) {
                                 <option value="Nothing">"Nothing"</option>
                             </gs-select>
                         </div>
-                        <div style="width: 16em;">Empty values</div>
                     </div>
                     <div flex-horizontal flex-fill class="option-row">
+                        <div style="width: 16em; text-align: left;">Copy types</div>
                         <div flex>
                             <gs-select class="pref-copy-types" mini>
                                 <option value="text">Text</option>
@@ -2741,13 +2745,12 @@ function beforeTableCopyFunction(event) {
                                 <option value="text,html">Both</option>
                             </gs-select>
                         </div>
-                        <div style="width: 16em;">Copy types</div>
                     </div>
                     <gs-checkbox flex-horizontal value="true" class="pref-save">
-                        <label flex style="text-align: right;">Remember settings</label>
+                        <label flex style="text-align: left;">Remember settings</label>
                     </gs-checkbox>
                     <gs-checkbox flex-horizontal value="true" class="pref-ask">
-                        <label flex style="text-align: right;">Always ask me</label>
+                        <label flex style="text-align: left;">Always ask me</label>
                     </gs-checkbox>
                     <hr />
                     <gs-grid gutter>
