@@ -143,6 +143,9 @@ bool get_schema_and_table_name(DB_conn *conn, char *_str_query, size_t int_query
 		SERROR_CHECK(ptr_end_table_name != NULL, "bstrstr failed");
 		*ptr_end_table_name = 0;
 
+		SERROR_SNCAT(str_temp, &int_temp_len, ptr_table_name, ptr_end_table_name - ptr_table_name);
+		SERROR_BREPLACE(str_temp, &int_temp_len, "\"", "\"\"", "g");
+
 		str_temp1 = bunescape_value(str_temp, &int_temp_len);
 		SERROR_CHECK(str_temp1 != NULL, "bunescape_value failed");
 		SFREE(str_temp);

@@ -385,7 +385,7 @@ bool ws_insert_step3(EV_P, void *cb_data, DB_result *res) {
 
 		char *str_temp = "SELECT count(*) FROM information_schema.tables WHERE ";
 		char *str_temp1 = "table_type = 'BASE TABLE' AND ";
-		char *str_temp2 = "schema_name = ";
+		char *str_temp2 = "table_schema = ";
 		char *str_temp3 = "table_name = ";
 		if (client_insert->str_schema_literal != NULL) {
 			SFINISH_SNCAT(str_sql, &int_sql_len,
