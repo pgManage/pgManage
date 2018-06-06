@@ -98,6 +98,76 @@ error:
 	return NULL;
 }
 
+bool get_schema_and_table_name(DB_conn *conn, char *_str_query, size_t int_query_len, char **ptr_str_schema_literal, char **ptr_str_table_literal) {
+	char *str_temp = NULL;
+	char *str_temp1 = NULL;
+	char *ptr_table_name = NULL;
+	char *ptr_end_table_name = NULL;
+	char *str_table_name = NULL;
+	char *str_query = NULL;
+
+	size_t int_temp_len = 0;
+
+	SERROR_SNCAT(
+		str_query, &int_query_len,
+		_str_query, int_query_len
+	);
+
+	ptr_table_name = str_query + 6;
+	SERROR_CHECK(*ptr_table_name == '\t', "Invalid request");
+	ptr_table_name += 1;
+	ptr_end_table_name = ptr_table_name + strncspn(ptr_table_name, int_query_len - (size_t)(ptr_table_name - str_query), "\t\012", (size_t)2);
+	bool bol_schema = *ptr_end_table_name == '\t';
+	*ptr_end_table_name = '\0';
+
+	SERROR_SNCAT(
+		str_temp, &int_temp_len,
+		ptr_table_name, ptr_end_table_name - ptr_table_name
+	);
+
+	str_temp1 = bunescape_value(str_temp, &int_temp_len);
+	SERROR_CHECK(str_temp1 != NULL, "bunescape_value failed");
+	SFREE(str_temp);
+	str_temp = str_temp1;
+	str_temp1 = NULL;
+
+	*ptr_str_table_literal = DB_escape_literal(conn, str_temp, int_temp_len);
+	SERROR_CHECK(*ptr_str_table_literal != NULL, "DB_escape_literal failed");
+	SFREE(str_temp);
+
+	if (bol_schema) {
+		*ptr_str_schema_literal = *ptr_str_table_literal;
+
+		ptr_table_name = ptr_end_table_name + 1;
+		ptr_end_table_name = bstrstr(ptr_table_name, int_query_len - (size_t)(ptr_table_name - str_query), "\012", (size_t)1);
+		SERROR_CHECK(ptr_end_table_name != NULL, "bstrstr failed");
+		*ptr_end_table_name = 0;
+
+		str_temp1 = bunescape_value(str_temp, &int_temp_len);
+		SERROR_CHECK(str_temp1 != NULL, "bunescape_value failed");
+		SFREE(str_temp);
+		str_temp = str_temp1;
+		str_temp1 = NULL;
+
+		*ptr_str_table_literal = DB_escape_literal(conn, str_temp, int_temp_len);
+		SERROR_CHECK(*ptr_str_table_literal != NULL, "DB_escape_literal failed");
+		SFREE(str_temp);
+	}
+
+	SFREE(str_query);
+
+	return true;
+error:
+	SFREE(str_temp1);
+	SFREE(str_temp);
+	SFREE(str_query);
+	*ptr_str_schema_literal = NULL;
+	*ptr_str_table_literal = NULL;
+
+	SFREE(str_table_name);
+	return false;
+}
+
 char *get_return_columns(char *_str_query, size_t int_query_len, char *str_table_name, size_t int_table_name_len, size_t *ptr_int_return_columns_len) {
 	char *str_temp = NULL;
 	char *str_temp1 = NULL;

@@ -767,7 +767,7 @@ function dialogClosedTabs() {
             var arrFiles, i, len, fullFileName, strHTML, strType
               , strDate, strTime, strFileName, strFileExtension
               , intDate, intTime, intFileName, intFileExtension
-              , arrElements;
+              , arrElements, strFullPath;
 
             if (!error && data.trim()) {
                 if (data.trim() !== 'TRANSACTION COMPLETED' && data.indexOf('Failed to get canonical path') === -1) {
@@ -794,7 +794,9 @@ function dialogClosedTabs() {
                         strTime = arrFiles[i].substring(intDate + 1, intTime).substring(0, 5);
                         strFileName = arrFiles[i].substring(intTime + 1, intFileExtension);
                         strFileExtension = arrFiles[i].substring(intFileExtension + 1);
+                        strFullPath = arrFiles[i];
                         arrFiles[i] = {
+                            strFullPath: strFullPath,
                             strDate: strDate,
                             date: new Date(strDate + ' ' + strTime),
                             strTime: strTime,
@@ -813,6 +815,7 @@ function dialogClosedTabs() {
                         strTime = arrFiles[i].strTime;
                         strFileName = arrFiles[i].strFileName;
                         strFileExtension = arrFiles[i].strFileExtension;
+                        strFullPath = arrFiles[i].strFullPath;
 
                         if (strFileExtension === 'sql') {
                             strType = 'SQL Script';
@@ -828,14 +831,14 @@ function dialogClosedTabs() {
                                 '<td>' + encodeHTML(strDate) + ' ' + encodeHTML(strTime) + '</td>' +
                                 '<td>' +
                                     '<gs-button class="button-add-as-new-tab" title="Open this script as a new tab" ' +
-                                        'data-path="' + arrFiles[i] + '" ' +
+                                        'data-path="' + strFullPath + '" ' +
                                         'data-original-name="' + strFileName + '" ' +
                                         'data-type="' + strFileExtension + '" dialogclose>Open</gs-button>' +
                                 '</td>' +
                                 '<td>' +
                                     ' <gs-button title="Download this script as a .sql file"' +
                                         ' href="/pgmanage/' + contextData.connectionID +
-                                                    '/download/' + encodeTabNameForFileName(GS.trim(strPath + '/' + arrFiles[i], '/')) + '"' +
+                                                    '/download/' + encodeTabNameForFileName(GS.trim(strPath + '/' + strFullPath, '/')) + '"' +
                                         '>Download</gs-button>' +
                                 '</td>' +
                             '</tr>';
