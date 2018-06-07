@@ -2918,6 +2918,16 @@ function executeHelperStartExecute(currentTab) {
     if (dataLoadTest) {
         console.time('query-load');
     }
+    window.beepPopup = true;
+    var beepPopup = setTimeout(function(){
+        if (window.beepPopup) {
+            // build page to ask if you want a sound played
+            window.queryNoise = false;
+            currentTab.relatedResultsArea.innerHTML = ml(function () {/*<h3>This query could take a while...</h3><p> Would you like a sound to be played when it's done?</p><gs-button bg-primary inline onclick="window.queryNoise = false; this.parentNode.innerHTML = ''">No</gs-button><gs-button autofocus bg-primary inline onclick="window.queryNoise = true; this.parentNode.innerHTML = ''">Yes</gs-button>
+            */});
+        }
+    }, 3000);
+
     GS.log(bolDebug, currentTab);
     var editor = currentTab.relatedEditor;
 
@@ -2940,6 +2950,10 @@ function executeHelperEndLoading(currentTab) {
     GS.log(bolDebug, currentTab);
     var editor = currentTab.relatedEditor;
 
+    //prevents beep popup from opening if it's been less than three seconds
+    window.beepPopup = false;
+
+
     currentTab.relatedClearButton.removeAttribute('hidden');
     currentTab.relatedResultsHeaderElement.classList.remove('executing');
 
@@ -2956,26 +2970,24 @@ function executeHelperEndLoading(currentTab) {
 
     currentTab.handlingQuery = false;
     currentTab.relatedStopSocketButton.setAttribute('hidden', '');
-	//console.log('test2');
     currentTab.relatedStopSocketButton.removeEventListener('click', executeHelperStopSocket);
 
-    var timeElements = [], totalTime = 0, iTime;
-    // get all the time elements
-    timeElements = xtag.query(xtag.query(document.body, '.current-tab')[0].relatedResultsArea, '.timeTaken');
-    console.log(timeElements);
-    // if there is more than one:
-    // loop
-    if (timeElements.length > 1) {
-        for (var i = 0, len = timeElements.length; i < len; i++) {
-            iTime = timeElements[i].innerHTML.substring(timeElements[i].innerHTML.indexOf(' ') + 1, timeElements[i].innerHTML.lastIndexOf(' '));
-            totalTime = totalTime + parseFloat(iTime);
+    //if sound answer was yes
+    if (window.queryNoise) {
+        var timeElements = [], totalTime = 0, iTime;
+        // get all the time elements
+        timeElements = xtag.query(xtag.query(document.body, '.current-tab')[0].relatedResultsArea, '.timeTaken');
+        // if there is more than one:
+        // loop
+        if (timeElements.length > 1) {
+            for (var i = 0, len = timeElements.length; i < len; i++) {
+                iTime = timeElements[i].innerHTML.substring(timeElements[i].innerHTML.indexOf(' ') + 1, timeElements[i].innerHTML.lastIndexOf(' '));
+                totalTime = totalTime + parseFloat(iTime);
+            }
+        } else if (timeElements.length > 0) {
+        // else just use the one
+            totalTime = parseFloat(timeElements[0].innerHTML.substring(timeElements[0].innerHTML.indexOf(' ') + 1, timeElements[0].innerHTML.lastIndexOf(' ')));
         }
-    } else if (timeElements.length > 0) {
-    // else just use the one
-        totalTime = parseFloat(timeElements[0].innerHTML.substring(timeElements[0].innerHTML.indexOf(' ') + 1, timeElements[0].innerHTML.lastIndexOf(' ')));
-    }
-    // if totalTime is greater then ten seconds
-    if (totalTime > 10) {
         // push notif
         window.sfx.beep();
         GS.pushMessage('Query Finished.', 1500);
@@ -3368,11 +3380,13 @@ function executeScript(bolCursorQuery) {
                         intErrorStartLine += (data.strQuery.match(/\n/gim) || []).length;
 						intErrorStartChar += data.strQuery.length;
                     }
+                    if (data.intCallbackNumber == 0) {
+                        currentTab.relatedResultsArea.innerHTML = '';
+                    }
 
                     //console.log(data.strMessage, data.bolLastMessage);
 
                     // handle putting the response in the results pane
-
                     // if this isn't the last message
                     if (!data.bolLastMessage) {
                         // if rows affected

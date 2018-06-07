@@ -288,7 +288,6 @@
                             */}).replace(/{{HEADERTOKEN}}/gi, headerContent).replace(/{{UPDATETOKEN}}/gi, updateContent).replace(/{{RECORDTOKEN}}/gi, recordContent).replace(/{{COPYTOKEN}}/gi, copyContent).replace(/{{INSERTTOKEN}}/gi, insertContent);
 
 
-
                             if (strPK && strPK !== '\\N') {
                                 tableElement.setAttribute('pk', strPK);
                                 tableElement.setAttribute('ord', quote_ident(strPK) + ' DESC');
@@ -308,6 +307,47 @@
 
                                 strSequenceDefaults = arrSequenceDefaults.join(',');
                                 tableElement.setAttribute('seq', strSequenceDefaults);
+                            } else {
+                                var pKTemplateElement = document.createElement('template');
+                                pKTemplateElement.setAttribute('data-max-width', '90em');
+                                if (evt.touchDevice) {
+                                    pKTemplateElement.setAttribute('data-mode', 'full');
+                                }
+                                var pKHtml;
+                                console.log(document.getElementById('tableElement'));
+                                for (i = 0, len = arrColumns.length, pKHtml = ''; i < len; i += 1) {
+                                    pKHtml += '<option>' + encodeHTML(arrColumns[i]) + '</option>';
+                                }
+                                var PkSelect = document.createElement('gs-select');
+                                PkSelect.innerHTML = '<option value="PKUNKNOWN">Unknown</option>' + pKHtml;
+                                pKTemplateElement.innerHTML = ml(function () {/*
+                                    <gs-page>
+                                        <gs-header><center><h3>No Primary Key Found.</h3></center></gs-header>
+                                        <gs-body padded>
+                                            <p>Choose a primary key to continue:</p>
+                                            <div id="pk-select-cont">
+                                                
+                                            </div>
+                                        </gs-body>
+                                    </gs-page>
+                                */});
+
+                                GS.openDialog(pKTemplateElement, function () {
+                                    var dialog = this;
+                                    document.getElementById('pk-select-cont').appendChild(PkSelect);
+                                    PkSelect.value = (tableElement.getAttribute('pk') || 'PKUNKNOWN');
+                                    PkSelect.addEventListener('change', function () {
+                                        if (this.value === 'PKUNKNOWN') {
+                                        } else {
+                                            tableElement.setAttribute('pk', this.value);
+                                            // console.log('test');
+                                            document.getElementById('select-pk').value = this.value;
+                                            GS.closeDialog(dialog);
+                                        }
+
+                                        tableElement.refresh();
+                                    });
+                                }, '');
                             }
                             if (strColumns) {
                                 tableElement.setAttribute('lock', strColumns);
