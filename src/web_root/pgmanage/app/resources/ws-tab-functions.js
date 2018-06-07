@@ -767,7 +767,7 @@ function dialogClosedTabs() {
             var arrFiles, i, len, fullFileName, strHTML, strType
               , strDate, strTime, strFileName, strFileExtension
               , intDate, intTime, intFileName, intFileExtension
-              , arrElements;
+              , arrElements, strFullPath;
 
             if (!error && data.trim()) {
                 if (data.trim() !== 'TRANSACTION COMPLETED' && data.indexOf('Failed to get canonical path') === -1) {
@@ -794,7 +794,9 @@ function dialogClosedTabs() {
                         strTime = arrFiles[i].substring(intDate + 1, intTime).substring(0, 5);
                         strFileName = arrFiles[i].substring(intTime + 1, intFileExtension);
                         strFileExtension = arrFiles[i].substring(intFileExtension + 1);
+                        strFullPath = arrFiles[i];
                         arrFiles[i] = {
+                            strFullPath: strFullPath,
                             strDate: strDate,
                             date: new Date(strDate + ' ' + strTime),
                             strTime: strTime,
@@ -813,6 +815,7 @@ function dialogClosedTabs() {
                         strTime = arrFiles[i].strTime;
                         strFileName = arrFiles[i].strFileName;
                         strFileExtension = arrFiles[i].strFileExtension;
+                        strFullPath = arrFiles[i].strFullPath;
 
                         if (strFileExtension === 'sql') {
                             strType = 'SQL Script';
@@ -828,14 +831,14 @@ function dialogClosedTabs() {
                                 '<td>' + encodeHTML(strDate) + ' ' + encodeHTML(strTime) + '</td>' +
                                 '<td>' +
                                     '<gs-button class="button-add-as-new-tab" title="Open this script as a new tab" ' +
-                                        'data-path="' + arrFiles[i] + '" ' +
+                                        'data-path="' + strFullPath + '" ' +
                                         'data-original-name="' + strFileName + '" ' +
                                         'data-type="' + strFileExtension + '" dialogclose>Open</gs-button>' +
                                 '</td>' +
                                 '<td>' +
                                     ' <gs-button title="Download this script as a .sql file"' +
                                         ' href="/pgmanage/' + contextData.connectionID +
-                                                    '/download/' + encodeTabNameForFileName(GS.trim(strPath + '/' + arrFiles[i], '/')) + '"' +
+                                                    '/download/' + encodeTabNameForFileName(GS.trim(strPath + '/' + strFullPath, '/')) + '"' +
                                         '>Download</gs-button>' +
                                 '</td>' +
                             '</tr>';
@@ -2581,6 +2584,7 @@ function SQLBeautify(strInput) {
     var bolStdin = false;
     var bolRule = false;
     var bolTable = false;
+    var bolView = false;
     var bolTrigger = false;
     var bolLastComment = false;
     var intCase = 0;
@@ -3131,9 +3135,32 @@ function SQLBeautify(strInput) {
             bolNoExtraWhitespace = true;
             //console.log(">KEYWORD|" + intTabLevel + "<");
 
+        // FOUND CREATE OR REPLACE VIEW
+        } else if (int_qs === 0 && strInput.substr(i).match(/^CREATE[\ \t]+OR[\ \t]+REPLACE[\ \t]+VIEW/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+            // Remove previous tab if previous character is whitespace
+            if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {
+                strResult = strResult.substr(0, strResult.length - 1);
+            }
+
+            bolView = true;
+            strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i).match(/^CREATE[\ \t]+OR[\ \t]+REPLACE[\ \t]+VIEW/i)[0] + ' ';
+            i += (strInput.substr(i).match(/^CREATE[\ \t]+OR[\ \t]+REPLACE[\ \t]+VIEW/i)[0].length - 1);
+            bolNoExtraWhitespace = true;
+            //console.log(">KEYWORD|" + intTabLevel + "<");
+
+        // FOUND CREATE OR REPLACE VIEW... AS
+        } else if (int_qs === 0 && bolView && strInput.substr(i).match(/^AS[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+
+            bolView = false;
+            strResult += 'AS\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel));
+            i += 1;
+            bolNoExtraWhitespace = true;
+            //console.log(">KEYWORD|" + intTabLevel + "<");
+
         // FOUND AS
-        } else if (int_qs === 0 && (!bolFunction) && strInput.substr(i).match(/^AS[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
-            strResult += strInput.substr(i).match(/^AS[\n\r\ \t]+/i)[0];
+        } else if (int_qs === 0 && (!bolFunction && !bolView) && strInput.substr(i).match(/^AS[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+            //strResult += strInput.substr(i).match(/^AS[\n\r\ \t]+/i)[0];
+            strResult += 'AS ';
             i += 1;
             bolNoExtraWhitespace = true;
             //console.log(">KEYWORD|" + intTabLevel + "<");

@@ -18,6 +18,11 @@ bool query_is_safe(char *str_query);
 This function takes a SELECT/INSERT/UPDATE/DELETE request and returns the table name
 */
 char *get_table_name(char *_str_query, size_t int_query_len, size_t *ptr_int_table_name_len);
+
+/*
+This function takes an INSERT request and returns the schema and table names as literals
+*/
+bool get_schema_and_table_name(DB_conn *conn, char *_str_query, size_t int_query_len, char **ptr_str_schema_literal, char **ptr_str_table_literal);
 /*
 This function takes a SELECT/INSERT/UPDATE request and returns the return columns
 */

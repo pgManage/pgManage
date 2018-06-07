@@ -12,17 +12,26 @@ struct sock_ev_client_insert {
 
 	char *str_return_columns;
 	size_t int_return_columns_length;
+	char *str_pk_columns;
+	size_t int_pk_columns_len;
 	char *str_pk_join_clause;
 	char *str_pk_where_clause;
+	char *str_pk_return_where_clause;
+	size_t int_pk_return_where_clause_len;
 	char *str_column_names;
+	char *str_schema_literal;
+	char *str_table_literal;
 	DArray *darr_insert_queries;
 	size_t int_current_insert_query;
 	char *str_real_table_name;
 	char *str_temp_table_name;
 	char *str_sql;
-	// These are for http_file:
 	DArray *darr_column_types;
 	DArray *darr_column_values;
+	DArray *darr_pk;
+	DArray *darr_sequence;
+	char *str_table_return_where;
+	size_t int_table_return_where_len;
 	char *str_sequence_name;
 	char *str_result;
 	char *str_identity_column_name;
@@ -70,38 +79,68 @@ void ws_insert_step1(struct sock_ev_client_request *client_request);
 
 /*
 create first temp table query came back
-This function will:
-2. send copy command to send data into the first temp table
+This function will send copy command to send data into the first temp table (view mode)
 */
 bool ws_insert_step2(EV_P, void *cb_data, DB_result *res);
 
 /*
-Copy came back
-This function will create second temp table to hold the inserted rows (this
-allows us to see the effect of defaults, rules and triggers)
+This function will determine if we are working with a table or a view
+*/
+bool ws_insert_step3(EV_P, void *cb_data, DB_result *res);
+
+/*
+This function will run the proper code for a table or a view
 */
 bool ws_insert_step4(EV_P, void *cb_data, DB_result *res);
 
 /*
+View Mode:
+This function will create second temp table to hold the inserted rows (this
+allows us to see the effect of defaults, rules and triggers)
+*/
+bool ws_insert_view_step1(EV_P, struct sock_ev_client_request *client_request);
+
+/*
 create second temp table query came back
 This function will generate queries to insert into the actual table, and also insert the values
-	touched by triggers etc into the second temp table
+touched by triggers etc into the second temp table
 */
-bool ws_insert_step5(EV_P, void *cb_data, DB_result *res);
+bool ws_insert_view_step2(EV_P, void *cb_data, DB_result *res);
 
 /*
 An insert query came back
 This function will run 1 insert query
-	if it is the last query, ws_insert_step7 is the callback
-	else ws_insert_step6 is the callback
+if it is the last query, ws_insert_step7 is the callback
+else ws_insert_step6 is the callback
 */
-bool ws_insert_step6(EV_P, void *cb_data, DB_result *res);
+bool ws_insert_view_step3(EV_P, void *cb_data, DB_result *res);
 
 /*
 Last insert query came back
 This function will start copy query from the second temp table
 */
-bool ws_insert_step7(EV_P, void *cb_data, DB_result *res);
+bool ws_insert_view_step4(EV_P, void *cb_data, DB_result *res);
+
+/*
+Table Mode:
+This function will select the current values for all sequences
+*/
+bool ws_insert_table_step1(EV_P, struct sock_ev_client_request *client_request);
+
+/*
+Sequence query came back
+This function will basically:
+INSERT INTO <table> (<columns>)
+SELECT <columns>
+FROM temp_insert;
+*/
+bool ws_insert_table_step2(EV_P, void *cb_data, DB_result *res);
+
+/*
+Insert query came back
+This function will start copy query from the realt table using xmin and the sequences
+*/
+bool ws_insert_table_step3(EV_P, void *cb_data, DB_result *res);
 
 /*
 This function will free the data associated with the client_insert struct

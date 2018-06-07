@@ -12,9 +12,47 @@ function createTestDataRequest(rowPrefix, intCount) {
 	}
 	return strRet;
 }
+function createTestDataRequestOneColumn(rowPrefix, intCount) {
+	var test = rowPrefix + (arguments.length > 2 && arguments[2] === false ? '' : '{{test_random}}') + '{{i}}\ttestset;akldsjf;lkasjdf;kljasjdf;lkasjdfkljdfgl;kjad;flkgjadg;alksjdf;lkasjdf;lkasjdf;lkasdjf;laskdjf;laskdjfa;lsdkfja;lskdfj\n', strRet = '';
+	for (var i = intCount; i > 0; i -= 1) {
+		strRet += test.replace('{{i}}', i.toString());
+	}
+	return strRet;
+}
+function createTestDataRequestNoId(rowPrefix, intCount) {
+	var test = rowPrefix + 'testset;akldsjf;lkasjdf;kljasjdf;lkasjdfkljdfgl;kjad;flkgjadg\t;alksjdf;lkasjdf;lkasjdf;lkasdjf;laskdjf;laskdjfa;lsdkfja;lskdfj\n', strRet = '';
+	for (var i = intCount; i > 0; i -= 1) {
+		strRet += test;
+	}
+	return strRet;
+}
 function createTestDataResponse(rowPrefix, intCount) {
 	var test = rowPrefix + (arguments.length > 2 && arguments[2] === false ? '' : '{{test_random}}') + '{{i}}\ttestset;akldsjf;lkasjdf;kljasjdf;lkasjdfkljdfgl;kjad;flkgjadg\t;alksjdf;lkasjdf;lkasjdf;lkasdjf;laskdjf;laskdjfa;lsdkfja;lskdfj\n', arrRet = [], temp = '';
 	for (var i = intCount; i > 0; i -= 10) {
+		temp = '';
+		for (var j = i; j > (i - 10); j -= 1) {
+			temp += test.replace('{{i}}', j.toString());
+		}
+		arrRet.push(temp);
+	}
+	arrRet.push('TRANSACTION COMPLETED');
+	return arrRet;
+}
+function createTestDataResponseOneColumn(rowPrefix, intCount) {
+	var test = rowPrefix + (arguments.length > 2 && arguments[2] === false ? '' : '{{test_random}}') + '{{i}}\ttestset;akldsjf;lkasjdf;kljasjdf;lkasjdfkljdfgl;kjad;flkgjadg;alksjdf;lkasjdf;lkasjdf;lkasdjf;laskdjf;laskdjfa;lsdkfja;lskdfj\n', arrRet = [], temp = '';
+	for (var i = intCount; i > 0; i -= 10) {
+		temp = '';
+		for (var j = i; j > (i - 10); j -= 1) {
+			temp += test.replace('{{i}}', j.toString());
+		}
+		arrRet.push(temp);
+	}
+	arrRet.push('TRANSACTION COMPLETED');
+	return arrRet;
+}
+function createTestDataResponseWithStart(rowPrefix, intCount, intStart) {
+	var test = rowPrefix + '{{i}}\ttestset;akldsjf;lkasjdf;kljasjdf;lkasjdfkljdfgl;kjad;flkgjadg\t;alksjdf;lkasjdf;lkasjdf;lkasdjf;laskdjf;laskdjfa;lsdkfja;lskdfj\n', arrRet = [], temp = '';
+	for (var i = intCount + (intStart - 1); i > intStart; i -= 10) {
 		temp = '';
 		for (var j = i; j > (i - 10); j -= 1) {
 			temp += test.replace('{{i}}', j.toString());
@@ -769,7 +807,7 @@ id	test_name
 {{test_random}}3	Eve
 */
 			}),
-			["DB_exec failed:\nFATAL\nerror_text\tERROR:  relation \"id\" does not exist\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t\n"]],
+			["DB_exec failed:\nFATAL\nerror_text\tERROR:  relation \"id\" does not exist\\nLINE 1: SELECT nextval('id')\\n                       ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t16\n"]],
 			['ROLLBACK', 'websocket', '', 'ROLLBACK', ['OK']],
 
 			['BEGIN', 'websocket', '', 'BEGIN', ['OK']],
@@ -844,7 +882,7 @@ id	test_name
 {{test_random}}3	Eve
 */
 			}),
-			["DB_exec failed:\nFATAL\nerror_text\tERROR:  zero-length delimited identifier at or near \"\"\"\"\\nLINE 2: SELECT \"rtesting_table\".\"\" FROM \"rtesting_table\" LIMIT 0;\\n                                ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t75\n"]],
+			["FATAL\nerror_text\tERROR:  zero-length delimited identifier at or near \"\"\"\"\\nLINE 1: COPY (SELECT \"rtesting_table\".\"\" FROM \"rtesting_table\" INNER...\\n                                      ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t31\n"]],
 			['ROLLBACK', 'websocket', '', 'ROLLBACK', ['OK']],
 
 			['BEGIN', 'websocket', '', 'BEGIN', ['OK']],
@@ -1120,7 +1158,7 @@ ORDER BY	id DESC
 id	test_name	test_name2
 */
 			}) + createTestDataRequest('', 200), createTestDataResponse('', 200)],
-			['COMMIT', 'websocket', '', 'COMMIT', ['OK']],
+			['ROLLBACK', 'websocket', '', 'ROLLBACK', ['OK']],
 
 			['BEGIN', 'websocket', '', 'BEGIN', ['OK']],
 			['INSERT 8', 'websocket', '', ml(function () {/*INSERT	WFP's "Testing" Table
@@ -1136,17 +1174,46 @@ id	WFP's First "Testing" Column	WFP's Second "Testing" Column
 {{test_random}}3	test3	test3
 */}),
 			['{{test_random}}1\ttest1\ttest1\n{{test_random}}2\ttest2\ttest2\n{{test_random}}3\ttest3\ttest3\n', 'TRANSACTION COMPLETED']],
+            ['ROLLBACK', 'websocket', '', 'ROLLBACK', ['OK']],
+            
+			['BEGIN', 'websocket', '', 'BEGIN', ['OK']],
+			['INSERT 9 (TABLE)', 'websocket', '', ml(function () {/*INSERT	rtesting_table_with_sequence
+RETURN	id	test_name	test_name2
+PK	id
+SEQ	public.rtesting_table_with_sequence_id_seq
+ORDER BY	id DESC
+
+test_name	test_name2
+*/
+			}) + createTestDataRequestNoId('', 2000), createTestDataResponseWithStart('', 2000, 2)],
+			['ROLLBACK', 'websocket', '', 'ROLLBACK', ['OK']],
+
+			['BEGIN', 'websocket', '', 'BEGIN', ['OK']],
+			['INSERT 9 (VIEW)', 'websocket', '', ml(function () {/*INSERT	ttesting_view2
+RETURN	id_1	test_name_1
+PK	id_1
+SEQ	*/
+}) + ml(function () {/*
+ORDER BY	id_1 DESC
+
+id_1	test_name_1
+*/
+			}) + createTestDataRequestOneColumn('', 2000), createTestDataResponseOneColumn('', 2000)],
 			['ROLLBACK', 'websocket', '', 'ROLLBACK', ['OK']],
 
 			['DELETE RECORDS 2', 'websocket', '', ml(function () {/*RAW
 DELETE FROM rtesting_table
 WHERE id::text ILIKE '{{test_random}}%';
+ALTER SEQUENCE public.rtesting_table_with_sequence_id_seq RESTART WITH 1;
 */
             }),
 			[
                 "QUERY\tDELETE FROM rtesting_table\\nWHERE id::text ILIKE '{{test_random}}%';",
                 "START", "END",
-                "Rows Affected\n200\n",
+                "Rows Affected\n0\n",
+                "QUERY\t\\nALTER SEQUENCE public.rtesting_table_with_sequence_id_seq RESTART WITH 1;",
+                "START", "END",
+                "Rows Affected\n0\n",
                 "TRANSACTION COMPLETED"
 			]],
 			['BEGIN', 'websocket', '', 'BEGIN', ['OK']],

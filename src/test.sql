@@ -96,3 +96,17 @@ CREATE TABLE public."WFP's ""Testing"" Table" (
 ) WITH (
   OIDS=FALSE
 );
+
+
+CREATE TABLE public.rtesting_table_with_sequence (
+  id serial,
+  test_name character varying(150),
+  test_name2 character varying(150),
+  "select" character varying(150),
+  "test@test" character varying(150),
+  CONSTRAINT rtesting_table_with_sequence_pk PRIMARY KEY (id)
+) WITH (
+  OIDS=FALSE
+);
+
+ALTER TABLE public.rtesting_table_with_sequence OWNER TO postgres;
