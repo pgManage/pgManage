@@ -404,11 +404,12 @@
                 strDumpQuery += strTableSuffix;
                 strDumpQuery += ';\n';
                 strDumpQuery += '{{HELPDEF}}';
-                strDumpQuery += 'DROP TABLE ';
-                strDumpQuery += strSchemaName;
-                strDumpQuery += '.';
-                strDumpQuery += strTableName;
-                strDumpQuery += strTableSuffix;
+                // strDumpQuery += 'DROP TABLE ';
+                // strDumpQuery += strSchemaName;
+                // strDumpQuery += '.';
+                // strDumpQuery += strTableName;
+                // strDumpQuery += strTableSuffix;
+                // console.log(strTableSuffix);
                 strDumpQuery += ';\n\n';
 
                 // // console.log(strDumpQuery);
@@ -543,12 +544,11 @@
 
                         //console.log(oidQuery);
                         getSingleCellData(oidQuery, function (newOID) {
-                            var tableRules = scriptQuery.objectTableNoCreate.replace(/\{\{INTOID\}\}/gi, newOID)
+                            var tableRules = scriptQuery.objectTableNoCreate.replace(/\{\{INTOID\}\}/gi, newOID).replace('COALESCE((SELECT E\'\\n\\n\\n\' || array_to_string((SELECT array_agg(ok.perms || E\'\\n\') FROM (', 'COALESCE((SELECT E\'\\n\\nDROP TABLE ' + strSchemaName + '.' + strTableName + strTableSuffix + ';\\n\\n\' || array_to_string((SELECT array_agg(ok.perms || E\'\\n\') FROM (')
                             .replace(/\{\{STRSQLSAFENAME\}\}/gi, '' + strTableName + '.' + strSchemaName + '');
                             getSingleCellData(tableRules, function (tabledef) {
                                 strDumpQuery = strDumpQuery.replace(/\{\{ALTERSEQUENCE\}\}/gi, query1);
                                 strDumpQuery = strDumpQuery.replace(/\{\{HELPDEF\}\}/gi, tabledef);
-
                                 strDumpQuery += query2;
                                 //var triggQuery = ml(function () {/*SELECT string_agg('-- Trigger: ' || quote_ident(pg_trigger.tgname) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname) || E';\n' ||
                                 //	'DROP TRIGGER ' || quote_ident(pg_trigger.tgname) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname) || E';\n' ||
