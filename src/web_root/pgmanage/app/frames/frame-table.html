@@ -189,7 +189,7 @@
                         }
                     }
                     if (error) {
-                        console.log(error);
+                        //console.log(error);
                         dropPart = error.substring(0, error.toLowerCase().indexOf('depends on'));
                         if (dropPart.trim().substring(0, 10).toLowerCase() === 'constraint') {
                             arrConstraint.push(dropPart);
@@ -197,7 +197,7 @@
 
                         } else {
                             if (dependency_text) {
-                                console.log('DROP ' + dropPart.trim() + ';\n', dependency_text.indexOf('DROP ' + dropPart.trim() + ';\n'));
+                                //console.log('DROP ' + dropPart.trim() + ';\n', dependency_text.indexOf('DROP ' + dropPart.trim() + ';\n'));
                                 if (dependency_text.indexOf('DROP ' + dropPart.trim() + ';\n') > -1) {
                                     dependency_text = dependency_text.replace('DROP ' + dropPart.trim() + ';\n', '');
                                 }
@@ -442,6 +442,7 @@
 							}
                             arrDropObjects.push(['' + strDropObjType + '', '' + strDropSchema + '', '' + strDropObjName + '']);
                         }
+                        console.log(arrDropObjects);
 
                         //add to beginning of arrDropObjects, the list of sequences
 
@@ -1057,11 +1058,23 @@
                     var strSchemaOID = '';
                     GS.addLoader('generate-script', 'Loading...');
                     GS.requestRawFromSocket(GS.envSocket,
-                                            'SELECT pg_class.relnamespace FROM pg_class WHERE pg_class.oid = ' + strOID,
+                                            'SET search_path TO pg_catalog;',
                                             function (data, error) {
                         if (!error) {
-                            if (data.strMessage !== '\\.' && data.intCallbackNumber === 0) {
-                                getDump(data.strMessage);
+                            console.log(data);
+                            if (data.intCallbackNumber === 0) {
+                                GS.requestRawFromSocket(GS.envSocket,
+                                                        'SELECT pg_class.relnamespace FROM pg_class WHERE pg_class.oid = ' + strOID,
+                                                        function (data, error) {
+                                    if (!error) {
+                                        if (data.strMessage !== '\\.' && data.intCallbackNumber === 0) {
+                                            getDump(data.strMessage);
+                                        }
+                                    } else {
+                                        GS.webSocketErrorDialog(data);
+                                        GS.removeLoader('generate-script');
+                                    }
+                                });
                             }
                         } else {
                             GS.webSocketErrorDialog(data);
