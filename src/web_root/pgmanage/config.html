@@ -79,7 +79,7 @@
 				}
 
 				editor = ace.edit('conf-editor');
-				editor.setTheme('ace/theme/eclipse');
+				editor.setTheme(localStorage.aceTheme ? localStorage.aceTheme : 'ace/theme/eclipse');
 				editor.getSession().setMode('ace/mode/ini');
 				editor.setShowPrintMargin(false);
 				editor.setDisplayIndentGuides(true);

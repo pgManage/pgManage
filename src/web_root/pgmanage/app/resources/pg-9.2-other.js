@@ -1107,7 +1107,47 @@ function dialogOptions(bolOnlyClipboard, currentTableElement) {
                         </gs-block>
                     </gs-grid>
 
+                    <h4>Ace Theme:</h4>
+                    <gs-select id="pgmanage-options-ace-theme">
+                        <option value="ace/theme/ambiance">ambiance</option>
+                        <option value="ace/theme/chaos">chaos</option>
+                        <option value="ace/theme/chrome">chrome</option>
+                        <option value="ace/theme/clouds">clouds</option>
+                        <option value="ace/theme/clouds_midnight">clouds_midnight</option>
+                        <option value="ace/theme/cobalt">cobalt</option>
+                        <option value="ace/theme/crimson_editor">crimson_editor</option>
+                        <option value="ace/theme/dawn">dawn</option>
+                        <option value="ace/theme/dreamweaver">dreamweaver</option>
+                        <option value="ace/theme/eclipse">eclipse</option>
+                        <option value="ace/theme/github">github</option>
+                        <option value="ace/theme/idle_fingers">idle_fingers</option>
+                        <option value="ace/theme/iplastic">iplastic</option>
+                        <option value="ace/theme/katzenmilch">katzenmilch</option>
+                        <option value="ace/theme/kr_theme">kr_theme</option>
+                        <option value="ace/theme/kuroir">kuroir</option>
+                        <option value="ace/theme/merbivore">merbivore</option>
+                        <option value="ace/theme/merbivore_soft">merbivore_soft</option>
+                        <option value="ace/theme/mono_industrial">mono_industrial</option>
+                        <option value="ace/theme/monokai">monokai</option>
+                        <option value="ace/theme/pastel_on_dark">pastel_on_dark</option>
+                        <option value="ace/theme/pgpanel">pgpanel</option>
+                        <option value="ace/theme/solarized_dark">solarized_dark</option>
+                        <option value="ace/theme/solarized_light">solarized_light</option>
+                        <option value="ace/theme/sqlserver">sqlserver</option>
+                        <option value="ace/theme/terminal">terminal</option>
+                        <option value="ace/theme/textmate">textmate</option>
+                        <option value="ace/theme/tomorrow">tomorrow</option>
+                        <option value="ace/theme/tomorrow_night">tomorrow_night</option>
+                        <option value="ace/theme/tomorrow_night_blue">tomorrow_night_blue</option>
+                        <option value="ace/theme/tomorrow_night_bright">tomorrow_night_bright</option>
+                        <option value="ace/theme/tomorrow_night_eighties">tomorrow_night_eighties</option>
+                        <option value="ace/theme/twilight">twilight</option>
+                        <option value="ace/theme/vibrant_ink">vibrant_ink</option>
+                        <option value="ace/theme/xcode">xcode</option>
+                    </gs-select>
+
                     <h3>Custom CSS Stylesheet</h3>
+                    <gs-button id="add-custom-theme-css">Add Dark Theme CSS</gs-button>
                     <div id="customCSSAce"></div>
                     <div><p>This Ace is stored in your local storage. Because this can get emptied it's recommended to save a copy.</p></div>
                 </gs-body>
@@ -1144,6 +1184,8 @@ function dialogOptions(bolOnlyClipboard, currentTableElement) {
         */})
             .replace(/\{\{CLIPOPTIONS\}\}/gi, clipOptions);
     }
+    templateElement.setAttribute('data-mode', 'constrained');
+    templateElement.setAttribute('data-max-height', (window.innerHeight * 0.9) + 'px');
 
     GS.openDialog(templateElement, function () {
         var dialog = this;
@@ -1279,7 +1321,7 @@ function dialogOptions(bolOnlyClipboard, currentTableElement) {
 
             var CSSEditor = ace.edit('customCSSAce');
             glb_CSSEditor = CSSEditor;
-            CSSEditor.setTheme('ace/theme/eclipse');
+            CSSEditor.setTheme(localStorage.aceTheme ? localStorage.aceTheme : 'ace/theme/eclipse');
             CSSEditor.getSession().setMode('ace/mode/css');
             CSSEditor.setShowPrintMargin(false);
             CSSEditor.setDisplayIndentGuides(true);
@@ -1294,6 +1336,317 @@ function dialogOptions(bolOnlyClipboard, currentTableElement) {
                 'enableLiveAutocompletion' : true
             });
 
+            document.getElementById('pgmanage-options-ace-theme').value = localStorage.aceTheme ? localStorage.aceTheme : 'ace/theme/eclipse';
+            document.getElementById('pgmanage-options-ace-theme').addEventListener('change', function () {
+                localStorage.aceTheme = document.getElementById('pgmanage-options-ace-theme').value;
+                CSSEditor.setTheme(localStorage.aceTheme);
+                xtag.query(document, '.tab-button').forEach(function (cur) {
+                    cur.relatedEditor.setTheme(localStorage.aceTheme);
+                });
+            });
+
+            document.getElementById('add-custom-theme-css').addEventListener('click', function () {
+                CSSEditor.setValue(CSSEditor.getValue() + ml(function () {/*
+
+#autocomplete-popup, #autocomplete-popup > #autocomplete-popup-instruction {
+    background-color: #191919;
+    border: 1px solid #000000;
+}
+
+pre {
+    background-color: #191919;
+    color: #a1a1a1;
+    border: 1px solid #000000;
+}
+
+a {
+    color: #29c529;
+}
+gs-header {
+    color: #b1b1b1;
+    background: #292929;
+    background: -moz-linear-gradient(top, #292929 0%, #191919 100%);
+    background: -webkit-linear-gradient(top, #292929 0%,#191919 100%);
+    background: linear-gradient(to bottom, #292929 0%,#191919 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#292929', endColorstr='#191919',GradientType=0 );
+}
+body {
+    background: #191919;
+}
+gs-body, gs-footer, .sql-results-area, .content-container {
+    background: #393939;
+    color: #b1b1b1;
+}
+gs-footer {
+    border-top: 2px solid #000000;
+}
+gs-panel > [flex], gs-panel > [panel-set-width] {
+    border-right: 1px solid #000000;
+}
+
+tr:nth-child(even) {
+    background: #333333;
+}
+tr:nth-child(odd) {
+    background: #222222;
+}
+td, th {
+    border: 1px solid #292929;
+}
+tr td:first-child, tr th:first-child {
+    border-left: 0 none;
+}
+.simple-table {
+    border-left: 0 none;
+}
+table {
+    background-color: transparent;
+}
+
+p, label {
+    color: #b1b1b1;
+}
+
+.ace-toolbar.ace-toolbar-browser.ace-toolbar-unlabeled { background-color: #191919 !important; }
+
+.clip-options .option-row {
+    color: #b1b1b1;
+    background: #222222;
+}
+
+*[selected] {
+    background-color: #35454F !important;
+}
+
+#tab-bar-container gs-button {
+    background-color: #191919;
+    color: #b1b1b1;
+    border: 1px solid #292929;
+}
+#tab-bar .tab-button {
+    background-color: #292929;
+    color: #b1b1b1;
+}
+
+#tab-bar-container.home-mode #button-home {
+    background-color: #292929;
+}
+#tab-bar-container.home-mode .tab-bar-toolbar.left {
+    border-bottom: 2px solid #191919;
+}
+
+#tab-bar .tab-button.current-tab {
+    background-color: #191919;
+    border-bottom: 2px solid #292929;
+}
+
+.ace-selected-query {
+    background-color: #474d33;
+}
+
+gs-button, gs-option, gs-checkbox, gs-text, gs-select, .clip-options .option-row { border: 1px solid #292929; }
+gs-button, gs-option, gs-checkbox, gs-text, gs-select, .control { background-color: #191919; color: #b1b1b1; }
+gs-button::after, gs-option::after, gs-checkbox::after, gs-text::after, gs-select::after, .gs-table-contextmenu gs-button[icon]:after { background-color: transparent; color: #b1b1b1; }
+
+#object-list-ace, .ace-pgpanel {
+    background-color: #191919;
+    color: #b1b1b1;
+}
+.ace-pgpanel .ace_marker-layer .ace_active-line {
+    background: #5f580e;
+}
+
+.ace-pgpanel .ace_ag,
+.ace-pgpanel .ace_cl,
+.ace-pgpanel .ace_cn,
+.ace-pgpanel .ace_do,
+.ace-pgpanel .ace_ft,
+.ace-pgpanel .ace_tc,
+.ace-pgpanel .ace_td,
+.ace-pgpanel .ace_tp,
+.ace-pgpanel .ace_tt,
+.ace-pgpanel .ace_fn,
+.ace-pgpanel .ace_in,
+.ace-pgpanel .ace_op,
+.ace-pgpanel .ace_oc,
+.ace-pgpanel .ace_of,
+.ace-pgpanel .ace_sq,
+.ace-pgpanel .ace_tb,
+.ace-pgpanel .ace_tf,
+.ace-pgpanel .ace_ty,
+
+.ace-pgpanel .ace_pk,
+.ace-pgpanel .ace_uk,
+.ace-pgpanel .ace_ck,
+.ace-pgpanel .ace_fk,
+.ace-pgpanel .ace_tk,
+.ace-pgpanel .ace_xk,
+
+.ace-pgpanel .ace_rl,
+.ace-pgpanel .ace_tr,
+.ace-pgpanel .ace_mv,
+.ace-pgpanel .ace_vw {
+    font-size: 1em;
+    font-weight: 900;
+}
+
+
+
+
+gs-table:not([theme]) >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell.table-record-selector {
+    background-color: #393939;
+    color: #b1b1b1;
+    border-bottom-color: #191919;
+    border-right-color: #191919;
+}
+
+gs-table.focus-in:not([theme]) >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell[auto-selected]:not([origin-record]):not(.table-header):not(.table-all-selector) {
+    background-color: #494949 !important;
+    background: #494949 !important;
+}
+
+gs-table.focus-in:not([theme]) >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell[auto-selected]:not(.table-header):not(.table-all-selector) {
+    background-color: #595959 !important;
+    background: #595959 !important;
+}
+
+gs-table:not([theme]) >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell.table-header,
+gs-table:not([theme]) >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell.table-all-selector {
+    border-right-color: #292929;
+    border-bottom-color: #292929;
+    color: #b1b1b1;
+    
+    background: #292929;
+    background: -moz-linear-gradient(top, #292929 0%, #191919 100%);
+    background: -webkit-linear-gradient(top, #292929 0%,#191919 100%);
+    background: linear-gradient(to bottom, #292929 0%,#191919 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#292929', endColorstr='#191919',GradientType=0 );
+}
+
+gs-table.focus-in:not([theme]) >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell.table-header[auto-selected] {
+    border-right-color: #292929;
+    border-bottom-color: #292929;
+    color: #b1b1b1;
+    
+    background: #393939;
+    background: -moz-linear-gradient(top, #393939 0%, #292929 100%);
+    background: -webkit-linear-gradient(top, #393939 0%,#292929 100%);
+    background: linear-gradient(to bottom, #393939 0%,#292929 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#393939', endColorstr='#292929',GradientType=0 );
+}
+
+gs-table:not([theme]) >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell.table-cell {
+    color: #b1b1b1;
+    background-color: #292929;
+    border-right-color: #6d6d6d;
+    border-bottom-color: #6d6d6d;
+}
+
+gs-table.focus-out:not([theme]) > .table-root >
+        .table-table-container > .table-data-container >
+        .table-data-viewport > gs-cell[selected],
+gs-table.focus-out:not([theme]) > .table-root >
+        .table-table-container > .table-data-container >
+        .table-data-viewport > gs-cell[auto-selected] {
+    background-color: #606060 !important;
+    background: #606060 !important;
+}
+
+gs-table.focus-in:not([theme]) > .table-root >
+        .table-table-container > .table-data-container >
+        .table-data-viewport > gs-cell[selected],
+gs-table.focus-in:not([theme]) > .table-root >
+        .table-table-container > .table-data-container >
+        .table-data-viewport > gs-cell[origin-record][selected] {
+    background-color: #494949 !important;
+    background: #494949 !important;
+}
+
+gs-table.focus-in:not([theme]) > .table-root >
+        .table-table-container > .table-data-container >
+        .table-data-viewport > gs-cell[origin-record]:not([selected]):not([auto-selected]) {
+    background-color: #393939 !important;
+    background: #393939 !important;
+}
+
+gs-table:not([theme]) >
+        .table-root.show-bottom-hud >
+        .table-hud-container.hud-bottom {
+    background-color: #FFF;
+    border-top-color: #000000;
+}
+
+gs-table:not([theme]) {
+    border-color: #191919;
+}
+
+gs-table:not([theme]) >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport {
+    background-color: #292929;
+    border-right-color: #191919;
+    border-bottom-color: #191919;
+}
+
+gs-table:not([theme]) >
+        .table-root.show-top-hud >
+        .table-hud-container.hud-top {
+    background-color: #292929;
+}
+
+gs-table:not([theme]) >
+        .table-root.show-bottom-hud >
+        .table-hud-container.hud-bottom {
+    background-color: #292929;
+}
+
+gs-table:not([theme]) > .table-root.show-top-hud > .table-hud-container.hud-top {
+    border-bottom-color: #191919;
+}
+
+gs-table > .table-root.show-top-hud > .table-hud-container.hud-top {
+    border-bottom: 1px solid #191919;
+}
+*/}));
+            });
+
             // if we're on a touch device: make the ace grow with it's content
             if (evt.touchDevice) {
                 CSSEditor.setOptions({
@@ -1304,7 +1657,7 @@ function dialogOptions(bolOnlyClipboard, currentTableElement) {
 
             // else: full height
             } else {
-                document.getElementById('customCSSAce').style.height = '30em';
+                document.getElementById('customCSSAce').style.height = '60vw';
             }
 
 
@@ -1325,6 +1678,8 @@ function dialogOptions(bolOnlyClipboard, currentTableElement) {
             document.getElementById('graph-options').addEventListener('change', function () {
                 localStorage.horizontalGraph = document.getElementById('graph-options').value;
             });
+            
+            customCSSText = CSSEditor.getValue();
             CSSEditor.addEventListener('change', function () {
                 customCSSText = CSSEditor.getValue();
             });
@@ -1482,6 +1837,7 @@ function dialogOptions(bolOnlyClipboard, currentTableElement) {
             ];
 
 
+            console.log(customCSSText);
             refreshCustomCSS(customCSSText);
             refreshShortcutKeys(ShortcutKeysText);
             var currentTab = document.getElementsByClassName('current-tab')[0];

@@ -1820,7 +1820,7 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
         // window.addEventListener('keydown', FFiveFunction);
         // window.addEventListener('keyup', FFiveUpFunction);
 
-        editor.setTheme('ace/theme/eclipse');
+        editor.setTheme(localStorage.aceTheme ? localStorage.aceTheme : 'ace/theme/eclipse');
         editor.getSession().setMode('ace/mode/pgsql');
         editor.setShowPrintMargin(false);
         editor.setDisplayIndentGuides(true);

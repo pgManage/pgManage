@@ -14,7 +14,7 @@ function autocompleteStart() {
 
         // create and configure popup ace
         autocompleteGlobals.popupAce = ace.edit(autocompleteGlobals.popupElement.children[1]);
-        autocompleteGlobals.popupAce.setTheme('ace/theme/clouds'); //eclipse
+        autocompleteGlobals.popupAce.setTheme(localStorage.aceTheme ? localStorage.aceTheme : 'ace/theme/clouds'); //eclipse
         autocompleteGlobals.popupAce.getSession().setMode('ace/mode/text');
         autocompleteGlobals.popupAce.setShowPrintMargin(false);
         autocompleteGlobals.popupAce.setDisplayIndentGuides(false);
