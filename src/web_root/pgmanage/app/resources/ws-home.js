@@ -34,7 +34,7 @@ function loadHome() {
         */}).replace(/\{\{PGMANAGE\}\}/g, contextData.pgmanageVersion).replace(/\{\{POSTGRES\}\}/g, contextData.versionNumber);//'10.3');
         // create ace
         homeEditor = ace.edit('sql-ace-area-home');
-        homeEditor.setTheme('ace/theme/eclipse');
+        homeEditor.setTheme(localStorage.aceTheme ? localStorage.aceTheme : 'ace/theme/eclipse');
         homeEditor.getSession().setMode('ace/mode/pgsql');
         homeEditor.setShowPrintMargin(false);
         homeEditor.setDisplayIndentGuides(true);

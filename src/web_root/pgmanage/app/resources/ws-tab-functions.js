@@ -1820,7 +1820,7 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
         // window.addEventListener('keydown', FFiveFunction);
         // window.addEventListener('keyup', FFiveUpFunction);
 
-        editor.setTheme('ace/theme/eclipse');
+        editor.setTheme(localStorage.aceTheme ? localStorage.aceTheme : 'ace/theme/eclipse');
         editor.getSession().setMode('ace/mode/pgsql');
         editor.setShowPrintMargin(false);
         editor.setDisplayIndentGuides(true);
@@ -2912,21 +2912,24 @@ function SQLBeautify(strInput) {
 
         // FOUND CASE... WHEN
         } else if (int_qs === 0 && intCase > 0 && strInput.substr(i).match(/^WHEN\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
-            strResult = strResult.trim() + '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + 'WHEN ';
+            //strResult = strResult.trim() + '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + 'WHEN ';
+            strResult += 'WHEN ';
             i = i + 3 + (strInput.substr(i + 4, 1) === ' ' ? 1 : 0);
             bolNoExtraWhitespace = true;
             //console.log(">WHEN|" + intTabLevel + "<");
 
         // FOUND CASE... ELSE
         } else if (int_qs === 0 && intCase > 0 && strInput.substr(i).match(/^ELSE\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
-            strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + 'ELSE ';
+            //strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + 'ELSE ';
+            strResult += 'ELSE ';
             i = i + 3 + (strInput.substr(i + 4, 1) === ' ' ? 1 : 0);
             bolNoExtraWhitespace = true;
             //console.log(">C ELSE|" + intTabLevel + "<");
 
         // FOUND CASE... END
         } else if (int_qs === 0 && intCase > 0 && strInput.substr(i).match(/^END\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
-            strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + 'END ';
+            //strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + 'END ';
+            strResult += 'END ';
             i = i + 2 + (strInput.substr(i + 3, 1) === ' ' ? 1 : 0);
             intTabLevel -= 1;
             bolNoExtraWhitespace = true;

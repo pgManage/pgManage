@@ -110,7 +110,7 @@ function refreshProcessList() {
                             editor = ace.edit(arrElements[0]);
                             editor.$blockScrolling = Infinity; // <== blocks a warning
                             editor.setValue(strCurrentQuery);
-                            editor.setTheme('ace/theme/eclipse');
+                            editor.setTheme(localStorage.aceTheme ? localStorage.aceTheme : 'ace/theme/eclipse');
                             editor.getSession().setMode('ace/mode/pgsql');
                             editor.setShowPrintMargin(false);
                             editor.setDisplayIndentGuides(true);

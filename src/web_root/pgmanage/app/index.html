@@ -34,7 +34,8 @@
                     link3 = GS.stringToElement('<link href="resources/pg-9.2-tree-functions.css" type="text/css" rel="stylesheet" />'),
                     link4 = GS.stringToElement('<link href="resources/pg-9.2-other.css" type="text/css" rel="stylesheet" />'),
                     link5 = GS.stringToElement('<link href="resources/pg-9.2-autocomplete.css" type="text/css" rel="stylesheet" />'),
-                    link6 = GS.stringToElement('<link href="../css/pgmanage.css" type="text/css" rel="stylesheet" />');
+                    link6 = GS.stringToElement('<link href="../css/pgmanage.css" type="text/css" rel="stylesheet" />'),
+                    customCSS = GS.stringToElement('<style id="customCss"></style>');
 
                 document.body.appendChild(link1);
                 document.body.appendChild(link2);
@@ -42,6 +43,7 @@
                 document.body.appendChild(link4);
                 document.body.appendChild(link5);
                 document.body.appendChild(link6);
+                document.body.appendChild(customCSS);
             });
 
             var reconnectNumber = 0;
@@ -701,6 +703,5 @@
 
         <script src="../js/settings.js" type="text/javascript"></script>
         <script id="shortcutKeys"></script>
-        <style id="customCss"></style>
     </body>
 </html>
