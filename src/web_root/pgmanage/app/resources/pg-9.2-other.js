@@ -2580,7 +2580,7 @@ function getClipSetting(propertyName) {
         "nullValues":     (savedSettings.nullValues             !== undefined ? savedSettings.nullValues            : "NULL"),
         "columnNames":    (savedSettings.columnNames            !== undefined ? savedSettings.columnNames           : "never"),
         "rowNumbers":    (savedSettings.rowNumbers              !== undefined ? savedSettings.rowNumbers            : "never"),
-        "copyTypes":    (savedSettings.copyTypes                !== undefined ? savedSettings.copyTypes             : "text")
+        "copyTypes":    (savedSettings.copyTypes                !== undefined ? savedSettings.copyTypes             : "text,html")
     };
 
     return savedSettings[propertyName];
