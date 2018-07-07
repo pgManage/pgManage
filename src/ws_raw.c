@@ -461,7 +461,9 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 
 		// int_i is incremented before this is run, so we counteract it
 		if ((client_request->int_i - 1) >= 0 && client_raw->bol_autocommit && client_raw->bol_begin_transaction) {
-			if (client_raw->bol_commit_transaction && strncmp(PQcmdStatus(res), "BEGIN", 5) == 0) {
+			PGTransactionStatusType tran_status = PQtransactionStatus(client_request->parent->conn->conn);
+			// don't commit if no transaction (suppresses a warning in postgres)
+			if (tran_status == PQTRANS_IDLE || (client_raw->bol_commit_transaction && strncmp(PQcmdStatus(res), "BEGIN", 5) == 0)) {
 				client_raw->bol_commit_transaction = false;
 			} else if (!client_raw->bol_commit_transaction && (strncmp(PQcmdStatus(res), "COMMIT", 6) == 0 || strncmp(PQcmdStatus(res), "ROLLBACK", 8) == 0)) {
 				client_raw->bol_commit_transaction = true;
