@@ -636,22 +636,52 @@ void http_auth_login_step2(EV_P, void *cb_data, DB_conn *conn) {
 		"SELECT CASE WHEN rolsuper THEN 'TRUE' ELSE 'FALSE' END AS result "
 		"FROM pg_catalog.pg_roles WHERE rolname = ";
 	char *str_temp2 =
-		" UNION ALL "
 		"SELECT CASE WHEN count(pg_roles.rolname) > 0 THEN 'TRUE' ELSE 'FALSE' "
 		"END "
 		"FROM pg_user "
 		"LEFT JOIN pg_auth_members on pg_user.usesysid = pg_auth_members.member "
 		"LEFT JOIN pg_roles on pg_roles.oid = pg_auth_members.roleid "
 		"WHERE pg_user.usename = ";
-	SFINISH_SNCAT(
-		str_sql, &int_temp,
-		str_temp1, strlen(str_temp1),
-		str_user_literal, int_user_literal_len,
-		str_temp2, strlen(str_temp2),
-		str_user_literal, int_user_literal_len,
-		" AND pg_roles.rolname = ", (size_t)24,
-		str_group_literal, int_group_literal_len
-	);
+	char *str_temp3 = " UNION ALL ";
+	char *str_temp4 = "SELECT 'TRUE'";
+    if (bol_global_super_only == true && str_global_login_group != NULL) {
+        SFINISH_SNCAT(
+            str_sql, &int_temp,
+            str_temp1, strlen(str_temp1),
+            str_user_literal, int_user_literal_len,
+            str_temp3, strlen(str_temp3),
+            str_temp2, strlen(str_temp2),
+            str_user_literal, int_user_literal_len,
+            " AND pg_roles.rolname = ", (size_t)24,
+            str_group_literal, int_group_literal_len
+        );
+    } else if (bol_global_super_only == true) {
+        SFINISH_SNCAT(
+            str_sql, &int_temp,
+            str_temp1, strlen(str_temp1),
+            str_user_literal, int_user_literal_len,
+            str_temp3, strlen(str_temp3),
+            str_temp4, strlen(str_temp4)
+        );
+    } else if (str_global_login_group != NULL) {
+        SFINISH_SNCAT(
+            str_sql, &int_temp,
+            str_temp4, strlen(str_temp4),
+            str_temp3, strlen(str_temp3),
+            str_temp2, strlen(str_temp2),
+            str_user_literal, int_user_literal_len,
+            " AND pg_roles.rolname = ", (size_t)24,
+            str_group_literal, int_group_literal_len
+        );
+    } else {
+        SFINISH_SNCAT(
+            str_sql, &int_temp,
+            str_temp4, strlen(str_temp4),
+            str_temp3, strlen(str_temp3),
+            str_temp4, strlen(str_temp4)
+        );
+    }
+    SINFO("str_sql: %s", str_sql);
 	SFREE(str_user_literal);
 	SFREE(str_group_literal);
 

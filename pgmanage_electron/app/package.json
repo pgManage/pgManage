@@ -14,7 +14,7 @@
   "license": "PostgreSQL",
   "main": "main.js",
   "name": "pgManage",
-  "version": "10.3.0",
+  "version": "10.3.1-rc",
   "author": {
     "name": "PostgreSQL Global Development Group",
     "email": "hackers@pgmanage.io"
