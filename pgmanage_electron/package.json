@@ -85,5 +85,5 @@
     "dist": "build",
     "dist-win": "build --ia32"
   },
-  "version": "10.3.0"
+  "version": "10.3.1"
 }
