@@ -109,7 +109,7 @@ char *canonical(const char *file_base, char *_path, char *check_type) {
 	SERROR_SNCAT(str, &int_len,
 		str_file_base, int_file_base_len,
 		path, int_path_len);
-	// SDEBUG("\"%s\" + \"%s\" = \"%s\"", str_file_base, path, str);
+	//SINFO("\"%s\" + \"%s\" = \"%s\"", str_file_base, path, str);
 
 	// if no path to canonicalize was provided then just return the file_base
 	if (path[0] == 0) {

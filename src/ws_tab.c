@@ -8,7 +8,7 @@ struct custom_check_callback {
 };
 
 void ws_tab_step1(struct sock_ev_client_request *client_request) {
-	SDEFINE_VAR_ALL(str_path_temp, str_local_path_root, str_change_stamp, str_query);
+	SDEFINE_VAR_ALL(str_path_temp, str_local_path_root, str_change_stamp, str_query, str_username_folder);
 	struct sock_ev_client_tab *client_tab = (struct sock_ev_client_tab *)(client_request->client_request_data);
 	char *str_response = NULL;
 	char *str_temp = NULL;
@@ -20,6 +20,7 @@ void ws_tab_step1(struct sock_ev_client_request *client_request) {
 	size_t int_path_len = 0;
 	size_t int_path_to_len = 0;
 	size_t int_change_stamp_len = 0;
+	size_t int_username_folder_len;
 
 	client_request->int_response_id = 0;
 	client_request->arr_response = DArray_create(sizeof(char *), 1);
@@ -46,10 +47,12 @@ void ws_tab_step1(struct sock_ev_client_request *client_request) {
 	str_path_temp = canonical(str_global_sql_root, client_request->parent->str_connname_folder, "read_dir");
 	SFINISH_CHECK(str_path_temp != NULL, "Failed to get canonical path: >%s|%s<", str_global_sql_root, client_request->parent->str_connname_folder);
 
-	str_local_path_root = canonical(str_path_temp, client_request->parent->str_username, "read_dir");
-	SFREE(str_path_temp);
+	SFINISH_CHECK((str_username_folder = snuri(client_request->parent->str_username, client_request->parent->int_username_len, &int_username_folder_len)) != NULL, "snuri failed");
+
+	str_local_path_root = canonical(str_path_temp, str_username_folder, "read_dir");
 	SFINISH_CHECK(str_local_path_root != NULL, "Failed to get canonical path: >%s|%s<", str_path_temp,
-		client_request->parent->str_username);
+		str_username_folder);
+	SFREE(str_path_temp);
 
 	if (strcmp(str_request_type, "LIST") == 0) {
 		client_tab->str_path = ptr_query;
