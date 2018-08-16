@@ -587,7 +587,7 @@ function handleQueryVersionDifferences(versionNum) {
                         UNION SELECT 7, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 't($|[^*])' THEN 'TRIGGER' END ) em
                         WHERE perms is not null),',')) ||
                     ' ON TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || ' TO ' ||
-                    quote_ident(CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN '"public"' ELSE (regexp_split_to_array(unnest::text,'[=/]'))[1] END) ||
+                    (CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN '"public"' ELSE (regexp_split_to_array(unnest::text,'[=/]'))[1] END) ||
                     ';' ), E'\n')
                     FROM unnest(relacl)
                     WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|a|d|D|x|t)($|[^*])'
@@ -608,7 +608,7 @@ function handleQueryVersionDifferences(versionNum) {
                         UNION SELECT 7, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 't\*' THEN 'TRIGGER' END ) em
                         WHERE perms is not null),',')) ||
                     ' ON TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || ' TO ' ||
-                    quote_ident(CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE ((regexp_split_to_array(unnest::text,'[=/]'))[1]) END) ||
+                    (CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE ((regexp_split_to_array(unnest::text,'[=/]'))[1]) END) ||
                     ' WITH GRANT OPTION;'), E'\n')
                     FROM unnest(relacl)
                     WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|a|d|D|x|t)\*' )
@@ -627,7 +627,7 @@ function handleQueryVersionDifferences(versionNum) {
                         ORDER BY 1),', '
                         )) ||
                     ' ON ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) ||
-                    ' TO ' || CASE WHEN substr((regexp_split_to_array(att.attacl::text,'[=/]'))[1], 2) = '' THEN 'public' ELSE quote_ident(substr((regexp_split_to_array(att.attacl::text,'[=/]'))[1], 2)) END ||
+                    ' TO ' || CASE WHEN substr((regexp_split_to_array(att.attacl::text,'[=/]'))[1], 2) = '' THEN 'public' ELSE (substr((regexp_split_to_array(att.attacl::text,'[=/]'))[1], 2)) END ||
                     ';' as perms
                 FROM pg_class
                 LEFT JOIN pg_attribute att ON att.attrelid = pg_class.oid
@@ -644,7 +644,7 @@ function handleQueryVersionDifferences(versionNum) {
                         ORDER BY 1),','
                         )) ||
                     ' ON ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) ||
-                    ' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE quote_ident((regexp_split_to_array(att.attacl::text,'[=/]'))[1]) END  ||
+                    ' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE ((regexp_split_to_array(att.attacl::text,'[=/]'))[1]) END  ||
                     ' WITH GRANT OPTION;' as perms
                 FROM pg_class
                 LEFT JOIN pg_attribute att ON att.attrelid = pg_class.oid
@@ -1040,7 +1040,7 @@ function handleQueryVersionDifferences(versionNum) {
                         UNION SELECT 7, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 't($|[^*])' THEN 'TRIGGER' END ) em
                         WHERE perms is not null),',')) ||
                     ' ON TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || ' TO ' ||
-                    quote_ident(CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE (regexp_split_to_array(unnest::text,'[=/]'))[1] END) ||
+                    (CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE (regexp_split_to_array(unnest::text,'[=/]'))[1] END) ||
                     ';' ), E'\n')
                     FROM unnest(relacl)
                     WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|a|d|D|x|t)($|[^*])'
@@ -1061,7 +1061,7 @@ function handleQueryVersionDifferences(versionNum) {
                         UNION SELECT 7, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 't\*' THEN 'TRIGGER' END ) em
                         WHERE perms is not null),',')) ||
                     ' ON TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || ' TO ' ||
-                    quote_ident(CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE ((regexp_split_to_array(unnest::text,'[=/]'))[1]) END) ||
+                    (CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE ((regexp_split_to_array(unnest::text,'[=/]'))[1]) END) ||
                     ' WITH GRANT OPTION;'), E'\n')
                     FROM unnest(relacl)
                     WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|a|d|D|x|t)\*' )
@@ -1080,7 +1080,7 @@ function handleQueryVersionDifferences(versionNum) {
                         ORDER BY 1),','
                         )) ||
                     ' ON ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || 
-                    ' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE quote_ident(substr((regexp_split_to_array(att.attacl::text,'[=/]'))[1], 2)) END ||
+                    ' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE (substr((regexp_split_to_array(att.attacl::text,'[=/]'))[1], 2)) END ||
                     ';' as perms
                 FROM pg_class
                 LEFT JOIN pg_attribute att ON att.attrelid = pg_class.oid
@@ -1097,7 +1097,7 @@ function handleQueryVersionDifferences(versionNum) {
                         ORDER BY 1),','
                         )) ||
                     ' ON ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) ||
-                    ' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE quote_ident((regexp_split_to_array(att.attacl::text,'[=/]'))[1]) END  ||
+                    ' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE ((regexp_split_to_array(att.attacl::text,'[=/]'))[1]) END  ||
                     ' WITH GRANT OPTION;' as perms
                 FROM pg_class
                 LEFT JOIN pg_attribute att ON att.attrelid = pg_class.oid
@@ -1372,7 +1372,7 @@ function handleQueryVersionDifferences(versionNum) {
                         ORDER BY 1),','
                         )) ||
                     ' ON ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || 
-                    ' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE quote_ident(substr((regexp_split_to_array(att.attacl::text,'[=/]'))[1], 2)) END ||
+                    ' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE (substr((regexp_split_to_array(att.attacl::text,'[=/]'))[1], 2)) END ||
                     ';' as perms
                 FROM pg_class 
                 LEFT JOIN pg_attribute att ON att.attrelid = pg_class.oid 
@@ -1389,7 +1389,7 @@ function handleQueryVersionDifferences(versionNum) {
                         ORDER BY 1),','
                         )) ||
                     ' ON ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || 
-                    ' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE quote_ident((regexp_split_to_array(att.attacl::text,'[=/]'))[1]) END  ||
+                    ' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE ((regexp_split_to_array(att.attacl::text,'[=/]'))[1]) END  ||
                     ' WITH GRANT OPTION;' as perms
                 FROM pg_class 
                 LEFT JOIN pg_attribute att ON att.attrelid = pg_class.oid 
@@ -1449,7 +1449,7 @@ function handleQueryVersionDifferences(versionNum) {
                             UNION SELECT 7, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 't($|[^*])' THEN 'TRIGGER' END ) em
                             WHERE perms is not null),',')) ||
                         ' ON TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || ' TO ' ||
-                        quote_ident(CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE (regexp_split_to_array(unnest::text,'[=/]'))[1] END) ||
+                        (CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE (regexp_split_to_array(unnest::text,'[=/]'))[1] END) ||
                         ';' ), E'\n')
                         FROM unnest(relacl)
                         WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|a|d|D|x|t)($|[^*])'
@@ -1470,7 +1470,7 @@ function handleQueryVersionDifferences(versionNum) {
                             UNION SELECT 7, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 't\*' THEN 'TRIGGER' END ) em
                             WHERE perms is not null),',')) ||
                         ' ON TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || ' TO ' ||
-                        quote_ident(CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE ((regexp_split_to_array(unnest::text,'[=/]'))[1]) END) ||
+                        (CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE ((regexp_split_to_array(unnest::text,'[=/]'))[1]) END) ||
                         ' WITH GRANT OPTION;'), E'\n')
                         FROM unnest(relacl)
                         WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|a|d|D|x|t)\*' )
@@ -1489,7 +1489,7 @@ function handleQueryVersionDifferences(versionNum) {
                             ORDER BY 1),','
                             )) ||
                         ' ON ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) ||
-                        ' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE quote_ident((regexp_split_to_array(att.attacl::text,'[=/]'))[1]) END ||
+                        ' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE ((regexp_split_to_array(att.attacl::text,'[=/]'))[1]) END ||
                         ';' as perms
                     FROM pg_class
                     LEFT JOIN pg_attribute att ON att.attrelid = pg_class.oid
@@ -1506,7 +1506,7 @@ function handleQueryVersionDifferences(versionNum) {
                             ORDER BY 1),','
                             )) ||
                         ' ON ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) ||
-                        ' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE quote_ident((regexp_split_to_array(att.attacl::text,'[=/]'))[1]) END  ||
+                        ' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE ((regexp_split_to_array(att.attacl::text,'[=/]'))[1]) END  ||
                         ' WITH GRANT OPTION;' as perms
                     FROM pg_class
                     LEFT JOIN pg_attribute att ON att.attrelid = pg_class.oid
@@ -2067,7 +2067,7 @@ function handleQueryVersionDifferences(versionNum) {
                         UNION SELECT 7, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 't($|[^*])' THEN 'TRIGGER' END ) em
                         WHERE perms is not null),',')) ||
                     ' ON TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || ' TO ' ||
-                    quote_ident(CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN '"public"' ELSE (regexp_split_to_array(unnest::text,'[=/]'))[1] END) ||
+                    (CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN '"public"' ELSE (regexp_split_to_array(unnest::text,'[=/]'))[1] END) ||
                     ';' ), E'\n')
                     FROM unnest(relacl)
                     WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|a|d|D|x|t)($|[^*])'
@@ -2087,7 +2087,7 @@ function handleQueryVersionDifferences(versionNum) {
                         UNION SELECT 7, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 't\*' THEN 'TRIGGER' END ) em
                         WHERE perms is not null),',')) ||
                     ' ON TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || ' TO ' ||
-                    quote_ident(CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE ((regexp_split_to_array(unnest::text,'[=/]'))[1]) END) ||
+                    (CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE ((regexp_split_to_array(unnest::text,'[=/]'))[1]) END) ||
                     ' WITH GRANT OPTION;'), E'\n')
                     FROM unnest(relacl)
                     WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|a|d|D|x|t)\*' )
@@ -2105,7 +2105,7 @@ function handleQueryVersionDifferences(versionNum) {
                         ORDER BY 1),', '
                         )) ||
                     ' ON ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) ||
-                    ' TO ' || CASE WHEN substr((regexp_split_to_array(att.attacl::text,'[=/]'))[1], 2) = '' THEN 'public' ELSE quote_ident(substr((regexp_split_to_array(att.attacl::text,'[=/]'))[1], 2)) END ||
+                    ' TO ' || CASE WHEN substr((regexp_split_to_array(att.attacl::text,'[=/]'))[1], 2) = '' THEN 'public' ELSE (substr((regexp_split_to_array(att.attacl::text,'[=/]'))[1], 2)) END ||
                     ';' as perms
                 FROM pg_class
                 LEFT JOIN pg_attribute att ON att.attrelid = pg_class.oid
@@ -2121,7 +2121,7 @@ function handleQueryVersionDifferences(versionNum) {
                         ORDER BY 1),','
                         )) ||
                     ' ON ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) ||
-                    ' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE quote_ident((regexp_split_to_array(att.attacl::text,'[=/]'))[1]) END  ||
+                    ' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE ((regexp_split_to_array(att.attacl::text,'[=/]'))[1]) END  ||
                     ' WITH GRANT OPTION;' as perms
                 FROM pg_class
                 LEFT JOIN pg_attribute att ON att.attrelid = pg_class.oid
@@ -2480,7 +2480,7 @@ function handleQueryVersionDifferences(versionNum) {
                         UNION SELECT 7, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 't($|[^*])' THEN 'TRIGGER' END ) em
                         WHERE perms is not null),',')) ||
                     ' ON TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || ' TO ' ||
-                    quote_ident(CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE (regexp_split_to_array(unnest::text,'[=/]'))[1] END) ||
+                    (CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE (regexp_split_to_array(unnest::text,'[=/]'))[1] END) ||
                     ';' ), E'\n')
                     FROM unnest(relacl)
                     WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|a|d|D|x|t)($|[^*])'
@@ -2500,7 +2500,7 @@ function handleQueryVersionDifferences(versionNum) {
                         UNION SELECT 7, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 't\*' THEN 'TRIGGER' END ) em
                         WHERE perms is not null),',')) ||
                     ' ON TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || ' TO ' ||
-                    quote_ident(CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE ((regexp_split_to_array(unnest::text,'[=/]'))[1]) END) ||
+                    (CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE ((regexp_split_to_array(unnest::text,'[=/]'))[1]) END) ||
                     ' WITH GRANT OPTION;'), E'\n')
                     FROM unnest(relacl)
                     WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|a|d|D|x|t)\*' )
@@ -2518,7 +2518,7 @@ function handleQueryVersionDifferences(versionNum) {
                         ORDER BY 1),','
                         )) ||
                     ' ON ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || 
-                    ' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE quote_ident(substr((regexp_split_to_array(att.attacl::text,'[=/]'))[1], 2)) END ||
+                    ' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE (substr((regexp_split_to_array(att.attacl::text,'[=/]'))[1], 2)) END ||
                     ';' as perms
                 FROM pg_class
                 LEFT JOIN pg_attribute att ON att.attrelid = pg_class.oid
@@ -2534,7 +2534,7 @@ function handleQueryVersionDifferences(versionNum) {
                         ORDER BY 1),','
                         )) ||
                     ' ON ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) ||
-                    ' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE quote_ident((regexp_split_to_array(att.attacl::text,'[=/]'))[1]) END  ||
+                    ' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE ((regexp_split_to_array(att.attacl::text,'[=/]'))[1]) END  ||
                     ' WITH GRANT OPTION;' as perms
                 FROM pg_class
                 LEFT JOIN pg_attribute att ON att.attrelid = pg_class.oid
@@ -2788,7 +2788,7 @@ function handleQueryVersionDifferences(versionNum) {
                         ORDER BY 1),','
                         )) ||
                     ' ON ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || 
-                    ' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE quote_ident(substr((regexp_split_to_array(att.attacl::text,'[=/]'))[1], 2)) END ||
+                    ' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE (substr((regexp_split_to_array(att.attacl::text,'[=/]'))[1], 2)) END ||
                     ';' as perms
                 FROM pg_class 
                 LEFT JOIN pg_attribute att ON att.attrelid = pg_class.oid 
@@ -2805,7 +2805,7 @@ function handleQueryVersionDifferences(versionNum) {
                         ORDER BY 1),','
                         )) ||
                     ' ON ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || 
-                    ' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE quote_ident((regexp_split_to_array(att.attacl::text,'[=/]'))[1]) END  ||
+                    ' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE ((regexp_split_to_array(att.attacl::text,'[=/]'))[1]) END  ||
                     ' WITH GRANT OPTION;' as perms
                 FROM pg_class 
                 LEFT JOIN pg_attribute att ON att.attrelid = pg_class.oid 
@@ -2853,7 +2853,7 @@ function handleQueryVersionDifferences(versionNum) {
                         UNION SELECT 7, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 't($|[^*])' THEN 'TRIGGER' END ) em
                         WHERE perms is not null),',')) ||
                     ' ON TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || ' TO ' ||
-                    quote_ident(CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE (regexp_split_to_array(unnest::text,'[=/]'))[1] END) ||
+                    (CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE (regexp_split_to_array(unnest::text,'[=/]'))[1] END) ||
                     ';' ), E'\n')
                     FROM unnest(relacl)
                     WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|a|d|D|x|t)($|[^*])'
@@ -2873,7 +2873,7 @@ function handleQueryVersionDifferences(versionNum) {
                         UNION SELECT 7, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 't\*' THEN 'TRIGGER' END ) em
                         WHERE perms is not null),',')) ||
                     ' ON TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || ' TO ' ||
-                    quote_ident(CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE ((regexp_split_to_array(unnest::text,'[=/]'))[1]) END) ||
+                    (CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE ((regexp_split_to_array(unnest::text,'[=/]'))[1]) END) ||
                     ' WITH GRANT OPTION;'), E'\n')
                     FROM unnest(relacl)
                     WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|a|d|D|x|t)\*' )
@@ -2891,7 +2891,7 @@ function handleQueryVersionDifferences(versionNum) {
                         ORDER BY 1),','
                         )) ||
                     ' ON ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) ||
-                    ' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE quote_ident((regexp_split_to_array(att.attacl::text,'[=/]'))[1]) END ||
+                    ' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE ((regexp_split_to_array(att.attacl::text,'[=/]'))[1]) END ||
                     ';' as perms
                 FROM pg_class
                 LEFT JOIN pg_attribute att ON att.attrelid = pg_class.oid
@@ -2907,7 +2907,7 @@ function handleQueryVersionDifferences(versionNum) {
                         ORDER BY 1),','
                         )) ||
                     ' ON ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) ||
-                    ' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE quote_ident((regexp_split_to_array(att.attacl::text,'[=/]'))[1]) END  ||
+                    ' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE ((regexp_split_to_array(att.attacl::text,'[=/]'))[1]) END  ||
                     ' WITH GRANT OPTION;' as perms
                 FROM pg_class
                 LEFT JOIN pg_attribute att ON att.attrelid = pg_class.oid
@@ -4883,7 +4883,7 @@ scriptQuery.objectView = ml(function () {/*
         		UNION SELECT 7, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 't($|[^*])' THEN 'TRIGGER' END ) em
         		WHERE perms is not null),',')) ||
         	' ON TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || ' TO ' ||
-        	quote_ident(CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE ((regexp_split_to_array(unnest::text,'[=/]'))[1]) END) ||
+        	(CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE ((regexp_split_to_array(unnest::text,'[=/]'))[1]) END) ||
         	';' ), E'\n')
         	FROM unnest(relacl)
         	WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|a|d|D|x|t)($|[^*])'
@@ -5073,7 +5073,7 @@ scriptQuery.objectViewNoComment = ml(function () {/*
         		UNION SELECT 7, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 't($|[^*])' THEN 'TRIGGER' END ) em
         		WHERE perms is not null),',')) ||
         	' ON TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || ' TO ' ||
-        	quote_ident(CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE ((regexp_split_to_array(unnest::text,'[=/]'))[1]) END) ||
+        	(CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE ((regexp_split_to_array(unnest::text,'[=/]'))[1]) END) ||
         	';' ), E'\n')
         	FROM unnest(relacl)
         	WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|a|d|D|x|t)($|[^*])'
@@ -5093,7 +5093,7 @@ scriptQuery.objectViewNoComment = ml(function () {/*
         		UNION SELECT 7, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 't\*' THEN 'TRIGGER' END ) em
         		WHERE perms is not null),',')) ||
         	' ON TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || ' TO ' ||
-        	quote_ident(CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE ((regexp_split_to_array(unnest::text,'[=/]'))[1]) END) ||
+        	(CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE ((regexp_split_to_array(unnest::text,'[=/]'))[1]) END) ||
         	' WITH GRANT OPTION;'), E'\n')
         	FROM unnest(relacl)
         	WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|a|d|D|x|t)\*' )

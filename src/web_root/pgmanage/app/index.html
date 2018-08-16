@@ -351,7 +351,7 @@
                 window.qsLoadScriptTab = function (strQueryString) {
                     var strView = GS.qryGetVal(strQueryString, 'view'), arrParts, buttons, strScript, strName, strButtons
                       , strTemplate, strOID, strSchema, strObjectName, strFinalName, arrElements, i, len, strCurrentTab
-                      , currentElement;
+                      , currentElement, strTabName;
 
                     if (strView && strView !== strViewCache) {
                         strViewCache = strView;
@@ -382,14 +382,21 @@
                                 // "strObjectName" should already be quote_ident in the listQuery
                                 if (arrParts[0] === 'objectColumn') {
                                     strFinalName = strObjectName;
+                                    strTabName = strObjectName;
                                 } else {
                                     strFinalName = quote_ident(strSchema) + '.' + strObjectName;
+                                    strTabName = strSchema + '.' + strObjectName;
                                 }
                             } else if (!strSchema) {
                                 strFinalName = quote_ident(strObjectName);
+                                strTabName = strObjectName;
                             } else {
                                 strFinalName = quote_ident(strSchema);
+                                strTabName = strSchema;
                             }
+
+                            strFinalName = quote_literal(strFinalName);
+                            strFinalName = strFinalName.substring(1, strFinalName.length - 1);
 
                             strScript = treePrepareQuery(scriptQuery[arrParts[0]], strOID, strFinalName, strFinalName);
 
@@ -412,9 +419,9 @@
                             }
 
                             if (strTemplate === 'objectView') {
-                                getScript(strFinalName, strButtons, strScript, false, localStorage.bolBeautify === 'true');
+                                getScript(strTabName, strButtons, strScript, false, localStorage.bolBeautify === 'true');
                             } else {
-                                getScript(strFinalName, strButtons, strScript);
+                                getScript(strTabName, strButtons, strScript);
                             }
 
                         // else, tab link

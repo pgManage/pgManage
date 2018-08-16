@@ -1931,6 +1931,22 @@ function quote_ident(strName) {
     return strName;
 }
 
+function quote_literal(strName) {
+    'use strict';
+    var bolQuote = !Boolean(strName.match(/^[a-z_]{1,}[a-z_0-9]*$/));
+
+    //_ is safe
+    //0-9 is safe (except when first char)
+    //a-z is safe
+
+    // if we need to quote: double up double quotes
+    if (bolQuote) {
+        return '\'' + strName.replace(/\'/g, '\'\'') + '\'';
+    }
+
+    return strName;
+}
+
 
 
 

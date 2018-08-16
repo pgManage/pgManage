@@ -831,8 +831,8 @@ function dialogClosedTabs() {
                                 '<td>' + encodeHTML(strDate) + ' ' + encodeHTML(strTime) + '</td>' +
                                 '<td>' +
                                     '<gs-button class="button-add-as-new-tab" title="Open this script as a new tab" ' +
-                                        'data-path="' + strFullPath + '" ' +
-                                        'data-original-name="' + strFileName + '" ' +
+                                        'data-path="' + encodeURIComponent(strFullPath) + '" ' +
+                                        'data-original-name="' + encodeURIComponent(strFileName) + '" ' +
                                         'data-type="' + strFileExtension + '" dialogclose>Open</gs-button>' +
                                 '</td>' +
                                 '<td>' +
@@ -861,12 +861,12 @@ function dialogClosedTabs() {
 
                     for (i = 0, len = arrElements.length; i < len; i += 1) {
                         arrElements[i].addEventListener('click', function () {
-                            var strType = this.getAttribute('data-type'), strName = this.getAttribute('data-original-name');
+                            var strType = this.getAttribute('data-type'), strName = decodeURIComponent(this.getAttribute('data-original-name'));
 
                             GS.requestFromSocket(GS.envSocket,
                                                  'TAB\tREAD\t' +
                                                  GS.encodeForTabDelimited(
-                                                     strPath + '/' + encodeTabNameForFileName(this.getAttribute('data-path'))
+                                                     strPath + '/' + encodeTabNameForFileName(decodeURIComponent(this.getAttribute('data-path')))
                                                  ),
                                                  function (data, error, errorData) {
                                 var strChangeStamp;
