@@ -396,7 +396,9 @@
                             }
 
                             strFinalName = quote_literal(strFinalName);
+                            console.log(strFinalName);
                             strFinalName = strFinalName.substring(1, strFinalName.length - 1);
+                            console.log(strFinalName);
 
                             strScript = treePrepareQuery(scriptQuery[arrParts[0]], strOID, strFinalName, strFinalName);
 

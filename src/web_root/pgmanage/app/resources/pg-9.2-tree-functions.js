@@ -741,11 +741,11 @@ function treePrepareQuery(strQuery, oid, strName, sqlSafeName) {
     // console.log(relName);
     //console.log(strQuery);
     return strQuery
-                .replace(/{{INTOID}}/gi, oid)
-                .replace(/{{STRNAME}}/gi, strName)
-                .replace(/{{STRSQLSAFENAME}}/gi, sqlSafeName)
-                .replace(/{{SCHEMA}}/gi, schemaName)
-                .replace(/{{STRRELNAME}}/gi, relName);
+                .replace(/\{\{INTOID\}\}/gi, oid)
+                .replace(/\{\{STRNAME\}\}/gi, strName)
+                .replace(/\{\{STRSQLSAFENAME\}\}/gi, sqlSafeName)
+                .replace(/\{\{SCHEMA\}\}/gi, schemaName)
+                .replace(/\{\{STRRELNAME\}\}/gi, relName);
 }
 
 //// this function adds or removes blank lines to/from the tree
@@ -1543,6 +1543,8 @@ function treeLoad(data, index, intColumn) {
                 strName = data.name;
                 strSqlSafeName = quote_ident(data.name);
             }
+            strSqlSafeName = quote_literal(strSqlSafeName);
+            strSqlSafeName = strSqlSafeName.substring(1, strSqlSafeName.length - 1);
 
             // if there's only one child: all of the loaded children are of that type
             if (arrChildren.length === 1) {
@@ -1628,9 +1630,9 @@ function treeLoad(data, index, intColumn) {
     }
 
     if (data.bullet === 'CL' && data.name !== '' && data.name.indexOf(' ') !== -1) {
-        data.name = data.name.substring(0, data.name.indexOf(' '));
+        data.name = data.name.substring(0, data.name.lastIndexOf(' '));
     }
-    //console.log(data);
+    console.log(data);
     if (arrType.indexOf('script') !== -1 &&
         (
             //If object is not a schema folder or a table folder then continue
@@ -1933,18 +1935,7 @@ function quote_ident(strName) {
 
 function quote_literal(strName) {
     'use strict';
-    var bolQuote = !Boolean(strName.match(/^[a-z_]{1,}[a-z_0-9]*$/));
-
-    //_ is safe
-    //0-9 is safe (except when first char)
-    //a-z is safe
-
-    // if we need to quote: double up double quotes
-    if (bolQuote) {
-        return '\'' + strName.replace(/\'/g, '\'\'') + '\'';
-    }
-
-    return strName;
+    return '\'' + strName.replace(/\'/g, '\'\'') + '\'';
 }
 
 
@@ -2322,6 +2313,7 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
                         resName = arrResult[i][1];
                     }
                     if (GS.strToTitle(arrResult[i][3]).toLowerCase() === 'view' || GS.strToTitle(arrResult[i][3]).toLowerCase() === 'table') {
+                        console.log('>' + quote_ident(strSchemaName) + '.' + resName + '<');
                         bolTableTriggers = GS.strToTitle(arrResult[i][3]).toLowerCase() === 'table';
                         bolViewTriggers = GS.strToTitle(arrResult[i][3]).toLowerCase() === 'view';
                         strQuery += '\n\n' +
@@ -2349,6 +2341,7 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
                     } else if (GS.strToTitle(arrResult[i][3]).toLowerCase() === 'index') {
                         len1 -= 1;
                     } else {
+                        console.log('>' + quote_ident(strSchemaName) + '.' + resName + '<');
                         strQuery += '\n\n' +
                             (
                                 scriptQuery['object' + GS.strToTitle(arrResult[i][3])]
