@@ -2035,6 +2035,9 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
                     <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-operator">
                         <label style="text-align: left;" flex>&nbsp;Operators</label>
                     </gs-checkbox>
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-procedure">
+                        <label style="text-align: left;" flex>&nbsp;Procedures</label>
+                    </gs-checkbox>
                     <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-sequence">
                         <label style="text-align: left;" flex>&nbsp;Sequences</label>
                     </gs-checkbox>
@@ -2082,7 +2085,7 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
         var bolDropStatments, bolSchema, bolAggregate, bolCollation, bolConversion,
             bolDomain, bolForeignTable, bolFunction, bolIndex,
             bolOperatorClass, bolOperatorFamily, bolOperator,
-            bolSequence, bolTable, bolTriggerFunction,
+            bolProcedure, bolSequence, bolTable, bolTriggerFunction,
             bolTextSearchConfiguration, bolTextSearchDictionary,
             bolTextSearchParser, bolTextSearchTemplate, bolType,
             bolView, strQuery, arrQuery, handleListResults,
@@ -2101,6 +2104,7 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
             bolOperatorClass                = document.getElementById('checkbox-schema-dump-operator-class').value              === 'true';
             bolOperatorFamily               = document.getElementById('checkbox-schema-dump-operator-family').value             === 'true';
             bolOperator                     = document.getElementById('checkbox-schema-dump-operator').value                    === 'true';
+            bolProcedure                     = document.getElementById('checkbox-schema-dump-procedure').value                    === 'true';
             bolSequence                     = document.getElementById('checkbox-schema-dump-sequence').value                    === 'true';
             bolTable                        = document.getElementById('checkbox-schema-dump-table').value                       === 'true';
             bolTriggerFunction              = document.getElementById('checkbox-schema-dump-trigger-function').value            === 'true';
@@ -2165,6 +2169,11 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
                     listQuery.objectOperator.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
                 ') em ');
             }
+            if (bolProcedure) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'Procedure\' AS objType FROM (' +
+                    listQuery.objectProcedure.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+                ') em ');
+            }
             if (bolSequence) {
                 arrQuery.push('\n\n SELECT oid, name, schema_name, obj AS objType FROM (' +
                     listQuery.objectSequenceDump.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
@@ -2212,7 +2221,7 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
             }
 
             if (   bolAggregate || bolCollation || bolConversion || bolDomain || bolForeignTable || bolFunction
-                || bolIndex || bolOperatorClass || bolOperatorFamily || bolOperator || bolSequence || bolTable
+                || bolIndex || bolOperatorClass || bolOperatorFamily || bolOperator || bolProcedure || bolSequence || bolTable
                 || bolTriggerFunction || bolTextSearchConfiguration || bolTextSearchDictionary
                 || bolTextSearchParser || bolTextSearchTemplate || bolType || bolView) {
                 strQuery = arrQuery.join(' UNION ALL ') + '\n\nORDER BY 1';
@@ -2409,6 +2418,7 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
             document.getElementById('checkbox-schema-dump-operator-class').value = document.getElementById('checkbox-all').value;
             document.getElementById('checkbox-schema-dump-operator-family').value = document.getElementById('checkbox-all').value;
             document.getElementById('checkbox-schema-dump-operator').value = document.getElementById('checkbox-all').value;
+            document.getElementById('checkbox-schema-dump-procedure').value = document.getElementById('checkbox-all').value;
             document.getElementById('checkbox-schema-dump-sequence').value = document.getElementById('checkbox-all').value;
             document.getElementById('checkbox-schema-dump-table').value = document.getElementById('checkbox-all').value;
             document.getElementById('checkbox-schema-dump-trigger-function').value = document.getElementById('checkbox-all').value;
@@ -2424,7 +2434,7 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
             var bolSchema, bolAggregate, bolCollation, bolConversion,
                 bolDomain, bolForeignTable, bolFunction, bolIndex,
                 bolOperatorClass, bolOperatorFamily, bolOperator,
-                bolSequence, bolTable, bolTriggerFunction,
+                bolProcedure, bolSequence, bolTable, bolTriggerFunction,
                 bolTextSearchConfiguration, bolTextSearchDictionary,
                 bolTextSearchParser, bolTextSearchTemplate, bolType,
                 bolView;
@@ -2440,6 +2450,7 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
             bolOperatorClass                = document.getElementById('checkbox-schema-dump-operator-class').value              === 'true';
             bolOperatorFamily               = document.getElementById('checkbox-schema-dump-operator-family').value             === 'true';
             bolOperator                     = document.getElementById('checkbox-schema-dump-operator').value                    === 'true';
+            bolProcedure                     = document.getElementById('checkbox-schema-dump-procedure').value                    === 'true';
             bolSequence                     = document.getElementById('checkbox-schema-dump-sequence').value                    === 'true';
             bolTable                        = document.getElementById('checkbox-schema-dump-table').value                       === 'true';
             bolTriggerFunction              = document.getElementById('checkbox-schema-dump-trigger-function').value            === 'true';
@@ -2452,7 +2463,7 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
 
             if (   !bolSchema && !bolAggregate && !bolCollation && !bolConversion && !bolDomain
                 && !bolForeignTable && !bolFunction && !bolIndex && !bolOperatorClass
-                && !bolOperatorFamily && !bolOperator && !bolSequence && !bolTable
+                && !bolOperatorFamily && !bolOperator && !bolProcedure && !bolSequence && !bolTable
                 && !bolTriggerFunction && !bolTextSearchConfiguration && !bolTextSearchDictionary
                 && !bolTextSearchParser && !bolTextSearchTemplate && !bolType && !bolView) {
                 document.getElementById('button-schema-dump').setAttribute('disabled', '');

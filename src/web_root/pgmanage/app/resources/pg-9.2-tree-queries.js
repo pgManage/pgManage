@@ -121,6 +121,1273 @@ if (parseFloat(versionNum, 10) < 9.6) {
         */});
     }
 
+    if (parseFloat(versionNum, 10) >= 11) {
+        titleRefreshQuery.objectFunction = titleRefreshQuery.functionNumber = ml(function () {/*
+            SELECT count(proname) AS result
+              FROM pg_proc pr
+              JOIN pg_type typ ON typ.oid = pr.prorettype
+             WHERE prokind = 'f' AND typname <> 'trigger' AND pr.pronamespace = {{INTOID}};
+        */});
+
+        titleRefreshQuery.objectProcedure = titleRefreshQuery.procedureNumber = ml(function () {/*
+            SELECT count(proname) AS result
+              FROM pg_proc pr
+              JOIN pg_type typ ON typ.oid = pr.prorettype
+             WHERE prokind = 'p' AND typname <> 'trigger' AND pr.pronamespace = {{INTOID}};
+        */});
+        
+        titleRefreshQuery.objectTriggerFunction = titleRefreshQuery.triggerNumber = ml(function () {/*
+            SELECT count(proname) AS result
+              FROM pg_proc
+              JOIN pg_type typ ON typ.oid=prorettype
+             WHERE prokind = 'f' AND typname = 'trigger' AND pg_proc.pronamespace = {{INTOID}};
+        */});
+        
+        listQuery.objectTriggerFunction = listQuery.triggers = ml(function () {/*
+              SELECT pr.oid, quote_ident(pr.proname) || '()' AS name, pg_namespace.nspname AS schema_name, 'TF' AS bullet
+                FROM pg_proc pr
+                JOIN pg_type typ ON typ.oid = prorettype
+           LEFT JOIN pg_namespace ON pg_namespace.oid = pr.pronamespace
+               WHERE prokind = 'f' AND typname = 'trigger' AND pr.pronamespace = {{INTOID}}
+            ORDER BY proname;
+        */});
+        
+        listQuery.objectFunction = listQuery.functions = ml(function () {/*
+            SELECT pr.oid,
+                   quote_ident(pr.proname) || '(' || COALESCE(pg_get_function_identity_arguments(pr.oid), '') || ')' AS name,
+                   pg_namespace.nspname AS schema_name, 'FN' AS bullet
+              FROM pg_proc pr
+              JOIN pg_type typ ON typ.oid = pr.prorettype
+         LEFT JOIN pg_namespace ON pg_namespace.oid = pr.pronamespace
+             WHERE pr.prokind = 'f'
+               AND typname <> 'trigger'
+               AND pr.pronamespace = {{INTOID}}
+          ORDER BY proname || '(' || COALESCE(pg_get_function_identity_arguments(pr.oid), '') || ')';
+      */});
+        
+        listQuery.objectProcedure = listQuery.functions = ml(function () {/*
+            SELECT pr.oid,
+                   quote_ident(pr.proname) || '(' || COALESCE(pg_get_function_identity_arguments(pr.oid), '') || ')' AS name,
+                   pg_namespace.nspname AS schema_name, 'FN' AS bullet
+              FROM pg_proc pr
+              JOIN pg_type typ ON typ.oid = pr.prorettype
+         LEFT JOIN pg_namespace ON pg_namespace.oid = pr.pronamespace
+             WHERE pr.prokind = 'p'
+               AND typname <> 'trigger'
+               AND pr.pronamespace = {{INTOID}}
+          ORDER BY proname || '(' || COALESCE(pg_get_function_identity_arguments(pr.oid), '') || ')';
+      */});
+        
+        associatedButtons.objectAggregate = ['propertyButton', 'dependButton'];
+        scriptQuery.objectAggregate = ml(function () {/*
+            -- DROP statement
+            SELECT (SELECT  '-- DROP AGGREGATE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(proname) || '(' || COALESCE(oidvectortypes(proargtypes), '') || ')' || E';\n\n'
+            FROM pg_proc
+            LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+            WHERE pg_proc.oid = {{INTOID}} AND prokind = 'a')
+        
+            || (SELECT  'CREATE AGGREGATE ' || quote_ident(fnnsp.nspname) || '.' || quote_ident(fnpr.proname) || '(' || COALESCE(oidvectortypes(fnpr.proargtypes), '') || ') ('
+                || rtrim(
+                    CASE WHEN aggtransfn    IS NOT NULL     THEN E'\n  SFUNC='    ||
+                            CASE WHEN sfnsp.nspname != 'pg_catalog' THEN quote_ident(sfnsp.nspname) || '.' ELSE '' END || quote_ident(sfpr.proname)
+                            || ',' ELSE '' END ||
+                    CASE WHEN format_type(aggtranstype::oid, null) IS NOT NULL THEN E'\n  STYPE='     || format_type(aggtranstype::oid, null) || ',' ELSE '' END ||
+                    CASE WHEN aggfinalfn   != '-'::regproc THEN E'\n  FINALFUNC=' ||
+                            CASE WHEN flnsp.nspname != 'pg_catalog' THEN quote_ident(flnsp.nspname) || '.' ELSE '' END || quote_ident(flpr.proname)
+                            || ',' ELSE '' END ||
+                    CASE WHEN agginitval   IS NOT NULL     THEN E'\n  INITCOND='  || quote_literal(agginitval)   || ',' ELSE '' END ||
+                    CASE WHEN aggsortop    != 0            THEN E'\n  SORTOP='    ||
+                            CASE WHEN opnsp.nspname != '' THEN quote_ident(opnsp.nspname) || '.' ELSE '' END || quote_ident(pg_operator.oprname) ||
+                            ' (' || format_type(oprleft, NULL) || ', ' || format_type(oprright, NULL) || ')' || ',' ELSE '' END
+                                , ',') || E'\n);\n\n'
+            FROM pg_aggregate
+            LEFT JOIN pg_proc       fnpr      ON fnpr.oid      = pg_aggregate.aggfnoid
+            LEFT JOIN pg_namespace  fnnsp     ON fnnsp.oid = fnpr.pronamespace
+            LEFT JOIN pg_proc       sfpr      ON sfpr.oid      = pg_aggregate.aggtransfn
+            LEFT JOIN pg_namespace  sfnsp     ON sfnsp.oid = sfpr.pronamespace
+            LEFT JOIN pg_proc       flpr      ON flpr.oid      = pg_aggregate.aggfinalfn
+            LEFT JOIN pg_namespace  flnsp     ON flnsp.oid = flpr.pronamespace
+            LEFT JOIN pg_operator        ON pg_operator.oid  = pg_aggregate.aggsortop
+            LEFT JOIN pg_namespace opnsp ON opnsp.oid = pg_operator.oprnamespace
+            WHERE fnpr.oid = {{INTOID}} AND fnpr.prokind = 'a')
+        
+            -- OWNER
+            || (SELECT E'ALTER AGGREGATE ' || COALESCE(quote_ident(nspname),'') || '.' || COALESCE(quote_ident(proname),'') || '(' || COALESCE(oidvectortypes(proargtypes), '') || ') OWNER TO ' || pg_roles.rolname || ';'
+            FROM pg_aggregate
+            JOIN pg_proc ON pg_proc.oid = pg_aggregate.aggfnoid
+            LEFT JOIN pg_roles ON pg_proc.proowner=pg_roles.oid
+            JOIN pg_namespace ON pg_namespace.oid = pg_proc.pronamespace
+            WHERE pg_proc.oid = {{INTOID}} AND prokind = 'a')
+        
+            -- grants:
+            || CASE WHEN (SELECT count(*)
+                FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(oidvectortypes(proargtypes), '') || ')' as name
+                    FROM pg_proc
+                    LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+                    WHERE pg_proc.oid = {{INTOID}} AND prokind = 'a') em
+                WHERE acl::text like '=%') > 0
+        
+                THEN (SELECT array_to_string(array_agg(E'\nGRANT ' || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%X%' THEN 'EXECUTE' ELSE '' END || ' ON FUNCTION ' || name
+                    || ' TO ' || substring(acl from 0 for strpos(acl, '=')) || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%*%' THEN ' WITH GRANT OPTION;' ELSE ';' END),',')
+                    FROM (SELECT acl, name FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(oidvectortypes(proargtypes), '') || ')' as name
+                        FROM pg_proc
+                        LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+                        WHERE pg_proc.oid = {{INTOID}} AND prokind = 'a') em
+                    WHERE acl::text not like '=%'
+                    ORDER BY acl) em)
+        
+                ELSE '' END
+        
+            || CASE WHEN -- public exists?
+                (SELECT count(*)
+                FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(oidvectortypes(proargtypes), '') || ')' as name
+                    FROM pg_proc
+                    LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+                    WHERE pg_proc.oid = {{INTOID}} AND prokind = 'a') em
+                WHERE acl::text like '=%') >0
+        
+               THEN
+                -- public grant:
+                (SELECT E'\nGRANT ' || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%X%' THEN 'EXECUTE' ELSE '' END || ' ON FUNCTION ' || name
+                    || ' TO public' || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%*%' THEN ' WITH GRANT OPTION;' ELSE ';' END
+                FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(oidvectortypes(proargtypes), '') || ')' as name
+                    FROM pg_proc
+                    LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+                    WHERE pg_proc.oid = {{INTOID}} AND prokind = 'a') em
+                WHERE acl::text like '=%')
+        
+               ELSE
+                -- public revoke
+                (SELECT E'\nREVOKE ALL ON FUNCTION ' || name || ' FROM public;'
+                FROM (SELECT quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(oidvectortypes(proargtypes), '') || ')' as name
+                    FROM pg_proc
+                    LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+                    WHERE pg_proc.oid = {{INTOID}} AND prokind = 'a') em)
+               END;
+            */});
+        
+        
+        associatedButtons.objectFunction = ['propertyButton', 'dependButton'];
+        scriptQuery.objectTriggerFunction = scriptQuery.objectFunction = ml(function () {/*
+            ---- DROP statement
+            --SELECT (SELECT  '-- DROP FUNCTION ' || quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '') || ')' || E';\n\n'
+            --FROM pg_proc
+            --LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+            --WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f')
+            --
+            ---- CREATE STATEMENT
+            --|| (SELECT  'CREATE OR REPLACE FUNCTION ' || quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '')
+            --	|| E')\n  RETURNS ' || pg_get_function_result(pg_proc.oid) || E' AS\n'
+            --	|| CASE WHEN prolang = '12' THEN
+            --		'    ' || quote_literal(prosrc) || E'\n'
+            --	    WHEN prolang = '13' THEN
+            --		'    ' || quote_literal(probin) || ', ' || quote_literal(prosrc) || E'\n'
+            --	    ELSE
+            --		'$BODY$' || prosrc || E'$BODY$\n'
+            --	    END
+            --	||'  LANGUAGE ' || quote_ident(lanname)
+            --	|| CASE WHEN provolatile = 'v' THEN
+            --		' VOLATILE'
+            --	    WHEN provolatile = 'i' THEN
+            --		' IMMUTABLE'
+            --	    WHEN provolatile = 's' THEN
+            --		' STABLE'
+            --	    END
+            --	|| CASE WHEN prosecdef THEN ' SECURITY DEFINER' ELSE '' END
+            --	|| CASE WHEN proisstrict THEN E' STRICT\n' ELSE E'\n' END
+            --	|| E'  COST ' || procost ||
+            --	CASE WHEN prorows <> 0 THEN E'\n  ROWS ' || prorows ELSE '' END || E';\n\n'
+            --FROM pg_proc
+            --LEFT JOIN pg_language ON pg_language.oid = pg_proc.prolang
+            --LEFT JOIN pg_namespace ON pg_namespace.oid=pg_proc.pronamespace
+            --WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f')
+            --
+            ---- OWNER
+            --|| (SELECT E'ALTER FUNCTION ' || COALESCE(quote_ident(nspname),'') || '.' || COALESCE(quote_ident(proname),'') || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '') || ') OWNER TO ' || pg_roles.rolname || ';'
+            --FROM pg_proc
+            --LEFT JOIN pg_roles ON pg_proc.proowner=pg_roles.oid
+            --JOIN pg_namespace ON pg_namespace.oid = pg_proc.pronamespace
+            --WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f')
+            --
+            ---- grants:
+            --|| CASE WHEN (SELECT count(*)
+            --	FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '') || ')' as name
+            --		FROM pg_proc
+            --		LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+            --		WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f') em
+            --	WHERE acl::text not like '=%') > 0
+        
+            --    THEN (SELECT array_to_string(array_agg(E'\nGRANT ' || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%X%' THEN 'EXECUTE' ELSE '' END || ' ON FUNCTION ' || name
+            --    	|| ' TO ' || substring(acl from 0 for strpos(acl, '=')) || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%*%' THEN ' WITH GRANT OPTION;' ELSE ';' END),'')
+            --    	FROM (SELECT acl, name FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '') || ')' as name
+            --    		FROM pg_proc
+            --    		LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+            --    		WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f') em
+            --    	WHERE acl::text not like '=%'
+            --        ORDER BY acl) em)
+            --
+            --    ELSE '' END
+            --
+            --|| CASE WHEN -- public exists?
+            --	(SELECT count(*)
+            --	FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '') || ')' as name
+            --		FROM pg_proc
+            --		LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+            --		WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f') em
+            --	WHERE acl::text like '=%') > 0
+            --
+            --   THEN
+            --	-- public grant:
+            --	(SELECT E'\nGRANT ' || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%X%' THEN 'EXECUTE' ELSE '' END || ' ON FUNCTION ' || name
+            --		|| ' TO public' || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%*%' THEN ' WITH GRANT OPTION;' ELSE ';' END
+            --	FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '') || ')' as name
+            --		FROM pg_proc
+            --		LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+            --		WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f') em
+            --	WHERE acl::text like '=%')
+            --
+            --   ELSE
+            --	-- public revoke
+            --	(SELECT E'\nREVOKE ALL ON FUNCTION ' || name || ' FROM public;'
+            --	FROM (SELECT quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '') || ')' as name
+            --		FROM pg_proc
+            --		LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+            --		WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f') em)
+            --   END
+            --
+            ---- COMMENT
+            --|| (SELECT CASE WHEN description IS NOT NULL THEN E'\n\nCOMMENT ON FUNCTION '
+            --	|| quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '') || ')'
+            --	|| $$ IS '$$ || description || $$';$$ ELSE '' END
+            --	FROM pg_proc
+            --	LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+            --	LEFT JOIN pg_description ON pg_proc.oid=pg_description.objoid
+            --	WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f')
+            --
+            ---- SELECT
+            --|| (SELECT CASE WHEN typname != 'trigger' THEN E'\n\n--SELECT '
+            --	|| quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '') || ')'
+            --	|| E';\n' ELSE '' END
+            --	FROM pg_proc
+            --	LEFT JOIN pg_type ON pg_type.oid = pg_proc.prorettype
+            --	LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+            --	LEFT JOIN pg_description ON pg_proc.oid=pg_description.objoid
+            --	WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f');
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+                -- DROP statement
+            SELECT (SELECT  '-- DROP FUNCTION ' || quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ')' || E';\n\n'
+            FROM pg_proc
+            LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+            WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f')
+        
+            -- CREATE STATEMENT
+            || (SELECT  'CREATE OR REPLACE FUNCTION ' || quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '')
+                || E')\n  RETURNS ' || pg_get_function_result(pg_proc.oid) || E' AS\n'
+                || CASE WHEN prolang = '12' THEN
+                    '    ' || quote_literal(prosrc) || E'\n'
+                    WHEN prolang = '13' THEN
+                    '    ' || quote_literal(probin) || ', ' || quote_literal(prosrc) || E'\n'
+                    ELSE
+                    '$BODY$' || prosrc || E'$BODY$\n'
+                    END
+                ||'  LANGUAGE ' || quote_ident(lanname)
+                || CASE WHEN provolatile = 'v' THEN
+                    ' VOLATILE'
+                    WHEN provolatile = 'i' THEN
+                    ' IMMUTABLE'
+                    WHEN provolatile = 's' THEN
+                    ' STABLE'
+                    END
+                || CASE WHEN prosecdef THEN ' SECURITY DEFINER' ELSE '' END
+                || CASE WHEN proisstrict THEN E' STRICT\n' ELSE E'\n' END
+                || E'  COST ' || procost ||
+                CASE WHEN prorows <> 0 THEN E'\n  ROWS ' || prorows ELSE '' END || E';\n\n'
+            FROM pg_proc
+            LEFT JOIN pg_language ON pg_language.oid = pg_proc.prolang
+            LEFT JOIN pg_namespace ON pg_namespace.oid=pg_proc.pronamespace
+            WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f')
+        
+            -- OWNER
+            || (SELECT E'ALTER FUNCTION ' || COALESCE(quote_ident(nspname),'') || '.' || COALESCE(quote_ident(proname),'') || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ') OWNER TO ' || quote_ident(pg_roles.rolname) || ';'
+            FROM pg_proc
+            LEFT JOIN pg_roles ON pg_proc.proowner=pg_roles.oid
+            JOIN pg_namespace ON pg_namespace.oid = pg_proc.pronamespace
+            WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f')
+        
+            -- grants:
+            || CASE WHEN (SELECT count(*)
+                FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ')' as name
+                    FROM pg_proc
+                    LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+                    WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f') em
+                WHERE acl::text not like '=%') > 0
+        
+                THEN (SELECT array_to_string(array_agg(E'\nGRANT ' || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%X%' THEN 'EXECUTE' ELSE '' END || ' ON FUNCTION ' || name
+                    || ' TO ' || substring(acl from 0 for strpos(acl, '=')) || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%*%' THEN ' WITH GRANT OPTION;' ELSE ';' END),'')
+                    FROM (SELECT acl, name FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ')' as name
+                        FROM pg_proc
+                        LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+                        WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f') em
+                    WHERE acl::text not like '=%'
+                    ORDER BY acl) em)
+        
+                ELSE '' END
+        
+            || CASE WHEN -- public exists?
+                (SELECT count(*)
+                FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ')' as name
+                    FROM pg_proc
+                    LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+                    WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f') em
+                WHERE acl::text like '=%') > 0
+        
+               THEN
+                -- public grant:
+                (SELECT E'\nGRANT ' || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%X%' THEN 'EXECUTE' ELSE '' END || ' ON FUNCTION ' || name
+                    || ' TO public' || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%*%' THEN ' WITH GRANT OPTION;' ELSE ';' END
+                FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ')' as name
+                    FROM pg_proc
+                    LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+                    WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f') em
+                WHERE acl::text like '=%')
+        
+               ELSE
+                -- public revoke
+                (SELECT E'\nREVOKE ALL ON FUNCTION ' || name || ' FROM public;'
+                FROM (SELECT quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ')' as name
+                    FROM pg_proc
+                    LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+                    WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f') em)
+               END
+        
+            -- COMMENT
+            || (SELECT CASE WHEN description IS NOT NULL THEN E'\n\nCOMMENT ON FUNCTION '
+                || quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ')'
+                || $$ IS '$$ || description || $$';$$ ELSE '' END
+                FROM pg_proc
+                LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+                LEFT JOIN pg_description ON pg_proc.oid=pg_description.objoid
+                WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f')
+        
+            -- SELECT
+            || (SELECT CASE WHEN typname != 'trigger' THEN E'\n\n--SELECT ' || CASE WHEN pg_get_function_result(pg_proc.oid) ILIKE '%setof%' OR pg_get_function_result(pg_proc.oid) ILIKE '%table%' THEN '* FROM ' ELSE '' END
+                || quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ')'
+                || E';\n' ELSE '' END
+                FROM pg_proc
+                LEFT JOIN pg_type ON pg_type.oid = pg_proc.prorettype
+                LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+                LEFT JOIN pg_description ON pg_proc.oid=pg_description.objoid
+                WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f');
+            */});
+        
+        propQuery.prop_aggregate = propQuery.objectAggregate = ml(function () {/*
+             SELECT 1 AS sort,
+                    'Name',
+                    'OID',
+                    'ACL',
+                    'Owner',
+                    'Parameter Types',
+                    'State Transition Function',
+                    'State Value Data Type',
+                    'Final Function',
+                    'Initial Condition',
+                    'Sort Operator',
+                    'Comment'
+        UNION ALL
+             SELECT 2 AS sort,
+                    quote_ident(fnnsp.nspname) || '.' || quote_ident(fnpr.proname)::text,
+                    fnpr.oid::text,
+                    fnpr.proacl::text,
+                    pg_roles.rolname::text,
+                    oidvectortypes(fnpr.proargtypes)::text,
+                    (CASE WHEN aggtransfn IS NOT NULL THEN quote_ident(sfnsp.nspname) || '.' || quote_ident(sfpr.proname) || '(' || COALESCE(oidvectortypes(sfpr.proargtypes)::text, '') || ')' ELSE '' END)::text,
+                    (CASE WHEN format_type(aggtranstype::oid, null) IS NOT NULL THEN format_type(aggtranstype::oid, null) ELSE '' END)::text,
+                    (CASE WHEN aggfinalfn != '-'::regproc THEN quote_ident(flnsp.nspname) || '.' || quote_ident(flpr.proname) || '(' || COALESCE(oidvectortypes(flpr.proargtypes)::text, '') || ')' ELSE '' END)::text,
+                    (CASE WHEN agginitval IS NOT NULL THEN quote_literal(agginitval) ELSE '' END)::text,
+                    (CASE WHEN aggsortop != 0 THEN quote_ident(opnsp.nspname) || '.' || quote_ident(pg_operator.oprname) ||
+                    ' (' || format_type(oprleft, NULL) || ', ' || format_type(oprright, NULL) || ')' ELSE '' END)::text,
+                    description::text
+               FROM pg_aggregate
+          LEFT JOIN pg_proc       fnpr      ON fnpr.oid   = pg_aggregate.aggfnoid
+          LEFT JOIN pg_namespace  fnnsp     ON fnnsp.oid  = fnpr.pronamespace
+          LEFT JOIN pg_proc       sfpr      ON sfpr.oid   = pg_aggregate.aggtransfn
+          LEFT JOIN pg_namespace  sfnsp     ON sfnsp.oid  = sfpr.pronamespace
+          LEFT JOIN pg_proc       flpr      ON flpr.oid   = pg_aggregate.aggfinalfn
+          LEFT JOIN pg_namespace  flnsp     ON flnsp.oid  = flpr.pronamespace
+          LEFT JOIN pg_operator             ON pg_operator.oid = pg_aggregate.aggsortop
+          LEFT JOIN pg_namespace opnsp      ON opnsp.oid = pg_operator.oprnamespace
+          LEFT JOIN pg_description          ON fnpr.oid  = pg_description.objoid
+          LEFT JOIN pg_roles                ON fnpr.proowner = pg_roles.oid
+              WHERE fnpr.oid = {{INTOID}} AND fnpr.prokind = 'a'
+           ORDER BY sort ASC;
+        */});
+        
+        propQuery.prop_function = propQuery.objectFunction = ml(function () {/*
+            SELECT 1 AS sort,
+                   'Name',
+                   'Owner',
+                   'OID',
+                   'Parameters',
+                   'Return Type',
+                   'Language',
+                   'Volatility',
+                   'Security Definer?',
+                   'Strict?',
+                   'Leakproof?',
+                   'Window Function?',
+                   'Cost',
+                   'Rows',
+                   'ACL',
+                   'Comment'
+         UNION ALL
+            SELECT 2 AS sort,
+                   proname::text,
+                   pg_roles.rolname::text,
+                   pg_proc.oid::text,
+                   pg_get_function_arguments(pg_proc.oid)::text,
+                   pg_get_function_result(pg_proc.oid)::text,
+                   lanname::text,
+                   (CASE WHEN provolatile = 'v' THEN 'Volatile'
+                   WHEN provolatile = 'i' THEN 'Immutable'
+                   WHEN provolatile = 's' THEN 'Stable' END)::text,
+                   (CASE WHEN prosecdef THEN 'Yes' ELSE 'No' END)::text,
+                   (CASE WHEN proisstrict THEN 'Yes' ELSE 'No' END)::text,
+                   (CASE WHEN proleakproof THEN 'Yes' ELSE 'No' END)::text,
+                   (CASE WHEN proiswindow THEN 'Yes' ELSE 'No' END)::text,
+                   procost::text,
+                   prorows::text,
+                   proacl::text,
+                   description::text
+              FROM pg_proc
+         LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+         LEFT JOIN pg_language ON pg_language.oid = pg_proc.prolang
+         LEFT JOIN pg_roles ON pg_proc.proowner = pg_roles.oid
+         LEFT JOIN pg_description ON pg_proc.oid=pg_description.objoid
+             WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f';
+         */});
+        
+        associatedButtons.objectProcedure = ['propertyButton', 'dependButton'];
+        scriptQuery.objectProcedure = scriptQuery.objectProcedureDump = ml(function () {/*
+            SELECT (
+                (SELECT '-- DROP PROCEDURE ' || pg_namespace.nspname || '.' || pg_proc.proname ||
+                    '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '') || ')' ||
+                E'\n\nCREATE OR REPLACE PROCEDURE ' || pg_namespace.nspname || '.' || pg_proc.proname ||
+                    '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '') || ')' ||
+                COALESCE(E'\n  ' || string_agg('TRANSFORM FOR TYPE ' || pg_type.typname, E'\n'), '') ||
+                E'\n  LANGUAGE ' || pg_language.lanname::text ||
+                CASE WHEN prosecdef THEN ' SECURITY DEFINER' ELSE '' END ||
+                E' AS\n' || CASE WHEN prolang = '12' THEN
+                    '    ' || quote_literal(prosrc) || E'\n'
+                    WHEN prolang = '13' THEN
+                    '    ' || quote_literal(probin) || ', ' || quote_literal(prosrc) || E'\n'
+                    ELSE
+                    '$BODY$' || prosrc || E'$BODY$;\n\n'
+                    END
+                FROM pg_proc
+            LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+            LEFT JOIN pg_language ON pg_language.oid = pg_proc.prolang
+            LEFT JOIN pg_roles ON pg_proc.proowner = pg_roles.oid
+            LEFT JOIN pg_description ON pg_proc.oid=pg_description.objoid
+            LEFT JOIN (
+                SELECT oid, unnest(protrftypes) AS transform_type
+                FROM pg_proc
+                WHERE pg_proc.oid = {{INTOID}} AND prokind = 'p'
+            ) pg_proc_transform_types ON pg_proc_transform_types.oid = pg_proc.oid
+            LEFT JOIN pg_type ON pg_type.oid = pg_proc_transform_types.transform_type
+                WHERE pg_proc.oid = {{INTOID}} AND prokind = 'p'
+                GROUP BY pg_namespace.nspname, pg_proc.proname, pg_get_function_arguments(pg_proc.oid), pg_language.lanname, prosecdef, prolang, prosrc, probin)
+        
+            -- OWNER
+            || (SELECT E'ALTER PROCEDURE ' || COALESCE(quote_ident(nspname),'') || '.' || COALESCE(quote_ident(proname),'') || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ') OWNER TO ' || quote_ident(pg_roles.rolname) || ';'
+            FROM pg_proc
+            LEFT JOIN pg_roles ON pg_proc.proowner=pg_roles.oid
+            JOIN pg_namespace ON pg_namespace.oid = pg_proc.pronamespace
+            WHERE pg_proc.oid = {{INTOID}} AND prokind = 'p')
+        
+            -- grants:
+            || CASE WHEN (SELECT count(*)
+                FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ')' as name
+                    FROM pg_proc
+                    LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+                    WHERE pg_proc.oid = {{INTOID}} AND prokind = 'p') em
+                WHERE acl::text not like '=%') > 0
+        
+                THEN (SELECT array_to_string(array_agg(E'\nGRANT ' || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%X%' THEN 'EXECUTE' ELSE '' END || ' ON FUNCTION ' || name
+                    || ' TO ' || substring(acl from 0 for strpos(acl, '=')) || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%*%' THEN ' WITH GRANT OPTION;' ELSE ';' END),'')
+                    FROM (SELECT acl, name FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ')' as name
+                        FROM pg_proc
+                        LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+                        WHERE pg_proc.oid = {{INTOID}} AND prokind = 'p') em
+                    WHERE acl::text not like '=%'
+                    ORDER BY acl) em)
+        
+                ELSE '' END
+        
+            || CASE WHEN -- public exists?
+                (SELECT count(*)
+                FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ')' as name
+                    FROM pg_proc
+                    LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+                    WHERE pg_proc.oid = {{INTOID}} AND prokind = 'p') em
+                WHERE acl::text like '=%') > 0
+        
+               THEN
+                -- public grant:
+                (SELECT E'\nGRANT ' || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%X%' THEN 'EXECUTE' ELSE '' END || ' ON PROCEDURE ' || name
+                    || ' TO public' || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%*%' THEN ' WITH GRANT OPTION;' ELSE ';' END
+                FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ')' as name
+                    FROM pg_proc
+                    LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+                    WHERE pg_proc.oid = {{INTOID}} AND prokind = 'p') em
+                WHERE acl::text like '=%')
+        
+               ELSE
+                -- public revoke
+                (SELECT E'\nREVOKE ALL ON PROCEDURE ' || name || ' FROM public;'
+                FROM (SELECT quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ')' as name
+                    FROM pg_proc
+                    LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+                    WHERE pg_proc.oid = {{INTOID}} AND prokind = 'p') em)
+               END
+        
+            -- COMMENT
+            || (SELECT CASE WHEN description IS NOT NULL THEN E'\n\nCOMMENT ON PROCEDURE '
+                || quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ')'
+                || $$ IS '$$ || description || $$';$$ ELSE '' END
+                FROM pg_proc
+                LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+                LEFT JOIN pg_description ON pg_proc.oid=pg_description.objoid
+                WHERE pg_proc.oid = {{INTOID}} AND prokind = 'p')
+        
+            -- CALL
+            || (SELECT CASE WHEN typname != 'trigger' THEN E'\n\n--CALL ' || CASE WHEN pg_get_function_result(pg_proc.oid) ILIKE '%setof%' OR pg_get_function_result(pg_proc.oid) ILIKE '%table%' THEN '* FROM ' ELSE '' END
+                || quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ')'
+                || E';\n' ELSE '' END
+                FROM pg_proc
+                LEFT JOIN pg_type ON pg_type.oid = pg_proc.prorettype
+                LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+                LEFT JOIN pg_description ON pg_proc.oid=pg_description.objoid
+                WHERE pg_proc.oid = {{INTOID}} AND prokind = 'p'));
+        */});
+        
+        propQuery.prop_procedure = propQuery.objectProcedure = ml(function () {/*
+            SELECT 1 AS sort,
+                   'Name',
+                   'Owner',
+                   'OID',
+                   'Parameters',
+                   'Language',
+                   'Volatility',
+                   'Security Definer?',
+                   'Strict?',
+                   'Leakproof?',
+                   'Window Function?',
+                   'Cost',
+                   'Rows',
+                   'ACL',
+                   'Comment'
+         UNION ALL
+            SELECT 2 AS sort,
+                   proname::text,
+                   pg_roles.rolname::text,
+                   pg_proc.oid::text,
+                   pg_get_function_arguments(pg_proc.oid)::text,
+                   lanname::text,
+                   (CASE WHEN provolatile = 'v' THEN 'Volatile'
+                   WHEN provolatile = 'i' THEN 'Immutable'
+                   WHEN provolatile = 's' THEN 'Stable' END)::text,
+                   (CASE WHEN prosecdef THEN 'Yes' ELSE 'No' END)::text,
+                   (CASE WHEN proisstrict THEN 'Yes' ELSE 'No' END)::text,
+                   (CASE WHEN proleakproof THEN 'Yes' ELSE 'No' END)::text,
+                   (CASE WHEN proiswindow THEN 'Yes' ELSE 'No' END)::text,
+                   procost::text,
+                   prorows::text,
+                   proacl::text,
+                   description::text
+              FROM pg_proc
+         LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+         LEFT JOIN pg_language ON pg_language.oid = pg_proc.prolang
+         LEFT JOIN pg_roles ON pg_proc.proowner = pg_roles.oid
+         LEFT JOIN pg_description ON pg_proc.oid=pg_description.objoid
+             WHERE pg_proc.oid = {{INTOID}} AND prokind = 'p';
+         */});        
+    } else {
+        titleRefreshQuery.objectFunction = titleRefreshQuery.functionNumber = ml(function () {/*
+            SELECT count(proname) AS result
+              FROM pg_proc pr
+              JOIN pg_type typ ON typ.oid = pr.prorettype
+             WHERE prokind = 'f' AND typname <> 'trigger' AND pr.pronamespace = {{INTOID}};
+        */});
+        
+        titleRefreshQuery.objectTriggerFunction = titleRefreshQuery.triggerNumber = ml(function () {/*
+            SELECT count(proname) AS result
+              FROM pg_proc
+              JOIN pg_type typ ON typ.oid=prorettype
+             WHERE prokind = 'f' AND typname = 'trigger' AND pg_proc.pronamespace = {{INTOID}};
+        */});
+        
+        listQuery.objectTriggerFunction = listQuery.triggers = ml(function () {/*
+              SELECT pr.oid, quote_ident(pr.proname) || '()' AS name, pg_namespace.nspname AS schema_name, 'TF' AS bullet
+                FROM pg_proc pr
+                JOIN pg_type typ ON typ.oid = prorettype
+           LEFT JOIN pg_namespace ON pg_namespace.oid = pr.pronamespace
+               WHERE prokind = 'f' AND typname = 'trigger' AND pr.pronamespace = {{INTOID}}
+            ORDER BY proname;
+        */});
+        
+        listQuery.objectFunction = listQuery.functions = ml(function () {/*
+              SELECT pr.oid,
+                     quote_ident(pr.proname) || '(' || COALESCE(pg_get_function_identity_arguments(pr.oid), '') || ')' AS name,
+                     pg_namespace.nspname AS schema_name, 'FN' AS bullet
+                FROM pg_proc pr
+                JOIN pg_type typ ON typ.oid = pr.prorettype
+           LEFT JOIN pg_namespace ON pg_namespace.oid = pr.pronamespace
+               WHERE pr.prokind = 'f'
+                 AND typname <> 'trigger'
+                 AND pr.pronamespace = {{INTOID}}
+            ORDER BY proname || '(' || COALESCE(pg_get_function_identity_arguments(pr.oid), '') || ')';
+        */});
+        
+        associatedButtons.objectAggregate = ['propertyButton', 'dependButton'];
+        scriptQuery.objectAggregate = ml(function () {/*
+            -- DROP statement
+            SELECT (SELECT  '-- DROP AGGREGATE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(proname) || '(' || COALESCE(oidvectortypes(proargtypes), '') || ')' || E';\n\n'
+            FROM pg_proc
+            LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+            WHERE pg_proc.oid = {{INTOID}} AND prokind = 'a')
+        
+            || (SELECT  'CREATE AGGREGATE ' || quote_ident(fnnsp.nspname) || '.' || quote_ident(fnpr.proname) || '(' || COALESCE(oidvectortypes(fnpr.proargtypes), '') || ') ('
+                || rtrim(
+                    CASE WHEN aggtransfn    IS NOT NULL     THEN E'\n  SFUNC='    ||
+                            CASE WHEN sfnsp.nspname != 'pg_catalog' THEN quote_ident(sfnsp.nspname) || '.' ELSE '' END || quote_ident(sfpr.proname)
+                            || ',' ELSE '' END ||
+                    CASE WHEN format_type(aggtranstype::oid, null) IS NOT NULL THEN E'\n  STYPE='     || format_type(aggtranstype::oid, null) || ',' ELSE '' END ||
+                    CASE WHEN aggfinalfn   != '-'::regproc THEN E'\n  FINALFUNC=' ||
+                            CASE WHEN flnsp.nspname != 'pg_catalog' THEN quote_ident(flnsp.nspname) || '.' ELSE '' END || quote_ident(flpr.proname)
+                            || ',' ELSE '' END ||
+                    CASE WHEN agginitval   IS NOT NULL     THEN E'\n  INITCOND='  || quote_literal(agginitval)   || ',' ELSE '' END ||
+                    CASE WHEN aggsortop    != 0            THEN E'\n  SORTOP='    ||
+                            CASE WHEN opnsp.nspname != '' THEN quote_ident(opnsp.nspname) || '.' ELSE '' END || quote_ident(pg_operator.oprname) ||
+                            ' (' || format_type(oprleft, NULL) || ', ' || format_type(oprright, NULL) || ')' || ',' ELSE '' END
+                                , ',') || E'\n);\n\n'
+            FROM pg_aggregate
+            LEFT JOIN pg_proc       fnpr      ON fnpr.oid      = pg_aggregate.aggfnoid
+            LEFT JOIN pg_namespace  fnnsp     ON fnnsp.oid = fnpr.pronamespace
+            LEFT JOIN pg_proc       sfpr      ON sfpr.oid      = pg_aggregate.aggtransfn
+            LEFT JOIN pg_namespace  sfnsp     ON sfnsp.oid = sfpr.pronamespace
+            LEFT JOIN pg_proc       flpr      ON flpr.oid      = pg_aggregate.aggfinalfn
+            LEFT JOIN pg_namespace  flnsp     ON flnsp.oid = flpr.pronamespace
+            LEFT JOIN pg_operator        ON pg_operator.oid  = pg_aggregate.aggsortop
+            LEFT JOIN pg_namespace opnsp ON opnsp.oid = pg_operator.oprnamespace
+            WHERE fnpr.oid = {{INTOID}} AND fnpr.prokind = 'a')
+        
+            -- OWNER
+            || (SELECT E'ALTER AGGREGATE ' || COALESCE(quote_ident(nspname),'') || '.' || COALESCE(quote_ident(proname),'') || '(' || COALESCE(oidvectortypes(proargtypes), '') || ') OWNER TO ' || pg_roles.rolname || ';'
+            FROM pg_aggregate
+            JOIN pg_proc ON pg_proc.oid = pg_aggregate.aggfnoid
+            LEFT JOIN pg_roles ON pg_proc.proowner=pg_roles.oid
+            JOIN pg_namespace ON pg_namespace.oid = pg_proc.pronamespace
+            WHERE pg_proc.oid = {{INTOID}} AND prokind = 'a')
+        
+            -- grants:
+            || CASE WHEN (SELECT count(*)
+                FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(oidvectortypes(proargtypes), '') || ')' as name
+                    FROM pg_proc
+                    LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+                    WHERE pg_proc.oid = {{INTOID}} AND prokind = 'a') em
+                WHERE acl::text like '=%') > 0
+        
+                THEN (SELECT array_to_string(array_agg(E'\nGRANT ' || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%X%' THEN 'EXECUTE' ELSE '' END || ' ON FUNCTION ' || name
+                    || ' TO ' || substring(acl from 0 for strpos(acl, '=')) || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%*%' THEN ' WITH GRANT OPTION;' ELSE ';' END),',')
+                    FROM (SELECT acl, name FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(oidvectortypes(proargtypes), '') || ')' as name
+                        FROM pg_proc
+                        LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+                        WHERE pg_proc.oid = {{INTOID}} AND prokind = 'a') em
+                    WHERE acl::text not like '=%'
+                    ORDER BY acl) em)
+        
+                ELSE '' END
+        
+            || CASE WHEN -- public exists?
+                (SELECT count(*)
+                FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(oidvectortypes(proargtypes), '') || ')' as name
+                    FROM pg_proc
+                    LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+                    WHERE pg_proc.oid = {{INTOID}} AND prokind = 'a') em
+                WHERE acl::text like '=%') >0
+        
+               THEN
+                -- public grant:
+                (SELECT E'\nGRANT ' || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%X%' THEN 'EXECUTE' ELSE '' END || ' ON FUNCTION ' || name
+                    || ' TO public' || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%*%' THEN ' WITH GRANT OPTION;' ELSE ';' END
+                FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(oidvectortypes(proargtypes), '') || ')' as name
+                    FROM pg_proc
+                    LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+                    WHERE pg_proc.oid = {{INTOID}} AND prokind = 'a') em
+                WHERE acl::text like '=%')
+        
+               ELSE
+                -- public revoke
+                (SELECT E'\nREVOKE ALL ON FUNCTION ' || name || ' FROM public;'
+                FROM (SELECT quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(oidvectortypes(proargtypes), '') || ')' as name
+                    FROM pg_proc
+                    LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+                    WHERE pg_proc.oid = {{INTOID}} AND prokind = 'a') em)
+               END;
+            */});
+        
+        
+        associatedButtons.objectFunction = ['propertyButton', 'dependButton'];
+        scriptQuery.objectTriggerFunction = scriptQuery.objectFunction = ml(function () {/*
+            ---- DROP statement
+            --SELECT (SELECT  '-- DROP FUNCTION ' || quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '') || ')' || E';\n\n'
+            --FROM pg_proc
+            --LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+            --WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f')
+            --
+            ---- CREATE STATEMENT
+            --|| (SELECT  'CREATE OR REPLACE FUNCTION ' || quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '')
+            --	|| E')\n  RETURNS ' || pg_get_function_result(pg_proc.oid) || E' AS\n'
+            --	|| CASE WHEN prolang = '12' THEN
+            --		'    ' || quote_literal(prosrc) || E'\n'
+            --	    WHEN prolang = '13' THEN
+            --		'    ' || quote_literal(probin) || ', ' || quote_literal(prosrc) || E'\n'
+            --	    ELSE
+            --		'$BODY$' || prosrc || E'$BODY$\n'
+            --	    END
+            --	||'  LANGUAGE ' || quote_ident(lanname)
+            --	|| CASE WHEN provolatile = 'v' THEN
+            --		' VOLATILE'
+            --	    WHEN provolatile = 'i' THEN
+            --		' IMMUTABLE'
+            --	    WHEN provolatile = 's' THEN
+            --		' STABLE'
+            --	    END
+            --	|| CASE WHEN prosecdef THEN ' SECURITY DEFINER' ELSE '' END
+            --	|| CASE WHEN proisstrict THEN E' STRICT\n' ELSE E'\n' END
+            --	|| E'  COST ' || procost ||
+            --	CASE WHEN prorows <> 0 THEN E'\n  ROWS ' || prorows ELSE '' END || E';\n\n'
+            --FROM pg_proc
+            --LEFT JOIN pg_language ON pg_language.oid = pg_proc.prolang
+            --LEFT JOIN pg_namespace ON pg_namespace.oid=pg_proc.pronamespace
+            --WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f')
+            --
+            ---- OWNER
+            --|| (SELECT E'ALTER FUNCTION ' || COALESCE(quote_ident(nspname),'') || '.' || COALESCE(quote_ident(proname),'') || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '') || ') OWNER TO ' || pg_roles.rolname || ';'
+            --FROM pg_proc
+            --LEFT JOIN pg_roles ON pg_proc.proowner=pg_roles.oid
+            --JOIN pg_namespace ON pg_namespace.oid = pg_proc.pronamespace
+            --WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f')
+            --
+            ---- grants:
+            --|| CASE WHEN (SELECT count(*)
+            --	FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '') || ')' as name
+            --		FROM pg_proc
+            --		LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+            --		WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f') em
+            --	WHERE acl::text not like '=%') > 0
+        
+            --    THEN (SELECT array_to_string(array_agg(E'\nGRANT ' || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%X%' THEN 'EXECUTE' ELSE '' END || ' ON FUNCTION ' || name
+            --    	|| ' TO ' || substring(acl from 0 for strpos(acl, '=')) || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%*%' THEN ' WITH GRANT OPTION;' ELSE ';' END),'')
+            --    	FROM (SELECT acl, name FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '') || ')' as name
+            --    		FROM pg_proc
+            --    		LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+            --    		WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f') em
+            --    	WHERE acl::text not like '=%'
+            --        ORDER BY acl) em)
+            --
+            --    ELSE '' END
+            --
+            --|| CASE WHEN -- public exists?
+            --	(SELECT count(*)
+            --	FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '') || ')' as name
+            --		FROM pg_proc
+            --		LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+            --		WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f') em
+            --	WHERE acl::text like '=%') > 0
+            --
+            --   THEN
+            --	-- public grant:
+            --	(SELECT E'\nGRANT ' || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%X%' THEN 'EXECUTE' ELSE '' END || ' ON FUNCTION ' || name
+            --		|| ' TO public' || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%*%' THEN ' WITH GRANT OPTION;' ELSE ';' END
+            --	FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '') || ')' as name
+            --		FROM pg_proc
+            --		LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+            --		WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f') em
+            --	WHERE acl::text like '=%')
+            --
+            --   ELSE
+            --	-- public revoke
+            --	(SELECT E'\nREVOKE ALL ON FUNCTION ' || name || ' FROM public;'
+            --	FROM (SELECT quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '') || ')' as name
+            --		FROM pg_proc
+            --		LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+            --		WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f') em)
+            --   END
+            --
+            ---- COMMENT
+            --|| (SELECT CASE WHEN description IS NOT NULL THEN E'\n\nCOMMENT ON FUNCTION '
+            --	|| quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '') || ')'
+            --	|| $$ IS '$$ || description || $$';$$ ELSE '' END
+            --	FROM pg_proc
+            --	LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+            --	LEFT JOIN pg_description ON pg_proc.oid=pg_description.objoid
+            --	WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f')
+            --
+            ---- SELECT
+            --|| (SELECT CASE WHEN typname != 'trigger' THEN E'\n\n--SELECT '
+            --	|| quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '') || ')'
+            --	|| E';\n' ELSE '' END
+            --	FROM pg_proc
+            --	LEFT JOIN pg_type ON pg_type.oid = pg_proc.prorettype
+            --	LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+            --	LEFT JOIN pg_description ON pg_proc.oid=pg_description.objoid
+            --	WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f');
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+                -- DROP statement
+            SELECT (SELECT  '-- DROP FUNCTION ' || quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ')' || E';\n\n'
+            FROM pg_proc
+            LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+            WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f')
+        
+            -- CREATE STATEMENT
+            || (SELECT  'CREATE OR REPLACE FUNCTION ' || quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '')
+                || E')\n  RETURNS ' || pg_get_function_result(pg_proc.oid) || E' AS\n'
+                || CASE WHEN prolang = '12' THEN
+                    '    ' || quote_literal(prosrc) || E'\n'
+                    WHEN prolang = '13' THEN
+                    '    ' || quote_literal(probin) || ', ' || quote_literal(prosrc) || E'\n'
+                    ELSE
+                    '$BODY$' || prosrc || E'$BODY$\n'
+                    END
+                ||'  LANGUAGE ' || quote_ident(lanname)
+                || CASE WHEN provolatile = 'v' THEN
+                    ' VOLATILE'
+                    WHEN provolatile = 'i' THEN
+                    ' IMMUTABLE'
+                    WHEN provolatile = 's' THEN
+                    ' STABLE'
+                    END
+                || CASE WHEN prosecdef THEN ' SECURITY DEFINER' ELSE '' END
+                || CASE WHEN proisstrict THEN E' STRICT\n' ELSE E'\n' END
+                || E'  COST ' || procost ||
+                CASE WHEN prorows <> 0 THEN E'\n  ROWS ' || prorows ELSE '' END || E';\n\n'
+            FROM pg_proc
+            LEFT JOIN pg_language ON pg_language.oid = pg_proc.prolang
+            LEFT JOIN pg_namespace ON pg_namespace.oid=pg_proc.pronamespace
+            WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f')
+        
+            -- OWNER
+            || (SELECT E'ALTER FUNCTION ' || COALESCE(quote_ident(nspname),'') || '.' || COALESCE(quote_ident(proname),'') || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ') OWNER TO ' || quote_ident(pg_roles.rolname) || ';'
+            FROM pg_proc
+            LEFT JOIN pg_roles ON pg_proc.proowner=pg_roles.oid
+            JOIN pg_namespace ON pg_namespace.oid = pg_proc.pronamespace
+            WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f')
+        
+            -- grants:
+            || CASE WHEN (SELECT count(*)
+                FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ')' as name
+                    FROM pg_proc
+                    LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+                    WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f') em
+                WHERE acl::text not like '=%') > 0
+        
+                THEN (SELECT array_to_string(array_agg(E'\nGRANT ' || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%X%' THEN 'EXECUTE' ELSE '' END || ' ON FUNCTION ' || name
+                    || ' TO ' || substring(acl from 0 for strpos(acl, '=')) || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%*%' THEN ' WITH GRANT OPTION;' ELSE ';' END),'')
+                    FROM (SELECT acl, name FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ')' as name
+                        FROM pg_proc
+                        LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+                        WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f') em
+                    WHERE acl::text not like '=%'
+                    ORDER BY acl) em)
+        
+                ELSE '' END
+        
+            || CASE WHEN -- public exists?
+                (SELECT count(*)
+                FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ')' as name
+                    FROM pg_proc
+                    LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+                    WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f') em
+                WHERE acl::text like '=%') > 0
+        
+               THEN
+                -- public grant:
+                (SELECT E'\nGRANT ' || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%X%' THEN 'EXECUTE' ELSE '' END || ' ON FUNCTION ' || name
+                    || ' TO public' || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%*%' THEN ' WITH GRANT OPTION;' ELSE ';' END
+                FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ')' as name
+                    FROM pg_proc
+                    LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+                    WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f') em
+                WHERE acl::text like '=%')
+        
+               ELSE
+                -- public revoke
+                (SELECT E'\nREVOKE ALL ON FUNCTION ' || name || ' FROM public;'
+                FROM (SELECT quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ')' as name
+                    FROM pg_proc
+                    LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+                    WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f') em)
+               END
+        
+            -- COMMENT
+            || (SELECT CASE WHEN description IS NOT NULL THEN E'\n\nCOMMENT ON FUNCTION '
+                || quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ')'
+                || $$ IS '$$ || description || $$';$$ ELSE '' END
+                FROM pg_proc
+                LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+                LEFT JOIN pg_description ON pg_proc.oid=pg_description.objoid
+                WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f')
+        
+            -- SELECT
+            || (SELECT CASE WHEN typname != 'trigger' THEN E'\n\n--SELECT ' || CASE WHEN pg_get_function_result(pg_proc.oid) ILIKE '%setof%' OR pg_get_function_result(pg_proc.oid) ILIKE '%table%' THEN '* FROM ' ELSE '' END
+                || quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ')'
+                || E';\n' ELSE '' END
+                FROM pg_proc
+                LEFT JOIN pg_type ON pg_type.oid = pg_proc.prorettype
+                LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+                LEFT JOIN pg_description ON pg_proc.oid=pg_description.objoid
+                WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f');
+            */});
+        
+        propQuery.prop_aggregate = propQuery.objectAggregate = ml(function () {/*
+             SELECT 1 AS sort,
+                    'Name',
+                    'OID',
+                    'ACL',
+                    'Owner',
+                    'Parameter Types',
+                    'State Transition Function',
+                    'State Value Data Type',
+                    'Final Function',
+                    'Initial Condition',
+                    'Sort Operator',
+                    'Comment'
+        UNION ALL
+             SELECT 2 AS sort,
+                    quote_ident(fnnsp.nspname) || '.' || quote_ident(fnpr.proname)::text,
+                    fnpr.oid::text,
+                    fnpr.proacl::text,
+                    pg_roles.rolname::text,
+                    oidvectortypes(fnpr.proargtypes)::text,
+                    (CASE WHEN aggtransfn IS NOT NULL THEN quote_ident(sfnsp.nspname) || '.' || quote_ident(sfpr.proname) || '(' || COALESCE(oidvectortypes(sfpr.proargtypes)::text, '') || ')' ELSE '' END)::text,
+                    (CASE WHEN format_type(aggtranstype::oid, null) IS NOT NULL THEN format_type(aggtranstype::oid, null) ELSE '' END)::text,
+                    (CASE WHEN aggfinalfn != '-'::regproc THEN quote_ident(flnsp.nspname) || '.' || quote_ident(flpr.proname) || '(' || COALESCE(oidvectortypes(flpr.proargtypes)::text, '') || ')' ELSE '' END)::text,
+                    (CASE WHEN agginitval IS NOT NULL THEN quote_literal(agginitval) ELSE '' END)::text,
+                    (CASE WHEN aggsortop != 0 THEN quote_ident(opnsp.nspname) || '.' || quote_ident(pg_operator.oprname) ||
+                    ' (' || format_type(oprleft, NULL) || ', ' || format_type(oprright, NULL) || ')' ELSE '' END)::text,
+                    description::text
+               FROM pg_aggregate
+          LEFT JOIN pg_proc       fnpr      ON fnpr.oid   = pg_aggregate.aggfnoid
+          LEFT JOIN pg_namespace  fnnsp     ON fnnsp.oid  = fnpr.pronamespace
+          LEFT JOIN pg_proc       sfpr      ON sfpr.oid   = pg_aggregate.aggtransfn
+          LEFT JOIN pg_namespace  sfnsp     ON sfnsp.oid  = sfpr.pronamespace
+          LEFT JOIN pg_proc       flpr      ON flpr.oid   = pg_aggregate.aggfinalfn
+          LEFT JOIN pg_namespace  flnsp     ON flnsp.oid  = flpr.pronamespace
+          LEFT JOIN pg_operator             ON pg_operator.oid = pg_aggregate.aggsortop
+          LEFT JOIN pg_namespace opnsp      ON opnsp.oid = pg_operator.oprnamespace
+          LEFT JOIN pg_description          ON fnpr.oid  = pg_description.objoid
+          LEFT JOIN pg_roles                ON fnpr.proowner = pg_roles.oid
+              WHERE fnpr.oid = {{INTOID}} AND fnpr.prokind = 'a'
+           ORDER BY sort ASC;
+        */});
+        
+        propQuery.prop_function = propQuery.objectFunction = ml(function () {/*
+           SELECT 1 AS sort,
+                  'Name',
+                  'Owner',
+                  'OID',
+                  'Parameters',
+                  'Return Type',
+                  'Language',
+                  'Volatility',
+                  'Security Definer?',
+                  'Strict?',
+                  'Leakproof?',
+                  'Window Function?',
+                  'Cost',
+                  'Rows',
+                  'ACL',
+                  'Comment'
+        UNION ALL
+           SELECT 2 AS sort,
+                  proname::text,
+                  pg_roles.rolname::text,
+                  pg_proc.oid::text,
+                  pg_get_function_arguments(pg_proc.oid)::text,
+                  pg_get_function_result(pg_proc.oid)::text,
+                  lanname::text,
+                  (CASE WHEN provolatile = 'v' THEN 'Volatile'
+                  WHEN provolatile = 'i' THEN 'Immutable'
+                  WHEN provolatile = 's' THEN 'Stable' END)::text,
+                  (CASE WHEN prosecdef THEN 'Yes' ELSE 'No' END)::text,
+                  (CASE WHEN proisstrict THEN 'Yes' ELSE 'No' END)::text,
+                  (CASE WHEN proleakproof THEN 'Yes' ELSE 'No' END)::text,
+                  (CASE WHEN proiswindow THEN 'Yes' ELSE 'No' END)::text,
+                  procost::text,
+                  prorows::text,
+                  proacl::text,
+                  description::text
+             FROM pg_proc
+        LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+        LEFT JOIN pg_language ON pg_language.oid = pg_proc.prolang
+        LEFT JOIN pg_roles ON pg_proc.proowner = pg_roles.oid
+        LEFT JOIN pg_description ON pg_proc.oid=pg_description.objoid
+            WHERE pg_proc.oid = {{INTOID}} AND prokind = 'f';
+        */});        
+    }
+
+    if (parseFloat(versionNum, 10) >= 11) {
+        listQuery.objectSchema = listQuery.schemaContents = ml(function () {/*
+            WITH folders AS (
+                SELECT 999 AS srt, '' AS oid, 'Empty' as name, 'objectNothing' AS obj_query, 1 AS obj_count
+                UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Aggregates' AS name, 'objectAggregate' AS obj_query, (SELECT count(proname) AS result
+                        FROM pg_aggregate ag
+                        JOIN pg_proc pr ON pr.oid = ag.aggfnoid
+                    WHERE pr.pronamespace = '{{INTOID}}'::oid) AS obj_count
+                UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Collations' AS name, 'objectCollation' AS obj_query, (SELECT count(collname) AS result
+                        FROM pg_collation
+                    WHERE collnamespace = '{{INTOID}}'::oid) AS obj_count
+                UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Conversions' AS name, 'objectConversion' AS obj_query, (SELECT count(conname) AS result
+                        FROM pg_conversion
+                    WHERE connamespace = '{{INTOID}}'::oid) AS obj_count
+                UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Domains' AS name, 'objectDomain' AS obj_query, (SELECT count(typname) AS result
+                    FROM pg_type
+                WHERE typtype = 'd' AND typnamespace = '{{INTOID}}'::oid) AS obj_count
+                UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Foreign Tables' AS name, 'objectForeignTable' AS obj_query, (SELECT count(relname) AS result
+                        FROM pg_foreign_table
+                LEFT JOIN pg_class ON pg_class.oid = pg_foreign_table.ftrelid
+                    WHERE relnamespace = '{{INTOID}}'::oid) AS obj_count
+                UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'TS Configurations' AS name, 'objectTextSearchConfiguration' AS obj_query, (SELECT count(cfgname) AS result
+                        FROM pg_ts_config
+                    WHERE cfgnamespace = '{{INTOID}}'::oid) AS obj_count
+                UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'TS Dictionaries' AS name, 'objectTextSearchDictionary' AS obj_query, (SELECT count(dictname) AS result
+                        FROM pg_ts_dict
+                    WHERE dictnamespace = '{{INTOID}}'::oid) AS obj_count
+                UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'TS Parsers' AS name, 'objectTextSearchParser' AS obj_query, (SELECT count(prsname) AS result
+                        FROM pg_ts_parser
+                    WHERE prsnamespace = '{{INTOID}}'::oid) AS obj_count
+                UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'TS Templates' AS name, 'objectTextSearchTemplate' AS obj_query, (SELECT count(tmplname) AS result
+                        FROM pg_ts_template
+                    WHERE tmplnamespace = '{{INTOID}}'::oid) AS obj_count
+                UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Functions' AS name, 'objectFunction' AS obj_query, (SELECT count(proname) AS result
+                    FROM pg_proc pr
+                    JOIN pg_type typ ON typ.oid = pr.prorettype
+                    WHERE prokind = 'f'
+                        AND typname <> 'trigger'
+                        AND pr.pronamespace = '{{INTOID}}'::oid) AS obj_count
+                UNION
+                --SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Indexes' AS name, 'objectIndex' AS obj_query,
+                --            (SELECT count(relname)
+                --              FROM pg_catalog.pg_class
+                --             WHERE relkind = 'i' AND relnamespace = '{{INTOID}}'::oid) AS obj_count
+                --UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Operators' AS name, 'objectOperator' AS obj_query, (SELECT count(oprname) AS result
+                    FROM pg_operator
+                    WHERE pg_operator.oprnamespace = '{{INTOID}}'::oid) AS obj_count
+                UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Operator Classes' AS name, 'objectOperatorClass' AS obj_query, (SELECT count(opcname) AS result
+                    FROM pg_opclass
+                    WHERE pg_opclass.opcnamespace = '{{INTOID}}'::oid) AS obj_count
+                UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Operator Families' AS name, 'objectOperatorFamily' AS obj_query, (SELECT count(opfname) AS result
+                    FROM pg_opfamily
+                    WHERE pg_opfamily.opfnamespace = '{{INTOID}}'::oid) AS obj_count
+                UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Procedures' AS name, 'objectProcedure' AS obj_query, (SELECT count(proname) AS result
+                    FROM pg_proc pr
+                    JOIN pg_type typ ON typ.oid = pr.prorettype
+                    WHERE prokind = 'p'
+                        AND typname <> 'trigger'
+                        AND pr.pronamespace = '{{INTOID}}'::oid) AS obj_count
+                UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Sequences' AS name, 'objectSequence' AS obj_query, (SELECT count(relname)
+                    FROM pg_class
+                    WHERE relkind = 'S'
+                        AND pg_class.relnamespace = '{{INTOID}}'::oid) AS obj_count
+                UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Tables' AS name, 'objectTableList' AS obj_query, (SELECT count(relname) AS result
+                        FROM pg_class rel
+                        WHERE relkind IN ('r','s','t','p') AND NOT relispartition AND rel.relnamespace = '{{INTOID}}'::oid) AS obj_count
+                UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Trigger Functions' AS name, 'objectTriggerFunction' AS obj_query, (SELECT count(proname) AS result
+                    FROM pg_proc
+                    JOIN pg_type typ ON typ.oid=prorettype
+                    WHERE prokind = 'f'
+                        AND typname = 'trigger'
+                        AND pg_proc.pronamespace = '{{INTOID}}'::oid) AS obj_count
+                UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Types' AS name, 'objectType' AS obj_query, (
+
+                    SELECT count(pg_type.typname)
+                    FROM pg_catalog.pg_type pg_type
+                LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_type.typnamespace
+                    WHERE (pg_type.typrelid = 0 OR (SELECT c.relkind = 'c' FROM pg_catalog.pg_class c WHERE c.oid = pg_type.typrelid))
+                    AND (NOT EXISTS (SELECT TRUE FROM pg_catalog.pg_type elem WHERE elem.oid = pg_type.typelem AND elem.typarray = pg_type.oid))
+                    AND (pg_type.typnamespace = '{{INTOID}}'::oid)
+                    AND (pg_type.typtype <> 'd')) AS obj_count
+                UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Views' AS name, 'objectViewList' AS obj_query, (SELECT count(c.relname) AS result
+                    FROM pg_class c
+                    WHERE ((c.relhasrules AND (EXISTS (
+                            SELECT r.rulename FROM pg_rewrite r
+                            WHERE r.ev_class = c.oid))))
+                        AND c.relnamespace = '{{INTOID}}'::oid AND (c.relkind = 'v' OR c.relkind = 'm')) AS obj_count
+                --ORDER BY srt ASC, name ASC
+                --UNION
+                --SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Views' AS name, 'objectViewList' AS obj_query, (SELECT count(pg_views.viewname) AS result
+                --FROM pg_views
+                --    WHERE pg_views.schemaname = '{{STRSQLSAFENAME}}') AS obj_count
+                ORDER BY srt ASC, name ASC
+            )
+            SELECT oid, CASE WHEN name = 'Empty' THEN 'Nothing In This Folder' ELSE name || ' (' || obj_count::text || ')' END, obj_query
+            FROM folders
+            WHERE srt = CASE WHEN (SELECT sum(obj_count) FROM folders filders_where) > 1 THEN 2 ELSE 999 END
+            AND obj_count > 0;
+        */});
+    } else if (parseFloat(versionNum, 10) >= 10) {
+        listQuery.objectSchema = listQuery.schemaContents = ml(function () {/*
+            WITH folders AS (
+                SELECT 999 AS srt, '' AS oid, 'Empty' as name, 'objectNothing' AS obj_query, 1 AS obj_count
+                UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Aggregates' AS name, 'objectAggregate' AS obj_query, (SELECT count(proname) AS result
+                        FROM pg_aggregate ag
+                        JOIN pg_proc pr ON pr.oid = ag.aggfnoid
+                    WHERE pr.pronamespace = '{{INTOID}}'::oid) AS obj_count
+                UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Collations' AS name, 'objectCollation' AS obj_query, (SELECT count(collname) AS result
+                        FROM pg_collation
+                    WHERE collnamespace = '{{INTOID}}'::oid) AS obj_count
+                UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Conversions' AS name, 'objectConversion' AS obj_query, (SELECT count(conname) AS result
+                        FROM pg_conversion
+                    WHERE connamespace = '{{INTOID}}'::oid) AS obj_count
+                UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Domains' AS name, 'objectDomain' AS obj_query, (SELECT count(typname) AS result
+                    FROM pg_type
+                WHERE typtype = 'd' AND typnamespace = '{{INTOID}}'::oid) AS obj_count
+                UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Foreign Tables' AS name, 'objectForeignTable' AS obj_query, (SELECT count(relname) AS result
+                        FROM pg_foreign_table
+                LEFT JOIN pg_class ON pg_class.oid = pg_foreign_table.ftrelid
+                    WHERE relnamespace = '{{INTOID}}'::oid) AS obj_count
+                UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'TS Configurations' AS name, 'objectTextSearchConfiguration' AS obj_query, (SELECT count(cfgname) AS result
+                        FROM pg_ts_config
+                    WHERE cfgnamespace = '{{INTOID}}'::oid) AS obj_count
+                UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'TS Dictionaries' AS name, 'objectTextSearchDictionary' AS obj_query, (SELECT count(dictname) AS result
+                        FROM pg_ts_dict
+                    WHERE dictnamespace = '{{INTOID}}'::oid) AS obj_count
+                UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'TS Parsers' AS name, 'objectTextSearchParser' AS obj_query, (SELECT count(prsname) AS result
+                        FROM pg_ts_parser
+                    WHERE prsnamespace = '{{INTOID}}'::oid) AS obj_count
+                UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'TS Templates' AS name, 'objectTextSearchTemplate' AS obj_query, (SELECT count(tmplname) AS result
+                        FROM pg_ts_template
+                    WHERE tmplnamespace = '{{INTOID}}'::oid) AS obj_count
+                UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Functions' AS name, 'objectFunction' AS obj_query, (SELECT count(proname) AS result
+                    FROM pg_proc pr
+                    JOIN pg_type typ ON typ.oid = pr.prorettype
+                    WHERE proisagg = FALSE
+                        AND typname <> 'trigger'
+                        AND pr.pronamespace = '{{INTOID}}'::oid) AS obj_count
+                UNION
+                --SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Indexes' AS name, 'objectIndex' AS obj_query,
+                --            (SELECT count(relname)
+                --              FROM pg_catalog.pg_class
+                --             WHERE relkind = 'i' AND relnamespace = '{{INTOID}}'::oid) AS obj_count
+                --UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Operators' AS name, 'objectOperator' AS obj_query, (SELECT count(oprname) AS result
+                    FROM pg_operator
+                    WHERE pg_operator.oprnamespace = '{{INTOID}}'::oid) AS obj_count
+                UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Operator Classes' AS name, 'objectOperatorClass' AS obj_query, (SELECT count(opcname) AS result
+                    FROM pg_opclass
+                    WHERE pg_opclass.opcnamespace = '{{INTOID}}'::oid) AS obj_count
+                UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Operator Families' AS name, 'objectOperatorFamily' AS obj_query, (SELECT count(opfname) AS result
+                    FROM pg_opfamily
+                    WHERE pg_opfamily.opfnamespace = '{{INTOID}}'::oid) AS obj_count
+                UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Sequences' AS name, 'objectSequence' AS obj_query, (SELECT count(relname)
+                    FROM pg_class
+                    WHERE relkind = 'S'
+                        AND pg_class.relnamespace = '{{INTOID}}'::oid) AS obj_count
+                UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Tables' AS name, 'objectTableList' AS obj_query, (SELECT count(relname) AS result
+                        FROM pg_class rel
+                        WHERE relkind IN ('r','s','t','p') AND NOT relispartition AND rel.relnamespace = '{{INTOID}}'::oid) AS obj_count
+                UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Trigger Functions' AS name, 'objectTriggerFunction' AS obj_query, (SELECT count(proname) AS result
+                    FROM pg_proc
+                    JOIN pg_type typ ON typ.oid=prorettype
+                    WHERE proisagg = FALSE
+                        AND typname = 'trigger'
+                        AND pg_proc.pronamespace = '{{INTOID}}'::oid) AS obj_count
+                UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Types' AS name, 'objectType' AS obj_query, (
+
+                    SELECT count(pg_type.typname)
+                    FROM pg_catalog.pg_type pg_type
+                LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_type.typnamespace
+                    WHERE (pg_type.typrelid = 0 OR (SELECT c.relkind = 'c' FROM pg_catalog.pg_class c WHERE c.oid = pg_type.typrelid))
+                    AND (NOT EXISTS (SELECT TRUE FROM pg_catalog.pg_type elem WHERE elem.oid = pg_type.typelem AND elem.typarray = pg_type.oid))
+                    AND (pg_type.typnamespace = '{{INTOID}}'::oid)
+                    AND (pg_type.typtype <> 'd')) AS obj_count
+                UNION
+                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Views' AS name, 'objectViewList' AS obj_query, (SELECT count(c.relname) AS result
+                    FROM pg_class c
+                    WHERE ((c.relhasrules AND (EXISTS (
+                            SELECT r.rulename FROM pg_rewrite r
+                            WHERE r.ev_class = c.oid))))
+                        AND c.relnamespace = '{{INTOID}}'::oid AND (c.relkind = 'v' OR c.relkind = 'm')) AS obj_count
+                --ORDER BY srt ASC, name ASC
+                --UNION
+                --SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Views' AS name, 'objectViewList' AS obj_query, (SELECT count(pg_views.viewname) AS result
+                --FROM pg_views
+                --    WHERE pg_views.schemaname = '{{STRSQLSAFENAME}}') AS obj_count
+                ORDER BY srt ASC, name ASC
+            )
+            SELECT oid, CASE WHEN name = 'Empty' THEN 'Nothing In This Folder' ELSE name || ' (' || obj_count::text || ')' END, obj_query
+            FROM folders
+            WHERE srt = CASE WHEN (SELECT sum(obj_count) FROM folders filders_where) > 1 THEN 2 ELSE 999 END
+            AND obj_count > 0;
+        */});
+    }
+
     if (parseFloat(versionNum, 10) >= 10) {
         scriptQuery.objectSequence = ml(function () {/*
                 SELECT (SELECT '-- DROP SEQUENCE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || E';\n\n' ||
@@ -329,117 +1596,6 @@ if (parseFloat(versionNum, 10) < 9.6) {
              WHERE pg_class.relkind = 'S' AND pg_class.oid = '{{INTOID}}'
           ORDER BY sort;
          */});
-
-        listQuery.objectSchema = listQuery.schemaContents = ml(function () {/*
-            WITH folders AS (
-                SELECT 999 AS srt, '' AS oid, 'Empty' as name, 'objectNothing' AS obj_query, 1 AS obj_count
-                UNION
-                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Aggregates' AS name, 'objectAggregate' AS obj_query, (SELECT count(proname) AS result
-                        FROM pg_aggregate ag
-                        JOIN pg_proc pr ON pr.oid = ag.aggfnoid
-                    WHERE pr.pronamespace = '{{INTOID}}'::oid) AS obj_count
-                UNION
-                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Collations' AS name, 'objectCollation' AS obj_query, (SELECT count(collname) AS result
-                        FROM pg_collation
-                    WHERE collnamespace = '{{INTOID}}'::oid) AS obj_count
-                UNION
-                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Conversions' AS name, 'objectConversion' AS obj_query, (SELECT count(conname) AS result
-                        FROM pg_conversion
-                    WHERE connamespace = '{{INTOID}}'::oid) AS obj_count
-                UNION
-                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Domains' AS name, 'objectDomain' AS obj_query, (SELECT count(typname) AS result
-                    FROM pg_type
-                WHERE typtype = 'd' AND typnamespace = '{{INTOID}}'::oid) AS obj_count
-                UNION
-                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Foreign Tables' AS name, 'objectForeignTable' AS obj_query, (SELECT count(relname) AS result
-                        FROM pg_foreign_table
-                LEFT JOIN pg_class ON pg_class.oid = pg_foreign_table.ftrelid
-                    WHERE relnamespace = '{{INTOID}}'::oid) AS obj_count
-                UNION
-                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'TS Configurations' AS name, 'objectTextSearchConfiguration' AS obj_query, (SELECT count(cfgname) AS result
-                        FROM pg_ts_config
-                    WHERE cfgnamespace = '{{INTOID}}'::oid) AS obj_count
-                UNION
-                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'TS Dictionaries' AS name, 'objectTextSearchDictionary' AS obj_query, (SELECT count(dictname) AS result
-                        FROM pg_ts_dict
-                    WHERE dictnamespace = '{{INTOID}}'::oid) AS obj_count
-                UNION
-                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'TS Parsers' AS name, 'objectTextSearchParser' AS obj_query, (SELECT count(prsname) AS result
-                        FROM pg_ts_parser
-                    WHERE prsnamespace = '{{INTOID}}'::oid) AS obj_count
-                UNION
-                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'TS Templates' AS name, 'objectTextSearchTemplate' AS obj_query, (SELECT count(tmplname) AS result
-                        FROM pg_ts_template
-                    WHERE tmplnamespace = '{{INTOID}}'::oid) AS obj_count
-                UNION
-                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Functions' AS name, 'objectFunction' AS obj_query, (SELECT count(proname) AS result
-                    FROM pg_proc pr
-                    JOIN pg_type typ ON typ.oid = pr.prorettype
-                    WHERE proisagg = FALSE
-                        AND typname <> 'trigger'
-                        AND pr.pronamespace = '{{INTOID}}'::oid) AS obj_count
-                UNION
-                --SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Indexes' AS name, 'objectIndex' AS obj_query,
-                --            (SELECT count(relname)
-                --              FROM pg_catalog.pg_class
-                --             WHERE relkind = 'i' AND relnamespace = '{{INTOID}}'::oid) AS obj_count
-                --UNION
-                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Operators' AS name, 'objectOperator' AS obj_query, (SELECT count(oprname) AS result
-                    FROM pg_operator
-                    WHERE pg_operator.oprnamespace = '{{INTOID}}'::oid) AS obj_count
-                UNION
-                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Operator Classes' AS name, 'objectOperatorClass' AS obj_query, (SELECT count(opcname) AS result
-                    FROM pg_opclass
-                    WHERE pg_opclass.opcnamespace = '{{INTOID}}'::oid) AS obj_count
-                UNION
-                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Operator Families' AS name, 'objectOperatorFamily' AS obj_query, (SELECT count(opfname) AS result
-                    FROM pg_opfamily
-                    WHERE pg_opfamily.opfnamespace = '{{INTOID}}'::oid) AS obj_count
-                UNION
-                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Sequences' AS name, 'objectSequence' AS obj_query, (SELECT count(relname)
-                    FROM pg_class
-                    WHERE relkind = 'S'
-                        AND pg_class.relnamespace = '{{INTOID}}'::oid) AS obj_count
-                UNION
-                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Tables' AS name, 'objectTableList' AS obj_query, (SELECT count(relname) AS result
-                        FROM pg_class rel
-                        WHERE relkind IN ('r','s','t','p') AND NOT relispartition AND rel.relnamespace = '{{INTOID}}'::oid) AS obj_count
-                UNION
-                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Trigger Functions' AS name, 'objectTriggerFunction' AS obj_query, (SELECT count(proname) AS result
-                    FROM pg_proc
-                    JOIN pg_type typ ON typ.oid=prorettype
-                    WHERE proisagg = FALSE
-                        AND typname = 'trigger'
-                        AND pg_proc.pronamespace = '{{INTOID}}'::oid) AS obj_count
-                UNION
-                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Types' AS name, 'objectType' AS obj_query, (
-
-                    SELECT count(pg_type.typname)
-                    FROM pg_catalog.pg_type pg_type
-                LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_type.typnamespace
-                    WHERE (pg_type.typrelid = 0 OR (SELECT c.relkind = 'c' FROM pg_catalog.pg_class c WHERE c.oid = pg_type.typrelid))
-                    AND (NOT EXISTS (SELECT TRUE FROM pg_catalog.pg_type elem WHERE elem.oid = pg_type.typelem AND elem.typarray = pg_type.oid))
-                    AND (pg_type.typnamespace = '{{INTOID}}'::oid)
-                    AND (pg_type.typtype <> 'd')) AS obj_count
-                UNION
-                SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Views' AS name, 'objectViewList' AS obj_query, (SELECT count(c.relname) AS result
-                    FROM pg_class c
-                    WHERE ((c.relhasrules AND (EXISTS (
-                            SELECT r.rulename FROM pg_rewrite r
-                            WHERE r.ev_class = c.oid))))
-                        AND c.relnamespace = '{{INTOID}}'::oid AND (c.relkind = 'v' OR c.relkind = 'm')) AS obj_count
-                --ORDER BY srt ASC, name ASC
-                --UNION
-                --SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Views' AS name, 'objectViewList' AS obj_query, (SELECT count(pg_views.viewname) AS result
-                --FROM pg_views
-                --    WHERE pg_views.schemaname = '{{STRSQLSAFENAME}}') AS obj_count
-                ORDER BY srt ASC, name ASC
-            )
-            SELECT oid, CASE WHEN name = 'Empty' THEN 'Nothing In This Folder' ELSE name || ' (' || obj_count::text || ')' END, obj_query
-            FROM folders
-            WHERE srt = CASE WHEN (SELECT sum(obj_count) FROM folders filders_where) > 1 THEN 2 ELSE 999 END
-            AND obj_count > 0;
-        */});
 
         titleRefreshQuery.objectTableList = titleRefreshQuery.tableNumber = ml(function () {/*
             SELECT count(relname) AS result
@@ -3066,6 +4222,8 @@ var treeStructure = [
             [3, 'script', 'objectOperatorClass'],
         [2, 'folder,refresh', 'objectOperatorFamily'],
             [3, 'script', 'objectOperatorFamily'],
+        [2, 'folder,refresh', 'objectProcedure'],
+            [3, 'script', 'objectProcedure'],
         [2, 'folder,refresh', 'objectSequence'],
             [3, 'script', 'objectSequence'],
         [2, 'folder,refresh', 'objectTableList'],
@@ -3325,14 +4483,6 @@ titleRefreshQuery.objectTextSearchTemplate = titleRefreshQuery.TSTemplateNumber 
      WHERE tmplnamespace = {{INTOID}};
 */});
 
-
-titleRefreshQuery.objectFunction = titleRefreshQuery.functionNumber = ml(function () {/*
-     SELECT count(proname) AS result
-       FROM pg_proc pr
-       JOIN pg_type typ ON typ.oid = pr.prorettype
-      WHERE proisagg = FALSE AND typname <> 'trigger' AND pr.pronamespace = {{INTOID}};
-*/});
-
 titleRefreshQuery.objectIndex = titleRefreshQuery.indexNumber = ml(function () {/*
     SELECT count(relname)
       FROM pg_catalog.pg_class
@@ -3425,14 +4575,6 @@ SELECT count(attname) AS result
 */});
 
 
-titleRefreshQuery.objectTriggerFunction = titleRefreshQuery.triggerNumber = ml(function () {/*
-    SELECT count(proname) AS result
-      FROM pg_proc
-      JOIN pg_type typ ON typ.oid=prorettype
-     WHERE proisagg = FALSE AND typname = 'trigger' AND pg_proc.pronamespace = {{INTOID}};
-*/});
-
-
 titleRefreshQuery.objectType = titleRefreshQuery.typeNumber = ml(function () {/*
     SELECT count(pg_type.typname) AS result
       FROM pg_catalog.pg_type pg_type
@@ -3455,7 +4597,6 @@ titleRefreshQuery.objectViewList = titleRefreshQuery.viewNumber = ml(function ()
     --    FROM pg_views
     --        WHERE pg_views.schemaname = '{{INTOID}}'::regclass
 */});
-
 
 
 listQuery.objectColumnList = ml(function () {/*
@@ -3527,20 +4668,6 @@ SELECT {{INTOID}}, quote_ident(clidx.relname) AS name, '{{SCHEMA}}' AS schema_na
         WHERE (cl.oid = {{INTOID}} OR cl.relname = '{{STRSQLSAFENAME}}')
           AND (SELECT count(*) FROM pg_constraint con WHERE con.conindid = clidx.oid) = 0;
 */});
-
-
-
-
-
-listQuery.objectTriggerFunction = listQuery.triggers = ml(function () {/*
-      SELECT pr.oid, quote_ident(pr.proname) || '()' AS name, pg_namespace.nspname AS schema_name, 'TF' AS bullet
-        FROM pg_proc pr
-        JOIN pg_type typ ON typ.oid = prorettype
-   LEFT JOIN pg_namespace ON pg_namespace.oid = pr.pronamespace
-       WHERE proisagg = FALSE AND typname = 'trigger' AND pr.pronamespace = {{INTOID}}
-    ORDER BY proname;
-*/});
-
 
 listQuery.objectType = listQuery.types = ml(function () {/*
     SELECT pg_type.oid, quote_ident(pg_type.typname) AS name, pg_namespace.nspname AS schema_name, 'TY' AS bullet
@@ -3743,20 +4870,6 @@ listQuery.objectTextSearchTemplate = listQuery.tstemplates = ml(function () {/*
     ORDER BY pg_ts_template.tmplname;
 */});
 
-
-listQuery.objectFunction = listQuery.functions = ml(function () {/*
-      SELECT pr.oid,
-             quote_ident(pr.proname) || '(' || COALESCE(pg_get_function_identity_arguments(pr.oid), '') || ')' AS name,
-             pg_namespace.nspname AS schema_name, 'FN' AS bullet
-        FROM pg_proc pr
-        JOIN pg_type typ ON typ.oid = pr.prorettype
-   LEFT JOIN pg_namespace ON pg_namespace.oid = pr.pronamespace
-       WHERE pr.proisagg = FALSE
-         AND typname <> 'trigger'
-         AND pr.pronamespace = {{INTOID}}
-    ORDER BY proname || '(' || COALESCE(pg_get_function_identity_arguments(pr.oid), '') || ')';
-*/});
-
 listQuery.objectIndex = listQuery.indexes = ml(function () {/*
     SELECT pg_class.oid, quote_ident(pg_class.relname) AS name, pg_namespace.nspname AS schema_name, 'IN' AS bullet
       FROM pg_catalog.pg_class
@@ -3838,94 +4951,6 @@ listQuery.objectForeignDataWrapper = listQuery.fdw = ml(function () {/*
 */});
 
 
-associatedButtons.objectAggregate = ['propertyButton', 'dependButton'];
-scriptQuery.objectAggregate = ml(function () {/*
-    -- DROP statement
-    SELECT (SELECT  '-- DROP AGGREGATE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(proname) || '(' || COALESCE(oidvectortypes(proargtypes), '') || ')' || E';\n\n'
-    FROM pg_proc
-    LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
-    WHERE pg_proc.oid = {{INTOID}} AND proisagg)
-
-    || (SELECT  'CREATE AGGREGATE ' || quote_ident(fnnsp.nspname) || '.' || quote_ident(fnpr.proname) || '(' || COALESCE(oidvectortypes(fnpr.proargtypes), '') || ') ('
-    	|| rtrim(
-    		CASE WHEN aggtransfn    IS NOT NULL     THEN E'\n  SFUNC='    ||
-    	            CASE WHEN sfnsp.nspname != 'pg_catalog' THEN quote_ident(sfnsp.nspname) || '.' ELSE '' END || quote_ident(sfpr.proname)
-    	            || ',' ELSE '' END ||
-    		CASE WHEN format_type(aggtranstype::oid, null) IS NOT NULL THEN E'\n  STYPE='     || format_type(aggtranstype::oid, null) || ',' ELSE '' END ||
-    		CASE WHEN aggfinalfn   != '-'::regproc THEN E'\n  FINALFUNC=' ||
-    		        CASE WHEN flnsp.nspname != 'pg_catalog' THEN quote_ident(flnsp.nspname) || '.' ELSE '' END || quote_ident(flpr.proname)
-    		        || ',' ELSE '' END ||
-    		CASE WHEN agginitval   IS NOT NULL     THEN E'\n  INITCOND='  || quote_literal(agginitval)   || ',' ELSE '' END ||
-    		CASE WHEN aggsortop    != 0            THEN E'\n  SORTOP='    ||
-    		        CASE WHEN opnsp.nspname != '' THEN quote_ident(opnsp.nspname) || '.' ELSE '' END || quote_ident(pg_operator.oprname) ||
-    		        ' (' || format_type(oprleft, NULL) || ', ' || format_type(oprright, NULL) || ')' || ',' ELSE '' END
-                        , ',') || E'\n);\n\n'
-    FROM pg_aggregate
-    LEFT JOIN pg_proc       fnpr      ON fnpr.oid      = pg_aggregate.aggfnoid
-    LEFT JOIN pg_namespace  fnnsp     ON fnnsp.oid = fnpr.pronamespace
-    LEFT JOIN pg_proc       sfpr      ON sfpr.oid      = pg_aggregate.aggtransfn
-    LEFT JOIN pg_namespace  sfnsp     ON sfnsp.oid = sfpr.pronamespace
-    LEFT JOIN pg_proc       flpr      ON flpr.oid      = pg_aggregate.aggfinalfn
-    LEFT JOIN pg_namespace  flnsp     ON flnsp.oid = flpr.pronamespace
-    LEFT JOIN pg_operator        ON pg_operator.oid  = pg_aggregate.aggsortop
-    LEFT JOIN pg_namespace opnsp ON opnsp.oid = pg_operator.oprnamespace
-    WHERE fnpr.oid = {{INTOID}} AND fnpr.proisagg)
-
-    -- OWNER
-    || (SELECT E'ALTER AGGREGATE ' || COALESCE(quote_ident(nspname),'') || '.' || COALESCE(quote_ident(proname),'') || '(' || COALESCE(oidvectortypes(proargtypes), '') || ') OWNER TO ' || pg_roles.rolname || ';'
-    FROM pg_aggregate
-    JOIN pg_proc ON pg_proc.oid = pg_aggregate.aggfnoid
-    LEFT JOIN pg_roles ON pg_proc.proowner=pg_roles.oid
-    JOIN pg_namespace ON pg_namespace.oid = pg_proc.pronamespace
-    WHERE pg_proc.oid = {{INTOID}} AND proisagg)
-
-    -- grants:
-    || CASE WHEN (SELECT count(*)
-    	FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(oidvectortypes(proargtypes), '') || ')' as name
-    		FROM pg_proc
-    		LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
-    		WHERE pg_proc.oid = {{INTOID}} AND proisagg) em
-    	WHERE acl::text like '=%') > 0
-
-        THEN (SELECT array_to_string(array_agg(E'\nGRANT ' || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%X%' THEN 'EXECUTE' ELSE '' END || ' ON FUNCTION ' || name
-        	|| ' TO ' || substring(acl from 0 for strpos(acl, '=')) || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%*%' THEN ' WITH GRANT OPTION;' ELSE ';' END),',')
-        	FROM (SELECT acl, name FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(oidvectortypes(proargtypes), '') || ')' as name
-        		FROM pg_proc
-        		LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
-        		WHERE pg_proc.oid = {{INTOID}} AND proisagg) em
-        	WHERE acl::text not like '=%'
-            ORDER BY acl) em)
-
-        ELSE '' END
-
-    || CASE WHEN -- public exists?
-    	(SELECT count(*)
-    	FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(oidvectortypes(proargtypes), '') || ')' as name
-    		FROM pg_proc
-    		LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
-    		WHERE pg_proc.oid = {{INTOID}} AND proisagg) em
-    	WHERE acl::text like '=%') >0
-
-       THEN
-    	-- public grant:
-    	(SELECT E'\nGRANT ' || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%X%' THEN 'EXECUTE' ELSE '' END || ' ON FUNCTION ' || name
-    		|| ' TO public' || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%*%' THEN ' WITH GRANT OPTION;' ELSE ';' END
-    	FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(oidvectortypes(proargtypes), '') || ')' as name
-    		FROM pg_proc
-    		LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
-    		WHERE pg_proc.oid = {{INTOID}} AND proisagg) em
-    	WHERE acl::text like '=%')
-
-       ELSE
-    	-- public revoke
-    	(SELECT E'\nREVOKE ALL ON FUNCTION ' || name || ' FROM public;'
-    	FROM (SELECT quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(oidvectortypes(proargtypes), '') || ')' as name
-    		FROM pg_proc
-    		LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
-    		WHERE pg_proc.oid = {{INTOID}} AND proisagg) em)
-       END;
-    */});
-
 associatedButtons.objectTrigger = [];
 scriptQuery.objectTrigger = ml(function () {/*
     SELECT
@@ -3975,231 +5000,6 @@ scriptQuery.objectTrigger = ml(function () {/*
             );
     */});
 
-
-
-
-associatedButtons.objectFunction = ['propertyButton', 'dependButton'];
-scriptQuery.objectTriggerFunction = scriptQuery.objectFunction = ml(function () {/*
-    ---- DROP statement
-    --SELECT (SELECT  '-- DROP FUNCTION ' || quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '') || ')' || E';\n\n'
-    --FROM pg_proc
-    --LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
-    --WHERE pg_proc.oid = {{INTOID}} AND proisagg = FALSE)
-    --
-    ---- CREATE STATEMENT
-    --|| (SELECT  'CREATE OR REPLACE FUNCTION ' || quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '')
-    --	|| E')\n  RETURNS ' || pg_get_function_result(pg_proc.oid) || E' AS\n'
-    --	|| CASE WHEN prolang = '12' THEN
-    --		'    ' || quote_literal(prosrc) || E'\n'
-    --	    WHEN prolang = '13' THEN
-    --		'    ' || quote_literal(probin) || ', ' || quote_literal(prosrc) || E'\n'
-    --	    ELSE
-    --		'$BODY$' || prosrc || E'$BODY$\n'
-    --	    END
-    --	||'  LANGUAGE ' || quote_ident(lanname)
-    --	|| CASE WHEN provolatile = 'v' THEN
-    --		' VOLATILE'
-    --	    WHEN provolatile = 'i' THEN
-    --		' IMMUTABLE'
-    --	    WHEN provolatile = 's' THEN
-    --		' STABLE'
-    --	    END
-    --	|| CASE WHEN prosecdef THEN ' SECURITY DEFINER' ELSE '' END
-    --	|| CASE WHEN proisstrict THEN E' STRICT\n' ELSE E'\n' END
-    --	|| E'  COST ' || procost ||
-    --	CASE WHEN prorows <> 0 THEN E'\n  ROWS ' || prorows ELSE '' END || E';\n\n'
-    --FROM pg_proc
-    --LEFT JOIN pg_language ON pg_language.oid = pg_proc.prolang
-    --LEFT JOIN pg_namespace ON pg_namespace.oid=pg_proc.pronamespace
-    --WHERE pg_proc.oid = {{INTOID}} AND proisagg = FALSE)
-    --
-    ---- OWNER
-    --|| (SELECT E'ALTER FUNCTION ' || COALESCE(quote_ident(nspname),'') || '.' || COALESCE(quote_ident(proname),'') || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '') || ') OWNER TO ' || pg_roles.rolname || ';'
-    --FROM pg_proc
-    --LEFT JOIN pg_roles ON pg_proc.proowner=pg_roles.oid
-    --JOIN pg_namespace ON pg_namespace.oid = pg_proc.pronamespace
-    --WHERE pg_proc.oid = {{INTOID}} AND proisagg = FALSE)
-    --
-    ---- grants:
-    --|| CASE WHEN (SELECT count(*)
-    --	FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '') || ')' as name
-    --		FROM pg_proc
-    --		LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
-    --		WHERE pg_proc.oid = {{INTOID}} AND proisagg = FALSE) em
-    --	WHERE acl::text not like '=%') > 0
-
-    --    THEN (SELECT array_to_string(array_agg(E'\nGRANT ' || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%X%' THEN 'EXECUTE' ELSE '' END || ' ON FUNCTION ' || name
-    --    	|| ' TO ' || substring(acl from 0 for strpos(acl, '=')) || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%*%' THEN ' WITH GRANT OPTION;' ELSE ';' END),'')
-    --    	FROM (SELECT acl, name FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '') || ')' as name
-    --    		FROM pg_proc
-    --    		LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
-    --    		WHERE pg_proc.oid = {{INTOID}} AND proisagg = FALSE) em
-    --    	WHERE acl::text not like '=%'
-    --        ORDER BY acl) em)
-    --
-    --    ELSE '' END
-    --
-    --|| CASE WHEN -- public exists?
-    --	(SELECT count(*)
-    --	FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '') || ')' as name
-    --		FROM pg_proc
-    --		LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
-    --		WHERE pg_proc.oid = {{INTOID}} AND proisagg = FALSE) em
-    --	WHERE acl::text like '=%') > 0
-    --
-    --   THEN
-    --	-- public grant:
-    --	(SELECT E'\nGRANT ' || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%X%' THEN 'EXECUTE' ELSE '' END || ' ON FUNCTION ' || name
-    --		|| ' TO public' || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%*%' THEN ' WITH GRANT OPTION;' ELSE ';' END
-    --	FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '') || ')' as name
-    --		FROM pg_proc
-    --		LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
-    --		WHERE pg_proc.oid = {{INTOID}} AND proisagg = FALSE) em
-    --	WHERE acl::text like '=%')
-    --
-    --   ELSE
-    --	-- public revoke
-    --	(SELECT E'\nREVOKE ALL ON FUNCTION ' || name || ' FROM public;'
-    --	FROM (SELECT quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '') || ')' as name
-    --		FROM pg_proc
-    --		LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
-    --		WHERE pg_proc.oid = {{INTOID}} AND proisagg = FALSE) em)
-    --   END
-    --
-    ---- COMMENT
-    --|| (SELECT CASE WHEN description IS NOT NULL THEN E'\n\nCOMMENT ON FUNCTION '
-    --	|| quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '') || ')'
-    --	|| $$ IS '$$ || description || $$';$$ ELSE '' END
-    --	FROM pg_proc
-    --	LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
-    --	LEFT JOIN pg_description ON pg_proc.oid=pg_description.objoid
-    --	WHERE pg_proc.oid = {{INTOID}} AND proisagg = FALSE)
-    --
-    ---- SELECT
-    --|| (SELECT CASE WHEN typname != 'trigger' THEN E'\n\n--SELECT '
-    --	|| quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '') || ')'
-    --	|| E';\n' ELSE '' END
-    --	FROM pg_proc
-    --	LEFT JOIN pg_type ON pg_type.oid = pg_proc.prorettype
-    --	LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
-    --	LEFT JOIN pg_description ON pg_proc.oid=pg_description.objoid
-    --	WHERE pg_proc.oid = {{INTOID}} AND proisagg = FALSE);
-
-
-
-
-
-
-
-
-
-
-
-    	-- DROP statement
-    SELECT (SELECT  '-- DROP FUNCTION ' || quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ')' || E';\n\n'
-    FROM pg_proc
-    LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
-    WHERE pg_proc.oid = {{INTOID}} AND proisagg = FALSE)
-
-    -- CREATE STATEMENT
-    || (SELECT  'CREATE OR REPLACE FUNCTION ' || quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '')
-    	|| E')\n  RETURNS ' || pg_get_function_result(pg_proc.oid) || E' AS\n'
-    	|| CASE WHEN prolang = '12' THEN
-    		'    ' || quote_literal(prosrc) || E'\n'
-    	    WHEN prolang = '13' THEN
-    		'    ' || quote_literal(probin) || ', ' || quote_literal(prosrc) || E'\n'
-    	    ELSE
-    		'$BODY$' || prosrc || E'$BODY$\n'
-    	    END
-    	||'  LANGUAGE ' || quote_ident(lanname)
-    	|| CASE WHEN provolatile = 'v' THEN
-    		' VOLATILE'
-    	    WHEN provolatile = 'i' THEN
-    		' IMMUTABLE'
-    	    WHEN provolatile = 's' THEN
-    		' STABLE'
-    	    END
-    	|| CASE WHEN prosecdef THEN ' SECURITY DEFINER' ELSE '' END
-    	|| CASE WHEN proisstrict THEN E' STRICT\n' ELSE E'\n' END
-    	|| E'  COST ' || procost ||
-    	CASE WHEN prorows <> 0 THEN E'\n  ROWS ' || prorows ELSE '' END || E';\n\n'
-    FROM pg_proc
-    LEFT JOIN pg_language ON pg_language.oid = pg_proc.prolang
-    LEFT JOIN pg_namespace ON pg_namespace.oid=pg_proc.pronamespace
-    WHERE pg_proc.oid = {{INTOID}} AND proisagg = FALSE)
-
-    -- OWNER
-    || (SELECT E'ALTER FUNCTION ' || COALESCE(quote_ident(nspname),'') || '.' || COALESCE(quote_ident(proname),'') || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ') OWNER TO ' || quote_ident(pg_roles.rolname) || ';'
-    FROM pg_proc
-    LEFT JOIN pg_roles ON pg_proc.proowner=pg_roles.oid
-    JOIN pg_namespace ON pg_namespace.oid = pg_proc.pronamespace
-    WHERE pg_proc.oid = {{INTOID}} AND proisagg = FALSE)
-
-    -- grants:
-    || CASE WHEN (SELECT count(*)
-    	FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ')' as name
-    		FROM pg_proc
-    		LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
-    		WHERE pg_proc.oid = {{INTOID}} AND proisagg = FALSE) em
-    	WHERE acl::text not like '=%') > 0
-
-        THEN (SELECT array_to_string(array_agg(E'\nGRANT ' || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%X%' THEN 'EXECUTE' ELSE '' END || ' ON FUNCTION ' || name
-        	|| ' TO ' || substring(acl from 0 for strpos(acl, '=')) || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%*%' THEN ' WITH GRANT OPTION;' ELSE ';' END),'')
-        	FROM (SELECT acl, name FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ')' as name
-        		FROM pg_proc
-        		LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
-        		WHERE pg_proc.oid = {{INTOID}} AND proisagg = FALSE) em
-        	WHERE acl::text not like '=%'
-            ORDER BY acl) em)
-
-        ELSE '' END
-
-    || CASE WHEN -- public exists?
-    	(SELECT count(*)
-    	FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ')' as name
-    		FROM pg_proc
-    		LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
-    		WHERE pg_proc.oid = {{INTOID}} AND proisagg = FALSE) em
-    	WHERE acl::text like '=%') > 0
-
-       THEN
-    	-- public grant:
-    	(SELECT E'\nGRANT ' || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%X%' THEN 'EXECUTE' ELSE '' END || ' ON FUNCTION ' || name
-    		|| ' TO public' || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%*%' THEN ' WITH GRANT OPTION;' ELSE ';' END
-    	FROM (SELECT unnest(proacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ')' as name
-    		FROM pg_proc
-    		LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
-    		WHERE pg_proc.oid = {{INTOID}} AND proisagg = FALSE) em
-    	WHERE acl::text like '=%')
-
-       ELSE
-    	-- public revoke
-    	(SELECT E'\nREVOKE ALL ON FUNCTION ' || name || ' FROM public;'
-    	FROM (SELECT quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ')' as name
-    		FROM pg_proc
-    		LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
-    		WHERE pg_proc.oid = {{INTOID}} AND proisagg = FALSE) em)
-       END
-
-    -- COMMENT
-    || (SELECT CASE WHEN description IS NOT NULL THEN E'\n\nCOMMENT ON FUNCTION '
-    	|| quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ')'
-    	|| $$ IS '$$ || description || $$';$$ ELSE '' END
-    	FROM pg_proc
-    	LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
-    	LEFT JOIN pg_description ON pg_proc.oid=pg_description.objoid
-    	WHERE pg_proc.oid = {{INTOID}} AND proisagg = FALSE)
-
-    -- SELECT
-    || (SELECT CASE WHEN typname != 'trigger' THEN E'\n\n--SELECT ' || CASE WHEN pg_get_function_result(pg_proc.oid) ILIKE '%setof%' OR pg_get_function_result(pg_proc.oid) ILIKE '%table%' THEN '* FROM ' ELSE '' END
-    	|| quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ')'
-    	|| E';\n' ELSE '' END
-    	FROM pg_proc
-    	LEFT JOIN pg_type ON pg_type.oid = pg_proc.prorettype
-    	LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
-    	LEFT JOIN pg_description ON pg_proc.oid=pg_description.objoid
-    	WHERE pg_proc.oid = {{INTOID}} AND proisagg = FALSE);
-    */});
 
 
 // associatedButtons.objectIndex = ['propertyButton', 'dependButton'];
@@ -6285,92 +7085,6 @@ UNION ALL
 LEFT JOIN pg_authid ON pg_authid.oid = pg_database.datdba
     WHERE datname = CURRENT_DATABASE()
  ORDER BY sort ASC;
-*/});
-
-propQuery.prop_aggregate = propQuery.objectAggregate = ml(function () {/*
-     SELECT 1 AS sort,
-            'Name',
-            'OID',
-            'ACL',
-            'Owner',
-            'Parameter Types',
-            'State Transition Function',
-            'State Value Data Type',
-            'Final Function',
-            'Initial Condition',
-            'Sort Operator',
-            'Comment'
-UNION ALL
-     SELECT 2 AS sort,
-            quote_ident(fnnsp.nspname) || '.' || quote_ident(fnpr.proname)::text,
-            fnpr.oid::text,
-            fnpr.proacl::text,
-            pg_roles.rolname::text,
-            oidvectortypes(fnpr.proargtypes)::text,
-            (CASE WHEN aggtransfn IS NOT NULL THEN quote_ident(sfnsp.nspname) || '.' || quote_ident(sfpr.proname) || '(' || COALESCE(oidvectortypes(sfpr.proargtypes)::text, '') || ')' ELSE '' END)::text,
-            (CASE WHEN format_type(aggtranstype::oid, null) IS NOT NULL THEN format_type(aggtranstype::oid, null) ELSE '' END)::text,
-            (CASE WHEN aggfinalfn != '-'::regproc THEN quote_ident(flnsp.nspname) || '.' || quote_ident(flpr.proname) || '(' || COALESCE(oidvectortypes(flpr.proargtypes)::text, '') || ')' ELSE '' END)::text,
-            (CASE WHEN agginitval IS NOT NULL THEN quote_literal(agginitval) ELSE '' END)::text,
-            (CASE WHEN aggsortop != 0 THEN quote_ident(opnsp.nspname) || '.' || quote_ident(pg_operator.oprname) ||
-            ' (' || format_type(oprleft, NULL) || ', ' || format_type(oprright, NULL) || ')' ELSE '' END)::text,
-            description::text
-       FROM pg_aggregate
-  LEFT JOIN pg_proc       fnpr      ON fnpr.oid   = pg_aggregate.aggfnoid
-  LEFT JOIN pg_namespace  fnnsp     ON fnnsp.oid  = fnpr.pronamespace
-  LEFT JOIN pg_proc       sfpr      ON sfpr.oid   = pg_aggregate.aggtransfn
-  LEFT JOIN pg_namespace  sfnsp     ON sfnsp.oid  = sfpr.pronamespace
-  LEFT JOIN pg_proc       flpr      ON flpr.oid   = pg_aggregate.aggfinalfn
-  LEFT JOIN pg_namespace  flnsp     ON flnsp.oid  = flpr.pronamespace
-  LEFT JOIN pg_operator             ON pg_operator.oid = pg_aggregate.aggsortop
-  LEFT JOIN pg_namespace opnsp      ON opnsp.oid = pg_operator.oprnamespace
-  LEFT JOIN pg_description          ON fnpr.oid  = pg_description.objoid
-  LEFT JOIN pg_roles                ON fnpr.proowner = pg_roles.oid
-      WHERE fnpr.oid = {{INTOID}} AND fnpr.proisagg
-   ORDER BY sort ASC;
-*/});
-
-propQuery.prop_function = propQuery.objectFunction = ml(function () {/*
-   SELECT 1 AS sort,
-          'Name',
-          'Owner',
-          'OID',
-          'Parameters',
-          'Return Type',
-          'Language',
-          'Volatility',
-          'Security Definer?',
-          'Strict?',
-          'Leakproof?',
-          'Window Function?',
-          'Cost',
-          'Rows',
-          'ACL',
-          'Comment'
-UNION ALL
-   SELECT 2 AS sort,
-          proname::text,
-          pg_roles.rolname::text,
-          pg_proc.oid::text,
-          pg_get_function_arguments(pg_proc.oid)::text,
-          pg_get_function_result(pg_proc.oid)::text,
-          lanname::text,
-          (CASE WHEN provolatile = 'v' THEN 'Volatile'
-          WHEN provolatile = 'i' THEN 'Immutable'
-          WHEN provolatile = 's' THEN 'Stable' END)::text,
-          (CASE WHEN prosecdef THEN 'Yes' ELSE 'No' END)::text,
-          (CASE WHEN proisstrict THEN 'Yes' ELSE 'No' END)::text,
-          (CASE WHEN proleakproof THEN 'Yes' ELSE 'No' END)::text,
-          (CASE WHEN proiswindow THEN 'Yes' ELSE 'No' END)::text,
-          procost::text,
-          prorows::text,
-          proacl::text,
-          description::text
-     FROM pg_proc
-LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
-LEFT JOIN pg_language ON pg_language.oid = pg_proc.prolang
-LEFT JOIN pg_roles ON pg_proc.proowner = pg_roles.oid
-LEFT JOIN pg_description ON pg_proc.oid=pg_description.objoid
-    WHERE pg_proc.oid = {{INTOID}} AND proisagg = FALSE;
 */});
 
 propQuery.prop_index = propQuery.objectIndex = ml(function () {/*
