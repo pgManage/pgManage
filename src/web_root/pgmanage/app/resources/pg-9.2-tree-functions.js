@@ -1545,6 +1545,7 @@ function treeLoad(data, index, intColumn) {
             }
             strSqlSafeName = quote_literal(strSqlSafeName);
             strSqlSafeName = strSqlSafeName.substring(1, strSqlSafeName.length - 1);
+            console.log(strSqlSafeName);
 
             // if there's only one child: all of the loaded children are of that type
             if (arrChildren.length === 1) {
@@ -2286,7 +2287,7 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
                 // For some there is an extra result at the beginning?
                 // I'm not sure why, but I get back (bolSchema ? 2 : 1) more script results than list results
                 var j = 0, len1 = arrResult.length + (bolSchema ? 2 : 1);
-                var resName;
+                var resName, strSqlSafeName;
 
                 for (i = 0, len = arrResult.length; i <= len; i += 1) {
                     if (i === len) {
@@ -2321,6 +2322,14 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
                     } else {
                         resName = arrResult[i][1];
                     }
+                    if (resName && strSchemaName) {
+                        strSqlSafeName = quote_ident(strSchemaName) + '.' + quote_ident(resName);
+                    } else {
+                        strSqlSafeName = quote_ident(resName);
+                    }
+                    strSqlSafeName = quote_literal(strSqlSafeName);
+                    strSqlSafeName = strSqlSafeName.substring(1, strSqlSafeName.length - 1);
+        
                     if (GS.strToTitle(arrResult[i][3]).toLowerCase() === 'view' || GS.strToTitle(arrResult[i][3]).toLowerCase() === 'table') {
                         console.log('>' + quote_ident(strSchemaName) + '.' + resName + '<');
                         bolTableTriggers = GS.strToTitle(arrResult[i][3]).toLowerCase() === 'table';
@@ -2330,7 +2339,7 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
                                 scriptQuery['object' + GS.strToTitle(arrResult[i][3]) + 'Dump']
                             )
                             .replace(/\{\{INTOID\}\}/gim, arrResult[i][0])
-                            .replace(/\{\{STRSQLSAFENAME\}\}/gim, quote_ident(strSchemaName) + '.' + resName);
+                            .replace(/\{\{STRSQLSAFENAME\}\}/gim, strSqlSafeName);
                     } else if (GS.strToTitle(arrResult[i][3]).toLowerCase() === 'sequence') {
                         //bolSequenceOwned = true;
                         strQuery += '\n\n' +
@@ -2338,7 +2347,7 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
                                 scriptQuery['objectSequenceDump']
                             )
                             .replace(/\{\{INTOID\}\}/gim, arrResult[i][0])
-                            .replace(/\{\{STRSQLSAFENAME\}\}/gim, quote_ident(strSchemaName) + '.' + resName);
+                            .replace(/\{\{STRSQLSAFENAME\}\}/gim, strSqlSafeName);
                     } else if (GS.strToTitle(arrResult[i][3]).toLowerCase() === 'ownedsequence') {
                         bolSequenceOwned = true;
                         strQuery += '\n\n' +
@@ -2346,17 +2355,17 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
                                 scriptQuery['objectSequenceDump']
                             )
                             .replace(/\{\{INTOID\}\}/gim, arrResult[i][0])
-                            .replace(/\{\{STRSQLSAFENAME\}\}/gim, quote_ident(strSchemaName) + '.' + resName);
+                            .replace(/\{\{STRSQLSAFENAME\}\}/gim, strSqlSafeName);
                     } else if (GS.strToTitle(arrResult[i][3]).toLowerCase() === 'index') {
                         len1 -= 1;
                     } else {
-                        console.log('>' + quote_ident(strSchemaName) + '.' + resName + '<');
+                        console.log('>' + strSqlSafeName + '<');
                         strQuery += '\n\n' +
                             (
                                 scriptQuery['object' + GS.strToTitle(arrResult[i][3])]
                             )
                             .replace(/\{\{INTOID\}\}/gim, arrResult[i][0])
-                            .replace(/\{\{STRSQLSAFENAME\}\}/gim, quote_ident(strSchemaName) + '.' + resName);
+                            .replace(/\{\{STRSQLSAFENAME\}\}/gim, strSqlSafeName);
                     }
                 }
                 handleScriptResults = function (arrResult) {
