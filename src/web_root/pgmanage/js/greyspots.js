@@ -57948,6 +57948,16 @@ if (typeof HTMLTemplateElement === 'undefined') {
                       renderHUD(this);
                   }
               },
+              'renderHUD': function () {
+                  if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
+                      renderHUD(this);
+                  }
+              },
+              'renderLocationFull': function () {
+                  if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
+                    renderLocationFull(this);
+                  }
+              },
               'toggleFullContainer': function (container, target) {
                   var element = this;
                   var containerElement;

@@ -2360,9 +2360,11 @@ function setFrame(tabElement, frameElement, bolBringToFirst) {
     }
 
     // This is for when you switch away from a tab while a query is running
+    console.log(tabElement.bolReRenderTables);
     if (tabElement.bolReRenderTables) {
         var arrElement = tabElement.relatedResultsArea.querySelectorAll('gs-table');
-        for (var i = 0, len = arrElement.length; i < len; i += 1) {
+        for (i = 0, len = arrElement.length; i < len; i += 1) {
+            console.log(arrElement[i], i);
             for (var j = 0, len2 = arrElement[i].internalDisplay.columnWidths.length; j < len2; j += 1) {
                 arrElement[i].internalDisplay.columnWidths[j] = 100;
             }
