@@ -22,8 +22,7 @@
 void
 posix_perror(const char *s)
 {
-	char *err = strerror(errno);
-	fprintf(stderr, "%s: %s\n", s, err);
+	fprintf(stderr, "%s: %s\n", s, strerror(errno));
 }
 
 FILE *
@@ -210,6 +209,7 @@ posix_setsockopt(int sockfd, int level, int optname,
 }
 
 #ifdef _MSC_VER
+struct timezone;
 int gettimeofday(struct timeval * tp, struct timezone * tzp)
 {
 	/*
