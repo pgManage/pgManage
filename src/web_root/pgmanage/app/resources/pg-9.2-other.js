@@ -3330,6 +3330,9 @@ function executeHelperEndLoading(currentTab) {
         var heightElem = document.createElement('div');
         heightElem.style.height = spaceHeight + 'px';
         currentTab.relatedResultsArea.appendChild(heightElem);
+        if (currentTab.relatedResultsAreaContainer.querySelector('.results-header.error')) {
+            currentTab.relatedResultsArea.scrollTop = currentTab.relatedResultsArea.scrollHeight;
+        }
     }
 
     currentTab.handlingQuery = false;
@@ -3767,7 +3770,7 @@ function executeScript(bolCursorQuery) {
 
                             strHTML = '<div flex-horizontal>' +
                                             '<h5 flex>Query #' + (data.intQueryNumber + 1) + strQueryName + ':</h5>' +
-                                            '<div>';
+                                            '<div style="width: 15em; max-width: 40em; width: 100%; text-align: right;">';
 
                             if (data.dteStart && data.dteEnd && !isNaN(data.dteStart.getTime()) && !isNaN(data.dteEnd.getTime())) {
                                 strHTML +=
@@ -3810,7 +3813,7 @@ function executeScript(bolCursorQuery) {
 
                             strHTML = '<div flex-horizontal>' +
                                             '<h5 flex>Query #' + (data.intQueryNumber + 1) + strQueryName + ':</h5>' +
-                                            '<div>';
+                                            '<div style="width: 15em; max-width: 40em; width: 100%; text-align: right;">';
 
                             if (data.dteStart && data.dteEnd && !isNaN(data.dteStart.getTime()) && !isNaN(data.dteEnd.getTime())) {
                                 strHTML +=
@@ -3876,7 +3879,7 @@ function executeScript(bolCursorQuery) {
                                 strHTML = (
                                     '<div flex-horizontal>' +
                                         '<h5 flex>Query #' + (data.intQueryNumber + 1) + strQueryName + ':</h5>' +
-                                        '<div>'
+                                        '<div style="width: 15em; max-width: 40em; width: 100%; text-align: right;">'
                                 );
 
                                 // if we have all of the query execution time
@@ -4213,9 +4216,6 @@ function executeScript(bolCursorQuery) {
                         }
 					}
                 } else {
-                    executeHelperEndExecute(currentTab);
-                    executeHelperEndLoading(currentTab);
-
                     arrExecuteHistory.push({
                         'strQuery': jsnCurrentQuery.strQuery,
                         'failed': true,
@@ -4252,8 +4252,8 @@ function executeScript(bolCursorQuery) {
                     divElement = document.createElement('div');
                     divElement.innerHTML = '<h4 id="error' + intQuery + '">Query #' + (intQuery) + strQueryName + ' Error:</h4>' + warningHTML +
                                             '<pre>' + data_error_text + '</pre>'; //strError ||
+                    divElement.appendChild(document.createElement('br'));
                     resultsContainer.appendChild(divElement);
-                    resultsContainer.appendChild(document.createElement('br'));
                     //resultsContainer.scrollTop = resultsContainer.scrollHeight + resultsContainer.offsetHeight;
                     //console.log(resultsContainer.scrollTop = document.getElementById('error' + intQuery));
                     resultsContainer.scrollTop = document.getElementById('error' + intQuery).offsetTop - 40;
@@ -4321,6 +4321,8 @@ function executeScript(bolCursorQuery) {
                     }
 
                     // update the success and error tally
+                    executeHelperEndExecute(currentTab);
+                    executeHelperEndLoading(currentTab);
                     executeHelperUpdateTally(currentTab, resultsTallyElement, intQuery, intError);
 
                     //editor.gotoLine(
