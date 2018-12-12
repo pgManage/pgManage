@@ -13,15 +13,17 @@ const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 const dialog = electron.dialog;
 
-var shouldQuit = app.makeSingleInstance(function (commandLine, workingDirectory) {
-	// Someone tried to run a second instance, we should create a new window
-	fs.writeFileSync(os.homedir() + '/.pgmanage/pgmanage-SIGHUP', '\n', 'utf8');
-});
+var gotLock = app.requestSingleInstanceLock();
 
-if (shouldQuit) {
+if (!gotLock) {
 	app.quit();
 	return;
 }
+
+app.on('second-instance', function (commandLine, workingDirectory) {
+	// Someone tried to run a second instance, we should create a new window
+	fs.writeFileSync(os.homedir() + '/.pgmanage/pgmanage-SIGHUP', '\n', 'utf8');
+});
 
 var strResourcesPath = path.normalize(process.resourcesPath);
 if (strResourcesPath.indexOf('pgmanage/pgmanage_electron/node_modules/electron/dist/resources') > -1) {

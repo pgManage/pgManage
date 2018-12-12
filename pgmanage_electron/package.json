@@ -63,8 +63,8 @@
     }
   },
   "devDependencies": {
-    "electron": "^1.6.2",
-    "electron-builder": "^17.10.0"
+    "electron": "^3.0.0",
+    "electron-builder": "^20.0.0"
   },
   "homepage": "https://github.com/pgManage/pgManage/blob/master/README.md",
   "keywords": [
@@ -85,5 +85,5 @@
     "dist": "build",
     "dist-win": "build --ia32"
   },
-  "version": "10.3.1"
+  "version": "11.0.0"
 }

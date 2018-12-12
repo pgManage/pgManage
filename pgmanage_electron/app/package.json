@@ -8,13 +8,13 @@
     "fs-extra": "^0.30.0",
     "hidefile": "^1.1.0",
     "opn": "^4.0.2",
-    "tcp-port-used": "0.1.2"
+    "tcp-port-used": "^1.0.1"
   },
   "description": "pgManage",
   "license": "PostgreSQL",
   "main": "main.js",
   "name": "pgManage",
-  "version": "10.3.1",
+  "version": "11.0.0",
   "author": {
     "name": "PostgreSQL Global Development Group",
     "email": "hackers@pgmanage.io"
