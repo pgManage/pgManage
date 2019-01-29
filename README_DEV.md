@@ -1,8 +1,8 @@
 # Developer Guide
 
-##TROUBLESHOOTING PERFORMANCE
+## TROUBLESHOOTING PERFORMANCE
 
-####With GDB:
+#### With GDB:
 
     gdb pgmanage PGMANAGEPID
     break ev_run
@@ -18,7 +18,7 @@ Until you get to EV_INVOKE_PENDING(), then run:
 
 Until you find out what watcher is invoked. Once you know what watcher is the problem, it should be pretty easy to figure out what the bottleneck is.
 
-####With LLDB:
+#### With LLDB:
 
     lldb pgmanage --attach-pid=PGMANAGEPID
     breakpoint set --name ev_run
@@ -34,7 +34,7 @@ Until you get to EV_INVOKE_PENDING(), then run:
 
 Until you find out what watcher is invoked. Once you know what watcher is the problem, it should be pretty easy to figure out what the bottleneck is.
 
-####DEBUGGING
+#### DEBUGGING
 
 Using GDB to debug general things (this has the effect of make test, just using gdb (look at Makefile.in for details)):
 
