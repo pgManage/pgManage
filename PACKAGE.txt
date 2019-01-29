@@ -1,4 +1,3 @@
-DONT FORGET DEBIAN (rename to distinguish)
 CHECK THE PG PATCHES!!!!!!!!!!  https://www.postgresql.org/support/versioning/
 CHECK THE LOGS!!!!!!!!!!!!!
 TURN ON THE ERROR LOGS!!!!!
