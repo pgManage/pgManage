@@ -12,6 +12,7 @@ output.txt
 /dependencies/libressl/apps/ocspcheck/ocspcheck
 
 /visualstudio/.vs
+/visualstudio/pgmanage/x64
 /visualstudio/Release
 /visualstudio/Debug
 /visualstudio/*/Release

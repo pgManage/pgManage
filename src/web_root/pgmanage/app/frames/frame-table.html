@@ -355,8 +355,10 @@
                 strDumpQuery += strConstraints;
                 strDumpQuery += ')\n';
                 strDumpQuery += 'WITH (\n';
-                strDumpQuery += '\tOIDS=';
-                strDumpQuery += strHasOids;
+                if (parseFloat(versionNum, 10) >= 12) {
+                    strDumpQuery += '\tOIDS=';
+                    strDumpQuery += strHasOids;
+                }
                 if (strRelOptions === '\\N') {
                     strRelOptions = '';
                 }
@@ -943,11 +945,11 @@
                             });
 
                             GS.requestRawFromSocket(GS.envSocket, ml(function () {/*
-                                     SELECT pg_namespace.nspname, relname, relhasoids, array_to_string(reloptions, E',\n\t') AS reloptions
+                                     SELECT pg_namespace.nspname, relname, {{RELHASOIDS}}, array_to_string(reloptions, E',\n\t') AS reloptions
                                        FROM pg_class
                                   LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
                                       WHERE pg_class.oid = {{INTOID}};
-                                */}).replace(/\{\{INTOID\}\}/g, strOID), function (data) {
+                                */}).replace(/\{\{INTOID\}\}/g, strOID).replace(/\{\{RELHASOIDS\}\}/g, (parseFloat(versionNum, 10) >= 12 ? '\'f\'' : 'relhasoids')), function (data) {
 
                                 //console.log('2', data);
 

@@ -1,6 +1,5 @@
 var autocompleteQuery = {}, autocompleteSearchQuery = {}, bolAutocompleteQueriesLoaded = true;
 
-
 autocompleteSearchQuery.schema = ml(function () {/*
     SELECT * FROM (
         SELECT oid, nspname, 'schema'::text
