@@ -191,6 +191,11 @@
                     if (error) {
                         //console.log(error);
                         dropPart = error.substring(0, error.toLowerCase().indexOf('depends on'));
+                        if (dropPart.toLowerCase().indexOf('rule') > -1) {
+                            // skip, this will automatically be dropped with the view
+                            dropPart = dropPart.substring(dropPart.indexOf('view'));
+                            //dropPart = '';
+                        }
                         if (dropPart.trim().substring(0, 10).toLowerCase() === 'constraint') {
                             arrConstraint.push(dropPart);
                             dropPart = '';

@@ -2093,6 +2093,9 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
 			strAnswer = event.target.innerText;
 
         if (strAnswer === 'Open Script') {
+            if (parseFloat(contextData.versionNumber, 10) < 11) {
+                document.getElementById('checkbox-schema-dump-procedure').value = 'false';
+            }
             bolDropStatments                = document.getElementById('checkbox-schema-dump-drop-statements').value             === 'true';
             bolSchema                       = document.getElementById('checkbox-schema-dump-schema').value                      === 'true';
             bolAggregate                    = document.getElementById('checkbox-schema-dump-aggregate').value                   === 'true';
@@ -2414,6 +2417,10 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
     };
 
     setObjectDetailValue(strHTML, function () {
+        if (parseFloat(contextData.versionNumber, 10) < 11) {
+            document.getElementById('checkbox-schema-dump-procedure').setAttribute('hidden', '');
+            document.getElementById('checkbox-schema-dump-procedure').value = 'false';
+        }
     	document.getElementById('checkbox-all').addEventListener('change', function () {
             document.getElementById('checkbox-schema-dump-drop-statements').value = document.getElementById('checkbox-all').value;
             document.getElementById('checkbox-schema-dump-schema').value = document.getElementById('checkbox-all').value;
