@@ -63,7 +63,7 @@
     }
   },
   "devDependencies": {
-    "electron": "^3.0.0",
+    "electron": "^9.1.0",
     "electron-builder": "^20.0.0"
   },
   "homepage": "https://github.com/pgManage/pgManage/blob/master/README.md",
