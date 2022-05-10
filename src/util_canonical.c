@@ -132,11 +132,7 @@ char *canonical(const char *file_base, char *_path, char *check_type) {
 	SERROR_SALLOC(canonical_filename, PATH_MAX);
 	char *realpath_res = realpath(str, canonical_filename);
 	// 2 is ENOENT, 22 is EINVAL
-#ifdef __OpenBSD__
 	SWARN_CHECK((errno == 0 && realpath_res != NULL) || errno == 2 || errno == 22, "realpath failed: %d (%s)", errno, strerror(errno));
-#else
-	SWARN_CHECK((errno == 0 && realpath_res != NULL) || errno == 2, "realpath failed: %d (%s)", errno, strerror(errno));
-#endif
 
 	errno = 0;
 	struct stat statdata;
