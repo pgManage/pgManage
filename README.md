@@ -14,6 +14,6 @@ The developers can be reached through Workflow Products.
 
 ## Roadmap
  
-This project has been archived. We are consolidating our code base for ease of maintenance. We don't expect users to be affected. New versions of pgManage will be available under the name Postage [here](https://www.workflowproducts.com/services.html#software). An issue tracker is available.
+This project has been archived. We are consolidating our code base for ease of maintenance. We don't expect users to be affected. New versions of pgManage will be available under the name Postage [here](https://www.workflowproducts.com/software.html). An issue tracker is available.
  
 Copyright 2023 Workflow Products LLC
